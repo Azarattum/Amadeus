@@ -19,11 +19,11 @@
   },
   "scripts": {
     "dev": "turbo run dev --parallel",
-    "build": "npm run clean && turbo run build",
+    "build": "rimraf build && turbo run build",
     "preview": "turbo run preview --parallel",
     "test": "turbo run test --parallel",
     "coverage": "turbo run coverage --parallel",
-    "clean": "rimraf build"
+    "clean": "rimraf build */coverage"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",
