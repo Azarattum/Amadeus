@@ -1,9 +1,10 @@
 {
-  "cSpell.words": ["pnpm", "ttypescript"],
+  "cSpell.words": ["pnpm", "sveltekit", "tailwindcss", "ttypescript"],
   "files.exclude": {
     "**/node_modules": true,
     "**/.turbo": true,
     "**/.vscode": true,
-    "*lock*": true
+    "*lock*": true,
+    "**/.svelte-kit": true
   }
 }

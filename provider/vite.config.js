@@ -1,12 +1,15 @@
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import { mergeConfig, defineConfig } from "vite";
 import { copy } from "vite-plugin-copy";
 import base from "../vite.config.js";
-import { mergeConfig } from "vite";
 
 const dest = "../build";
-const data = copy([{ src: "config", dest }]);
 
-export default mergeConfig(base, {
-  plugins: [data],
+const data = copy([{ src: "config", dest }]);
+const resolve = { ...nodeResolve(), enforce: "pre" };
+
+const config = defineConfig({
+  plugins: [resolve, data],
   build: {
     outDir: dest,
     lib: {
@@ -16,3 +19,5 @@ export default mergeConfig(base, {
     },
   },
 });
+
+export default mergeConfig(base, config);
