@@ -1,9 +1,17 @@
 {
   "name": "amadeus",
   "type": "module",
+  "workspaces": [
+    "plugins",
+    "protocol",
+    "provider",
+    "web"
+  ],
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
+        "ts-node",
+        "rollup",
         "svelte"
       ]
     }
@@ -22,6 +30,8 @@
     "eslint": "^8.19.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte3": "^4.0.0",
+    "prettier": "^2.7.1",
+    "prettier-plugin-tailwindcss": "^0.1.11",
     "rimraf": "^3.0.2",
     "rollup-plugin-typescript2": "^0.32.1",
     "ttypescript": "^1.5.13",
