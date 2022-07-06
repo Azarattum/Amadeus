@@ -1,11 +1,19 @@
 {
-  "cSpell.words": ["pnpm", "sveltekit", "tailwindcss", "ttypescript"],
+  "cSpell.words": [
+    "cssnano",
+    "lcov",
+    "pnpm",
+    "sveltekit",
+    "tailwindcss",
+    "ttypescript"
+  ],
   "prettier.documentSelectors": ["**/*.svelte"],
   "files.exclude": {
     "**/node_modules": true,
-    "**/.turbo": true,
+    "**/.svelte-kit": true,
+    "**/coverage": true,
     "**/.vscode": true,
-    "*lock*": true,
-    "**/.svelte-kit": true
+    "**/.turbo": true,
+    "*lock*": true
   }
 }

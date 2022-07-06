@@ -21,6 +21,8 @@
     "dev": "turbo run dev --parallel",
     "build": "npm run clean && turbo run build",
     "preview": "turbo run preview --parallel",
+    "test": "turbo run test --parallel",
+    "coverage": "turbo run coverage --parallel",
     "clean": "rimraf build"
   },
   "devDependencies": {
@@ -28,6 +30,7 @@
     "@types/node": "18.0.3",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
+    "c8": "^7.11.3",
     "eslint": "^8.19.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-svelte3": "^4.0.0",

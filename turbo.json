@@ -13,6 +13,12 @@
       "dependsOn": ["build"],
       "outputs": [],
       "cache": false
+    },
+    "test": {
+      "outputs": []
+    },
+    "coverage": {
+      "outputs": ["coverage/**"]
     }
   }
 }

@@ -12,7 +12,9 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "prepare": "svelte-kit sync"
+    "prepare": "svelte-kit sync",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "next",

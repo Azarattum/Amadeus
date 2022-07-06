@@ -5,6 +5,8 @@
     "vunguyentuan.vscode-postcss",
     "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
-    "dbaeumer.vscode-eslint"
+    "dbaeumer.vscode-eslint",
+    "ZixuanChen.vitest-explorer",
+    "ryanluker.vscode-coverage-gutters"
   ]
 }

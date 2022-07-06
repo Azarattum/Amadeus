@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "vite-node -w app.ts",
     "build": "vite build --emptyOutDir=false",
-    "preview": "(cd ../build && node app.cjs)"
+    "preview": "(cd ../build && node app.cjs)",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "vite-node": "0.17.0",
