@@ -4,6 +4,9 @@ import base from "../vite.config.js";
 
 const config = defineConfig({
   plugins: [sveltekit()],
+  server: {
+    fs: { allow: ["."], deny: ["node_modules"] },
+  },
 });
 
 export default mergeConfig(base, config);

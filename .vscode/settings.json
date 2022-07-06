@@ -1,5 +1,6 @@
 {
   "cSpell.words": ["pnpm", "sveltekit", "tailwindcss", "ttypescript"],
+  "prettier.documentSelectors": ["**/*.svelte"],
   "files.exclude": {
     "**/node_modules": true,
     "**/.turbo": true,

@@ -10,6 +10,9 @@ const config = {
       routes: "routes",
       template: "app.html",
     },
+    alias: {
+      ui: "./ui",
+    },
 
     prerender: { default: true },
     adapter: adapter({ pages: "../build/public" }),

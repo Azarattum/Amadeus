@@ -17,7 +17,12 @@
   "devDependencies": {
     "@sveltejs/adapter-static": "next",
     "@sveltejs/kit": "next",
+    "autoprefixer": "^10.4.7",
+    "cssnano": "^5.1.12",
+    "postcss": "^8.4.14",
+    "postcss-import": "^14.1.0",
     "svelte": "^3.44.0",
-    "svelte-preprocess": "^4.10.6"
+    "svelte-preprocess": "^4.10.6",
+    "tailwindcss": "^3.1.4"
   }
 }
