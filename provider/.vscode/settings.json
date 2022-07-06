@@ -1,0 +1,9 @@
+{
+  "cSpell.words": ["pnpm", "ttypescript"],
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.turbo": true,
+    "**/.vscode": true,
+    "*lock*": true
+  }
+}

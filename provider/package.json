@@ -1,0 +1,13 @@
+{
+  "name": "provider",
+  "type": "module",
+  "scripts": {
+    "dev": "vite-node -w app.ts",
+    "build": "vite build --emptyOutDir=false",
+    "preview": "(cd ../build && node app.cjs)"
+  },
+  "devDependencies": {
+    "vite-node": "0.17.0",
+    "vite-plugin-copy": "^0.1.6"
+  }
+}
