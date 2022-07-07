@@ -43,7 +43,7 @@ importers:
       vite: 2.9.13
       vitest: 0.17.0_c8@7.11.3
 
-  provider:
+  apps/core:
     specifiers:
       vite-node: 0.17.0
       vite-plugin-copy: ^0.1.6
@@ -51,7 +51,7 @@ importers:
       vite-node: 0.17.0
       vite-plugin-copy: 0.1.6
 
-  web:
+  apps/web:
     specifiers:
       '@sveltejs/adapter-static': next
       '@sveltejs/kit': next

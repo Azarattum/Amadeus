@@ -15,7 +15,7 @@ const config = {
     },
 
     prerender: { default: true },
-    adapter: adapter({ pages: "../build/public" }),
+    adapter: adapter({ pages: "../../build/public" }),
   },
 };
 

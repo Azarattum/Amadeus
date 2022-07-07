@@ -1,9 +1,9 @@
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import { mergeConfig, defineConfig } from "vite";
 import { copy } from "vite-plugin-copy";
-import base from "../vite.config.js";
+import base from "../../vite.config.js";
 
-const dest = "../build";
+const dest = "../../build";
 
 const data = copy([{ src: "config", dest }]);
 const resolve = { ...nodeResolve(), enforce: "pre" };
