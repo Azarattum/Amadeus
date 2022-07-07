@@ -2,10 +2,9 @@
   "name": "amadeus",
   "type": "module",
   "workspaces": [
-    "plugins",
-    "protocol",
-    "provider",
-    "web"
+    "apps/*",
+    "packages/*",
+    "plugins/*"
   ],
   "pnpm": {
     "peerDependencyRules": {

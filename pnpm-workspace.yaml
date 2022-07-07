@@ -1,5 +1,4 @@
 packages:
-  - "plugins"
-  - "protocol"
-  - "provider"
-  - "web"
+  - "apps/*"
+  - "packages/*"
+  - "plugins/*"
