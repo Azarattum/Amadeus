@@ -1,11 +1,9 @@
 {
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
-    "lib": ["ESNext"],
-    "types": ["node"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "isolatedModules": true,
+    "types": ["svelte"],
     "strict": true,
     "plugins": [
       {

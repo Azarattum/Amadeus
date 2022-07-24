@@ -1,5 +1,7 @@
-<script lang="ts">
-  import "ui/__theme.pcss";
-</script>
-
 <slot />
+
+<style lang="postcss" global>
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+</style>
