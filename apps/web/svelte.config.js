@@ -8,10 +8,7 @@ const config = {
   kit: {
     files: {
       routes: "routes",
-      template: "app.html",
-    },
-    alias: {
-      ui: "./ui",
+      template: "routes/__layout.html",
     },
 
     prerender: { default: true },
