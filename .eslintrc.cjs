@@ -22,6 +22,7 @@ module.exports = {
     node: true,
   },
   rules: {
+    "no-var": "error",
     "no-empty": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-function": "off",
