@@ -1,5 +1,5 @@
 {
-  "name": "provider",
+  "name": "core",
   "type": "module",
   "scripts": {
     "build": "vite build --emptyOutDir=false --mode node",
