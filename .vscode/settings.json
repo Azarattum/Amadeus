@@ -18,6 +18,6 @@
     "**/coverage": true,
     "**/.vscode": true,
     "**/.turbo": true,
-    "*lock*": true
+    "*pnpm*": true
   }
 }
