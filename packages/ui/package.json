@@ -1,0 +1,29 @@
+{
+  "name": "ui",
+  "type": "module",
+  "exports": {
+    "./*": "./lib/*/index.ts"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/*/index.ts"
+      ]
+    }
+  },
+  "scripts": {
+    "dev": "vite dev -c ../../vite.config.js --mode svelte",
+    "prepare": "svelte-kit sync"
+  },
+  "devDependencies": {
+    "svelte": "^3.44.0",
+    "svelte-preprocess": "^4.10.6"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "vite"
+      ]
+    }
+  }
+}
