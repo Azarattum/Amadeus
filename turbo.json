@@ -7,7 +7,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["../build/**"]
+      "outputs": ["../../build/**", ".svelte-kit/**"]
     },
     "preview": {
       "dependsOn": ["build"],

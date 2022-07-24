@@ -1,10 +1,15 @@
 {
   "compilerOptions": {
-    "lib": ["ESNext"],
-    "types": ["node"],
     "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "error",
+    "preserveValueImports": true,
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "isolatedModules": true,
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["ESNext"],
+    "types": ["node"],
     "strict": true,
     "plugins": [
       {

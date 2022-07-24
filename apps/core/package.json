@@ -2,11 +2,11 @@
   "name": "provider",
   "type": "module",
   "scripts": {
+    "build": "vite build --emptyOutDir=false --mode node",
+    "coverage": "vitest run --coverage --mode node",
     "dev": "vite-node -w app.ts",
-    "build": "vite build --emptyOutDir=false",
-    "preview": "(cd ../build && node app.cjs)",
-    "test": "vitest run",
-    "coverage": "vitest run --coverage"
+    "preview": "(cd ../../build && node app.cjs)",
+    "test": "vitest run --mode node"
   },
   "devDependencies": {
     "vite-node": "0.17.0",
