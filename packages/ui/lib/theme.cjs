@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-const config = {};
-config.theme = {
-  extend: {},
+const config = {
+  theme: {
+    extend: {},
+  },
 };
 
 module.exports = config.theme;
