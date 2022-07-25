@@ -4,11 +4,6 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "types": ["svelte", "node"],
-    "strict": true,
-    "plugins": [
-      {
-        "transform": "typescript-is/lib/transform-inline/transformer"
-      }
-    ]
+    "strict": true
   }
 }

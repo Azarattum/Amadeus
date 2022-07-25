@@ -10,11 +10,6 @@
     "target": "esnext",
     "lib": ["ESNext"],
     "types": ["node"],
-    "strict": true,
-    "plugins": [
-      {
-        "transform": "typescript-is/lib/transform-inline/transformer"
-      }
-    ]
+    "strict": true
   }
 }
