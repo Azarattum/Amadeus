@@ -1,9 +1,9 @@
 <script lang="ts">
+  import { capitalize } from "@amadeus/util/string";
+
   export let stories: string[];
   let current = globalThis.location?.hash.slice(1) || stories[0];
   let preview: HTMLIFrameElement | undefined;
-
-  const capitalize = (x: string) => x.replace(/\b\w/g, (c) => c.toUpperCase());
 
   $: if (preview) preview.src = `stories/${current}`;
   $: if ("location" in globalThis) location.hash = current;

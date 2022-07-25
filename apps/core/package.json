@@ -10,6 +10,9 @@
     "preview": "(cd ../../build && node app.cjs)",
     "test": "vitest run --mode node"
   },
+  "dependencies": {
+    "@amadeus/util": "workspace:*"
+  },
   "devDependencies": {
     "vite-node": "0.19.1",
     "vite-plugin-copy": "^0.1.6"

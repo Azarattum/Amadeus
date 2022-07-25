@@ -16,5 +16,8 @@
   "scripts": {
     "dev": "vite dev -c ../../vite.config.js --mode svelte --port 5174",
     "prepare": "svelte-kit sync"
+  },
+  "dependencies": {
+    "@amadeus/util": "workspace:*"
   }
 }

@@ -16,6 +16,8 @@
     "sveltekit",
     "tailwindcss",
     "ttypescript",
+    "unprefix",
+    "unprefixes",
     "vitest"
   ],
   "eslint.validate": ["javascript", "typescript", "svelte"],

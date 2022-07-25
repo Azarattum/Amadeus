@@ -1,0 +1,8 @@
+{
+  "name": "@amadeus/util",
+  "type": "module",
+  "scripts": {
+    "coverage": "vitest run -c ../../vite.config.js --coverage --mode node",
+    "test": "vitest run -c ../../vite.config.js --mode node"
+  }
+}
