@@ -12,6 +12,7 @@
     "preprocess",
     "rimraf",
     "rollup",
+    "superstruct",
     "sveltekit",
     "tailwindcss",
     "ttypescript",

@@ -24,6 +24,7 @@ importers:
       prettier-plugin-tailwindcss: ^0.1.12
       rimraf: ^3.0.2
       rollup: ^2.77.0
+      superstruct: ^0.16.0
       svelte: ^3.49.0
       svelte-preprocess: ^4.10.6
       tailwindcss: ^3.1.6
@@ -32,10 +33,9 @@ importers:
       typescript: ^4.7.4
       vite: 3.0.3
       vitest: 0.19.0
-      zod: ^3.17.10
     dependencies:
       gun: 0.2020.1237
-      zod: 3.17.10
+      superstruct: 0.16.0
     devDependencies:
       '@rollup/plugin-node-resolve': 13.3.0_rollup@2.77.0
       '@sveltejs/kit': 1.0.0-next.392_svelte@3.49.0+vite@3.0.3
@@ -84,6 +84,16 @@ importers:
 
   packages/ui:
     specifiers: {}
+
+  plugins/template:
+    specifiers:
+      '@rollup/plugin-node-resolve': ^13.3.0
+      rollup: ^2.77.0
+      vite: 3.0.3
+    devDependencies:
+      '@rollup/plugin-node-resolve': 13.3.0_rollup@2.77.0
+      rollup: 2.77.0
+      vite: 3.0.3
 
 packages:
 
@@ -2521,6 +2531,10 @@ packages:
       postcss-selector-parser: 6.0.10
     dev: true
 
+  /superstruct/0.16.0:
+    resolution: {integrity: sha512-IDQtwnnlaan1NhuHqyD/U11lROYvCQ79JyfwlFU9xEVHzqV/Ys/RrwmHPCG0CVH/1g0BuodEjH1msxK2UHxehA==}
+    dev: false
+
   /supports-color/7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
@@ -3080,7 +3094,3 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
-
-  /zod/3.17.10:
-    resolution: {integrity: sha512-IHXnQYQuOOOL/XgHhgl8YjNxBHi3xX0mVcHmqsvJgcxKkEczPshoWdxqyFwsARpf41E0v9U95WUROqsHHxt0UQ==}
-    dev: false

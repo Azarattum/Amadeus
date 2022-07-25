@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "gun": "^0.2020.1237",
-    "zod": "^3.17.10"
+    "superstruct": "^0.16.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",
