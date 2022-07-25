@@ -16,16 +16,5 @@
   "scripts": {
     "dev": "vite dev -c ../../vite.config.js --mode svelte --port 5174",
     "prepare": "svelte-kit sync"
-  },
-  "devDependencies": {
-    "svelte": "^3.44.0",
-    "svelte-preprocess": "^4.10.6"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "vite"
-      ]
-    }
   }
 }
