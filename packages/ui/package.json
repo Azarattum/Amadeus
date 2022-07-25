@@ -2,7 +2,9 @@
   "name": "ui",
   "type": "module",
   "exports": {
-    "./*": "./lib/*/index.ts"
+    "./*": "./lib/*/index.ts",
+    "./tailwind": "./lib/tailwind.pcss",
+    "./theme": "./lib/theme.cjs"
   },
   "typesVersions": {
     "*": {
@@ -12,7 +14,7 @@
     }
   },
   "scripts": {
-    "dev": "vite dev -c ../../vite.config.js --mode svelte",
+    "dev": "vite dev -c ../../vite.config.js --mode svelte --port 5174",
     "prepare": "svelte-kit sync"
   },
   "devDependencies": {
