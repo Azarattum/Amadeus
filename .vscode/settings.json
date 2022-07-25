@@ -1,14 +1,21 @@
 {
   "cSpell.words": [
+    "autoprefixer",
     "cssnano",
+    "esbuild",
     "HTMLI",
     "iframe",
     "lcov",
+    "pcss",
     "pnpm",
     "postcss",
+    "preprocess",
+    "rimraf",
+    "rollup",
     "sveltekit",
     "tailwindcss",
-    "ttypescript"
+    "ttypescript",
+    "vitest"
   ],
   "eslint.validate": ["javascript", "typescript", "svelte"],
   "prettier.documentSelectors": ["**/*.svelte"],
