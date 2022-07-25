@@ -1,5 +1,6 @@
 import { mergeConfig, defineConfig } from "vite";
 import { copy } from "vite-plugin-copy";
+
 import base from "../../vite.config.js";
 
 const dest = "../../build";
