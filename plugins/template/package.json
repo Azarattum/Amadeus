@@ -1,0 +1,19 @@
+{
+  "name": "@amadeus/plugin-template",
+  "version": "1.0.0",
+  "description": "Template for Amadeus plugins.",
+  "scripts": {
+    "build": "vite build --emptyOutDir=false --mode node",
+    "coverage": "vitest run --coverage --mode node",
+    "test": "vitest run --mode node"
+  },
+  "dependencies": {
+    "@amadeus/core": "workspace:*",
+    "@amadeus/util": "workspace:*"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "rollup": "^2.77.0",
+    "vite": "3.0.3"
+  }
+}
