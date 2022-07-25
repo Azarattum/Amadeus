@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@amadeus/web",
   "type": "module",
   "scripts": {
     "build": "vite build -c ../../vite.config.js --mode svelte",
@@ -10,7 +10,7 @@
     "test": "vitest run -c ../../vite.config.js --mode svelte"
   },
   "dependencies": {
-    "ui": "workspace:*"
+    "@amadeus/ui": "workspace:*"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "next"

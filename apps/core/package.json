@@ -1,6 +1,8 @@
 {
-  "name": "core",
+  "name": "@amadeus/core",
   "type": "module",
+  "main": "app.ts",
+  "types": "app.ts",
   "scripts": {
     "build": "vite build --emptyOutDir=false --mode node",
     "coverage": "vitest run --coverage --mode node",
@@ -9,7 +11,7 @@
     "test": "vitest run --mode node"
   },
   "devDependencies": {
-    "vite-node": "0.19.0",
+    "vite-node": "0.19.1",
     "vite-plugin-copy": "^0.1.6"
   }
 }

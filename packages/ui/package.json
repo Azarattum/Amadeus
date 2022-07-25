@@ -1,9 +1,9 @@
 {
-  "name": "ui",
+  "name": "@amadeus/ui",
   "type": "module",
   "exports": {
+    ".": "./lib/tailwind.pcss",
     "./*": "./lib/*/index.ts",
-    "./tailwind": "./lib/tailwind.pcss",
     "./theme": "./lib/theme.cjs"
   },
   "typesVersions": {

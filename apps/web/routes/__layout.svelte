@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "ui/tailwind";
+  import "@amadeus/ui";
 </script>
 
 <slot />
