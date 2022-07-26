@@ -1,4 +1,4 @@
-import { capitalize, unprefix } from "./string";
+import { capitalize, offset, unprefix } from "./string";
 import { expect } from "vitest";
 import { it } from "vitest";
 
@@ -13,4 +13,9 @@ it("unprefixes", () => {
   expect(unprefix("@some/prefix-data")).toBe("data");
   expect(unprefix("prefix-second-data")).toBe("data");
   expect(unprefix("@some/prefix-second-data")).toBe("data");
+});
+
+it("offsets", () => {
+  expect(offset("one\ntwo\nthree")).toBe("    one\n    two\n    three");
+  expect(offset("one\ntwo\nthree", 2)).toBe("  one\n  two\n  three");
 });

@@ -17,3 +17,20 @@ export function capitalize(string: string, all = true) {
 export function unprefix(string: string) {
   return string.replace(/(@(\w|-)*\/)|((\w|-)*-)/g, "");
 }
+
+/**
+ * Offsets a string with respect to multiple lines
+ * @param string String to offset
+ * @param offset Offset size (in spaces)
+ */
+export function offset(string: string, offset = 4) {
+  return string.replace(/^|\n/g, "$&" + " ".repeat(offset));
+}
+
+/**
+ * Regex escape function. Makes a string safe to use in a regular expression
+ * @param string String to escape
+ */
+export function rescape(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
