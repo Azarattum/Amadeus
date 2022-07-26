@@ -76,7 +76,7 @@ function err(this: PluginContext, ...data: any[]) {
         rescape(target || "").replace(/(\s|\n)+/g, "(\\s|\\n)*") || "$^"
       );
       const important = [e.path.join("."), e.value + "", e.type].map(
-        (x) => new RegExp("\\b" + rescape(x) + "\\b")
+        (x) => new RegExp("\\b" + rescape(x) + "\\b", "g")
       );
 
       const received = offset(highlight(root, pattern, bright, red));
