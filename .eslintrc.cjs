@@ -26,5 +26,14 @@ module.exports = {
     "no-empty": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-function": "off",
+    "spaced-comment": ["warn", "always", { markers: ["/"] }],
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        types: {
+          Function: false,
+        },
+      },
+    ],
   },
 };

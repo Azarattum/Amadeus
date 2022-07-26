@@ -10,6 +10,7 @@
     "pnpm",
     "postcss",
     "preprocess",
+    "rescape",
     "rimraf",
     "rollup",
     "superstruct",
@@ -29,5 +30,9 @@
     "**/.vscode": true,
     "**/.turbo": true,
     "*pnpm*": true
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
   }
 }
