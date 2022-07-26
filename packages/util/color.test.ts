@@ -23,4 +23,8 @@ it("highlights segments", () => {
   expect(highlight(text, "second", red, blue)).toBe(
     `first\n${red}second${reset}${blue}\nthird`
   );
+
+  expect(highlight(text, /s(?=e)/, red)).toBe(
+    `first\n${red}s${reset}econd\nthird`
+  );
 });

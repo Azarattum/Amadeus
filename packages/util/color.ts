@@ -43,8 +43,7 @@ export function highlight(
   for (let segment of segments) {
     if (!segment) continue;
     if (typeof segment === "string") segment = rescape(segment);
-    const part = string.match(segment)?.[0];
-    if (part) string = string.replace(part, paint(part, color, regular));
+    string = string.replace(segment, (x) => paint(x, color, regular));
   }
   return string;
 }

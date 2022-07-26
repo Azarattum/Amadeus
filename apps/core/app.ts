@@ -1,8 +1,8 @@
-import { load as loadPlugins } from "./plugin";
+import { complete, start } from "./status";
+import { configure } from "./data/config";
+import { err } from "./status/log";
+import { load } from "./plugin";
 
-///TODO: Consider top level await (somehow \_(•_•)_/)
-loadPlugins().then(() => {
-  console.log("All plugins loaded!");
-});
+start().then(configure).then(load).then(complete).catch(err);
 
-export * from "./plugin";
+export { register } from "./plugin";
