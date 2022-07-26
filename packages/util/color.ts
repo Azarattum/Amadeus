@@ -20,7 +20,7 @@ export const white: Color = "\x1b[37m";
  */
 export function paint(string: string, color: Color, regular = reset) {
   return (
-    string.replace(/(^|\n)/g, "$&" + color) +
+    string.replace(/(\n|^)/g, "$&" + color) +
     reset +
     (regular !== reset ? regular : "")
   );

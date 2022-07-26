@@ -12,6 +12,7 @@ import {
 import { offset, rescape } from "@amadeus/util/string";
 import type { PluginContext } from "../plugin";
 import { StructError } from "superstruct";
+import { inspect } from "util";
 
 function time() {
   return new Date().toTimeString().slice(0, 8);
@@ -22,22 +23,21 @@ function log(
   { level, separator, color, data, pure }: LogInfo
 ) {
   separator ??= "|";
-  level ??= "log";
+  level ??= "info";
   color ??= reset;
 
   const module = this?.module?.toUpperCase() || "CORE";
   const logger = console[level];
 
-  if (pure) return logger(...data, reset);
+  if (pure) return logger(...data);
   logger(
     bright + black + time() + reset,
     color + separator + reset,
-    `[${bright}${module}${reset}]:${color}`,
-    ...data.flatMap((x) => {
-      if (typeof x !== "string") return [reset, x, reset];
-      return paint(x, color || reset, color);
-    }),
-    reset
+    `[${bright}${module}${reset}]:`,
+    ...data.map((x) => {
+      if (typeof x !== "string") x = inspect(x);
+      return paint(x, color || reset);
+    })
   );
 }
 
@@ -84,7 +84,7 @@ function err(this: PluginContext, ...data: any[]) {
 
       return stack + "\nReceived:\n" + received;
     }
-    if (e instanceof Error) return e.stack || "", red;
+    if (e instanceof Error) return e.stack || "";
     return e;
   });
 
@@ -99,7 +99,7 @@ function divide(title = "") {
 }
 
 type LogInfo = {
-  level?: "log" | "warn" | "error";
+  level?: "info" | "warn" | "error";
   separator?: string;
   pure?: boolean;
   color?: Color;
