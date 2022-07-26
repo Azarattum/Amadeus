@@ -1,23 +1,26 @@
 import resolve from "@rollup/plugin-node-resolve";
 import { name } from "./package.json";
 import { defineConfig } from "vite";
+import { existsSync } from "fs";
 
-// You might change this location to suit your project
-const dest = "../../build/plugins";
+// Detect a monorepo setup
+const dest = existsSync("../../package.json")
+  ? "../../build/plugins"
+  : "./build";
 
 const config = defineConfig({
   plugins: [{ ...resolve(), enforce: "pre" }],
   // We want to include sdk from the app itself in runtime
-  define: {
-    'import { register } from "@amadeus/core";':
-      'const { register } = require("../app.cjs")',
-  },
+  define: { '"@amadeus/core"': '"../app.cjs"' },
   build: {
     outDir: dest,
     lib: {
       formats: ["cjs"],
-      entry: "./plugin.ts",
+      entry: "./index.ts",
       fileName: (ext) => `${name.split("-").pop()}.${ext}`,
+    },
+    rollupOptions: {
+      external: ["../app.cjs"],
     },
   },
 });
