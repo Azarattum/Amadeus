@@ -24,6 +24,9 @@ module.exports = {
   rules: {
     "no-var": "error",
     "no-empty": "off",
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-function": "off",
     "spaced-comment": ["warn", "always", { markers: ["/"] }],
