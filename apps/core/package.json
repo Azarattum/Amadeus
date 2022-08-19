@@ -15,7 +15,7 @@
     "@amadeus/util": "workspace:*"
   },
   "devDependencies": {
-    "vite-node": "0.19.1",
+    "vite-node": "0.22.1",
     "vite-plugin-copy": "^0.1.6"
   }
 }

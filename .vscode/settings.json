@@ -2,6 +2,8 @@
   "cSpell.words": [
     "autoprefixer",
     "cssnano",
+    "dasharray",
+    "dashoffset",
     "dpcm",
     "dragend",
     "dragstart",
@@ -9,7 +11,9 @@
     "esbuild",
     "HTMLI",
     "iframe",
+    "keyframes",
     "lcov",
+    "linecap",
     "minmax",
     "onhold",
     "pcss",

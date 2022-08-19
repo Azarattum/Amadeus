@@ -1,7 +1,3 @@
-<script context="module">
-  export const router = false;
-</script>
-
 <script lang="ts">
   import { Sortable, Overlay } from "$lib/layout";
   import { autoscroll } from "$lib/action";

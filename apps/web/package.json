@@ -13,6 +13,6 @@
     "@amadeus/ui": "workspace:*"
   },
   "devDependencies": {
-    "@sveltejs/adapter-static": "next"
+    "@sveltejs/adapter-static": "1.0.0-next.39"
   }
 }
