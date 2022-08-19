@@ -5,7 +5,6 @@
     "build": "vite build -c ../../vite.config.js --mode svelte",
     "coverage": "vitest run --coverage -c ../../vite.config.js --mode svelte",
     "dev": "vite dev -c ../../vite.config.js --mode svelte --port 5173",
-    "prepare": "svelte-kit sync",
     "preview": "vite preview -c ../../vite.config.js --mode svelte",
     "test": "vitest run -c ../../vite.config.js --mode svelte"
   },

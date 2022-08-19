@@ -8,7 +8,7 @@ const config = {
   kit: {
     files: {
       routes: "routes",
-      template: "routes/__layout.html",
+      template: "routes/+layout.html",
     },
 
     prerender: { default: true },

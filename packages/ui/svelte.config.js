@@ -8,7 +8,12 @@ const config = {
     files: {
       lib: "lib",
       routes: "demo",
-      template: "demo/__layout.html",
+      template: "demo/+layout.html",
+    },
+    alias: {
+      "@amadeus/ui/internal": "./internal",
+      "@amadeus/ui/action": "./action.ts",
+      "@amadeus/ui": "./component.ts",
     },
     prerender: { default: true },
   },
