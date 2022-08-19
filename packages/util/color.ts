@@ -1,5 +1,6 @@
 import { rescape } from "./string";
 
+export const clear: Color = "\x1b[2K\r";
 export const reset: Color = "\x1b[0m";
 export const bright: Color = "\x1b[1m";
 export const dim: Color = "\x1b[2m";
@@ -50,6 +51,7 @@ export function highlight(
 
 /** Color type */
 export type Color =
+  | "\x1b[2K\r"
   | "\x1b[0m"
   | "\x1b[1m"
   | "\x1b[2m"

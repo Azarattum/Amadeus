@@ -1,6 +1,7 @@
 import {
   black,
   bright,
+  clear,
   green,
   highlight,
   paint,
@@ -12,6 +13,8 @@ import {
 import { offset, rescape } from "@amadeus/util/string";
 import type { PluginContext } from "../plugin";
 import { StructError } from "superstruct";
+import { stdout } from "node:process";
+import { EventEmitter } from "tsee";
 import { inspect } from "util";
 
 function time() {
@@ -27,10 +30,16 @@ function log(
   color ??= reset;
 
   const module = this?.module?.toUpperCase() || "CORE";
-  const logger = console[level];
+  const log = console[level];
 
-  if (pure) return logger(...data);
-  logger(
+  stdout.write(clear);
+
+  if (pure) {
+    log(...data);
+    return logger.emit("log", data.join(" "));
+  }
+
+  log(
     bright + black + time() + reset,
     color + separator + reset,
     `[${bright}${module}${reset}]:`,
@@ -38,6 +47,15 @@ function log(
       if (typeof x !== "string") x = inspect(x);
       return paint(x, color || reset);
     })
+  );
+  logger.emit(
+    "log",
+    [
+      time(),
+      separator,
+      `[${module}]:`,
+      ...data.map((x) => (typeof x !== "string" ? inspect(x) : x)),
+    ].join(" ")
   );
 }
 
@@ -112,4 +130,9 @@ class SilentError extends Error {
   }
 }
 
-export { ok, info, wrn, err, divide, SilentError };
+type LogEvent = (text: string) => any;
+const logger = new EventEmitter<{ log: LogEvent }>();
+const logged = (x: LogEvent) => logger.on("log", x);
+/// TODO: removeAllListeners on close!
+
+export { ok, info, wrn, err, divide, SilentError, logged };
