@@ -1,4 +1,4 @@
-import { position, type Point } from "$lib/store/pointer";
+import { position, type Point } from "../../internal/pointer";
 
 export default function autoscroll(
   node: HTMLElement,

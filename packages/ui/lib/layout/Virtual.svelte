@@ -1,9 +1,7 @@
 <script lang="ts">
-  import "$lib/util/polyfill";
-
   import { afterUpdate, onDestroy, onMount, tick } from "svelte";
-  import { derive, slice as take } from "$lib/util/object";
-  import { finitify, minmax } from "$lib/util/math";
+  import { derive, slice as take } from "@amadeus/util/object";
+  import { finitify, minmax } from "@amadeus/util/math";
 
   export let items: any[];
   export let animation = 0;

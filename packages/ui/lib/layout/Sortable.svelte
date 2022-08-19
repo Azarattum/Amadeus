@@ -1,12 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy } from "svelte";
-  import { rigid, select } from "$lib/util/haptic";
-  import draggable from "$lib/action/draggable";
-  import { position } from "$lib/store/pointer";
-  import { minmax } from "$lib/util/math";
-  import hold from "$lib/action/hold";
+  import { rigid, select } from "../../internal/haptic";
+  import { position } from "../../internal/pointer";
+  import { draggable, hold } from "../../action";
+  import { minmax } from "@amadeus/util/math";
 
-  import Virtual from "$lib/layout/Virtual.svelte";
+  import Virtual from "./Virtual.svelte";
 
   export let items: any[];
   export let animation = 0;

@@ -1,8 +1,6 @@
-import "$lib/util/polyfill";
-
-import { createEffect } from "$lib/layout/Overlay.svelte";
-import { position, type Point } from "$lib/store/pointer";
-import { lock, unlock } from "$lib/util/touch";
+import { position, type Point } from "../../internal/pointer";
+import { createEffect } from "../layout/Overlay.svelte";
+import { lock, unlock } from "../../internal/touch";
 
 export default function draggable(
   node: HTMLElement,

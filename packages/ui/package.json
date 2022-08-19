@@ -1,21 +1,14 @@
 {
   "name": "@amadeus/ui",
   "type": "module",
+  "types": "./component.ts",
   "exports": {
-    ".": "./lib/tailwind.pcss",
-    "./*": "./lib/*/index.ts",
-    "./theme": "./lib/theme.cjs"
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./lib/*/index.ts"
-      ]
-    }
+    ".": "./component.ts",
+    "./action": "./action.ts",
+    "./internal/*": "./internal/*.ts"
   },
   "scripts": {
-    "dev": "vite dev -c ../../vite.config.js --mode svelte --port 5174",
-    "prepare": "svelte-kit sync"
+    "dev": "vite dev -c ../../vite.config.js --mode svelte --port 5174"
   },
   "dependencies": {
     "@amadeus/util": "workspace:*"

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Spinner } from "$lib/primitive";
+  import { Spinner } from "@amadeus/ui";
   import { page } from "$app/stores";
 
   $: ({ story } = $page.params);

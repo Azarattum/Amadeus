@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Sortable, Overlay } from "$lib/layout";
-  import { autoscroll } from "$lib/action";
+  import { autoscroll } from "@amadeus/ui/action";
+  import { Sortable, Overlay } from "@amadeus/ui";
   import { onMount } from "svelte";
 
   const images = [

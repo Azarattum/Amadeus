@@ -32,7 +32,6 @@ export function derive(obj: any, times = 1): object | symbol {
  * @param iterator Iterator object
  * @param start Start index
  * @param end End index
- * @returns
  */
 export function slice<T>(iterator: Iterator<T>, start: number, end: number) {
   if (!Number.isFinite(start) || !Number.isFinite(end)) return [];

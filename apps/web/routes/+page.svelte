@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button } from "@amadeus/ui/primitive";
+  import { Button } from "@amadeus/ui";
 </script>
 
 <!-- ///Temporary example!!! -->
