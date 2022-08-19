@@ -3,6 +3,7 @@ import "./internal/polyfill";
 import "./lib/tailwind.pcss";
 
 export { default as Overlay } from "./lib/layout/Overlay.svelte";
+export { default as Portal } from "./lib/layout/Portal.svelte";
 export { default as Sortable } from "./lib/layout/Sortable.svelte";
 export { default as Virtual } from "./lib/layout/Virtual.svelte";
 
