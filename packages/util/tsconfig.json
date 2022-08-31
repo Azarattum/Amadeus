@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "error",
+    "types": ["node", "vite/client"],
+    "preserveValueImports": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["ESNext"],
+    "strict": true
+  }
+}

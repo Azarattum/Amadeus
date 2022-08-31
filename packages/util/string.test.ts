@@ -1,6 +1,5 @@
 import { capitalize, offset, unprefix } from "./string";
-import { expect } from "vitest";
-import { it } from "vitest";
+import { expect, it } from "vitest";
 
 it("capitalizes", () => {
   expect(capitalize("test string")).toBe("Test String");

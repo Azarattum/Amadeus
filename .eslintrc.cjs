@@ -24,6 +24,7 @@ module.exports = {
   rules: {
     "no-var": "error",
     "no-empty": "off",
+    "require-yield": "off",
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-this-alias": "off",
     "@typescript-eslint/ban-ts-comment": "off",

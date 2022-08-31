@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "autoprefixer",
+    "catchable",
     "cssnano",
     "dasharray",
     "dashoffset",
@@ -15,6 +16,7 @@
     "lcov",
     "linecap",
     "minmax",
+    "oneish",
     "onhold",
     "pcss",
     "pnpm",
@@ -35,6 +37,7 @@
     "typeof",
     "unprefix",
     "unprefixes",
+    "unwrappable",
     "vitest"
   ],
   "eslint.validate": ["javascript", "typescript", "svelte"],
