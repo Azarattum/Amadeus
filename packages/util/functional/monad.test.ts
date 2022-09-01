@@ -106,7 +106,7 @@ it("rejects inline", () => {
         () => 3,
         () => 4
       );
-    check(monad).toBe(4);
+    check(monad).toBe(3);
   }
 });
 
@@ -124,13 +124,15 @@ it("catches async errors", async () => {
     const monad = maybe(promise);
     expect(monad).rejects.toBe("Error");
     expect(monad.unwrap()).rejects.toBe("Error");
-
     const never = vitest.fn<[], undefined>();
     const rejected = vitest.fn<[], undefined>();
-    // TODO:                              ↓ this breaks
-    await monad.then(never, rejected); // .then((x) => console.log("!!!!!", x));
+    const result = await monad
+      .then(never, rejected)
+      .then(never)
+      .catch(() => 42);
     expect(never).not.toBeCalled();
     expect(rejected).toBeCalled();
+    expect(result).toBe(42);
   }
 });
 
@@ -149,7 +151,7 @@ it("mixes with promises", async () => {
   check(maybeMaybe.unwrap()).toBeInstanceOf(Promise);
 });
 
-it("spreads array", () => {
+it("spreads array", async () => {
   const list = spread([1, 2, 3, 4]);
   const result = list
     .then((x) => x * 2)
@@ -157,4 +159,28 @@ it("spreads array", () => {
     .then((x) => [x]);
 
   check(result).toEqual([["2"], ["4"], ["6"], ["8"]]);
+  expect(await result.unwrap()).toEqual([["2"], ["4"], ["6"], ["8"]]);
+  expect(await result).toEqual(["2"]);
+});
+
+it("calls inner thenable", async () => {
+  let value = 42;
+  const then = vitest.fn((resolve?: ((_: any) => void) | null) => {
+    value = resolve?.(value) ?? value;
+    return thenable as any;
+  });
+  const thenable: PromiseLike<number> = { then };
+
+  thenable.then((x) => (expect(x).toBe(42), 42));
+  expect(then).toBeCalledTimes(1);
+
+  const mayThen = maybe(thenable);
+  expect(then).toBeCalledTimes(2);
+  mayThen.then();
+  expect(then).toBeCalledTimes(3);
+
+  check(mayThen.then((x) => x * 2)).toBe(84);
+  expect(then).toBeCalledTimes(5);
+  expect(await mayThen.then((x) => x * 2)).toBe(168);
+  expect(then).toBeCalledTimes(7);
 });
