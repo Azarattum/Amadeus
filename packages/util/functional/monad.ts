@@ -7,13 +7,13 @@ import type {
   Resolve,
   Reject,
 } from "./monad.types";
-import type { HKT } from "./hkt";
+import type { Composed, HKT } from "./hkt";
 
 const error = Symbol();
 const noop: Wrapper = (value, fn) => fn(value);
 
 function monad<F extends HKT>(transform = noop) {
-  const failure = (reject?: Reject) => (e?: any) => {
+  const failure = (reject?: Reject | null) => (e?: any) => {
     try {
       return reject ? transform(e, reject) : { [error]: e };
     } catch (message) {
@@ -21,35 +21,50 @@ function monad<F extends HKT>(transform = noop) {
     }
   };
 
-  const wrap = <T>(value: T): Monad<T, F> => ({
+  const state = Symbol();
+  const wrap = <T>(value: T): Monad<T, [F]> => {
+    // Dedupe monads of the same type
+    if (value && typeof value === "object" && state in value) {
+      return create((value as any)[state]);
+    }
+    return create(value);
+  };
+
+  const create = <T>(value: T): Monad<T, [F]> => ({
     then(resolve, reject) {
-      const success: Resolve<T, any, F> = (x) => {
+      const success: Resolve<Composed<[F], T>> = (x) => {
         if (invalid(x)) throw x[error];
         return resolve ? transform(x, resolve) : x;
       };
 
-      return wrap(apply(success, failure(reject))(value));
+      return wrap(apply(success, failure(reject))(value)) as any;
     },
     catch(reject) {
-      const success: Resolve<T, any, F> = (x) => {
+      const success: Resolve<Composed<[F], T>> = (x) => {
         if (invalid(x)) throw x[error];
         return x;
       };
 
-      return wrap(apply(success, failure(reject))(value));
+      return wrap(apply(success, failure(reject))(value)) as any;
     },
     unwrap() {
       return unwrap(value);
     },
+    get [Symbol.toStringTag]() {
+      return "Monad";
+    },
+    get [state]() {
+      return value;
+    },
   });
 
-  /// TODO: dedupe identical monads
-  /// TODO: add promises to monad HKT chain (now they are lost)
   return <T>(value: T) => wrap(value).then((x) => x);
 }
 
-function unwrap<T>(value: Wrapped<T> | Thenable<T> | T): Unwrapped<T> {
-  if (unwrappable(value)) value = value.unwrap() as any;
+function unwrap<T, F extends HKT[]>(
+  value: Wrapped<T> | Thenable<T> | T
+): Unwrapped<T, F> {
+  if (unwrappable(value)) value = value.unwrap();
   // Instantly unwrap synchronous thenables
   if (thenable(value)) {
     const nothing = Symbol();
@@ -65,7 +80,10 @@ function unwrap<T>(value: Wrapped<T> | Thenable<T> | T): Unwrapped<T> {
   return value as any;
 }
 
-function apply<T, U, F extends HKT>(resolve: Resolve<T, U, F>, reject: Reject) {
+function apply<T, U, F extends HKT>(
+  resolve: Resolve<Composed<[F], T>, U>,
+  reject: Reject
+) {
   return function next(value: any): any {
     if (thenable(value)) return value.then(next, reject);
     try {

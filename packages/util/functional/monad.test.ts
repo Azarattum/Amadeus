@@ -191,7 +191,7 @@ it("calls inner thenable", async () => {
     value = resolve?.(value) ?? value;
     return thenable as any;
   });
-  const thenable: PromiseLike<number> = { then };
+  const thenable = { then } as any as Promise<number>;
 
   thenable.then((x) => (expect(x).toBe(42), 42));
   expect(then).toBeCalledTimes(1);
@@ -205,4 +205,69 @@ it("calls inner thenable", async () => {
   expect(then).toBeCalledTimes(5);
   expect(await mayThen.then((x) => x * 2)).toBe(168);
   expect(then).toBeCalledTimes(7);
+});
+
+it("return a string tag", () => {
+  expect(identity(123).toString()).toMatch(/\[object Monad\/[0-9a-z]+\]/);
+  expect(maybe(null).toString()).toMatch(/\[object Monad\/Maybe\]/);
+  expect(spread([]).toString()).toMatch(/\[object Monad\/Spread\]/);
+});
+
+it("deduplicates wrappers", async () => {
+  const impl = vitest.fn((x, fn) => fn(x));
+  const logger = monad(impl);
+
+  const double = logger(logger(42));
+  check(double).toBe(42);
+  expect(impl).toBeCalledTimes(2);
+
+  const more = maybe(double);
+  expect(impl).toBeCalledTimes(3);
+  more.then((x) => x);
+  expect(impl).toBeCalledTimes(4);
+
+  const wrapped = maybe(more);
+  expect(impl).toBeCalledTimes(5);
+  wrapped.then((x) => x);
+  expect(impl).toBeCalledTimes(6);
+  wrapped.then((x) => x);
+  expect(impl).toBeCalledTimes(7);
+
+  const self = logger(42);
+  const ofNumber = self.then(() => logger(123));
+  check(ofNumber).toBe(123);
+  expect(impl).toBeCalledTimes(10);
+});
+
+it("resolves a long chain", async () => {
+  const a = maybe(1);
+  expect(a.unwrap()).toBe(1);
+  const b = a.then((x) => x * 2);
+  expect(b.unwrap()).toBe(2);
+  const c = b.then((x) => Promise.resolve(x * 3));
+  expect(c.unwrap()).toBeInstanceOf(Promise);
+  expect(c.unwrap()).resolves.toBe(6);
+  const d = c.then((x) => maybe(x + 10));
+  expect(d.unwrap()).toBeInstanceOf(Promise);
+  expect(d.unwrap()).resolves.toBe(16);
+  const e = d.then(() => null).catch(() => "123");
+  expect(e.unwrap()).toBeInstanceOf(Promise);
+  expect(e.unwrap()).resolves.toBe("123");
+  const f = e.then((x) => maybe(x.toString()));
+  expect(f.unwrap()).toBeInstanceOf(Promise);
+  expect(f.unwrap()).resolves.toBe("123");
+  const g = f.then((x) => Promise.resolve(x.split("")));
+  expect(g.unwrap()).toBeInstanceOf(Promise);
+  expect(g.unwrap()).resolves.toEqual(["1", "2", "3"]);
+
+  const h = g
+    .then((x) => +x)
+    .then((x) => x.toFixed() || null)
+    .then((x) => x.toLowerCase())
+    .then(() => ("" || null) as never)
+    .then((x) => x.toUpperCase())
+    .catch(() => "[]");
+
+  expect(h.unwrap()).toBeInstanceOf(Promise);
+  expect(h.unwrap()).resolves.toBe("[]");
 });

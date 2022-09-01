@@ -1,8 +1,8 @@
 import type { HKT } from "./hkt";
 import { monad } from "./monad";
 
-interface Maybe extends HKT {
-  type: NonNullable<this["_"]>;
+interface Maybe extends HKT<"Maybe"> {
+  type: NonNullable<this[""]>;
 }
 
 const maybe = monad<Maybe>((value, fn) => {
@@ -11,12 +11,12 @@ const maybe = monad<Maybe>((value, fn) => {
   throw new Error("Value is nothing!");
 });
 
-interface Spread extends HKT {
-  type: this["_"] extends (infer T)[]
+interface Spread extends HKT<"Spread"> {
+  type: this[""] extends (infer T)[]
     ? T
-    : this["_"] extends Generator<infer T>
+    : this[""] extends Generator<infer T>
     ? T
-    : this["_"];
+    : this[""];
 }
 
 const spread = monad<Spread>((value, fn) => {
