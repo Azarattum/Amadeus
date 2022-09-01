@@ -12,11 +12,29 @@ const maybe = monad<Maybe>((value, fn) => {
 });
 
 interface Spread extends HKT {
-  type: this["_"] extends (infer T)[] ? T : this["_"];
+  type: this["_"] extends (infer T)[]
+    ? T
+    : this["_"] extends Generator<infer T>
+    ? T
+    : this["_"];
 }
 
 const spread = monad<Spread>((value, fn) => {
-  if (Array.isArray(value)) return value.map(fn);
+  const nothing = Symbol();
+  const filter = (x: any) => x !== nothing;
+  const map = (x: any) => {
+    try {
+      return fn(x);
+    } catch {
+      return nothing;
+    }
+  };
+
+  if (Array.isArray(value)) return value.map(map).filter(filter);
+  if (typeof value?.[Symbol.iterator] === "function") {
+    return Array.from(value, map).filter(filter);
+  }
+
   return fn(value);
 });
 

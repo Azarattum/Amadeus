@@ -163,6 +163,28 @@ it("spreads array", async () => {
   expect(await result).toEqual(["2"]);
 });
 
+it("spreads iterable", async () => {
+  function* iterable() {
+    yield 1;
+    yield 2;
+    yield* [3, 4];
+  }
+
+  const list = spread(iterable());
+  const result = list
+    .then((x) => {
+      if (x % 2) throw "";
+      return x;
+    })
+    .then((x) => x * 2)
+    .then((x) => x.toString())
+    .then((x) => [x]);
+
+  check(result).toEqual([["4"], ["8"]]);
+  expect(await result.unwrap()).toEqual([["4"], ["8"]]);
+  expect(await result).toEqual(["4"]);
+});
+
 it("calls inner thenable", async () => {
   let value = 42;
   const then = vitest.fn((resolve?: ((_: any) => void) | null) => {
