@@ -3,6 +3,7 @@ import type {
   Transform,
   Wrappable,
   Thenable,
+  Identity,
   Resolve,
   Wrapper,
   Wrapped,
@@ -14,7 +15,7 @@ import type {
 const error = Symbol();
 const noop: Wrapper = (value, fn) => fn(value);
 
-function monad<F extends Transform>(transform = noop) {
+function monad<F extends Transform = Identity>(transform = noop) {
   type M<T> = Monad<T, [F]>;
 
   const failure = (reject?: Reject | null) => (e?: any) => {
@@ -36,6 +37,16 @@ function monad<F extends Transform>(transform = noop) {
 
   const create = <T>(value: T): M<T> => ({
     then(resolve, reject) {
+      /// TODO: find a better solution
+      const native = "function () { [native code] }";
+      if (resolve?.toString() === native && reject?.toString() === native) {
+        try {
+          return resolve(unwrap<[F], T>(value));
+        } catch (message) {
+          return reject(message);
+        }
+      }
+
       const success: Resolve<Wrapped<[F], T>> = (x) => {
         if (invalid(x)) throw x[error];
         return resolve ? transform(x, resolve) : x;
@@ -76,7 +87,11 @@ function unwrap<F extends Transform[], T>(
 
     value = value.then(
       (x) => (result = unwrap<F, T>(x)),
-      (e) => (result = { [error]: e })
+      (e) => {
+        // TODO: consider unified validation (see line 109)
+        if (value instanceof Promise) throw e;
+        return (result = { [error]: e });
+      }
     ) as any;
     value = result !== nothing ? result : value;
   }
@@ -89,7 +104,13 @@ function apply<T, U, F extends Transform>(
   reject: Reject
 ) {
   return function next(value: any): any {
-    if (thenable(value)) return value.then(next, reject);
+    const validate = (fn: Resolve<Wrapped<[F], T>, U>) => (e: any) => {
+      const result = fn(e);
+      if (invalid(result) && value instanceof Promise) throw result[error];
+      return result;
+    };
+
+    if (thenable(value)) return value.then(validate(next), reject);
     try {
       return resolve(value);
     } catch (message) {
@@ -99,7 +120,7 @@ function apply<T, U, F extends Transform>(
 }
 
 function all<T extends readonly any[]>(values: T) {
-  let monad = null;
+  let container = monad()([] as any);
   let buffer: any[] = [];
   for (const value of values) {
     if (!thenable(value)) {
@@ -108,16 +129,11 @@ function all<T extends readonly any[]>(values: T) {
     }
 
     const current = [...buffer];
-    if (!monad) {
-      monad = value.then((x) => [...current, x]);
-    } else {
-      monad = monad.then((x) => value.then((y) => [...x, ...current, y]));
-    }
+    container = container.then((x) => value.then((y) => [...x, ...current, y]));
     buffer = [];
   }
 
-  if (!monad) return buffer as any as All<T>;
-  return monad.then((x) => [...x, ...buffer]) as All<T>;
+  return container.then((x) => [...x, ...buffer]) as All<T>;
 }
 
 function thenable(value: any): value is Thenable<unknown> {

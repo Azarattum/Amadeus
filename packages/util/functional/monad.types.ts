@@ -4,14 +4,14 @@ import type { HKT, Piped, Composed } from "./hkt";
 type Wrapper = (value: any, fn: (value: any) => any) => any;
 type Resolve<T, R = any> = (value: T) => R;
 type Reject<R = any> = (reason?: any) => R;
-type Unwrapped<F extends readonly Identity[], T> = T extends never
+type Unwrapped<F extends readonly Transform[], T> = T extends never
   ? never
   : Composed<F, T, "unwrap">;
-type Wrapped<F extends readonly Identity[], T> = T extends never
+type Wrapped<F extends readonly Transform[], T> = T extends never
   ? never
   : Piped<F, T, "then">;
 type All<T extends readonly any[]> = MonadsTransform<T> extends []
-  ? T
+  ? Monad<T, [Identity]>
   : Monad<MonadsType<T>, Deduplicated<MonadsTransform<T>>>;
 
 interface Thenable<T> {
@@ -25,22 +25,27 @@ interface Catchable {
   catch<U = never>(rejected?: Reject<U | Thenable<U>> | null): Catchable;
 }
 
-interface Wrappable<T, F extends Identity[] = []> {
+interface Wrappable<T, F extends Transform[] = []> {
   unwrap(): Unwrapped<F, T>;
 }
 
-interface Identity<ID extends string = string> extends HKT {
+interface Transform<ID extends string = string> extends HKT {
   readonly unwrap: this[""];
   readonly then: this[""];
   readonly $: ID;
 }
 
-interface Future extends Identity<"Future"> {
+interface Identity extends Transform<"Identity"> {
+  unwrap: this[""];
+  then: this[""];
+}
+
+interface Future extends Transform<"Future"> {
   unwrap: Promise<this[""]>;
   then: Awaited<this[""]>;
 }
 
-interface Monad<T = any, F extends readonly Identity[] = [Identity]> {
+interface Monad<T = any, F extends readonly Transform[] = [Identity]> {
   then<Result1 = T, Result2 = never>(
     resolved?: Resolve<Wrapped<F, T>, Result1> | null,
     rejected?: Reject<Result2> | null
@@ -56,11 +61,15 @@ interface Monad<T = any, F extends readonly Identity[] = [Identity]> {
   readonly [state: symbol]: any;
 }
 
+/// FIX: b results in `Monad<unknown, [Maybe, Future, ...Transform<string>[]]>`
+// const a = Promise.reject();
+// const b = maybe(a);
+
 // ======================= UTILS ======================= //
 
 type Monadify<T> = T extends Promise<infer U> ? Monad<U, [Future]> : T;
 
-type Merged<T, F extends readonly Identity[] = []> = Monadify<T> extends Monad<
+type Merged<T, F extends readonly Transform[] = []> = Monadify<T> extends Monad<
   infer T1,
   infer F1
 >
@@ -69,14 +78,14 @@ type Merged<T, F extends readonly Identity[] = []> = Monadify<T> extends Monad<
     : Monad<T1, [...F, ...F1]>
   : Monad<T, F>;
 
-type Parsed<T, F extends readonly Identity[] = []> = Merged<T, F> extends Monad<
-  infer T1,
-  infer F1
->
+type Parsed<T, F extends readonly Transform[] = []> = Merged<
+  T,
+  F
+> extends Monad<infer T1, infer F1>
   ? Monad<T1, Deduplicated<F1>>
   : never;
 
-type Resolved<T, U, F extends readonly Identity[] = []> = Wrapped<
+type Resolved<T, U, F extends readonly Transform[] = []> = Wrapped<
   F,
   T
 > extends never
@@ -102,7 +111,7 @@ type MonadsType<T extends readonly any[]> = IsTuple<
 type MonadsTransform<T extends readonly any[]> = IsTuple<
   T,
   T extends readonly [infer A, ...infer Tail]
-    ? A extends Monad<any, infer R extends Identity[]>
+    ? A extends Monad<any, infer R extends Transform[]>
       ? [...R, ...MonadsTransform<Tail>]
       : A extends Promise<any>
       ? [Future, ...MonadsTransform<Tail>]
@@ -112,7 +121,7 @@ type MonadsTransform<T extends readonly any[]> = IsTuple<
     ? (A extends Monad<any, infer F> ? F : A) extends infer K
       ? K extends Promise<any>
         ? [Future]
-        : K extends Identity[]
+        : K extends Transform[]
         ? K
         : never
       : never
@@ -120,12 +129,13 @@ type MonadsTransform<T extends readonly any[]> = IsTuple<
 >;
 
 export type {
-  Identity as Transform,
+  Transform as Transform,
   Unwrapped,
   Catchable,
   Wrappable,
   Thenable,
   Resolved,
+  Identity,
   Wrapped,
   Wrapper,
   Resolve,

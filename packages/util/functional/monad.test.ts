@@ -156,11 +156,13 @@ it("spreads array", async () => {
   const result = list
     .then((x) => x * 2)
     .then((x) => x.toString())
-    .then((x) => [x]);
+    .then((x) => [x])
+    ///    ↓ FIX: this should not be flat! x must be string[]!
+    .then((x) => x);
 
   check(result).toEqual([["2"], ["4"], ["6"], ["8"]]);
   expect(await result.unwrap()).toEqual([["2"], ["4"], ["6"], ["8"]]);
-  expect(await result).toEqual(["2"]);
+  expect(await result).toEqual([["2"], ["4"], ["6"], ["8"]]);
 
   const broken = spread(1).catch(() => [123]);
 
@@ -187,7 +189,7 @@ it("spreads iterable", async () => {
 
   check(result).toEqual([["4"], ["8"]]);
   expect(await result.unwrap()).toEqual([["4"], ["8"]]);
-  expect(await result).toEqual(["4"]);
+  expect(await result).toEqual([["4"], ["8"]]);
 });
 
 it("calls inner thenable", async () => {
@@ -278,11 +280,11 @@ it("resolves a long chain", async () => {
 });
 
 it("alls primitives", () => {
-  const values = [1, 2, 3, 4];
+  const values = [1, 2, 3, 4] as const;
   const single = all(values);
 
-  expect(single).toBeInstanceOf(Array);
-  expect(single).toEqual([1, 2, 3, 4]);
+  expect(single).not.toBeInstanceOf(Array);
+  expect(single.unwrap()).toEqual([1, 2, 3, 4]);
 });
 
 it("alls monads", () => {
@@ -298,10 +300,10 @@ it("alls monads & promises", async () => {
   const values = [
     maybe(12),
     maybe(Promise.resolve(42)),
-    undefined,
     123,
+    "test",
     maybe(Promise.resolve(1337)),
-  ];
+  ] as const;
 
   const single = all(values);
   single.then((x) => x);
@@ -309,15 +311,27 @@ it("alls monads & promises", async () => {
   expect("then" in single);
   expect("unwrap" in single);
   expect(single.unwrap()).toBeInstanceOf(Promise);
-  expect(await single.unwrap()).toEqual([12, 42, undefined, 123, 1337]);
-  expect(await single).toEqual([12, 42, undefined, 123, 1337]);
+  expect(await single.unwrap()).toEqual([12, 42, 123, "test", 1337]);
+  expect(await single).toEqual([12, 42, 123, "test", 1337]);
 
   const one = single.then((x) => x.reduce((acc, x) => acc + x?.toString(), ""));
   const two = one.then((x) => x.toUpperCase());
   expect(two.unwrap()).toBeInstanceOf(Promise);
-  expect(await two).toEqual("1242UNDEFINED1231337");
+  expect(await two).toEqual("1242123TEST1337");
 
   expect(two.then(() => null).unwrap()).rejects.toEqual(
     new Error("Value is nothing!")
   );
+});
+
+it("correctly rejects promises", async () => {
+  const value = maybe(Promise.resolve(1));
+  let target = identity([] as any);
+  target = target.then((x: any) => value.then((y) => [...x, y]));
+
+  expect(target.then(() => null).unwrap()).rejects.toEqual(
+    new Error("Value is nothing!")
+  );
+
+  expect(maybe(Promise.resolve(123))).resolves.toBe(123);
 });
