@@ -1,9 +1,15 @@
-import type { Contains, Deduplicated, IsTuple } from "./types";
-import type { Composed, HKT } from "./hkt";
+import type { Deduplicated, IsTuple } from "./types";
+import type { HKT, Piped, Composed } from "./hkt";
 
 type Wrapper = (value: any, fn: (value: any) => any) => any;
 type Resolve<T, R = any> = (value: T) => R;
 type Reject<R = any> = (reason?: any) => R;
+type Unwrapped<F extends readonly Identity[], T> = T extends never
+  ? never
+  : Composed<F, T, "unwrap">;
+type Wrapped<F extends readonly Identity[], T> = T extends never
+  ? never
+  : Piped<F, T, "then">;
 type All<T extends readonly any[]> = MonadsTransform<T> extends []
   ? T
   : Monad<MonadsType<T>, Deduplicated<MonadsTransform<T>>>;
@@ -19,22 +25,32 @@ interface Catchable {
   catch<U = never>(rejected?: Reject<U | Thenable<U>> | null): Catchable;
 }
 
-interface Wrapped<T> {
-  unwrap(): Unwrapped<T>;
+interface Wrappable<T, F extends Identity[] = []> {
+  unwrap(): Unwrapped<F, T>;
 }
 
-interface Monad<T = any, F extends readonly HKT[] = [HKT]> {
+interface Identity<ID extends string = string> extends HKT {
+  readonly unwrap: this[""];
+  readonly then: this[""];
+  readonly $: ID;
+}
+
+interface Future extends Identity<"Future"> {
+  unwrap: Promise<this[""]>;
+  then: Awaited<this[""]>;
+}
+
+interface Monad<T = any, F extends readonly Identity[] = [Identity]> {
   then<Result1 = T, Result2 = never>(
-    resolved?: Resolve<Composed<F, T>, Result1> | null,
+    resolved?: Resolve<Wrapped<F, T>, Result1> | null,
     rejected?: Reject<Result2> | null
-  ): Resolved<Result1 | Result2, T, F>;
-  /// TODO    ↑ Try to decompose the result
+  ): Resolved<Result1 | Wrapped<F, Result2>, T, F>;
 
   catch<Result1 = never>(
     rejected?: Reject<Result1> | null
-  ): Resolved<T | Result1, T, F>;
+  ): Resolved<T | Wrapped<F, Result1>, T, F>;
 
-  unwrap(): Unwrapped<T, F>;
+  unwrap(): Unwrapped<F, T>;
 
   readonly [Symbol.toStringTag]: string;
   readonly [state: symbol]: any;
@@ -42,36 +58,25 @@ interface Monad<T = any, F extends readonly HKT[] = [HKT]> {
 
 // ======================= UTILS ======================= //
 
-interface Future extends HKT<"Promise"> {
-  type: Awaited<this[""]>;
-}
-
-type Unwrapped<T, F extends readonly HKT[] = []> = Contains<
-  F,
-  Future,
-  Promise<T>,
-  T
->;
-
 type Monadify<T> = T extends Promise<infer U> ? Monad<U, [Future]> : T;
 
-type Merged<T, F extends readonly HKT[] = []> = Monadify<T> extends Monad<
+type Merged<T, F extends readonly Identity[] = []> = Monadify<T> extends Monad<
   infer T1,
   infer F1
 >
-  ? T1 extends Monad<any, any>
+  ? Monadify<T1> extends Monad<any, any>
     ? Merged<T1, [...F, ...F1]>
     : Monad<T1, [...F, ...F1]>
   : Monad<T, F>;
 
-type Parsed<T, F extends readonly HKT[] = []> = Merged<T, F> extends Monad<
+type Parsed<T, F extends readonly Identity[] = []> = Merged<T, F> extends Monad<
   infer T1,
   infer F1
 >
   ? Monad<T1, Deduplicated<F1>>
   : never;
 
-type Resolved<T, U, F extends readonly HKT[] = []> = Composed<
+type Resolved<T, U, F extends readonly Identity[] = []> = Wrapped<
   F,
   T
 > extends never
@@ -97,7 +102,7 @@ type MonadsType<T extends readonly any[]> = IsTuple<
 type MonadsTransform<T extends readonly any[]> = IsTuple<
   T,
   T extends readonly [infer A, ...infer Tail]
-    ? A extends Monad<any, infer R extends HKT[]>
+    ? A extends Monad<any, infer R extends Identity[]>
       ? [...R, ...MonadsTransform<Tail>]
       : A extends Promise<any>
       ? [Future, ...MonadsTransform<Tail>]
@@ -107,7 +112,7 @@ type MonadsTransform<T extends readonly any[]> = IsTuple<
     ? (A extends Monad<any, infer F> ? F : A) extends infer K
       ? K extends Promise<any>
         ? [Future]
-        : K extends HKT[]
+        : K extends Identity[]
         ? K
         : never
       : never
@@ -115,9 +120,12 @@ type MonadsTransform<T extends readonly any[]> = IsTuple<
 >;
 
 export type {
+  Identity as Transform,
   Unwrapped,
   Catchable,
+  Wrappable,
   Thenable,
+  Resolved,
   Wrapped,
   Wrapper,
   Resolve,

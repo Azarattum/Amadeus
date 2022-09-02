@@ -161,6 +161,11 @@ it("spreads array", async () => {
   check(result).toEqual([["2"], ["4"], ["6"], ["8"]]);
   expect(await result.unwrap()).toEqual([["2"], ["4"], ["6"], ["8"]]);
   expect(await result).toEqual(["2"]);
+
+  const broken = spread(1).catch(() => [123]);
+
+  check(broken).toEqual([123]);
+  invalid(spread(1));
 });
 
 it("spreads iterable", async () => {

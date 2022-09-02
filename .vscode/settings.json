@@ -40,7 +40,8 @@
     "unprefix",
     "unprefixes",
     "unwrappable",
-    "vitest"
+    "vitest",
+    "Wrappable"
   ],
   "eslint.validate": ["javascript", "typescript", "svelte"],
   "prettier.documentSelectors": ["**/*.svelte"],
