@@ -6,7 +6,7 @@ interface HKT<Id extends string = string> {
 
 type Kind<F extends HKT, T> = (F & { readonly "": T })["type"];
 
-type Composed<HKTs extends HKT[], T> = HKTs extends [
+type Composed<HKTs extends readonly HKT[], T> = HKTs extends [
   ...infer Rest extends HKT[],
   infer Last extends HKT
 ]

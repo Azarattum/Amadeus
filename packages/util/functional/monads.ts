@@ -39,3 +39,4 @@ const spread = monad<Spread>((value, fn) => {
 });
 
 export { maybe, spread };
+export type { Maybe, Spread };

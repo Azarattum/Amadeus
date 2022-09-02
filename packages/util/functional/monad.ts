@@ -6,6 +6,7 @@ import type {
   Monad,
   Resolve,
   Reject,
+  All,
 } from "./monad.types";
 import type { Composed, HKT } from "./hkt";
 
@@ -48,7 +49,7 @@ function monad<F extends HKT>(transform = noop) {
       return wrap(apply(success, failure(reject))(value)) as any;
     },
     unwrap() {
-      return unwrap(value);
+      return unwrap<T, [F]>(value);
     },
     get [Symbol.toStringTag]() {
       return "Monad";
@@ -71,7 +72,7 @@ function unwrap<T, F extends HKT[]>(
     let result: any = nothing;
 
     value = value.then(
-      (x) => (result = unwrap(x)),
+      (x) => (result = unwrap<T, F>(x)),
       (e) => (result = { [error]: e })
     ) as any;
     value = result !== nothing ? result : value;
@@ -92,6 +93,28 @@ function apply<T, U, F extends HKT>(
       return reject(message);
     }
   };
+}
+
+function all<T extends readonly any[]>(values: T) {
+  let monad = null;
+  let buffer: any[] = [];
+  for (const value of values) {
+    if (!thenable(value)) {
+      buffer.push(value);
+      continue;
+    }
+
+    const current = [...buffer];
+    if (!monad) {
+      monad = value.then((x) => [...current, x]);
+    } else {
+      monad = monad.then((x) => value.then((y) => [...x, ...current, y]));
+    }
+    buffer = [];
+  }
+
+  if (!monad) return buffer as any as All<T>;
+  return monad.then((x) => [...x, ...buffer]) as All<T>;
 }
 
 function thenable(value: any): value is Thenable<unknown> {
@@ -116,4 +139,4 @@ function invalid(value: any): value is { [error]: any } {
   return value != null && typeof value === "object" && error in value;
 }
 
-export { monad, unwrap };
+export { monad, unwrap, all };

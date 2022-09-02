@@ -1,6 +1,6 @@
+import { monad, unwrap, all } from "./monad";
 import { expect, it, vitest } from "vitest";
 import { maybe, spread } from "./monads";
-import { monad, unwrap } from "./monad";
 
 const check = (x: any) => expect(unwrap(x));
 const invalid = (x: any) => expect(() => unwrap(x)).toThrow();
@@ -208,9 +208,9 @@ it("calls inner thenable", async () => {
 });
 
 it("return a string tag", () => {
-  expect(identity(123).toString()).toMatch(/\[object Monad\/[0-9a-z]+\]/);
-  expect(maybe(null).toString()).toMatch(/\[object Monad\/Maybe\]/);
-  expect(spread([]).toString()).toMatch(/\[object Monad\/Spread\]/);
+  expect(identity(123).toString()).toBe("[object Monad]");
+  expect(maybe(null).toString()).toBe("[object Monad]");
+  expect(spread([]).toString()).toBe("[object Monad]");
 });
 
 it("deduplicates wrappers", async () => {
@@ -270,4 +270,49 @@ it("resolves a long chain", async () => {
 
   expect(h.unwrap()).toBeInstanceOf(Promise);
   expect(h.unwrap()).resolves.toBe("[]");
+});
+
+it("alls primitives", () => {
+  const values = [1, 2, 3, 4];
+  const single = all(values);
+
+  expect(single).toBeInstanceOf(Array);
+  expect(single).toEqual([1, 2, 3, 4]);
+});
+
+it("alls monads", () => {
+  const values = [1, maybe(2), 3, maybe(identity(4))] as const;
+  const single = all(values);
+
+  expect("then" in single);
+  expect("unwrap" in single);
+  expect(single.unwrap()).toEqual([1, 2, 3, 4]);
+});
+
+it("alls monads & promises", async () => {
+  const values = [
+    maybe(12),
+    maybe(Promise.resolve(42)),
+    undefined,
+    123,
+    maybe(Promise.resolve(1337)),
+  ];
+
+  const single = all(values);
+  single.then((x) => x);
+
+  expect("then" in single);
+  expect("unwrap" in single);
+  expect(single.unwrap()).toBeInstanceOf(Promise);
+  expect(await single.unwrap()).toEqual([12, 42, undefined, 123, 1337]);
+  expect(await single).toEqual([12, 42, undefined, 123, 1337]);
+
+  const one = single.then((x) => x.reduce((acc, x) => acc + x?.toString(), ""));
+  const two = one.then((x) => x.toUpperCase());
+  expect(two.unwrap()).toBeInstanceOf(Promise);
+  expect(await two).toEqual("1242UNDEFINED1231337");
+
+  expect(two.then(() => null).unwrap()).rejects.toEqual(
+    new Error("Value is nothing!")
+  );
 });
