@@ -38,4 +38,7 @@ type Flatten<T> = IsTuple<
     : T
 >;
 
-export type { Deduplicated, IsTuple, IsNever, Flatten };
+/** Function shorthand */
+type Fn<A = any[], Z = void> = (...args: A extends any[] ? A : [A]) => Z;
+
+export type { Deduplicated, IsTuple, IsNever, Flatten, Fn };
