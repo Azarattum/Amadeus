@@ -153,19 +153,20 @@ it("mixes with promises", async () => {
 
 it("spreads array", async () => {
   const list = spread([1, 2, 3, 4]);
+
   const result = list
     .then((x) => x * 2)
     .then((x) => x.toString())
     .then((x) => [x])
-    ///    ↓ FIX: this should not be flat! x must be string[]!
     .then((x) => x);
 
-  check(result).toEqual([["2"], ["4"], ["6"], ["8"]]);
-  expect(await result.unwrap()).toEqual([["2"], ["4"], ["6"], ["8"]]);
-  expect(await result).toEqual([["2"], ["4"], ["6"], ["8"]]);
+  check(result).toEqual(["2", "4", "6", "8"]);
+  expect(await result.unwrap()).toEqual(["2", "4", "6", "8"]);
+  expect(await result).toEqual(["2", "4", "6", "8"]);
 
   const broken = spread(1).catch(() => [123]);
 
+  check(spread([[[1, 2, [[3], 4]]]])).toEqual([1, 2, 3, 4]);
   check(broken).toEqual([123]);
   invalid(spread(1));
 });
@@ -173,7 +174,7 @@ it("spreads array", async () => {
 it("spreads iterable", async () => {
   function* iterable() {
     yield 1;
-    yield 2;
+    yield [2];
     yield* [3, 4];
   }
 
@@ -185,7 +186,8 @@ it("spreads iterable", async () => {
     })
     .then((x) => x * 2)
     .then((x) => x.toString())
-    .then((x) => [x]);
+    .then((x) => [x])
+    .then();
 
   check(result).toEqual([["4"], ["8"]]);
   expect(await result.unwrap()).toEqual([["4"], ["8"]]);

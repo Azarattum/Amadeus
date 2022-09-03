@@ -1,4 +1,5 @@
 import { monad, type Monad } from "./monad";
+import type { Flatten } from "./types";
 
 interface Maybe extends Monad<"Maybe"> {
   then: NonNullable<this[""]>;
@@ -11,12 +12,8 @@ const maybe = monad<Maybe>((value, fn) => {
 });
 
 interface Spread extends Monad<"Spread"> {
+  then: Flatten<this[""]>;
   unwrap: this[""][];
-  then: this[""] extends Iterable<infer T>
-    ? T
-    : this[""] extends Generator<infer T>
-    ? T
-    : this[""];
 }
 
 class SpreadError extends Error {
@@ -29,23 +26,21 @@ class SpreadError extends Error {
 
 const spread = monad<Spread>((value, fn) => {
   if (value instanceof Error) return fn(value);
-
-  const nothing = Symbol();
-  const filter = (x: any) => x !== nothing;
-  const map = (x: any) => {
-    try {
-      return fn(x);
-    } catch {
-      return nothing;
-    }
-  };
-
-  if (Array.isArray(value)) return value.map(map).filter(filter);
-  if (typeof value?.[Symbol.iterator] === "function") {
-    return Array.from(value, map).filter(filter);
+  if (typeof value?.[Symbol.iterator] !== "function") {
+    throw new SpreadError(value);
   }
 
-  throw new SpreadError(value);
+  const nothing = Symbol();
+  return Array.from(value)
+    .flat(Infinity)
+    .map((x) => {
+      try {
+        return fn(x);
+      } catch {
+        return nothing;
+      }
+    })
+    .filter((x) => x !== nothing);
 });
 
 export { maybe, spread, SpreadError };

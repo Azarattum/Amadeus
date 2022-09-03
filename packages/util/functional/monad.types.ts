@@ -129,7 +129,7 @@ type MonadsTransform<T extends readonly any[]> = IsTuple<
 >;
 
 export type {
-  Transform as Transform,
+  Transform,
   Unwrapped,
   Catchable,
   Wrappable,

@@ -10,15 +10,32 @@ type Dedupe<T, A> = T extends [infer B, ...infer Tail]
   : T;
 
 /** Checks whether the value is a tuple or an array */
-type IsTuple<
-  T extends readonly any[],
-  True = true,
-  False = false
-> = any[] extends T ? False : True;
+type IsTuple<T, True = true, False = false> = T extends readonly [any, ...any]
+  ? True
+  : T extends []
+  ? True
+  : False;
 
 /** Checks whether the type `T` is equal to `never` */
 type IsNever<T, True = true, False = false> = [T] extends [never]
   ? True
   : False;
 
-export type { Deduplicated, IsTuple, IsNever };
+/** Returns a flat type of any array/tuple/iterable */
+type Flatten<T> = IsTuple<
+  T,
+  T extends readonly [infer U, ...infer Tail extends any[]]
+    ? U extends readonly any[]
+      ? Flatten<U>
+      : U | Flatten<Tail>
+    : never,
+  T extends string
+    ? T
+    : T extends Iterable<infer U>
+    ? U extends Iterable<infer R>
+      ? Flatten<R>
+      : U
+    : T
+>;
+
+export type { Deduplicated, IsTuple, IsNever, Flatten };
