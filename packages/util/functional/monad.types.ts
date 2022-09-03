@@ -1,4 +1,4 @@
-import type { Deduplicated, IsTuple } from "./types";
+import type { Deduplicated, IsNever, IsTuple } from "./types";
 import type { HKT, Piped, Composed } from "./hkt";
 
 type Wrapper = (value: any, fn: (value: any) => any) => any;
@@ -61,13 +61,13 @@ interface Monad<T = any, F extends readonly Transform[] = [Identity]> {
   readonly [state: symbol]: any;
 }
 
-/// FIX: b results in `Monad<unknown, [Maybe, Future, ...Transform<string>[]]>`
-// const a = Promise.reject();
-// const b = maybe(a);
-
 // ======================= UTILS ======================= //
 
-type Monadify<T> = T extends Promise<infer U> ? Monad<U, [Future]> : T;
+type Monadify<T> = IsNever<T, unknown, T> extends Promise<infer U>
+  ? IsNever<U, unknown, U> extends Promise<any>
+    ? Monadify<U>
+    : Monad<U, [Future]>
+  : IsNever<T, unknown, T>;
 
 type Merged<T, F extends readonly Transform[] = []> = Monadify<T> extends Monad<
   infer T1,
@@ -111,9 +111,9 @@ type MonadsType<T extends readonly any[]> = IsTuple<
 type MonadsTransform<T extends readonly any[]> = IsTuple<
   T,
   T extends readonly [infer A, ...infer Tail]
-    ? A extends Monad<any, infer R extends Transform[]>
+    ? IsNever<A, unknown, A> extends Monad<any, infer R extends Transform[]>
       ? [...R, ...MonadsTransform<Tail>]
-      : A extends Promise<any>
+      : IsNever<A, unknown, A> extends Promise<any>
       ? [Future, ...MonadsTransform<Tail>]
       : [...MonadsTransform<Tail>]
     : [],

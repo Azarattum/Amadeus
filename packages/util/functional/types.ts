@@ -16,4 +16,9 @@ type IsTuple<
   False = false
 > = any[] extends T ? False : True;
 
-export type { Deduplicated, IsTuple };
+/** Checks whether the type `T` is equal to `never` */
+type IsNever<T, True = true, False = false> = [T] extends [never]
+  ? True
+  : False;
+
+export type { Deduplicated, IsTuple, IsNever };

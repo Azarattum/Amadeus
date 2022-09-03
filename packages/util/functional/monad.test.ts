@@ -288,7 +288,7 @@ it("alls primitives", () => {
 });
 
 it("alls monads", () => {
-  const values = [1, maybe(2), 3, maybe(identity(4))] as const;
+  const values = [1, maybe(2), 3 as never, maybe(identity(4))] as const;
   const single = all(values);
 
   expect("then" in single);
