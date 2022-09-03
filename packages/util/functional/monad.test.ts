@@ -329,9 +329,29 @@ it("correctly rejects promises", async () => {
   let target = identity([] as any);
   target = target.then((x: any) => value.then((y) => [...x, y]));
 
+  expect(target.then(() => null)).rejects.toEqual(
+    new Error("Value is nothing!")
+  );
   expect(target.then(() => null).unwrap()).rejects.toEqual(
     new Error("Value is nothing!")
   );
 
   expect(maybe(Promise.resolve(123))).resolves.toBe(123);
+});
+
+it("unwraps for native await", async () => {
+  const a = maybe(identity(identity(spread([1, 2, 3]))));
+
+  expect(await a.then((x) => x + 1)).toEqual([2, 3, 4]);
+  expect(await a).toEqual([1, 2, 3]);
+
+  const check = vitest.fn();
+  const mock = ((x: any) => {
+    check();
+    expect(x).not.toBeInstanceOf(Array);
+    expect(x).not.toBeInstanceOf(Error);
+  }).bind({});
+
+  spread([1]).then(mock, mock);
+  expect(check).toBeCalledTimes(1);
 });

@@ -37,14 +37,13 @@ function monad<F extends Transform = Identity>(transform = noop) {
 
   const create = <T>(value: T): M<T> => ({
     then(resolve, reject) {
-      /// TODO: find a better solution
-      const native = "function () { [native code] }";
-      if (resolve?.toString() === native && reject?.toString() === native) {
+      if (native(reject) && native(resolve)) {
         try {
-          return resolve(unwrap<[F], T>(value));
+          resolve(unwrap<[F], T>(value));
         } catch (message) {
-          return reject(message);
+          reject(message);
         }
+        return wrap(value);
       }
 
       const success: Resolve<Wrapped<[F], T>> = (x) => {
@@ -104,13 +103,7 @@ function apply<T, U, F extends Transform>(
   reject: Reject
 ) {
   return function next(value: any): any {
-    const validate = (fn: Resolve<Wrapped<[F], T>, U>) => (e: any) => {
-      const result = fn(e);
-      if (invalid(result) && value instanceof Promise) throw result[error];
-      return result;
-    };
-
-    if (thenable(value)) return value.then(validate(next), reject);
+    if (thenable(value)) return value.then(next, reject);
     try {
       return resolve(value);
     } catch (message) {
@@ -156,6 +149,16 @@ function unwrappable(value: any): value is Wrappable<unknown> {
 
 function invalid(value: any): value is { [error]: any } {
   return value != null && typeof value === "object" && error in value;
+}
+
+function native(fn: any, args = 1): fn is (...args: any[]) => void {
+  if (typeof fn !== "function") return false;
+  const signature = Function.prototype.toString.call(fn);
+  return (
+    signature === "function () { [native code] }" &&
+    fn.length === args &&
+    fn.name === ""
+  );
 }
 
 export { monad, unwrap, all };
