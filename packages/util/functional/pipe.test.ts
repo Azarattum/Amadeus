@@ -1,6 +1,7 @@
 import { it, expect, vitest } from "vitest";
 import { pipe, pipeline } from "./pipe";
 import { maybe } from "./monads";
+import { monad } from "./monad";
 
 function adders(length: number) {
   return Array.from({ length }).map((_) => (x: number) => x + 1);
@@ -50,15 +51,33 @@ it("pipelines", () => {
 });
 
 it("supports promises", async () => {
+  /// TODO: mb possible to type with generics?
+  //    now it is unknown
+  const noop = pipe((x) => x);
+
+  expect(noop(Promise.resolve(123))).toBeInstanceOf(Promise);
+  expect(noop(Promise.resolve(123))).resolves.toBe(123);
+
+  /// FIX: value should really be a promise of string
   const value = pipeline(Promise.resolve(42))(
     (x) => x * 2,
     (x) => Promise.resolve(x),
     (x) => x.toString(),
-    (x) => Promise.resolve(x)
+    (x) => Promise.resolve(x),
+    (x) => x
   );
 
   expect(value).toBeInstanceOf(Promise);
   expect(await value).toBe("84");
+
+  const future = monad()(Promise.resolve(1337));
+  const result = pipeline(future)(
+    (x) => `data: ${x}`,
+    (x) => x.toUpperCase()
+  );
+
+  expect(result).toBeInstanceOf(Promise);
+  expect(result).resolves.toBe("DATA: 1337");
 });
 
 it("supports monads", async () => {
@@ -77,6 +96,8 @@ it("supports monads", async () => {
 
   expect(value2).toBeInstanceOf(Promise);
   expect(await value2).toBe("84");
+
+  /// TODO: add spread monad test. (fix unwrap typings)
 });
 
 it("handles longs chains", async () => {
