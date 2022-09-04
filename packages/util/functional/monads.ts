@@ -43,5 +43,7 @@ const spread = monad<Spread>((value, fn) => {
     .filter((x) => x !== nothing);
 });
 
+/// TODO: implement a stream monad
+
 export { maybe, spread, SpreadError };
 export type { Maybe, Spread };

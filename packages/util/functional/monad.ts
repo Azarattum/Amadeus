@@ -87,7 +87,7 @@ function unwrap<F extends Transform[], T>(
     value = value.then(
       (x) => (result = unwrap<F, T>(x)),
       (e) => {
-        // TODO: consider unified validation (see line 109)
+        /// TODO: consider unified validation (see line 109)
         if (value instanceof Promise) throw e;
         return (result = { [error]: e });
       }
@@ -128,6 +128,9 @@ function all<T extends readonly any[]>(values: T) {
 
   return container.then((x) => [...x, ...buffer]) as All<T>;
 }
+
+/// TODO: implement a safe unwrap function
+//    (returns an error, does not throw it)
 
 function thenable(value: any): value is Thenable<unknown> {
   return (

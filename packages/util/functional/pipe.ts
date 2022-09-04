@@ -22,4 +22,6 @@ const pipeline: Pipeline = (...data: any[]) => {
   return (...fns: Fn[]) => pipe(...fns)(...data);
 };
 
+/// TODO: implement a catch function
+
 export { pipe, pipeline };
