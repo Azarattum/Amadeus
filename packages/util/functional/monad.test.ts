@@ -164,11 +164,11 @@ it("spreads array", async () => {
   expect(await result.unwrap()).toEqual(["2", "4", "6", "8"]);
   expect(await result).toEqual(["2", "4", "6", "8"]);
 
-  const broken = spread(1).catch(() => [123]);
+  const broken = spread(1 as any).catch(() => [123]);
 
   check(spread([[[1, 2, [[3], 4]]]])).toEqual([1, 2, 3, 4]);
   check(broken).toEqual([123]);
-  invalid(spread(1));
+  invalid(spread(1 as any));
 });
 
 it("spreads iterable", async () => {

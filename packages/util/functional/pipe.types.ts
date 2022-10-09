@@ -1,10 +1,10 @@
 import type { Monad, MonadsTransform, Unwrapped } from "./monad.types";
-import type { Arrayify, Deduplicated, Last } from "./types";
+import type { Deduplicated, Last } from "./types";
 
 type λs = λ<any, any>[];
 type γs = γ<any[], any>[];
-type λ<A, Z> = (arg: Awaited<A>) => Z;
-type γ<A, Z> = A extends any[] ? (...args: A) => Z : never;
+type λ<A, Z> = (_: Awaited<A>) => Z;
+type γ<A, Z> = A extends any[] ? (..._: A) => Z : never;
 
 type λ2<A, B, C> = [γ<A, B>, λ<B, C>];
 type λ3<A, B, C, D> = [...λ2<A, B, C>, λ<C, D>];
@@ -28,9 +28,9 @@ type Type = "pipe" | "pipeline";
 type Awaits<T> = { -readonly [P in keyof T]: Awaited<T[P]> };
 type Returns<T extends γs> = { -readonly [P in keyof T]: ReturnType<T[P]> };
 type Thenable<T> = T | Monad<T, any[]> | Promise<T>;
-type Thenify<T extends any[]> = Arrayify<{
-  -readonly [P in keyof T]: Thenable<T[P]>;
-}>;
+type Thenify<T> = T extends [infer Item, ...infer Rest]
+  ? [Thenable<Item>, ...Thenify<Rest>]
+  : T;
 type Spread<T> = T extends [infer A extends any[], ...infer B]
   ? [...A, ...B]
   : T;
@@ -39,7 +39,7 @@ type Resolve<M extends any[]> = MonadsTransform<Spread<M>> extends []
   : Unwrapped<Deduplicated<MonadsTransform<Spread<M>>>, Awaited<Last<M>>>;
 
 type To<Y extends Type, M extends any[]> = Y extends "pipeline"
-  ? (...args: Thenify<M[0]>) => Resolve<M>
+  ? (..._: Thenify<M[0]>) => Resolve<M>
   : Resolve<M>;
 
 // prettier-ignore

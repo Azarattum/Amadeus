@@ -147,8 +147,7 @@ it("can be used as a callback", () => {
     expect(callback("123")).toEqual(["123"]);
   }
 
-  /// FIX: types should work!
-  single(pipeline((x) => [x]));
+  single(pipeline((x) => [x] as [string]));
   expect(check).toBeCalledTimes(2);
 });
 
