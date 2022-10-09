@@ -21,10 +21,6 @@ interface Thenable<T> {
   ): Thenable<U | K>;
 }
 
-interface Catchable {
-  catch<U = never>(rejected?: Reject<U | Thenable<U>> | null): Catchable;
-}
-
 interface Wrappable<T, F extends Transform[] = []> {
   unwrap(): Unwrapped<F, T>;
 }
@@ -32,6 +28,7 @@ interface Wrappable<T, F extends Transform[] = []> {
 interface Transform<ID extends string = string> extends HKT {
   readonly unwrap: this[""];
   readonly then: this[""];
+  readonly accept: any;
   readonly $: ID;
 }
 
@@ -129,12 +126,11 @@ type MonadsTransform<T extends readonly any[]> = IsTuple<
 >;
 
 export type {
+  MonadsTransform,
   Transform,
   Unwrapped,
-  Catchable,
   Wrappable,
   Thenable,
-  Resolved,
   Identity,
   Wrapped,
   Wrapper,

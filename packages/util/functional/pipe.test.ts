@@ -4,7 +4,7 @@ import { maybe } from "./monads";
 import { monad } from "./monad";
 
 function adders(length: number) {
-  return Array.from({ length }).map((_) => (x: number) => x + 1);
+  return Array.from({ length }).map(() => (x: number) => x + 1);
 }
 
 it("pipes", () => {

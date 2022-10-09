@@ -12,6 +12,7 @@ const maybe = monad<Maybe>((value, fn) => {
 });
 
 interface Spread extends Monad<"Spread"> {
+  accept: { [Symbol.iterator]: () => any };
   then: Flatten<this[""]>;
   unwrap: this[""][];
 }

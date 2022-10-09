@@ -72,7 +72,7 @@ function monad<F extends Transform = Identity>(transform = noop) {
     },
   });
 
-  return <T>(value: T) => wrap(value).then((x) => x);
+  return <T extends F["accept"]>(value: T) => wrap(value).then((x) => x);
 }
 
 function unwrap<F extends Transform[], T>(
@@ -131,6 +131,8 @@ function all<T extends readonly any[]>(values: T) {
 
 /// TODO: implement a safe unwrap function
 //    (returns an error, does not throw it)
+
+/// TODO: an optional fallback value in unwrap
 
 function thenable(value: any): value is Thenable<unknown> {
   return (
