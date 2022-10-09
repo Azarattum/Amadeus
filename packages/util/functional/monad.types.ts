@@ -1,4 +1,4 @@
-import type { Deduplicated, IsNever, IsTuple } from "./types";
+import type { Contains, Deduplicated, IsNever, IsTuple } from "./types";
 import type { HKT, Piped, Composed } from "./hkt";
 
 type Wrapper = (value: any, fn: (value: any) => any) => any;
@@ -22,7 +22,9 @@ interface Thenable<T> {
 }
 
 interface Wrappable<T, F extends Transform[] = []> {
-  unwrap(): Unwrapped<F, T>;
+  unwrap<U = never>(
+    fallback?: U
+  ): Unwrapped<F, T> | Contains<F, Future, Promise<U>, U>;
 }
 
 interface Transform<ID extends string = string> extends HKT {
@@ -52,7 +54,9 @@ interface Monad<T = any, F extends readonly Transform[] = [Identity]> {
     rejected?: Reject<Result1> | null
   ): Resolved<T | Wrapped<F, Result1>, T, F>;
 
-  unwrap(): Unwrapped<F, T>;
+  unwrap<U = never>(
+    fallback?: U
+  ): Unwrapped<F, T> | Contains<F, Future, Promise<U>, U>;
 
   readonly [Symbol.toStringTag]: string;
   readonly [state: symbol]: any;
@@ -135,6 +139,7 @@ export type {
   Wrapped,
   Wrapper,
   Resolve,
+  Future,
   Reject,
   Monad,
   All,

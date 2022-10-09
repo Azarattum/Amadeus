@@ -10,7 +10,9 @@ import type {
   Reject,
   Monad,
   All,
+  Future,
 } from "./monad.types";
+import type { Contains } from "./types";
 
 const error = Symbol();
 const noop: Wrapper = (value, fn) => fn(value);
@@ -61,8 +63,8 @@ function monad<F extends Transform = Identity>(transform = noop) {
 
       return wrap(apply(success, failure(reject))(value)) as any;
     },
-    unwrap() {
-      return unwrap<[F], T>(value);
+    unwrap(fallback) {
+      return unwrap<[F], T>(value, fallback as any);
     },
     get [Symbol.toStringTag]() {
       return "Monad";
@@ -75,26 +77,30 @@ function monad<F extends Transform = Identity>(transform = noop) {
   return <T extends F["accept"]>(value: T) => wrap(value).then((x) => x);
 }
 
-function unwrap<F extends Transform[], T>(
-  value: Wrappable<T> | Thenable<T> | T
-): Unwrapped<F, T> {
-  if (unwrappable(value)) value = value.unwrap();
+function unwrap<F extends Transform[], T, U = never>(
+  value: Wrappable<T> | Thenable<T> | T,
+  fallback?: U
+): Unwrapped<F, T> | Contains<F, Future, Promise<U>, U> {
+  if (unwrappable(value)) value = value.unwrap(fallback) as any;
   // Instantly unwrap synchronous thenables
   if (thenable(value)) {
     const nothing = Symbol();
     let result: any = nothing;
 
     value = value.then(
-      (x) => (result = unwrap<F, T>(x)),
+      (x) => (result = unwrap<F, T>(x, fallback as any) as any),
       (e) => {
-        /// TODO: consider unified validation (see line 109)
+        if (fallback !== undefined) return fallback;
         if (value instanceof Promise) throw e;
         return (result = { [error]: e });
       }
     ) as any;
     value = result !== nothing ? result : value;
   }
-  if (invalid(value)) throw value[error];
+  if (invalid(value)) {
+    if (fallback !== undefined) return fallback as any;
+    throw value[error];
+  }
   return value as any;
 }
 
@@ -131,8 +137,6 @@ function all<T extends readonly any[]>(values: T) {
 
 /// TODO: implement a safe unwrap function
 //    (returns an error, does not throw it)
-
-/// TODO: an optional fallback value in unwrap
 
 function thenable(value: any): value is Thenable<unknown> {
   return (

@@ -357,3 +357,18 @@ it("unwraps for native await", async () => {
   spread([1]).then(mock, mock);
   expect(check).toBeCalledTimes(1);
 });
+
+it("respects unwrap fallback", () => {
+  function bad() {
+    throw new Error();
+    return 123;
+  }
+
+  const monad = maybe(42).then(bad);
+  const result = monad.unwrap("1337");
+  expect(result).toBe("1337");
+
+  const future = identity(Promise.resolve(42)).then(bad);
+  const result2 = future.unwrap(":(");
+  expect(result2).resolves.toBe(":(");
+});

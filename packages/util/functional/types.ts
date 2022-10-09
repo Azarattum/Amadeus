@@ -50,4 +50,20 @@ type Last<T extends any[]> = IsTuple<T> extends true
 /** Function shorthand */
 type Fn<A = any[], Z = void> = (...args: A extends any[] ? A : [A]) => Z;
 
-export type { Deduplicated, IsTuple, IsNever, Flatten, Last, Fn };
+/** Checks whether a tuple or an array contains the given type */
+type Contains<
+  T extends readonly any[],
+  U,
+  True = true,
+  False = false
+> = IsTuple<
+  T,
+  T extends [infer Item, ...infer Rest]
+    ? U extends Item
+      ? True
+      : Contains<Rest, U, True, False>
+    : False,
+  T extends (infer Item)[] ? (U extends Item ? True : False) : never
+>;
+
+export type { Deduplicated, IsTuple, IsNever, Contains, Flatten, Last, Fn };
