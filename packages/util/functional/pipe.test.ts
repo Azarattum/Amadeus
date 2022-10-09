@@ -7,7 +7,7 @@ function adders(length: number) {
   return Array.from({ length }).map(() => (x: number) => x + 1) as [];
 }
 
-it("pipes", () => {
+it("pipeline", () => {
   expect(pipeline()(1)).toBe(1);
   expect(pipeline((x: number) => x * 2)(1)).toBe(2);
   expect(
@@ -24,7 +24,7 @@ it("pipes", () => {
   }
 });
 
-it("pipelines", () => {
+it("pipe", () => {
   expect(pipe(1)()).toBe(1);
   expect(pipe(1)((x) => x * 2)).toBe(2);
 
@@ -180,4 +180,49 @@ it("unwraps monads", () => {
     expect(result).toBeTypeOf("number");
     expect(result).toBe(1);
   }
+});
+
+it("propagates monads", () => {
+  const none = () => undefined as number | undefined;
+  const dunno = <T>(x: T) => x as T | undefined;
+
+  const value = pipe(maybe(4))(
+    (x) => x * 2,
+    dunno,
+    (x) => x.toString()
+  );
+  expect(value).toBe("8");
+
+  const never = vitest.fn();
+  const invalid = pipeline(
+    () => 42,
+    maybe,
+    none,
+    (x) => x.toFixed(),
+    never
+  );
+  expect(invalid).toThrow();
+  expect(never).not.toBeCalled();
+
+  const check = vitest.fn();
+  const long = pipeline(
+    () => 1,
+    (x) => x + 1,
+    dunno,
+    (x) => (x ? x + 1 : undefined),
+    maybe,
+    (x) => x + 1,
+    (x) => x + 1,
+    (x) => x + 1,
+    (x) => x + 1,
+    maybe,
+    check,
+    none,
+    (x) => x.toFixed(),
+    never
+  );
+
+  expect(long).toThrow();
+  expect(check).toBeCalled();
+  expect(never).not.toBeCalled();
 });
