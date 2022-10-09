@@ -1,6 +1,6 @@
+import { pipeline, pipe, fallback } from "./pipe";
 import { it, expect, vitest } from "vitest";
 import { maybe, spread } from "./monads";
-import { pipeline, pipe } from "./pipe";
 import { monad } from "./monad";
 
 function adders(length: number) {
@@ -225,4 +225,23 @@ it("propagates monads", () => {
   expect(long).toThrow();
   expect(check).toBeCalled();
   expect(never).not.toBeCalled();
+});
+
+it("respects fallback", () => {
+  function bad() {
+    throw new Error("fail");
+    return 123;
+  }
+
+  const result = pipe(42)(bad, fallback(":("));
+  expect(result).toBe(":(");
+
+  const message = pipe(1)(
+    bad,
+    (x) => x * 2,
+    fallback((e: Error) => e.message),
+    (x) => x.toString(),
+    (x) => x.toUpperCase()
+  );
+  expect(message).toBe("FAIL");
 });
