@@ -5,9 +5,8 @@ import { all } from "./monad";
 const pipeline: Pipeline = (...fns: Fn[]) => {
   return (...data: any[]) => {
     let value = all(data).then((x: any) => {
-      if (!fns.length) return Array.isArray(x) ? x[0] : x;
-      if (Array.isArray(x)) return fns[0](...x);
-      return fns[0](x);
+      if (!fns.length) return x[0];
+      return fns[0](...x);
     });
 
     for (let i = 1; i < fns.length; i++) {

@@ -129,12 +129,12 @@ it("handles longs chains", async () => {
 
 it("can be used as a callback", () => {
   const check = vitest.fn();
-  function test(callback: (x: string, y: number) => [string]) {
+  function multiple(callback: (x: string, y: number) => [string]) {
     check();
     expect(callback("test", 123)).toEqual(["TEST123"]);
   }
 
-  test(
+  multiple(
     pipeline(
       (x, y) => x.toUpperCase() + y.toPrecision(),
       (x) => [x]
