@@ -1,4 +1,4 @@
-import { pipeline, pipe, fallback } from "./pipe";
+import { pipeline, pipe, fallback, expose } from "./pipe";
 import { it, expect, vitest } from "vitest";
 import { maybe, spread } from "./monads";
 import { monad } from "./monad";
@@ -244,4 +244,15 @@ it("respects fallback", () => {
     (x) => x.toUpperCase()
   );
   expect(message).toBe("FAIL");
+
+  {
+    const { data, error } = pipe(1)(bad, (x) => x * 2, ...expose);
+    expect(data).toBeTypeOf("undefined");
+    expect(error?.message).toBe("fail");
+  }
+  {
+    const { data, error } = pipe(1)((x) => x * 2, ...expose);
+    expect(error).toBeTypeOf("undefined");
+    expect(data).toBe(2);
+  }
 });

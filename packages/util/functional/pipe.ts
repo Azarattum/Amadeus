@@ -32,4 +32,10 @@ const fallback = <T>(value: T | ((e: any) => T)) => {
   return handler;
 };
 
-export { fallback, pipeline, pipe };
+const errorify = (e: any) => (e instanceof Error ? e : new Error(e));
+const expose = [
+  <T>(data: T) => ({ data, error: undefined }),
+  fallback((e: any) => ({ error: errorify(e), data: undefined })),
+] as const;
+
+export { fallback, expose, pipeline, pipe };
