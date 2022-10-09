@@ -66,6 +66,20 @@ function monad<F extends Transform = Identity>(transform = noop) {
     unwrap(fallback) {
       return unwrap<[F], T>(value, fallback as any);
     },
+    expose() {
+      const errorify = (e: any) => (e instanceof Error ? e : new Error(e));
+      try {
+        const data = unwrap<[F], T>(value);
+        if (data instanceof Promise) {
+          return data
+            .then((x) => ({ data: x }))
+            .catch((e) => ({ error: errorify(e) }));
+        }
+        return { data } as any;
+      } catch (error) {
+        return { error: errorify(error) };
+      }
+    },
     get [Symbol.toStringTag]() {
       return "Monad";
     },
@@ -134,9 +148,6 @@ function all<T extends readonly any[]>(values: T) {
 
   return container.then((x) => [...x, ...buffer]) as All<T>;
 }
-
-/// TODO: implement a safe unwrap function
-//    (returns an error, does not throw it)
 
 function thenable(value: any): value is Thenable<unknown> {
   return (

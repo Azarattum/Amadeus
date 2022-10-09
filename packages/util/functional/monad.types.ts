@@ -22,9 +22,7 @@ interface Thenable<T> {
 }
 
 interface Wrappable<T, F extends Transform[] = []> {
-  unwrap<U = never>(
-    fallback?: U
-  ): Unwrapped<F, T> | Contains<F, Future, Promise<U>, U>;
+  unwrap<U = never>(fallback?: U): Unwrapped<F, T> | Promised<F, U>;
 }
 
 interface Transform<ID extends string = string> extends HKT {
@@ -54,15 +52,26 @@ interface Monad<T = any, F extends readonly Transform[] = [Identity]> {
     rejected?: Reject<Result1> | null
   ): Resolved<T | Wrapped<F, Result1>, T, F>;
 
-  unwrap<U = never>(
-    fallback?: U
-  ): Unwrapped<F, T> | Contains<F, Future, Promise<U>, U>;
+  unwrap<U = never>(fallback?: U): Unwrapped<F, T> | Promised<F, U>;
+
+  expose(): Promised<
+    F,
+    | { data: Awaited<Unwrapped<F, T>>; error: undefined }
+    | { data: undefined; error: Error }
+  >;
 
   readonly [Symbol.toStringTag]: string;
   readonly [state: symbol]: any;
 }
 
 // ======================= UTILS ======================= //
+
+type Promised<F extends readonly Transform[], T> = Contains<
+  F,
+  Future,
+  Promise<T>,
+  T
+>;
 
 type Monadify<T> = IsNever<T, unknown, T> extends Promise<infer U>
   ? IsNever<U, unknown, U> extends Promise<any>

@@ -372,3 +372,30 @@ it("respects unwrap fallback", () => {
   const result2 = future.unwrap(":(");
   expect(result2).resolves.toBe(":(");
 });
+
+it("exposes data & error", async () => {
+  {
+    const monad = maybe(42);
+    const { data, error } = monad.expose();
+    expect(data).toBe(42);
+    expect(error).toBeTypeOf("undefined");
+  }
+  {
+    const monad = maybe<number>(undefined as any);
+    const { data, error } = monad.expose();
+    expect(data).toBeTypeOf("undefined");
+    expect(error).toBeInstanceOf(Error);
+  }
+  {
+    const monad = maybe(Promise.resolve(42));
+    const { data, error } = await monad.expose();
+    expect(data).toBe(42);
+    expect(error).toBeTypeOf("undefined");
+  }
+  {
+    const monad = maybe(Promise.reject("123"));
+    const { data, error } = await monad.expose();
+    expect(data).toBeTypeOf("undefined");
+    expect(error).toBeInstanceOf(Error);
+  }
+});
