@@ -2,11 +2,10 @@ import type { Pipe, Pipeline } from "./pipe.types";
 import type { Fn } from "./types";
 import { all } from "./monad";
 
-const pipe: Pipe = (...fns: Fn[]) => {
-  if (fns.length === 0) return (x: any) => x;
-  if (fns.length === 1) return fns[0];
+const pipeline: Pipeline = (...fns: Fn[]) => {
   return (...data: any[]) => {
     let value = all(data).then((x: any) => {
+      if (!fns.length) return Array.isArray(x) ? x[0] : x;
       if (Array.isArray(x)) return fns[0](...x);
       return fns[0](x);
     });
@@ -14,14 +13,14 @@ const pipe: Pipe = (...fns: Fn[]) => {
     for (let i = 1; i < fns.length; i++) {
       value = value.then(fns[i]);
     }
-    return value.unwrap();
+    return value.unwrap() as never;
   };
 };
 
-const pipeline: Pipeline = (...data: any[]) => {
-  return (...fns: Fn[]) => pipe(...fns)(...data);
+const pipe: Pipe = (...data: any[]) => {
+  return (...fns: Fn[]) => (pipeline as any)(...fns)(...data) as never;
 };
 
 /// TODO: implement a catch function
 
-export { pipe, pipeline };
+export { pipeline, pipe };

@@ -1,5 +1,6 @@
 {
   "cSpell.words": [
+    "Arrayify",
     "autoprefixer",
     "catchable",
     "cssnano",
@@ -34,6 +35,7 @@
     "sveltekit",
     "tailwindcss",
     "thenables",
+    "Thenify",
     "tsee",
     "ttypescript",
     "typeof",

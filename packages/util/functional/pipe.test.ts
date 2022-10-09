@@ -1,17 +1,17 @@
 import { it, expect, vitest } from "vitest";
-import { pipe, pipeline } from "./pipe";
-import { maybe } from "./monads";
+import { maybe, spread } from "./monads";
+import { pipeline, pipe } from "./pipe";
 import { monad } from "./monad";
 
 function adders(length: number) {
-  return Array.from({ length }).map(() => (x: number) => x + 1);
+  return Array.from({ length }).map(() => (x: number) => x + 1) as [];
 }
 
 it("pipes", () => {
-  expect(pipe()(1)).toBe(1);
-  expect(pipe((x: number) => x * 2)(1)).toBe(2);
+  expect(pipeline()(1)).toBe(1);
+  expect(pipeline((x: number) => x * 2)(1)).toBe(2);
   expect(
-    pipe(
+    pipeline(
       (x: string) => x.toUpperCase(),
       (x) => x.split(" "),
       ([a, b]) => `${a}, ${+b * 2}`
@@ -19,16 +19,16 @@ it("pipes", () => {
   ).toBe("HELLO, 246");
 
   for (let i = 0; i < 10; i++) {
-    const value = pipe(...adders(i))(0);
+    const value = pipeline(...adders(i))(0);
     expect(value).toBe(i);
   }
 });
 
 it("pipelines", () => {
-  expect(pipeline(1)()).toBe(1);
-  expect(pipeline(1)((x) => x * 2)).toBe(2);
+  expect(pipe(1)()).toBe(1);
+  expect(pipe(1)((x) => x * 2)).toBe(2);
 
-  pipeline("hello 123")(
+  pipe("hello 123")(
     (x: string) => x.toUpperCase(),
     (x) => x.split(" "),
     ([a, b]) => `${a}, ${+b * 2}`,
@@ -37,11 +37,11 @@ it("pipelines", () => {
   );
 
   for (let i = 0; i < 10; i++) {
-    const value = pipeline(0)(...adders(i));
+    const value = pipe(0)(...adders(i));
     expect(value).toBe(i);
   }
 
-  const process = pipeline(123, 321);
+  const process = pipe(123, 321);
   const result = process(
     (x, y) => x * y,
     (x) => `Value: ${x}`,
@@ -51,15 +51,12 @@ it("pipelines", () => {
 });
 
 it("supports promises", async () => {
-  /// TODO: mb possible to type with generics?
-  //    now it is unknown
-  const noop = pipe((x) => x);
+  const noop = pipeline((x) => x);
 
   expect(noop(Promise.resolve(123))).toBeInstanceOf(Promise);
   expect(noop(Promise.resolve(123))).resolves.toBe(123);
 
-  /// FIX: value should really be a promise of string
-  const value = pipeline(Promise.resolve(42))(
+  const value = pipe(Promise.resolve(42))(
     (x) => x * 2,
     (x) => Promise.resolve(x),
     (x) => x.toString(),
@@ -71,7 +68,7 @@ it("supports promises", async () => {
   expect(await value).toBe("84");
 
   const future = monad()(Promise.resolve(1337));
-  const result = pipeline(future)(
+  const result = pipe(future)(
     (x) => `data: ${x}`,
     (x) => x.toUpperCase()
   );
@@ -81,7 +78,7 @@ it("supports promises", async () => {
 });
 
 it("supports monads", async () => {
-  const value = pipeline(maybe(42))(
+  const value = pipe(maybe(42))(
     (x) => x * 2,
     (x) => x.toString()
   );
@@ -89,7 +86,7 @@ it("supports monads", async () => {
   expect(typeof value).toBe("string");
   expect(value).toBe("84");
 
-  const value2 = pipeline(maybe(Promise.resolve(42)))(
+  const value2 = pipe(maybe(Promise.resolve(42)))(
     (x) => x * 2,
     (x) => x.toString()
   );
@@ -97,11 +94,22 @@ it("supports monads", async () => {
   expect(value2).toBeInstanceOf(Promise);
   expect(await value2).toBe("84");
 
-  /// TODO: add spread monad test. (fix unwrap typings)
+  const value3 = pipe([
+    [1, 2, 3],
+    [4, 5, 6],
+  ])(
+    spread,
+    (x) => x * x,
+    (x) => x - 1,
+    (x) => x.toString()
+  );
+
+  expect(value3).toBeInstanceOf(Array);
+  expect(value3).toEqual(["0", "3", "8", "15", "24", "35"]);
 });
 
 it("handles longs chains", async () => {
-  const data = pipe(
+  const data = pipeline(
     (x: string, y: number) => (x ? 1 : y),
     (x) => [x],
     (x) => ({ x }),
@@ -127,15 +135,50 @@ it("can be used as a callback", () => {
   }
 
   test(
-    pipe(
+    pipeline(
       (x, y) => x.toUpperCase() + y.toPrecision(),
       (x) => [x]
     )
   );
   expect(check).toBeCalled();
+
+  function single(callback: (x: string) => [string]) {
+    check();
+    expect(callback("123")).toEqual(["123"]);
+  }
+
+  /// FIX: types should work!
+  single(pipeline((x) => [x]));
+  expect(check).toBeCalledTimes(2);
 });
 
 it("handles spread functions", () => {
-  const transform = pipe(...[(x: number) => +x + 1, (x: any) => String(x)]);
+  const fns = [(x: number) => +x + 1, (x: any) => String(x)];
+  // A hack to make TypeScript happy, generally we don't want
+  //  to allow a spread function pipeline
+  const hack = fns as [];
+
+  const transform = pipeline(...hack);
   expect(transform(42)).toBe("43");
+});
+
+it("unwraps monads", () => {
+  {
+    const result = pipe(maybe(1))();
+    expect(result).toBeTypeOf("number");
+    expect(result).toBe(1);
+  }
+  {
+    const result = pipe(maybe(1))((x) => x);
+    expect(result).toBeTypeOf("number");
+    expect(result).toBe(1);
+  }
+  {
+    const result = pipe(maybe(1))(
+      (x) => x,
+      (x) => x
+    );
+    expect(result).toBeTypeOf("number");
+    expect(result).toBe(1);
+  }
 });

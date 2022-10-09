@@ -1,59 +1,65 @@
-import type { Fn } from "./types";
+import type { Monad, MonadsTransform, Unwrapped } from "./monad.types";
+import type { Arrayify, Deduplicated, Last } from "./types";
 
-/** ==================== Helpers ===================== */
+type λs = λ<any, any>[];
+type γs = γ<any[], any>[];
+type λ<A, Z> = (arg: Awaited<A>) => Z;
+type γ<A, Z> = A extends any[] ? (...args: A) => Z : never;
 
-type λ<A extends any[] = any[], Z = any> = (
-  ...args: { -readonly [P in keyof A]: Awaited<A[P]> }
-) => Z;
+type λ2<A, B, C> = [γ<A, B>, λ<B, C>];
+type λ3<A, B, C, D> = [...λ2<A, B, C>, λ<C, D>];
+type λ4<A, B, C, D, E> = [...λ3<A, B, C, D>, λ<D, E>];
+type λ5<A, B, C, D, E, F> = [...λ4<A, B, C, D, E>, λ<E, F>];
+type λ6<A, B, C, D, E, F, G> = [...λ5<A, B, C, D, E, F>, λ<F, G>];
+type λ7<A, B, C, D, E, F, G, H> = [...λ6<A, B, C, D, E, F, G>, λ<G, H>];
+type λ8<A, B, C, D, E, F, G, H, I> = [...λ7<A, B, C, D, E, F, G, H>, λ<H, I>];
+type λ_<A, B, C, D, E, F, G, H, I, Z extends λs> = [
+  ...λ8<A, B, C, D, E, F, G, H, I>,
+  ...λn<I, Z>
+];
 
-type Result<Z> = Z extends [...any, Fn<any[], infer R>]
-  ? R
-  : Z extends Fn<any[], infer R>[]
-  ? R
+type λn<A, Z extends λs> = Z extends [λ<any, infer B>, ...infer Rest]
+  ? Rest extends [any, ...any]
+    ? [λ<A, B>, ...λn<B, Rest>]
+    : [λ<A, B>]
   : Z;
 
-type To<A, Z, Y> = Y extends false
-  ? Fn<A extends [infer T] ? T : A, Result<Z>>
-  : Result<Z>;
+type Type = "pipe" | "pipeline";
+type Awaits<T> = { -readonly [P in keyof T]: Awaited<T[P]> };
+type Returns<T extends γs> = { -readonly [P in keyof T]: ReturnType<T[P]> };
+type Thenable<T> = T | Monad<T, any[]> | Promise<T>;
+type Thenify<T extends any[]> = Arrayify<{
+  -readonly [P in keyof T]: Thenable<T[P]>;
+}>;
+type Spread<T> = T extends [infer A extends any[], ...infer B]
+  ? [...A, ...B]
+  : T;
+type Resolve<M extends any[]> = MonadsTransform<Spread<M>> extends []
+  ? Last<M>
+  : Unwrapped<Deduplicated<MonadsTransform<Spread<M>>>, Awaited<Last<M>>>;
 
-type Args<A, Z extends Fn[]> = Z extends [Fn<any[], infer R>, ...infer Rest]
-  ? Rest extends [Fn, ...any]
-    ? [λ<[A], R>, ...Args<R, Rest>]
-    : [λ<[A], R>]
-  : Z;
-
-/** =================== Arguments ==================== */
-
-type Arg1<A extends any[], Z> = [λ<A, Z>];
-type Arg2<A extends any[], B, Z> = [λ<A, B>, λ<[B], Z>];
-type Arg3<A extends any[], B, C, Z> = [...Arg2<A, B, C>, λ<[C], Z>];
-type Arg4<A extends any[], B, C, D, Z> = [...Arg3<A, B, C, D>, λ<[D], Z>];
-type Arg5<A extends any[], B, C, D, E, Z> = [...Arg4<A, B, C, D, E>, λ<[E], Z>];
-// prettier-ignore
-type Arg6<A extends any[], B, C, D, E, F, Z> = [...Arg5<A, B, C, D, E, F>, λ<[F], Z>];
-// prettier-ignore
-type Arg7<A extends any[], B, C, D, E, F, G, Z> = [...Arg6<A, B, C, D, E, F, G>, λ<[G], Z>];
-// prettier-ignore
-type ArgAny<A extends any[], B, C, D, E, F, G, H, Z extends Fn[]> = [...Arg7<A, B, C, D, E, F, G, H>, ...Args<H, Z>];
-
-/** ================= Implementation ================= */
+type To<Y extends Type, M extends any[]> = Y extends "pipeline"
+  ? (...args: Thenify<M[0]>) => Resolve<M>
+  : Resolve<M>;
 
 // prettier-ignore
-type Pipe<X extends any[] = unknown[], Y = false> = {
-  <A extends any[] = X>(): To<A, A[0], Y>;
-  <Z, A extends any[] = X>(..._: Arg1<A, Z>): To<A, Z, Y>;
-  <B, Z, A extends any[]= X>(..._: Arg2<A, B, Z>): To<A, Z, Y>;
-  <B, C, Z, A extends any[]= X>(..._: Arg3<A, B, C, Z>): To<A, Z, Y>;
-  <B, C, D, Z, A extends any[]= X>(..._: Arg4<A, B, C, D, Z>): To<A, Z, Y>;
-  <B, C, D, E, Z, A extends any[]= X>(..._: Arg5<A, B, C, D, E, Z>): To<A, Z, Y>;
-  <B, C, D, E, F, Z, A extends any[]= X>(..._: Arg6<A, B, C, D, E, F, Z>): To<A, Z, Y>;
-  <B, C, D, E, F, G, Z, A extends any[] = X>(..._: Arg7<A, B, C, D, E, F, G, Z>): To<A, Z, Y>;
-  <B, C, D, E, F, G, H, Z extends Fn[], A extends any[]= X>(
-    ..._: ArgAny<A, B, C, D, E, F, G, H, Z>
-  ): To<A, Z, Y>;
-  <Z extends Fn[], A = X>(..._: Args<A, Z>): To<A, Z, Y>;
+type Flow<Y extends Type, X extends any[] = unknown[]> = {
+  <A = X>(): To<Y, [A extends any[] ? A[0] : A]>;
+  <B, A = X>(_: γ<Awaits<A>, B>): To<Y, [A, B]>;
+  <C, B, A = X>(..._: λ2<Awaits<A>, B, C>): To<Y, [A, B, C]>;
+  <D, C, B, A = X>(..._: λ3<Awaits<A>, B, C, D>): To<Y, [A, B, C, D]>;
+  <E, D, C, B, A = X>(..._: λ4<Awaits<A>, B, C, D, E>): To<Y, [A, B, C, D, E]>;
+  <F, E, D, C, B, A = X>(..._: λ5<Awaits<A>, B, C, D, E, F>): To<Y, [A, B, C, D, E, F]>;
+  <G, F, E, D, C, B, A = X>(..._: λ6<Awaits<A>, B, C, D, E, F, G>): To<Y, [A, B, C, D, E, F, G]>;
+  <H, G, F, E, D, C, B, A = X>(..._: λ7<Awaits<A>, B, C, D, E, F, G, H>): To<Y, [A, B, C, D, E, F, G, H]>;
+  <I, H, G, F, E, D, C, B, A = X>(..._: λ8<Awaits<A>, B, C, D, E, F, G, H, I>): To<Y, [A, B, C, D, E, F, G, H, I]>;
+
+  <Z extends λs, I, H, G, F, E, D, C, B, A = X>(
+    ..._: λ_<Awaits<A>, B, C, D, E, F, G, H, I, Z>
+  ): To<Y, [A, B, C, D, E, F, G, H, I, ...Returns<Z>]>;
 };
 
-type Pipeline = <T extends any[]>(...data: T) => Pipe<T, true>;
+type Pipeline = Flow<"pipeline">;
+type Pipe = <T extends any[]>(...data: T) => Flow<"pipe", T>;
 
-export type { Pipe, Pipeline };
+export type { Pipeline, Pipe };

@@ -38,7 +38,19 @@ type Flatten<T> = IsTuple<
     : T
 >;
 
+/** Returns the type of the last element of an array or tuple */
+type Last<T extends any[]> = IsTuple<T> extends true
+  ? T extends [...any[], infer L]
+    ? L
+    : never
+  : T extends (infer L)[]
+  ? L
+  : never;
+
+/** Wraps non-array types as [T], leaves arrays as is */
+type Arrayify<T> = T extends any[] ? T : [T];
+
 /** Function shorthand */
 type Fn<A = any[], Z = void> = (...args: A extends any[] ? A : [A]) => Z;
 
-export type { Deduplicated, IsTuple, IsNever, Flatten, Fn };
+export type { Deduplicated, IsTuple, IsNever, Flatten, Last, Fn, Arrayify };
