@@ -1,15 +1,5 @@
-import { monad, type Monad } from "./monad";
-import type { Flatten } from "./types";
-
-interface Maybe extends Monad<"Maybe"> {
-  then: NonNullable<this[""]>;
-}
-
-const maybe = monad<Maybe>((value, fn) => {
-  const updated = fn(value);
-  if (updated != null) return updated;
-  throw new Error("Value is nothing!");
-});
+import { monad, type Monad } from "../monad";
+import type { Flatten } from "../types";
 
 interface Spread extends Monad<"Spread"> {
   accept: { [Symbol.iterator]: () => any };
@@ -44,7 +34,4 @@ const spread = monad<Spread>((value, fn) => {
     .filter((x) => x !== nothing);
 });
 
-/// TODO: implement a stream monad
-
-export { maybe, spread, SpreadError };
-export type { Maybe, Spread };
+export { spread, SpreadError, type Spread };
