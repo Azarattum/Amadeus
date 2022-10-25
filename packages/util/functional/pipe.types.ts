@@ -1,5 +1,5 @@
 import type { Monad, MonadsTransform, Unwrapped, Wrapped } from "./monad.types";
-import type { Deduplicated, Last } from "./types";
+import type { Last } from "./types";
 
 type γs = γ<any[], any>[];
 type λs = λ<any, any, any[]>[];
@@ -40,7 +40,7 @@ type Thenify<T> = T extends [infer Item, ...infer Rest]
 type Spread<T> = T extends [infer A extends any[], ...infer B]
   ? [...A, ...B]
   : T;
-type Wrappers<T extends any[]> = Deduplicated<MonadsTransform<Spread<T>>>;
+type Wrappers<T extends any[]> = MonadsTransform<Spread<T>>;
 type Rewrap<F extends any[], T> = Unwrapped<
   Wrappers<F>,
   Wrapped<Wrappers<F>, Awaited<T>>

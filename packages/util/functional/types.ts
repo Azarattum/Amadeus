@@ -1,13 +1,17 @@
-/** Deduplicated consecutive values in a tuple */
-type Deduplicated<T extends readonly any[]> = T extends [infer A, ...infer Tail]
-  ? [A, ...Dedupe<Tail, A>]
-  : T;
+/** Combines deduplicated arrays without any new duplicates */
+type Combine<A extends readonly any[], B extends readonly any[]> = A extends [
+  ...infer S,
+  infer L
+]
+  ? Equal<L, B[0], Combine<S, B>, [...A, ...B]>
+  : B;
 
-type Dedupe<T, A> = T extends [infer B, ...infer Tail]
+/** Checks whether two types are equal to each other */
+type Equal<A, B, True = true, False = false> = A extends B
   ? B extends A
-    ? [...Dedupe<Tail, B>]
-    : [B, ...Dedupe<Tail, B>]
-  : T;
+    ? True
+    : False
+  : False;
 
 /** Checks whether the value is a tuple or an array */
 type IsTuple<T, True = true, False = false> = T extends readonly [any, ...any]
@@ -66,4 +70,4 @@ type Contains<
   T extends (infer Item)[] ? (U extends Item ? True : False) : never
 >;
 
-export type { Deduplicated, IsTuple, IsNever, Contains, Flatten, Last, Fn };
+export type { Contains, Combine, IsTuple, IsNever, Flatten, Equal, Last, Fn };

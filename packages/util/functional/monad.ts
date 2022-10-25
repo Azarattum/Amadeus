@@ -8,9 +8,9 @@ import type {
   Wrapper,
   Wrapped,
   Reject,
+  Future,
   Monad,
   All,
-  Future,
 } from "./monad.types";
 import type { Contains } from "./types";
 
@@ -32,7 +32,7 @@ function monad<F extends Transform = Identity>(transform = noop) {
   const wrap = <T>(value: T): M<T> => {
     // Dedupe monads of the same type
     if (value && typeof value === "object" && state in value) {
-      return create((value as any)[state]);
+      return create<T>((value as any)[state]);
     }
     return create(value);
   };

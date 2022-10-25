@@ -1,5 +1,6 @@
 import { monad, unwrap, all } from "./monad";
 import { expect, it, vitest } from "vitest";
+import type { Monad } from "./monad.types";
 import { maybe, spread } from "./monads";
 
 const check = (x: any) => expect(unwrap(x));
@@ -328,7 +329,7 @@ it("alls monads & promises", async () => {
 
 it("correctly rejects promises", async () => {
   const value = maybe(Promise.resolve(1));
-  let target = identity([] as any);
+  let target: Monad<any, any[]> = identity([] as any);
   target = target.then((x: any) => value.then((y) => [...x, y]));
 
   expect(target.then(() => null)).rejects.toEqual(

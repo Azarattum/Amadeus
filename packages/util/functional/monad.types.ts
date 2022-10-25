@@ -1,18 +1,19 @@
-import type { Contains, Deduplicated, IsNever, IsTuple } from "./types";
+import type { Combine, Contains, IsNever, IsTuple } from "./types";
 import type { HKT, Piped, Composed } from "./hkt";
 
+type Transforms = readonly Transform[];
 type Wrapper = (value: any, fn: (value: any) => any) => any;
 type Resolve<T, R = any> = (value: T) => R;
 type Reject<R = any> = (reason?: any) => R;
-type Unwrapped<F extends readonly Transform[], T> = T extends never
-  ? never
-  : Composed<F, T, "unwrap">;
-type Wrapped<F extends readonly Transform[], T> = T extends never
-  ? never
-  : Piped<F, T, "then">;
+type Unwrapped<F extends Transforms, T> = IsNever<
+  T,
+  never,
+  Composed<F, T, "unwrap">
+>;
+type Wrapped<F extends Transforms, T> = IsNever<T, never, Piped<F, T, "then">>;
 type All<T extends readonly any[]> = MonadsTransform<T> extends []
   ? Monad<T, [Identity]>
-  : Monad<MonadsType<T>, Deduplicated<MonadsTransform<T>>>;
+  : Monad<MonadsType<T>, MonadsTransform<T>>;
 
 interface Thenable<T> {
   then<U = T, K = never>(
@@ -21,7 +22,7 @@ interface Thenable<T> {
   ): Thenable<U | K>;
 }
 
-interface Wrappable<T, F extends Transform[] = []> {
+interface Wrappable<T, F extends Transforms = []> {
   unwrap<U = never>(fallback?: U): Unwrapped<F, T> | Promised<F, U>;
 }
 
@@ -42,7 +43,7 @@ interface Future extends Transform<"Future"> {
   then: Awaited<this[""]>;
 }
 
-interface Monad<T = any, F extends readonly Transform[] = [Identity]> {
+type Monad<T = any, F extends Transforms = [Identity]> = {
   then<Result1 = T, Result2 = never>(
     resolved?: Resolve<Wrapped<F, T>, Result1> | null,
     rejected?: Reject<Result2> | null
@@ -62,50 +63,37 @@ interface Monad<T = any, F extends readonly Transform[] = [Identity]> {
 
   readonly [Symbol.toStringTag]: string;
   readonly [state: symbol]: any;
-}
+};
 
 // ======================= UTILS ======================= //
 
-type Promised<F extends readonly Transform[], T> = Contains<
-  F,
-  Future,
-  Promise<T>,
-  T
->;
+type Promised<F extends Transforms, T> = Contains<F, Future, Promise<T>, T>;
 
-type Monadify<T> = IsNever<T, unknown, T> extends Promise<infer U>
-  ? IsNever<U, unknown, U> extends Promise<any>
-    ? Monadify<U>
-    : Monad<U, [Future]>
-  : IsNever<T, unknown, T>;
+type Merged<T, F extends Transforms> = T extends Monad<infer T1, infer F1>
+  ? Merged<T1, Combine<F, F1>>
+  : T extends Promise<infer T1>
+  ? Merged<T1, Combine<F, [Future]>>
+  : [T, F];
 
-type Merged<T, F extends readonly Transform[] = []> = Monadify<T> extends Monad<
+type Parsed<T, U extends Transforms> = Merged<T, U> extends [
   infer T1,
-  infer F1
->
-  ? Monadify<T1> extends Monad<any, any>
-    ? Merged<T1, [...F, ...F1]>
-    : Monad<T1, [...F, ...F1]>
-  : Monad<T, F>;
-
-type Parsed<T, F extends readonly Transform[] = []> = Merged<
-  T,
-  F
-> extends Monad<infer T1, infer F1>
-  ? Monad<T1, Deduplicated<F1>>
+  infer U1 extends Transforms
+]
+  ? Monad<T1, U1>
   : never;
 
-type Resolved<T, U, F extends readonly Transform[] = []> = Wrapped<
-  F,
-  T
-> extends never
-  ? Parsed<U, F>
-  : Parsed<T, F>;
+type Resolved<T, U, F extends readonly any[] = []> = IsNever<
+  Wrapped<F, T>,
+  Parsed<U, F>,
+  Parsed<T, F>
+>;
 
 type MonadsType<T extends readonly any[]> = IsTuple<
   T,
   T extends readonly [infer A, ...infer Tail]
-    ? Monadify<A> extends Monad<infer R, any>
+    ? A extends Monad<infer R, any>
+      ? [R, ...MonadsType<Tail>]
+      : A extends Promise<infer R>
       ? [R, ...MonadsType<Tail>]
       : [A, ...MonadsType<Tail>]
     : [],
@@ -121,17 +109,17 @@ type MonadsType<T extends readonly any[]> = IsTuple<
 type MonadsTransform<T extends readonly any[]> = IsTuple<
   T,
   T extends readonly [infer A, ...infer Tail]
-    ? IsNever<A, unknown, A> extends Monad<any, infer R extends Transform[]>
-      ? [...R, ...MonadsTransform<Tail>]
+    ? IsNever<A, unknown, A> extends Monad<any, infer R extends Transforms>
+      ? Combine<R, MonadsTransform<Tail>>
       : IsNever<A, unknown, A> extends Promise<any>
-      ? [Future, ...MonadsTransform<Tail>]
-      : [...MonadsTransform<Tail>]
+      ? Combine<[Future], MonadsTransform<Tail>>
+      : MonadsTransform<Tail>
     : [],
   T extends readonly (infer A)[]
     ? (A extends Monad<any, infer F> ? F : A) extends infer K
       ? K extends Promise<any>
         ? [Future]
-        : K extends Transform[]
+        : K extends Transforms
         ? K
         : never
       : never
