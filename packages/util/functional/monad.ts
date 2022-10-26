@@ -54,7 +54,7 @@ function monad<F extends Transform = Identity>(
 
       const success: Resolve<Wrapped<[F], T>> = (x) => {
         if (invalid(x)) throw x[error];
-        return resolve ? transform(x, resolve) : x;
+        return resolve ? transform(x, resolve as any) : x;
       };
 
       return wrap(apply(success, failure(reject))(value)) as any;
