@@ -1,7 +1,7 @@
+import { maybe, nothing, spread } from "./monads";
 import { monad, unwrap, all } from "./monad";
 import { expect, it, vitest } from "vitest";
 import type { Monad } from "./monad.types";
-import { maybe, spread } from "./monads";
 
 const check = (x: any) => expect(unwrap(x));
 const invalid = (x: any) => expect(() => unwrap(x)).toThrow();
@@ -185,6 +185,7 @@ it("spreads iterable", async () => {
       if (x % 2) throw "";
       return x;
     })
+    .catch(() => nothing)
     .then((x) => x * 2)
     .then((x) => x.toString())
     .then((x) => [x])
@@ -329,7 +330,7 @@ it("alls monads & promises", async () => {
 
 it("correctly rejects promises", async () => {
   const value = maybe(Promise.resolve(1));
-  let target: Monad<any, any[]> = identity([] as any);
+  let target: Monad<any, any> = identity([] as any);
   target = target.then((x: any) => value.then((y) => [...x, y]));
 
   expect(target.then(() => null)).rejects.toEqual(

@@ -1,4 +1,5 @@
 import type {
+  Extensions,
   Unwrapped,
   Transform,
   Wrappable,
@@ -15,9 +16,12 @@ import type {
 import type { Contains } from "./types";
 
 const error = Symbol();
-const noop: Wrapper = (value, fn) => fn(value);
+const state = Symbol();
 
-function monad<F extends Transform = Identity>(transform = noop) {
+function monad<F extends Transform = Identity>(
+  transform: Wrapper<F> = (value, fn) => fn(value),
+  extensions: Extensions<F> = {}
+) {
   type M<T> = Monad<T, [F]>;
 
   const failure = (reject?: Reject | null) => (e?: any) => {
@@ -28,10 +32,10 @@ function monad<F extends Transform = Identity>(transform = noop) {
     }
   };
 
-  const state = Symbol();
+  const kind = Symbol();
   const wrap = <T>(value: T): M<T> => {
     // Dedupe monads of the same type
-    if (value && typeof value === "object" && state in value) {
+    if (value && typeof value === "object" && kind in value) {
       return create<T>((value as any)[state]);
     }
     return create(value);
@@ -86,6 +90,8 @@ function monad<F extends Transform = Identity>(transform = noop) {
     get [state]() {
       return value;
     },
+    [kind]: true,
+    ...extensions,
   });
 
   return <T extends F["accept"]>(value: T) => wrap(value).then((x) => x);
@@ -181,5 +187,5 @@ function native(fn: any, args = 1): fn is (...args: any[]) => void {
   );
 }
 
-export { monad, unwrap, all };
+export { monad, unwrap, all, state };
 export type { Transform as Monad };
