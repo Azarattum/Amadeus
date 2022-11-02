@@ -138,9 +138,9 @@ function apply<T, U, F extends Transform>(
   return function next(value: any): any {
     if (thenable(value)) return value.then(next, reject);
     try {
-      return resolve(value);
-    } catch (message) {
-      return reject(message);
+      return resolve ? resolve(value) : value;
+    } catch (reason) {
+      return reject ? reject(reason) : reason;
     }
   };
 }

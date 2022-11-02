@@ -2,8 +2,8 @@ import type { Combine, Contains, IsNever, IsTuple } from "./types";
 import type { HKT, Piped, Composed, Kind } from "./hkt";
 
 type Transforms = readonly Transform[];
-type Resolve<T, R = any> = (value: T) => R;
-type Reject<R = any> = (reason?: any) => R;
+type Resolve<T, R = any> = ((value: T) => R) | null;
+type Reject<R = any> = ((reason?: any) => R) | null;
 type Unwrapped<F extends Transforms, T> = IsNever<
   T,
   never,
@@ -16,8 +16,8 @@ type All<T extends readonly any[]> = MonadsTransform<T> extends []
 
 interface Thenable<T> {
   then<U = T, K = never>(
-    resolved?: Resolve<Awaited<T>, U | Thenable<U>> | null,
-    rejected?: Reject<K | Thenable<K>> | null
+    resolved?: Resolve<Awaited<T>, U | Thenable<U>>,
+    rejected?: Reject<K | Thenable<K>>
   ): Thenable<U | K>;
 }
 
@@ -46,12 +46,12 @@ interface Future extends Transform<"Future"> {
 declare const types: unique symbol;
 interface Base<T = any, F extends Transforms = [Identity]> {
   then<Result1 = T, Result2 = never>(
-    resolved?: Resolve<Wrapped<F, T>, Result1> | null,
-    rejected?: Reject<Result2> | null
+    resolved?: Resolve<Wrapped<F, T>, Result1>,
+    rejected?: Reject<Result2>
   ): Resolved<Result1 | Wrapped<F, Result2>, T, F>;
 
   catch<Result1 = never>(
-    rejected?: Reject<Result1> | null
+    rejected?: Reject<Result1>
   ): Resolved<T | Wrapped<F, Result1>, T, F>;
 
   unwrap<U = never>(fallback?: U): Unwrapped<F, T> | Promised<F, U>;
