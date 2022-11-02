@@ -218,8 +218,7 @@ it("propagates monads", () => {
     maybe,
     check,
     none,
-    /// TODO: should `x: number` work?
-    (x) => x.toFixed(),
+    (x: number) => x.toFixed(),
     never
   );
 
