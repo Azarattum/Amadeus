@@ -115,3 +115,23 @@ it("catches errors", () => {
   expect(cloned.expose().error).toBeInstanceOf(Error);
   expect(fixed.unwrap()).toBe(42);
 });
+
+it("subscribes listeners", async () => {
+  const calls: number[] = [];
+  const listener = vi.fn((x) => calls.push(x));
+
+  const pusher = stream(1);
+  const unsubscribe = pusher.subscribe(listener);
+  pusher.push(2);
+  pusher.push(42);
+  pusher.push(Promise.resolve(10) as any);
+  await new Promise((x) => setTimeout(x));
+  expect(listener).toHaveBeenCalledTimes(4);
+  expect(calls).toEqual([1, 2, 42, 10]);
+
+  unsubscribe();
+  pusher.push(1337);
+  await new Promise((x) => setTimeout(x));
+  expect(listener).toHaveBeenCalledTimes(4);
+  expect(calls).toEqual([1, 2, 42, 10]);
+});
