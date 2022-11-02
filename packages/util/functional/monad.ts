@@ -60,8 +60,8 @@ function monad<F extends Transform = Identity>(
   };
 
   const create = <T>(value: T): Monad<T, [F]> => {
-    if (value && Object.getPrototypeOf(value) === extensions) {
-      return value as any;
+    while (value && Object.getPrototypeOf(value) === extensions) {
+      value = (value as any)[state];
     }
     const instance = { [state]: value };
     return Object.setPrototypeOf(instance, extensions);

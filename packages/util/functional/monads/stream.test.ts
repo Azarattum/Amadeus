@@ -135,3 +135,24 @@ it("subscribes listeners", async () => {
   expect(listener).toHaveBeenCalledTimes(4);
   expect(calls).toEqual([1, 2, 42, 10]);
 });
+
+it("nested streams", () => {
+  const a = stream(1);
+  const b = stream("");
+  const c = a.then((x) => b.then((y) => y + x));
+
+  expect(c.unwrap()).toBe("1");
+  a.push(2);
+  expect(c.unwrap()).toBe("2");
+  b.push("_");
+  expect(c.unwrap()).toBe("_2");
+  b.push("+");
+  a.push(3);
+  expect(c.unwrap()).toBe("+3");
+  b.push("-");
+  expect(c.unwrap()).toBe("-3");
+  c.push("0_o");
+  expect(a.unwrap()).toBe(3);
+  expect(b.unwrap()).toBe("-");
+  expect(c.unwrap()).toBe("0_o");
+});
