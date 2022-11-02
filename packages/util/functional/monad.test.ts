@@ -75,10 +75,8 @@ it("calls inner thenable", async () => {
   mayThen.then();
   expect(then).toBeCalledTimes(3);
 
-  check(mayThen.then((x) => x * 2)).toBe(84);
-  expect(then).toBeCalledTimes(5);
-  expect(await mayThen.then((x) => x * 2)).toBe(168);
-  expect(then).toBeCalledTimes(7);
+  expect(await mayThen.then((x) => x * 2)).toBe(84);
+  expect(then).toBeCalledTimes(6);
 });
 
 it("return a string tag", () => {

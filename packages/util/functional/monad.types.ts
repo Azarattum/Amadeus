@@ -63,8 +63,8 @@ interface Base<T = any, F extends Transforms = [Identity]> {
   >;
 
   readonly [Symbol.toStringTag]: string;
-  readonly [state: symbol]: any;
   readonly [types]?: [T, F];
+  [state: symbol]: any;
 }
 
 type Monad<T = any, F extends Transforms = [Identity]> = Base<T, F> &
@@ -74,8 +74,12 @@ type Monad<T = any, F extends Transforms = [Identity]> = Base<T, F> &
 
 // ======================= UTILS ======================= //
 
-type Promised<F extends Transforms, T> = Contains<F, Future, Promise<T>, T>;
 type Monadify<T> = T extends Promise<infer U> ? Monad<U, [Future]> : T;
+type Promised<F extends Transforms, T> = IsNever<
+  T,
+  never,
+  Contains<F, Future, Promise<T>, T>
+>;
 
 type Merged<T, F extends Transforms> = Monadify<T> extends Monad<
   infer T1,
@@ -144,11 +148,11 @@ type Wrapper<F extends Transform> = {
 
 type Extensions<F extends Transform> =
   | {
-      [key in keyof F["extensions"]]: F["extensions"][key] extends (
-        ..._: infer P
-      ) => infer R
+      [key in keyof (F["extensions"] &
+        Partial<Monad<unknown, [F]>>)]: (F["extensions"] &
+        Monad<unknown, [F]>)[key] extends (..._: infer P) => infer R
         ? (this: Monad<unknown, [F]>, ..._: P) => R
-        : F["extensions"][key];
+        : (F["extensions"] & Monad<unknown, [F]>)[key];
     }
   | Record<string, never>;
 
@@ -158,6 +162,7 @@ export type {
   Transform,
   Unwrapped,
   Wrappable,
+  Promised,
   Thenable,
   Identity,
   Wrapped,

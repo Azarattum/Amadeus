@@ -14,11 +14,11 @@ type Equal<A, B, True = true, False = false> = A extends B
   : False;
 
 /** Checks whether the value is a tuple or an array */
-type IsTuple<T, True = true, False = false> = T extends readonly [any, ...any]
-  ? True
-  : T extends []
-  ? True
-  : False;
+type IsTuple<T, True = true, False = false> = IsNever<
+  T,
+  False,
+  T extends readonly [any, ...any] ? True : T extends [] ? True : False
+>;
 
 /** Checks whether the type `T` is equal to `never` */
 type IsNever<T, True = true, False = false> = [T] extends [never]

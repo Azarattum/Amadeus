@@ -3,139 +3,72 @@ import type {
   Unwrapped,
   Transform,
   Wrappable,
+  Promised,
   Thenable,
   Identity,
   Resolve,
   Wrapper,
   Wrapped,
   Reject,
-  Future,
   Monad,
   All,
 } from "./monad.types";
-import type { Contains } from "./types";
 
 const error = Symbol();
 const state = Symbol();
 
 function monad<F extends Transform = Identity>(
-  transform: Wrapper<F> = (value, fn) => fn(value),
+  transformer: Wrapper<F> = (value, fn) => fn(value),
   extensions: Extensions<F> = {}
 ) {
-  type M<T> = Monad<T, [F]>;
-
-  const failure = (reject?: Reject | null) => (e?: any) => {
-    try {
-      return reject ? transform(e, reject) : { [error]: e };
-    } catch (message) {
-      return { [error]: message };
-    }
-  };
-
-  const kind = Symbol();
-  const wrap = <T>(value: T): M<T> => {
-    // Dedupe monads of the same type
-    if (value && typeof value === "object" && kind in value) {
-      return create<T>((value as any)[state]);
-    }
-    return create(value);
-  };
-
-  const create = <T>(value: T): M<T> => ({
-    then(resolve, reject) {
+  const proto: Monad<unknown, [F]> = {
+    then(resolve, reject): any {
       if (native(reject) && native(resolve)) {
         try {
-          resolve(unwrap<[F], T>(value));
+          resolve(this.unwrap());
         } catch (message) {
           reject(message);
         }
-        return wrap(value);
+        return create(this[state]);
       }
 
-      const success: Resolve<Wrapped<[F], T>> = (x) => {
-        if (invalid(x)) throw x[error];
-        return resolve ? transform(x, resolve as any) : x;
-      };
-
-      return wrap(apply(success, failure(reject))(value)) as any;
+      return create(transform(this[state], resolve, reject, transformer));
     },
-    catch(reject) {
-      const success: Resolve<Wrapped<[F], T>> = (x) => {
-        if (invalid(x)) throw x[error];
-        return x;
-      };
-
-      return wrap(apply(success, failure(reject))(value)) as any;
+    catch(reject): any {
+      return this.then((x) => x, reject);
     },
     unwrap(fallback) {
-      return unwrap<[F], T>(value, fallback as any);
+      return unwrap(this[state], fallback);
     },
-    expose() {
-      const errorify = (e: any) => (e instanceof Error ? e : new Error(e));
+    expose(): any {
       try {
-        const data = unwrap<[F], T>(value);
-        if (data instanceof Promise) {
-          return data
-            .then((x) => ({ data: x }))
-            .catch((e) => ({ error: errorify(e) }));
+        const data = unwrap(this[state]);
+        if (thenable(data)) {
+          return data.then(
+            (x) => ({ data: x }),
+            (e) => ({ error: errorify(e)[error] })
+          );
         }
-        return { data } as any;
-      } catch (error) {
-        return { error: errorify(error) };
+        return { data };
+      } catch (reason) {
+        return { error: errorify(reason)[error] };
       }
     },
     get [Symbol.toStringTag]() {
       return "Monad";
     },
-    get [state]() {
-      return value;
-    },
-    [kind]: true,
-    ...extensions,
-  });
-
-  return <T extends F["accept"]>(value: T) => wrap(value).then((x) => x);
-}
-
-function unwrap<F extends Transform[], T, U = never>(
-  value: Wrappable<T> | Thenable<T> | T,
-  fallback?: U
-): Unwrapped<F, T> | Contains<F, Future, Promise<U>, U> {
-  if (unwrappable(value)) value = value.unwrap(fallback) as any;
-  // Instantly unwrap synchronous thenables
-  if (thenable(value)) {
-    const nothing = Symbol();
-    let result: any = nothing;
-
-    value = value.then(
-      (x) => (result = unwrap<F, T>(x, fallback as any) as any),
-      (e) => {
-        if (fallback !== undefined) return fallback;
-        if (value instanceof Promise) throw e;
-        return (result = { [error]: e });
-      }
-    ) as any;
-    value = result !== nothing ? result : value;
-  }
-  if (invalid(value)) {
-    if (fallback !== undefined) return fallback as any;
-    throw value[error];
-  }
-  return value as any;
-}
-
-function apply<T, U, F extends Transform>(
-  resolve: Resolve<Wrapped<[F], T>, U>,
-  reject: Reject
-) {
-  return function next(value: any): any {
-    if (thenable(value)) return value.then(next, reject);
-    try {
-      return resolve(value);
-    } catch (message) {
-      return reject(message);
-    }
   };
+
+  const create = <T>(value: T): Monad<T, [F]> => {
+    if (value && Object.getPrototypeOf(value) === extensions) {
+      return value as any;
+    }
+    const instance = { [state]: value };
+    return Object.setPrototypeOf(instance, extensions);
+  };
+
+  Object.setPrototypeOf(extensions, proto);
+  return <T extends F["accept"]>(value: T) => create(value).then((x) => x);
 }
 
 function all<T extends readonly any[]>(values: T) {
@@ -155,7 +88,64 @@ function all<T extends readonly any[]>(values: T) {
   return container.then((x) => [...x, ...buffer]) as All<T>;
 }
 
-function thenable(value: any): value is Thenable<unknown> {
+function unwrap<T, U = never, F extends Transform[] = [Identity]>(
+  value: Monad<T, F> | Thenable<T> | T,
+  fallback?: U
+): Unwrapped<F, T> | Promised<F, U> {
+  if (unwrappable(value)) value = value.unwrap(fallback) as any;
+  if (thenable(value)) {
+    value = value.then(
+      (x) => unwrap(x, fallback) as any,
+      (e) => {
+        if (fallback !== undefined) return fallback;
+        throw e;
+      }
+    ) as any;
+  }
+
+  if (invalid(value)) {
+    if (fallback === undefined) throw value[error];
+    return fallback as any;
+  }
+  return value as any;
+}
+
+function transform<T, F extends Transform = Identity>(
+  value: T,
+  resolve?: Resolve<T>,
+  reject?: Reject,
+  transformer: Wrapper<F> = (value, fn) => fn(value)
+) {
+  return apply(
+    (value) => {
+      if (invalid(value)) throw value[error];
+      return resolve ? transformer(value, resolve as any) : value;
+    },
+    (reason) => {
+      try {
+        return reject ? transformer(reason, reject) : errorify(reason);
+      } catch (reason) {
+        return errorify(reason);
+      }
+    }
+  )(value);
+}
+
+function apply<T, U, F extends Transform>(
+  resolve: Resolve<Wrapped<[F], T>, U>,
+  reject: Reject
+) {
+  return function next(value: any): any {
+    if (thenable(value)) return value.then(next, reject);
+    try {
+      return resolve(value);
+    } catch (message) {
+      return reject(message);
+    }
+  };
+}
+
+function thenable<T = unknown>(value: any): value is Thenable<T> {
   return (
     value != null &&
     typeof value === "object" &&
@@ -164,7 +154,7 @@ function thenable(value: any): value is Thenable<unknown> {
   );
 }
 
-function unwrappable(value: any): value is Wrappable<unknown> {
+function unwrappable<T = unknown>(value: any): value is Wrappable<T> {
   return (
     value != null &&
     typeof value === "object" &&
@@ -187,5 +177,10 @@ function native(fn: any, args = 1): fn is (...args: any[]) => void {
   );
 }
 
-export { monad, unwrap, all, state };
+function errorify(what: any): { [error]: Error } {
+  if (invalid(what)) what = what[error];
+  return { [error]: what instanceof Error ? what : new Error(what) };
+}
+
+export { monad, all, unwrap, transform, state };
 export type { Transform as Monad };

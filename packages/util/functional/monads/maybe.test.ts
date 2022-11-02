@@ -82,8 +82,8 @@ it("catches async errors", async () => {
 
   {
     const monad = maybe(promise);
-    expect(monad).rejects.toBe("Error");
-    expect(monad.unwrap()).rejects.toBe("Error");
+    expect(monad).rejects.toThrow("Error");
+    expect(monad.unwrap()).rejects.toThrow("Error");
     const never = vi.fn<[], undefined>();
     const rejected = vi.fn<[], undefined>();
     const result = await monad
