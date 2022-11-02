@@ -1,6 +1,13 @@
 import { monad, state, transform, type Monad } from "../monad";
 import type { Reject, Resolve } from "../monad.types";
 
+// This would cause a MEMORY LEAK on older platforms, but at least nothing will break
+if (!("WeakRef" in globalThis)) {
+  (globalThis as any)["WeakRef"] = function <T>(target: T) {
+    (this as any).deref = () => target;
+  };
+}
+
 const children = Symbol();
 const listeners = Symbol();
 interface Extensions<T> {
