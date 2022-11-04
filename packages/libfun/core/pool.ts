@@ -1,5 +1,5 @@
-import type { Fn } from "./functional/types";
 import { merge, wrap } from "./iterator";
+import type { Fn } from "./types";
 
 /// TODO: feature list
 //    + name

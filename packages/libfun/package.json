@@ -1,0 +1,11 @@
+{
+  "name": "libfun",
+  "type": "module",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "dev": "vitest -c ../../vite.config.js --mode node",
+    "coverage": "vitest run -c ../../vite.config.js --coverage --mode node",
+    "test": "vitest run -c ../../vite.config.js --mode node"
+  }
+}

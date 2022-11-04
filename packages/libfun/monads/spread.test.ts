@@ -1,6 +1,6 @@
+import { unwrap } from "../core/monad";
 import { expect, it } from "vitest";
 import { spread, nothing } from ".";
-import { unwrap } from "../monad";
 
 const check = (x: any) => expect(unwrap(x));
 const invalid = (x: any) => expect(() => unwrap(x)).toThrow();

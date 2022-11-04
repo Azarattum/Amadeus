@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { unwrap } from "../monad";
+import { unwrap } from "../core/monad";
 import { maybe } from ".";
 
 const check = (x: any) => expect(unwrap(x));

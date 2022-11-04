@@ -1,5 +1,5 @@
-import { monad, type Monad } from "../monad";
-import type { Flatten } from "../types";
+import { monad, type Monad } from "../core/monad";
+import type { Flatten } from "../core/types";
 
 interface Spread extends Monad<"Spread"> {
   accept: { [Symbol.iterator]: () => any };
