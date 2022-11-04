@@ -1,100 +1,14 @@
+import type { Handler, Options, Pool, Pools } from "./pool.types";
 import { merge, wrap } from "./iterator";
 import type { Fn } from "./types";
 
 /// TODO: feature list
 //    + name
-//    - concurrency
-//    - rate limits
-//    - module association
+//    + concurrency
+//    + rate limits
+//    - group limits
 //    - abort (fetch, tg, async, monads)
 //    - catch error handling
-
-function pool<T extends Fn = () => void>(id: string) {
-  const existing = pools[all].get(id);
-  if (existing) return existing as Pool<T>;
-
-  type Listener = Handler<T>;
-  const listeners = new Set<Listener>();
-  /// TODO: implement queue
-  let queue = [];
-
-  const handle = (...params: [Listener] | any[]) => {
-    if (params.length === 1 && typeof params[0] === "function") {
-      pools[all].set(id, pool);
-      listeners.add(params[0]);
-      return () => listeners.delete(params[0]);
-    }
-
-    const generators = [...listeners.values()];
-    const iterables = generators.map((x) =>
-      wrap(x(...(params as Parameters<T>)))
-    );
-    return merge(...iterables);
-  };
-
-  const abort = () => {
-    /// TODO
-  };
-
-  const drain = () => {
-    abort();
-    queue = [];
-  };
-
-  const close = () => {
-    listeners.clear();
-    drain();
-    pools[all].delete(id);
-  };
-
-  const status = () => {
-    /// TODO
-    return { id };
-  };
-
-  const catcher = (handler: Fn) => {
-    /// TODO
-  };
-
-  const methods = { abort, close, drain, status, catch: catcher };
-  const pool = Object.assign(handle, methods) as Pool<T>;
-  pools[all].set(id, pool);
-  return pool;
-}
-
-/** Global State */
-
-const all = Symbol();
-const pools = {
-  [all]: new Map() as Pools,
-  abort: () => each("abort"),
-  drain: () => each("drain"),
-  close: () => each("close"),
-  /// TODO: add global catch
-  get length() {
-    return (this[all] as Pools).size;
-  },
-  status,
-};
-
-function each<T extends keyof Pool<any>>(
-  method: T,
-  ...args: any[]
-): ReturnType<Pool<any>[T]>[] {
-  return [...pools[all].values()].map((x) =>
-    /// TODO: ↓ fix stuff here
-    x[method](...args)
-  ) as any;
-}
-
-function status(): PoolStatus[];
-function status(id?: string): PoolStatus;
-function status(id?: string) {
-  if (id == null) return each("status");
-  const status = pools[all].get(id)?.status();
-  if (!status) throw new Error(`Pool with id ${id} not found!`);
-  return status;
-}
 
 /// TODO: `fetch` generator
 //    - error prone (log errors per module)
@@ -109,32 +23,150 @@ function status(id?: string) {
 //  yield* fetch("...").json(); ← gretchen under the hood
 //  yield* fetch("...").as(User);
 
-/** Type Definitions */
-
-type Handler<T extends Fn> = (
-  ...args: Parameters<T>
-) => Generator<ReturnType<T>, void>;
-
-type Pool<T extends Fn> = {
-  (handler: Handler<T>): () => void;
-  /// TODO:                 ↓ consider this to be an iterator instead
-  (...args: Parameters<T>): AsyncGenerator<ReturnType<T>>;
-  /// TODO:        ↓ narrow the type here
-  catch: (handler: Fn) => void;
-  status: () => PoolStatus;
-  abort: () => void;
-  close: () => void;
-  drain: () => void;
+const defaults: Options = {
+  concurrency: Infinity,
+  signal: undefined,
+  group: undefined,
+  rate: Infinity,
+  cache: 0,
 };
 
-type Pools = Map<string, Pool<any>>;
+const state = Symbol();
+const delay = (ms: number) => new Promise((x) => setTimeout(x, ms));
 
-interface PoolStatus {
-  id: string;
-  /// TODO
+function pools(options: Partial<Options> = {}): Pools {
+  options = { ...defaults, ...options };
+  const all = new Map<string, Pool>();
+  function each<T extends keyof Omit<Pool, symbol>>(method: T) {
+    return function (...args: Parameters<Pool[T]>) {
+      return Array.from(all.values()).map((x) =>
+        x[method](...(args as [any]))
+      ) as ReturnType<Pool[T]>[];
+    };
+  }
+
+  const proto: ThisType<Pool<Fn>> = {
+    abort() {
+      /// TODO
+    },
+    drain() {
+      this.abort();
+      /// TODO: SOMEHOW CANCEL ALL THE PENDING EVENTS
+      //  maybe?:
+      //   this[state].executing = 0;
+      //   this[state].last = new Date();
+    },
+    close() {
+      this[state].listeners.clear();
+      this.drain();
+      all.delete(this[state].id);
+    },
+    status() {
+      return this[state];
+    },
+    catch() {
+      /// TODO
+    },
+  };
+
+  return {
+    abort: each("abort"),
+    drain: each("drain"),
+    close: each("close"),
+    catch: each("catch"),
+    count: () => all.size,
+    status: (id?: string) => {
+      if (id == null) return each("status");
+      const status = all.get(id)?.status();
+      if (!status) throw new Error(`Pool with id ${id} not found!`);
+      return status as any;
+    },
+    pool: pool.bind({ all, options, proto }) as any,
+  };
 }
 
-/** Exports */
+function pool<T extends Fn = () => void>(
+  this: { all: Map<string, Pool>; options: Partial<Options>; proto: object },
+  id: string,
+  options: Options = {} as Options
+): Pool<T> {
+  const { all, proto } = this;
+  const existing = all.get(id);
+  if (existing) return existing;
+  options = { ...this.options, ...options };
 
-export { pool, pools };
-export type { Handler, Pool };
+  const data: Pick<Pool, symbol> = {
+    [state]: {
+      id,
+      executing: 0,
+      last: new Date(0),
+      listeners: new Set(),
+      ...options,
+    },
+  };
+
+  function apply(this: typeof data, ...params: [Handler<T>] | any[]) {
+    const self = this[state];
+    // Register a new handler
+    if (params.length === 1 && typeof params[0] === "function") {
+      self.listeners.add(params[0]);
+      all.set(id, pool);
+      return () => self.listeners.delete(params[0]);
+    }
+
+    // Call all event handlers
+    return block.bind(self)(() => {
+      self.executing += 1;
+      const generators = [...self.listeners.values()];
+      const iterables = generators.map((x) =>
+        wrap(x(...(params as Parameters<T>)))
+      );
+
+      return (async function* () {
+        yield* merge(...iterables);
+        self.executing -= 1;
+        self.last = new Date();
+      })();
+    });
+  }
+
+  Object.setPrototypeOf(proto, Function);
+  const pool = Object.setPrototypeOf(apply.bind(data), proto);
+  Object.assign(pool, data);
+  return pool;
+}
+
+/**
+ * Clears an execution stack of a given function (using setTimeout)
+ * @param func Function to unstack
+ */
+function unstack<T extends Fn>(
+  func: T
+): (...args: Parameters<T>) => Promise<ReturnType<T>> {
+  return (...args: Parameters<T>) =>
+    new Promise<ReturnType<T>>((resolve) => {
+      setTimeout(() => {
+        resolve(func(...args));
+      }, 0);
+    });
+}
+
+function block<T extends AsyncGenerator>(
+  this: Pool[symbol],
+  resolve: () => T
+): T {
+  // Try calling synchronously
+  if (this.executing < this.concurrency) return resolve();
+  const interval = 60000 / this.rate;
+  const elapsed = Date.now() - +this.last;
+
+  // Otherwise wait and try again
+  const self = block.bind(this);
+  return (async function* () {
+    await delay(Math.max(30, interval - elapsed));
+    /// FIXME: unwrapping lots of generators might be bad performance wise...
+    yield* await unstack(self)(resolve);
+  })() as T;
+}
+
+export { pools };
