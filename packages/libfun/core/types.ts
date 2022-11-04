@@ -52,7 +52,7 @@ type Last<T extends any[]> = IsTuple<T> extends true
   : never;
 
 /** Function shorthand */
-type Fn<A = any[], Z = void> = (...args: A extends any[] ? A : [A]) => Z;
+type Fn<A = any[], Z = any> = (...args: A extends any[] ? A : [A]) => Z;
 
 /** Checks whether a tuple or an array contains the given type */
 type Contains<
