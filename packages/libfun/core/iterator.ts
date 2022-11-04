@@ -1,4 +1,9 @@
-type SomeIterator<T> = Iterator<T> | AsyncIterator<T>;
+type SomeIterator<T = any> = Iterator<T> | AsyncIterator<T>;
+type Iterated<T extends SomeIterator> = T extends AsyncIterator<infer U>
+  ? Promise<U[]>
+  : T extends Iterator<infer U>
+  ? U[]
+  : never;
 
 async function* wrap<T, U>(iterator: SomeIterator<T>) {
   for (let value, done; ; ) {
@@ -41,4 +46,29 @@ async function* merge<T, U>(...iterators: SomeIterator<T>[]) {
   return results;
 }
 
-export { wrap, merge };
+function all<T extends SomeIterator>(
+  iterator: T,
+  limit = Infinity
+): Iterated<T> {
+  if (Symbol.iterator in iterator) {
+    let i = 0;
+    const array = [];
+    for (const x of iterator as any) {
+      array.push(x);
+      if (++i >= limit) break;
+    }
+    return array as any;
+  }
+
+  return (async () => {
+    let i = 0;
+    const array = [];
+    for await (const x of iterator as any) {
+      array.push(x);
+      if (++i >= limit) break;
+    }
+    return array;
+  })() as any;
+}
+
+export { wrap, merge, all };
