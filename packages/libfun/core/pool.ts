@@ -8,7 +8,11 @@ import type { Fn } from "./types";
 //    + rate limits
 //    / group limits
 //    - handle level groups
-//    - abort (fetch, tg, async, monads)
+//    - abort
+//        + async
+//        + fetch
+//        - nested
+//        - tg
 //    - catch error handling
 
 /// TODO: `fetch` generator

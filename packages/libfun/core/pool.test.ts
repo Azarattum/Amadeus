@@ -1,4 +1,4 @@
-import { all, async, map } from "./iterator";
+import { all, async, map, signal } from "./iterator";
 import { expect, it, vi } from "vitest";
 import type { Fn } from "./types";
 import { pools } from "./pool";
@@ -177,4 +177,23 @@ it("supports nested generators", async () => {
   expect(await all(doubled())).toEqual([2, 4, 6, 1, 4, 9]);
   numbers.close();
   doubled.close();
+});
+
+it("resolves signal requests", async () => {
+  const fetch = function* () {
+    const abort = yield* signal();
+    const awaited = yield* async(Promise.resolve(abort));
+    return awaited;
+  };
+
+  const event = pool<() => AbortSignal | undefined>("event");
+  event(function* () {
+    const stuff = yield* fetch();
+    yield stuff;
+  });
+
+  const result = await all(event());
+  expect(result).toHaveLength(1);
+  expect(result[0]).toBeInstanceOf(AbortSignal);
+  event.close();
 });
