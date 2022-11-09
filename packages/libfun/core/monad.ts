@@ -4,7 +4,6 @@ import type {
   Transform,
   Wrappable,
   Promised,
-  Thenable,
   Identity,
   Resolve,
   Wrapper,
@@ -13,6 +12,7 @@ import type {
   Monad,
   All,
 } from "./monad.types";
+import { thenable } from "./iterator";
 
 const error = Symbol();
 const state = Symbol();
@@ -89,7 +89,7 @@ function all<T extends readonly any[]>(values: T) {
 }
 
 function unwrap<T, U = never, F extends Transform[] = [Identity]>(
-  value: Monad<T, F> | Thenable<T> | T,
+  value: Monad<T, F> | PromiseLike<T> | T,
   fallback?: U
 ): Unwrapped<F, T> | Promised<F, U> {
   if (unwrappable(value)) value = value.unwrap(fallback) as any;
@@ -145,18 +145,9 @@ function apply<T, U, F extends Transform>(
   };
 }
 
-function thenable<T = unknown>(value: any): value is Thenable<T> {
-  return (
-    value != null &&
-    typeof value === "object" &&
-    "then" in value &&
-    typeof value["then"] === "function"
-  );
-}
-
 function unwrappable<T = unknown>(value: any): value is Wrappable<T> {
   return (
-    value != null &&
+    value !== null &&
     typeof value === "object" &&
     "unwrap" in value &&
     typeof value["unwrap"] === "function"
@@ -164,7 +155,7 @@ function unwrappable<T = unknown>(value: any): value is Wrappable<T> {
 }
 
 function invalid(value: any): value is { [error]: any } {
-  return value != null && typeof value === "object" && error in value;
+  return value !== null && typeof value === "object" && error in value;
 }
 
 function native(fn: any, args = 1): fn is (...args: any[]) => void {

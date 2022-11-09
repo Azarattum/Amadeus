@@ -1,3 +1,4 @@
+import type { Passthrough } from "./iterator";
 import type { Fn } from "./types";
 
 interface Options {
@@ -30,7 +31,7 @@ interface State<T extends Fn> extends Options {
 
 type Handler<T extends Fn> = (
   ...args: Parameters<T>
-) => Generator<ReturnType<T> | Promise<any>>; /// Filter promises
+) => Generator<ReturnType<T> | Promise<ReturnType<T>> | Passthrough<unknown>>;
 
 type Pool<T extends Fn = (..._: any) => any> = {
   (handler: Handler<T>): () => void;

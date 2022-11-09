@@ -1,6 +1,6 @@
+import { all, async } from "./iterator";
 import { expect, it, vi } from "vitest";
 import type { Fn } from "./types";
-import { all } from "./iterator";
 import { pools } from "./pool";
 
 const { pool, count, status } = pools();
@@ -83,7 +83,7 @@ it("reports status", () => {
 it("limits concurrency", async () => {
   let resolve: (_?: unknown) => void = () => {};
   const impl = vi.fn(function* () {
-    yield new Promise((x) => (resolve = x));
+    yield* async(new Promise((x) => (resolve = x)));
     yield 42;
   });
 
@@ -106,7 +106,7 @@ it("limits concurrency", async () => {
 it("rates calls per minute", async () => {
   const resolve: Fn[] = [];
   const impl = vi.fn(function* () {
-    yield new Promise((x) => resolve.push(x));
+    yield* async(new Promise((x) => resolve.push(x)));
     yield 42;
   });
   const event = pool<() => number>("event", {
@@ -126,6 +126,20 @@ it("rates calls per minute", async () => {
 
   resolve.map((x) => x());
   event.close();
+});
+
+it("establishes asynchronous workflow", () => {
+  const event = pool<() => number>("event");
+
+  event(function* () {
+    const value = yield* async(Promise.resolve("1"));
+    yield Number.parseInt(value);
+    yield Promise.resolve(2);
+    yield Promise.resolve(3);
+    yield 4;
+  });
+
+  expect(all(event())).resolves.toEqual([1, 2, 3, 4]);
 });
 
 it("can be aborted", () => {

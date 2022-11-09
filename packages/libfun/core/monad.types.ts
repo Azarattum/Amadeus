@@ -14,13 +14,6 @@ type All<T extends readonly any[]> = MonadsTransform<T> extends []
   ? Monad<T, [Identity]>
   : Monad<MonadsType<T>, MonadsTransform<T>>;
 
-interface Thenable<T> {
-  then<U = T, K = never>(
-    resolved?: Resolve<Awaited<T>, U | Thenable<U>>,
-    rejected?: Reject<K | Thenable<K>>
-  ): Thenable<U | K>;
-}
-
 interface Wrappable<T, F extends Transforms = []> {
   unwrap<U = never>(fallback?: U): Unwrapped<F, T> | Promised<F, U>;
 }
@@ -163,7 +156,6 @@ export type {
   Unwrapped,
   Wrappable,
   Promised,
-  Thenable,
   Identity,
   Wrapped,
   Wrapper,

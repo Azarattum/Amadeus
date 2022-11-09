@@ -1,17 +1,47 @@
+const passthrough = Symbol();
 type SomeIterator<T = any> = Iterator<T> | AsyncIterator<T>;
+type Passthrough<T> = PromiseLike<T> & { [passthrough]: true };
 type Iterated<T extends SomeIterator> = T extends AsyncIterator<infer U>
   ? Promise<U[]>
   : T extends Iterator<infer U>
   ? U[]
   : never;
 
+const async = function* <T>(promise: Promise<T>) {
+  (promise as any)[passthrough] = true;
+  const result: T = yield promise as any as Passthrough<T>;
+  return result;
+};
+
 async function* wrap<T, U>(iterator: SomeIterator<T>) {
   for (let value, done; ; ) {
     ({ value, done } = await iterator.next(value));
     if (done) return value as U;
-    if (typeof value !== "object" || !("then" in value)) yield value as T;
-    value = await value;
+    if (!thenable(value)) yield value as T;
+    else {
+      const skip = passable(value);
+      value = await value;
+      if (!skip) yield value as Awaited<T>;
+    }
   }
+}
+
+function thenable<T = unknown>(value: any): value is PromiseLike<T> {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "then" in value &&
+    typeof value["then"] === "function"
+  );
+}
+
+function passable(value: any) {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    passthrough in value &&
+    value[passthrough] === true
+  );
 }
 
 async function* merge<T, U>(...iterators: SomeIterator<T>[]) {
@@ -90,4 +120,5 @@ function block<T extends AsyncGenerator>(
   })();
 }
 
-export { wrap, merge, all, block };
+export { wrap, merge, all, block, async, thenable };
+export type { Passthrough };
