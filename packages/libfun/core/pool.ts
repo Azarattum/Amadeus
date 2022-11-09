@@ -1,12 +1,13 @@
 import type { Handler, Options, Pool, Pools } from "./pool.types";
-import { merge, wrap } from "./iterator";
+import { block, merge, wrap } from "./iterator";
 import type { Fn } from "./types";
 
 /// TODO: feature list
 //    + name
 //    + concurrency
 //    + rate limits
-//    - group limits
+//    / group limits
+//    - handle level groups
 //    - abort (fetch, tg, async, monads)
 //    - catch error handling
 
@@ -32,11 +33,11 @@ const defaults: Options = {
 };
 
 const state = Symbol();
-const delay = (ms: number) => new Promise((x) => setTimeout(x, ms));
 
 function pools(options: Partial<Options> = {}): Pools {
   options = { ...defaults, ...options };
   const all = new Map<string, Pool>();
+
   function each<T extends keyof Omit<Pool, symbol>>(method: T) {
     return function (...args: Parameters<Pool[T]>) {
       return Array.from(all.values()).map((x) =>
@@ -45,7 +46,7 @@ function pools(options: Partial<Options> = {}): Pools {
     };
   }
 
-  const proto: ThisType<Pool<Fn>> = {
+  const proto: Pick<Pool, keyof Pool> = {
     abort() {
       /// TODO
     },
@@ -64,19 +65,24 @@ function pools(options: Partial<Options> = {}): Pools {
     status() {
       return this[state];
     },
-    catch() {
+    catch(handler) {
       /// TODO
+    },
+    schedule(when) {
+      /// TODO !!!
+      throw new Error("Unimplemented!");
     },
   };
 
   return {
+    schedule: each("schedule"),
     abort: each("abort"),
     drain: each("drain"),
     close: each("close"),
     catch: each("catch"),
     count: () => all.size,
     status: (id?: string) => {
-      if (id == null) return each("status");
+      if (id == null) return each("status")();
       const status = all.get(id)?.status();
       if (!status) throw new Error(`Pool with id ${id} not found!`);
       return status as any;
@@ -99,7 +105,6 @@ function pool<T extends Fn = () => void>(
     [state]: {
       id,
       executing: 0,
-      last: new Date(0),
       listeners: new Set(),
       ...options,
     },
@@ -115,58 +120,33 @@ function pool<T extends Fn = () => void>(
     }
 
     // Call all event handlers
-    return block.bind(self)(() => {
-      self.executing += 1;
-      const generators = [...self.listeners.values()];
-      const iterables = generators.map((x) =>
-        wrap(x(...(params as Parameters<T>)))
-      );
-
-      return (async function* () {
-        yield* merge(...iterables);
-        self.executing -= 1;
+    return block(
+      () => {
+        const interval = 60000 / self.rate;
+        const left = interval - (Date.now() - +(self.last || new Date(0)));
+        if (self.executing < self.concurrency && left <= 0) return true;
+        return Math.max(left, 30);
+      },
+      () => {
+        self.executing += 1;
         self.last = new Date();
-      })();
-    });
+        const generators = [...self.listeners.values()];
+        const iterables = generators.map((x) =>
+          wrap(x(...(params as Parameters<T>)))
+        );
+
+        return (async function* () {
+          yield* merge(...iterables);
+          self.executing -= 1;
+        })();
+      }
+    );
   }
 
   Object.setPrototypeOf(proto, Function);
   const pool = Object.setPrototypeOf(apply.bind(data), proto);
   Object.assign(pool, data);
   return pool;
-}
-
-/**
- * Clears an execution stack of a given function (using setTimeout)
- * @param func Function to unstack
- */
-function unstack<T extends Fn>(
-  func: T
-): (...args: Parameters<T>) => Promise<ReturnType<T>> {
-  return (...args: Parameters<T>) =>
-    new Promise<ReturnType<T>>((resolve) => {
-      setTimeout(() => {
-        resolve(func(...args));
-      }, 0);
-    });
-}
-
-function block<T extends AsyncGenerator>(
-  this: Pool[symbol],
-  resolve: () => T
-): T {
-  // Try calling synchronously
-  if (this.executing < this.concurrency) return resolve();
-  const interval = 60000 / this.rate;
-  const elapsed = Date.now() - +this.last;
-
-  // Otherwise wait and try again
-  const self = block.bind(this);
-  return (async function* () {
-    await delay(Math.max(30, interval - elapsed));
-    /// FIXME: unwrapping lots of generators might be bad performance wise...
-    yield* await unstack(self)(resolve);
-  })() as T;
 }
 
 export { pools };

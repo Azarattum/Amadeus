@@ -71,4 +71,23 @@ function all<T extends SomeIterator>(
   })() as any;
 }
 
-export { wrap, merge, all };
+function block<T extends AsyncGenerator>(
+  condition: () => true | number,
+  resolve: () => T
+) {
+  const ready = condition();
+  if (ready === true) return resolve();
+
+  const blocking = new Promise<void>(function poll(resolve) {
+    const ready = condition();
+    if (ready === true) resolve();
+    else setTimeout(() => poll(resolve), ready);
+  });
+
+  return (async function* () {
+    await blocking;
+    yield* resolve();
+  })();
+}
+
+export { wrap, merge, all, block };

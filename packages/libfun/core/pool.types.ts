@@ -8,11 +8,24 @@ interface Options {
   group?: string;
 }
 
+type Schedule = (
+  | {
+      relative: number;
+      absolute?: never;
+    }
+  | {
+      relative?: never;
+      absolute: Date;
+    }
+) & {
+  interval?: number;
+};
+
 interface State<T extends Fn> extends Options {
   id: string;
   listeners: Set<Handler<T>>;
   executing: number;
-  last: Date;
+  last?: Date;
 }
 
 type Handler<T extends Fn> = (
@@ -23,7 +36,10 @@ type Pool<T extends Fn = (..._: any) => any> = {
   (handler: Handler<T>): () => void;
   (...args: Parameters<T>): AsyncIterator<ReturnType<T>>;
 
-  catch: (handler: (reason: unknown) => any) => void;
+  schedule: (
+    when: Schedule
+  ) => (...args: Parameters<T>) => AsyncIterator<ReturnType<T>>;
+  catch: (handler?: (reason: unknown) => any) => void;
   status: () => State<T>;
   abort: () => void;
   close: () => void;

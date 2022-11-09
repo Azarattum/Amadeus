@@ -1,8 +1,9 @@
 import { expect, it, vi } from "vitest";
+import type { Fn } from "./types";
 import { all } from "./iterator";
 import { pools } from "./pool";
 
-const { pool, count } = pools();
+const { pool, count, status } = pools();
 const delay = (ms: number) => new Promise((x) => setTimeout(x, ms));
 
 it("fires events", () => {
@@ -63,6 +64,22 @@ it("assigns a group", () => {
   expect(pool("").status().group).toBeUndefined();
 });
 
+it("reports status", () => {
+  const a = pool("a");
+  const b = pool("b");
+
+  expect(a.status().id).toBe("a");
+  expect(b.status().id).toBe("b");
+  expect(a.status().executing).toBe(0);
+  expect(b.status().executing).toBe(0);
+  expect(status()).toHaveLength(0);
+  a(function* () {});
+  expect(status()).toHaveLength(1);
+  b(function* () {});
+  expect(status()).toHaveLength(2);
+  expect(status()).toMatchObject([{ id: "a" }, { id: "b" }]);
+});
+
 it("limits concurrency", async () => {
   let resolve: (_?: unknown) => void = () => {};
   const impl = vi.fn(function* () {
@@ -84,18 +101,33 @@ it("limits concurrency", async () => {
   await delay(100);
   expect(impl).toHaveBeenCalledTimes(2);
   event.close();
-  /// TODO: add a group concurrency test
 });
 
-it("rates calls per minute", () => {
-  /// TODO: implement a rate limit test
-  //          per event/module
+it("rates calls per minute", async () => {
+  const resolve: Fn[] = [];
+  const impl = vi.fn(function* () {
+    yield new Promise((x) => resolve.push(x));
+    yield 42;
+  });
+  const event = pool<() => number>("event", {
+    rate: 1200,
+  });
+
+  event(impl);
+  expect(impl).not.toHaveBeenCalled();
+  expect(all(event())).resolves.toEqual([42]);
+  expect(impl).toHaveBeenCalledTimes(1);
+  expect(all(event())).resolves.toEqual([42]);
+  expect(impl).toHaveBeenCalledTimes(1);
+  await delay(10);
+  expect(impl).toHaveBeenCalledTimes(1);
+  await delay(100);
+  expect(impl).toHaveBeenCalledTimes(2);
+
+  resolve.map((x) => x());
+  event.close();
 });
 
 it("can be aborted", () => {
   /// TODO: test the abort functionality along with the fetch support
-});
-
-it("reports status", () => {
-  /// TODO: status should be properly reported and globally accessible
 });
