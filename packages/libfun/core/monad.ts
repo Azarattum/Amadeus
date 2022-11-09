@@ -177,9 +177,14 @@ function native(fn: any, args = 1): fn is (...args: any[]) => void {
   );
 }
 
-function errorify(what: any): { [error]: Error } {
+function errorify(what: unknown): { [error]: Error } {
   if (invalid(what)) what = what[error];
-  return { [error]: what instanceof Error ? what : new Error(what) };
+  return {
+    [error]:
+      what instanceof Error
+        ? what
+        : new Error(typeof what === "string" ? what : JSON.stringify(what)),
+  };
 }
 
 export { monad, all, unwrap, transform, state };
