@@ -7,23 +7,57 @@ type Iterated<T extends SomeIterator> = T extends AsyncIterator<infer U>
   ? U[]
   : never;
 
-const async = function* <T>(promise: Promise<T>) {
+const async = function* <T>(promise: PromiseLike<T>) {
   (promise as any)[passthrough] = true;
   const result: T = yield promise as any as Passthrough<T>;
   return result;
 };
 
-async function* wrap<T, U>(iterator: SomeIterator<T>) {
+async function* wrap<T, U>(iterator: SomeIterator<T>, signal?: AbortSignal) {
   for (let value, done; ; ) {
-    ({ value, done } = await iterator.next(value));
+    ({ value, done } = await cancelable(iterator.next(value), signal));
     if (done) return value as U;
     if (!thenable(value)) yield value as T;
     else {
       const skip = passable(value);
-      value = await value;
+      value = await cancelable(value, signal);
       if (!skip) yield value as Awaited<T>;
     }
   }
+}
+
+function* map<T, M, R>(
+  iterator: AsyncIterator<T>,
+  map: (item: T) => Generator<M, R>
+) {
+  const all: R[] = [];
+  for (let value, done; ; ) {
+    ({ value, done } = yield* async(iterator.next()));
+    if (done) return all;
+    /// Can it really be aborted?     ↓ signal here might be nice
+    const mapped = wrap(map(value as T));
+    for (let value, done; !done; ) {
+      ({ value, done } = yield* async(mapped.next()));
+      if (done) all.push(value as R);
+      else yield value as M;
+    }
+  }
+}
+
+function cancelable<T>(promise: T, signal?: AbortSignal) {
+  const cancel = new Promise<void>((_, reject) => {
+    const remove = () => signal?.removeEventListener("abort", abort);
+    function abort() {
+      reject(new DOMException("This operation was aborted", "AbortError"));
+      remove();
+    }
+
+    if (signal?.aborted) return abort();
+    Promise.resolve(promise).then(remove, remove);
+    signal?.addEventListener("abort", abort);
+  });
+
+  return Promise.race([promise, cancel]) as T;
 }
 
 function thenable<T = unknown>(value: any): value is PromiseLike<T> {
@@ -120,5 +154,5 @@ function block<T extends AsyncGenerator>(
   })();
 }
 
-export { wrap, merge, all, block, async, thenable };
+export { wrap, merge, all, block, async, thenable, map };
 export type { Passthrough };

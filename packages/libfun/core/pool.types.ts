@@ -2,11 +2,9 @@ import type { Passthrough } from "./iterator";
 import type { Fn } from "./types";
 
 interface Options {
-  rate: number;
-  cache: number;
   concurrency: number;
-  signal?: AbortSignal;
-  group?: string;
+  cache: number;
+  rate: number;
 }
 
 type Schedule = (
@@ -22,14 +20,24 @@ type Schedule = (
   interval?: number;
 };
 
+interface Executor {
+  controller: AbortController;
+}
+
+interface Context {
+  signal: AbortSignal;
+}
+
 interface State<T extends Fn> extends Options {
-  id: string;
   listeners: Set<Handler<T>>;
-  executing: number;
+  executing: Set<Executor>;
+  pending: Set<Executor>;
   last?: Date;
+  id: string;
 }
 
 type Handler<T extends Fn> = (
+  this: Context,
   ...args: Parameters<T>
 ) => Generator<ReturnType<T> | Promise<ReturnType<T>> | Passthrough<unknown>>;
 

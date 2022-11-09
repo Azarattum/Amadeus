@@ -1,4 +1,4 @@
-import { all, async } from "./iterator";
+import { all, async, map } from "./iterator";
 import { expect, it, vi } from "vitest";
 import type { Fn } from "./types";
 import { pools } from "./pool";
@@ -58,20 +58,14 @@ it("registers globally", () => {
   expect(count()).toBe(0);
 });
 
-it("assigns a group", () => {
-  const event = pool("event", { group: "Test" });
-  expect(event.status().group).toBe("Test");
-  expect(pool("").status().group).toBeUndefined();
-});
-
 it("reports status", () => {
   const a = pool("a");
   const b = pool("b");
 
   expect(a.status().id).toBe("a");
   expect(b.status().id).toBe("b");
-  expect(a.status().executing).toBe(0);
-  expect(b.status().executing).toBe(0);
+  expect(a.status().executing.size).toBe(0);
+  expect(b.status().executing.size).toBe(0);
   expect(status()).toHaveLength(0);
   a(function* () {});
   expect(status()).toHaveLength(1);
@@ -95,7 +89,7 @@ it("limits concurrency", async () => {
   expect(impl).not.toHaveBeenCalled();
   expect(all(event())).resolves.toEqual([42]);
   expect(impl).toHaveBeenCalledTimes(1);
-  expect(all(event())).resolves.toEqual([42]);
+  expect(all(event())).rejects.toBeInstanceOf(Error);
   expect(impl).toHaveBeenCalledTimes(1);
   resolve();
   await delay(100);
@@ -125,10 +119,11 @@ it("rates calls per minute", async () => {
   expect(impl).toHaveBeenCalledTimes(2);
 
   resolve.map((x) => x());
+  await delay(1);
   event.close();
 });
 
-it("establishes asynchronous workflow", () => {
+it("establishes asynchronous workflow", async () => {
   const event = pool<() => number>("event");
 
   event(function* () {
@@ -139,9 +134,47 @@ it("establishes asynchronous workflow", () => {
     yield 4;
   });
 
-  expect(all(event())).resolves.toEqual([1, 2, 3, 4]);
+  const results = all(event());
+  expect(await results).toEqual([1, 2, 3, 4]);
+  event.close();
 });
 
-it("can be aborted", () => {
-  /// TODO: test the abort functionality along with the fetch support
+it("can be aborted", async () => {
+  let resolve: (_?: unknown) => void = () => {};
+  const spy = vi.fn();
+
+  const event = pool("event");
+  event(function* () {
+    yield* async(new Promise((x) => (resolve = x)));
+    spy();
+  });
+
+  const loading = all(event());
+  await delay(1);
+  event.abort();
+  await loading.catch((e) => expect(e).toBeInstanceOf(Error));
+  resolve();
+  await delay(1);
+  expect(spy).not.toHaveBeenCalled();
+  event.close();
+});
+
+it("supports nested generators", async () => {
+  const numbers = pool<() => number>("numbers");
+  numbers(function* () {
+    yield* [1, 2, 3];
+  });
+
+  const doubled = pool<() => number>("doubled");
+  doubled(function* () {
+    const squared = yield* map(numbers(), function* (x) {
+      yield Promise.resolve(x * 2);
+      return yield* async(Promise.resolve(x * x));
+    });
+    yield* squared;
+  });
+
+  expect(await all(doubled())).toEqual([2, 4, 6, 1, 4, 9]);
+  numbers.close();
+  doubled.close();
 });

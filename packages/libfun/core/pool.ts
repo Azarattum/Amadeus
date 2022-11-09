@@ -26,8 +26,6 @@ import type { Fn } from "./types";
 
 const defaults: Options = {
   concurrency: Infinity,
-  signal: undefined,
-  group: undefined,
   rate: Infinity,
   cache: 0,
 };
@@ -48,14 +46,13 @@ function pools(options: Partial<Options> = {}): Pools {
 
   const proto: Pick<Pool, keyof Pool> = {
     abort() {
-      /// TODO
+      this[state].executing.forEach((x) => x.controller.abort());
+      this[state].executing.clear();
     },
     drain() {
+      this[state].pending.forEach((x) => x.controller.abort());
+      this[state].pending.clear();
       this.abort();
-      /// TODO: SOMEHOW CANCEL ALL THE PENDING EVENTS
-      //  maybe?:
-      //   this[state].executing = 0;
-      //   this[state].last = new Date();
     },
     close() {
       this[state].listeners.clear();
@@ -69,7 +66,7 @@ function pools(options: Partial<Options> = {}): Pools {
       /// TODO
     },
     schedule(when) {
-      /// TODO !!!
+      /// TODO
       throw new Error("Unimplemented!");
     },
   };
@@ -104,14 +101,15 @@ function pool<T extends Fn = () => void>(
   const data: Pick<Pool, symbol> = {
     [state]: {
       id,
-      executing: 0,
+      pending: new Set(),
+      executing: new Set(),
       listeners: new Set(),
       ...options,
     },
   };
 
-  function apply(this: typeof data, ...params: [Handler<T>] | any[]) {
-    const self = this[state];
+  function apply(...params: [Handler<T>] | any[]) {
+    const self = data[state];
     // Register a new handler
     if (params.length === 1 && typeof params[0] === "function") {
       self.listeners.add(params[0]);
@@ -120,31 +118,36 @@ function pool<T extends Fn = () => void>(
     }
 
     // Call all event handlers
+    const executor = { controller: new AbortController() };
+    const context = { signal: executor.controller.signal };
+    self.pending.add(executor);
     return block(
       () => {
+        executor.controller.signal.throwIfAborted();
         const interval = 60000 / self.rate;
         const left = interval - (Date.now() - +(self.last || new Date(0)));
-        if (self.executing < self.concurrency && left <= 0) return true;
+        if (self.executing.size < self.concurrency && left <= 0) return true;
         return Math.max(left, 30);
       },
       () => {
-        self.executing += 1;
+        self.pending.delete(executor);
+        self.executing.add(executor);
         self.last = new Date();
         const generators = [...self.listeners.values()];
         const iterables = generators.map((x) =>
-          wrap(x(...(params as Parameters<T>)))
+          wrap(x.bind(context)(...(params as Parameters<T>)), context.signal)
         );
 
         return (async function* () {
           yield* merge(...iterables);
-          self.executing -= 1;
+          self.executing.delete(executor);
         })();
       }
     );
   }
 
   Object.setPrototypeOf(proto, Function);
-  const pool = Object.setPrototypeOf(apply.bind(data), proto);
+  const pool = Object.setPrototypeOf(apply, proto);
   Object.assign(pool, data);
   return pool;
 }
