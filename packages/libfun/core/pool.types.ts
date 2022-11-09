@@ -35,11 +35,11 @@ type Handler<T extends Fn> = (
 
 type Pool<T extends Fn = (..._: any) => any> = {
   (handler: Handler<T>): () => void;
-  (...args: Parameters<T>): AsyncIterator<ReturnType<T>>;
+  (...args: Parameters<T>): AsyncGenerator<ReturnType<T>>;
 
   schedule: (
     when: Schedule
-  ) => (...args: Parameters<T>) => AsyncIterator<ReturnType<T>>;
+  ) => (...args: Parameters<T>) => AsyncGenerator<ReturnType<T>>;
   catch: (handler?: (reason: unknown) => any) => void;
   status: () => State<T>;
   abort: () => void;
