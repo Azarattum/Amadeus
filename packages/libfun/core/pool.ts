@@ -1,6 +1,11 @@
+import {
+  context as globalContext,
+  generate,
+  block,
+  merge,
+  wrap,
+} from "./iterator";
 import type { Handler, Options, Pool, Pools } from "./pool.types";
-import { context as globalContext } from "./iterator";
-import { block, merge, wrap } from "./iterator";
 import type { Fn } from "./types";
 
 /// TODO: feature list
@@ -128,7 +133,10 @@ function pool<T extends Fn = () => void>(
         self.last = new Date();
         const generators = [...self.listeners.values()];
         const iterables = generators.map((x) =>
-          wrap(x.bind(context)(...(params as Parameters<T>)), context.signal)
+          wrap(
+            generate(x.bind(context)(...(params as Parameters<T>))),
+            context.signal
+          )
         );
 
         return (async function* () {

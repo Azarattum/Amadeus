@@ -39,10 +39,12 @@ interface State<T extends Fn> extends Options {
 type Handler<T extends Fn> = (
   this: Context,
   ...args: Parameters<T>
-) => Generator<
-  ReturnType<T> | Promise<ReturnType<T>> | Passthrough<unknown>,
-  void
->;
+) =>
+  | Generator<
+      ReturnType<T> | Promise<ReturnType<T>> | Passthrough<unknown>,
+      void
+    >
+  | (ReturnType<T> extends Promise<any> ? never : ReturnType<T>);
 
 type Pool<T extends Fn = (..._: any) => any> = {
   (handler: Handler<T>): () => void;

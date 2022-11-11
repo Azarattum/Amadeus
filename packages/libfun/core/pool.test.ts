@@ -258,3 +258,13 @@ it("aborts nested pools", async () => {
   }
   expect(unreachable).not.toHaveBeenCalled();
 });
+
+it("supports synchronous non-generator handlers", async () => {
+  const event = pool<(x: number) => number>("event");
+  event((x) => 42 * x);
+
+  const iterator = event(2);
+  expect(await iterator.next()).toEqual({ value: 84, done: false });
+  expect(await iterator.next()).toEqual({ value: undefined, done: true });
+  event.close();
+});

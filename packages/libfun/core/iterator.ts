@@ -50,6 +50,17 @@ function* map<T, M, R>(
   }
 }
 
+function generate<T>(
+  value: T
+): T extends Generator<any> ? T : Generator<T, void> {
+  if (value && typeof value === "object" && Symbol.iterator in value) {
+    return value as any;
+  }
+  return (function* () {
+    yield value;
+  })() as any;
+}
+
 function cancelable<T>(promise: T, signal?: AbortSignal) {
   const cancel = new Promise<void>((_, reject) => {
     const remove = () => signal?.removeEventListener("abort", abort);
@@ -160,5 +171,5 @@ function block<T extends AsyncGenerator>(
   })();
 }
 
-export { wrap, merge, all, block, async, thenable, map, context };
+export { wrap, merge, all, block, async, thenable, map, context, generate };
 export type { Passthrough };
