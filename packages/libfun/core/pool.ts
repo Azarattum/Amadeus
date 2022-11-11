@@ -4,26 +4,14 @@ import { block, merge, wrap } from "./iterator";
 import type { Fn } from "./types";
 
 /// TODO: feature list
-//    + name
+//    + id
 //    + concurrency
 //    + rate limits
 //    / group limits
-//    - handle level groups
 //    + abort
 //    - catch error handling
-
-/// TODO: `fetch` generator
-//    - error prone (log errors per module)
-//    - auto superstruct validation
-//    - maybe use gretchen
-//    - auto json parse (mb when validated?)
-//      - this should be type specific (e.g. do not json parse streams)
-//
-// Consider the API:
-//  yield* fetch(User, "...");
-// vs
-//  yield* fetch("...").json(); ← gretchen under the hood
-//  yield* fetch("...").as(User);
+//    - groups
+//        - context based inheritance
 
 const defaults: Options = {
   concurrency: Infinity,
