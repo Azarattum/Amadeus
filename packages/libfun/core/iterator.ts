@@ -1,7 +1,6 @@
 const passthrough = Symbol();
-const abort = Symbol();
 type SomeIterator<T = any> = Iterator<T> | AsyncIterator<T>;
-type Passthrough<T> = (PromiseLike<T> & { [passthrough]: true }) | typeof abort;
+type Passthrough<T> = PromiseLike<T> & { [passthrough]: true };
 type Iterated<T extends SomeIterator> = T extends AsyncIterator<infer U>
   ? Promise<U[]>
   : T extends Iterator<infer U>
@@ -14,18 +13,17 @@ const async = function* <T>(promise: PromiseLike<T>) {
   return result;
 };
 
-const signal = function* (): Generator<typeof abort, AbortSignal | undefined> {
-  const signal = (yield abort) as AbortSignal | undefined;
-  return signal;
-};
-
-async function* wrap<T, U>(iterator: SomeIterator<T>, signal?: AbortSignal) {
+const context = { signal: undefined as AbortSignal | undefined };
+async function* wrap<T, U>(iterator: Iterator<T>, signal?: AbortSignal) {
   for (let value, done; ; ) {
-    ({ value, done } = await cancelable(iterator.next(value), signal));
-    if (done) return value as U;
+    signal?.throwIfAborted();
+    const previous = context.signal;
+    context.signal = signal;
+    ({ value, done } = iterator.next(value));
+    context.signal = previous;
 
-    if (value === abort) value = signal as T;
-    else if (!thenable(value)) yield value as T;
+    if (done) return value as U;
+    if (!thenable(value)) yield value as T;
     else {
       const skip = passable(value);
       value = await cancelable(value, signal);
@@ -39,11 +37,11 @@ function* map<T, M, R>(
   map: (item: T) => Generator<M, R>
 ) {
   const all: R[] = [];
-  const abort = yield* signal();
   for (let value, done; ; ) {
     ({ value, done } = yield* async(iterator.next()));
     if (done) return all;
-    const mapped = wrap(map(value as T), abort);
+
+    const mapped = wrap(map(value as T), context.signal);
     for (let value, done; !done; ) {
       ({ value, done } = yield* async(mapped.next()));
       if (done) all.push(value as R);
@@ -162,5 +160,5 @@ function block<T extends AsyncGenerator>(
   })();
 }
 
-export { wrap, merge, all, block, async, signal, thenable, map };
+export { wrap, merge, all, block, async, thenable, map, context };
 export type { Passthrough };

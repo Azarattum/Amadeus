@@ -1,10 +1,15 @@
-import { all, async, map, signal } from "./iterator";
+import { all, async, context, map } from "./iterator";
 import { expect, it, vi } from "vitest";
 import type { Fn } from "./types";
 import { pools } from "./pool";
 
 const { pool, count, status } = pools();
-const delay = (ms: number) => new Promise((x) => setTimeout(x, ms));
+const delay = (ms = 1) => new Promise((x) => setTimeout(x, ms));
+const barrier = () => {
+  let resolve: () => void = () => {};
+  const promise = new Promise<void>((r) => (resolve = r));
+  return { resolve, promise };
+};
 
 it("fires events", () => {
   const event = pool<(_: number) => void>("event");
@@ -119,7 +124,7 @@ it("rates calls per minute", async () => {
   expect(impl).toHaveBeenCalledTimes(2);
 
   resolve.map((x) => x());
-  await delay(1);
+  await delay();
   event.close();
 });
 
@@ -140,21 +145,21 @@ it("establishes asynchronous workflow", async () => {
 });
 
 it("can be aborted", async () => {
-  let resolve: (_?: unknown) => void = () => {};
+  const { resolve, promise } = barrier();
   const spy = vi.fn();
 
   const event = pool("event");
   event(function* () {
-    yield* async(new Promise((x) => (resolve = x)));
+    yield* async(promise);
     spy();
   });
 
   const loading = all(event());
-  await delay(1);
+  await delay();
   event.abort();
   await loading.catch((e) => expect(e).toBeInstanceOf(Error));
   resolve();
-  await delay(1);
+  await delay();
   expect(spy).not.toHaveBeenCalled();
   event.close();
 });
@@ -179,10 +184,9 @@ it("supports nested generators", async () => {
   doubled.close();
 });
 
-it("resolves signal requests", async () => {
+it("resolves signal context", async () => {
   const fetch = function* () {
-    const abort = yield* signal();
-    const awaited = yield* async(Promise.resolve(abort));
+    const awaited = yield* async(Promise.resolve(context.signal));
     return awaited;
   };
 
@@ -196,4 +200,61 @@ it("resolves signal requests", async () => {
   expect(result).toHaveLength(1);
   expect(result[0]).toBeInstanceOf(AbortSignal);
   event.close();
+});
+
+it("aborts nested pools", async () => {
+  const unreachable = vi.fn();
+  {
+    const { resolve, promise } = barrier();
+    const numbers = pool<() => number>("numbers");
+    numbers(function* () {
+      yield 10;
+      yield* async(promise);
+      unreachable();
+      yield 42;
+    });
+
+    const doubled = pool<() => number>("doubled");
+    doubled(function* () {
+      yield* map(numbers(), function* (x) {
+        yield x;
+      });
+      unreachable();
+    });
+
+    const result = doubled();
+    await result.next();
+    expect(result.next()).rejects.toBeInstanceOf(Error);
+    doubled.close();
+    resolve();
+    await delay();
+    numbers.close();
+  }
+  {
+    const { resolve, promise } = barrier();
+    const numbers = pool<() => number>("numbers");
+    numbers(function* () {
+      yield 10;
+      yield* async(promise);
+      unreachable();
+      yield 42;
+    });
+
+    const doubled = pool<() => number>("doubled");
+    doubled(function* () {
+      const generator = numbers();
+      yield (yield* async(generator.next())).value;
+      (yield* async(generator.next())).value;
+      unreachable();
+    });
+
+    const result = doubled();
+    await result.next();
+    expect(result.next()).rejects.toBeInstanceOf(Error);
+    doubled.close();
+    resolve();
+    await delay();
+    numbers.close();
+  }
+  expect(unreachable).not.toHaveBeenCalled();
 });

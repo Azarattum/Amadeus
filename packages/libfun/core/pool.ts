@@ -1,4 +1,5 @@
 import type { Handler, Options, Pool, Pools } from "./pool.types";
+import { context as globalContext } from "./iterator";
 import { block, merge, wrap } from "./iterator";
 import type { Fn } from "./types";
 
@@ -8,11 +9,7 @@ import type { Fn } from "./types";
 //    + rate limits
 //    / group limits
 //    - handle level groups
-//    - abort
-//        + async
-//        + fetch
-//        - nested
-//        - tg
+//    + abort
 //    - catch error handling
 
 /// TODO: `fetch` generator
@@ -124,10 +121,14 @@ function pool<T extends Fn = () => void>(
     // Call all event handlers
     const executor = { controller: new AbortController() };
     const context = { signal: executor.controller.signal };
+    globalContext.signal?.addEventListener("abort", () =>
+      executor.controller.abort()
+    );
+
     self.pending.add(executor);
     return block(
       () => {
-        executor.controller.signal.throwIfAborted();
+        context.signal.throwIfAborted();
         const interval = 60000 / self.rate;
         const left = interval - (Date.now() - +(self.last || new Date(0)));
         if (self.executing.size < self.concurrency && left <= 0) return true;
