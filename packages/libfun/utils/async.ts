@@ -1,3 +1,5 @@
+import { handle } from "./error";
+
 function cancel<T>(promise: T, signal?: AbortSignal) {
   const cancel = new Promise<void>((_, reject) => {
     const remove = () => signal?.removeEventListener("abort", abort);
@@ -37,4 +39,32 @@ function thenable<T = unknown>(value: any): value is PromiseLike<T> {
   );
 }
 
-export { cancel, thenable, derive };
+function block<T extends AsyncGenerator>(
+  condition: () => true | number,
+  resolve: () => T,
+  catcher?: (error: Error) => void
+) {
+  try {
+    const ready = condition();
+    if (ready === true) return resolve();
+
+    const blocking = new Promise<void>(function poll(resolve) {
+      const ready = condition();
+      if (ready === true) resolve();
+      else setTimeout(() => poll(resolve), ready);
+    });
+
+    return (async function* () {
+      try {
+        await blocking;
+        yield* resolve();
+      } catch (error) {
+        handle(error, catcher);
+      }
+    })();
+  } catch (error) {
+    return handle(error, catcher, (async function* () {})());
+  }
+}
+
+export { cancel, thenable, derive, block };

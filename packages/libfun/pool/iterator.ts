@@ -4,10 +4,14 @@ import { handle } from "../utils/error";
 const passthrough = Symbol();
 type SomeIterator<T = any> = Iterator<T> | AsyncIterator<T>;
 type Passthrough<T> = PromiseLike<T> & { [passthrough]: true };
-type Iterated<T extends SomeIterator> = T extends AsyncIterator<infer U>
-  ? Promise<U[]>
+type Iterated<T extends SomeIterator, One = false> = T extends AsyncIterator<
+  infer U
+>
+  ? Promise<One extends true ? U : U[]>
   : T extends Iterator<infer U>
-  ? U[]
+  ? One extends true
+    ? U
+    : U[]
   : never;
 
 const async = function* <T>(promise: PromiseLike<T>) {
@@ -73,15 +77,6 @@ function generate<T>(
   })() as any;
 }
 
-function passable(value: any) {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    passthrough in value &&
-    value[passthrough] === true
-  );
-}
-
 async function* merge<T, U>(...iterators: SomeIterator<T>[]) {
   const never = new Promise<any>(() => {});
 
@@ -139,33 +134,30 @@ function take<T extends SomeIterator>(
   })() as any;
 }
 
-function block<T extends AsyncGenerator>(
-  condition: () => true | number,
-  resolve: () => T,
-  catcher?: (error: Error) => void
-) {
-  try {
-    const ready = condition();
-    if (ready === true) return resolve();
-
-    const blocking = new Promise<void>(function poll(resolve) {
-      const ready = condition();
-      if (ready === true) resolve();
-      else setTimeout(() => poll(resolve), ready);
-    });
-
-    return (async function* () {
-      try {
-        await blocking;
-        yield* resolve();
-      } catch (error) {
-        handle(error, catcher);
-      }
-    })();
-  } catch (error) {
-    return handle(error, catcher, (async function* () {})());
+function first<T extends SomeIterator>(iterator: T): Iterated<T, true> {
+  if (Symbol.iterator in iterator) {
+    const { value, done } = (iterator as any).next();
+    if (done) throw new Error("No values to take from the iterator!");
+    iterator.return?.();
+    return value;
   }
+
+  return (async () => {
+    const { value, done } = await (iterator as any).next();
+    if (done) throw new Error("No values to take from the iterator!");
+    iterator.return?.();
+    return value;
+  })() as any;
 }
 
-export { wrap, merge, take, block, async, map, context, generate };
+function passable(value: any) {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    passthrough in value &&
+    value[passthrough] === true
+  );
+}
+
+export { wrap, merge, take, first, async, map, context, generate };
 export type { Passthrough };
