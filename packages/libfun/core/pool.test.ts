@@ -1,9 +1,9 @@
 import { all, async, context, map } from "./iterator";
+import { PoolError, pools } from "./pool";
 import { expect, it, vi } from "vitest";
 import type { Fn } from "./types";
-import { pools } from "./pool";
 
-const { pool, count, status } = pools();
+const { pool, count, status } = pools({ group: "test" });
 const delay = (ms = 1) => new Promise((x) => setTimeout(x, ms));
 const barrier = () => {
   let resolve: () => void = () => {};
@@ -94,7 +94,7 @@ it("limits concurrency", async () => {
   expect(impl).not.toHaveBeenCalled();
   expect(all(event())).resolves.toEqual([42]);
   expect(impl).toHaveBeenCalledTimes(1);
-  expect(all(event())).rejects.toBeInstanceOf(Error);
+  expect(all(event())).resolves.toEqual([]);
   expect(impl).toHaveBeenCalledTimes(1);
   resolve();
   await delay(100);
@@ -224,7 +224,7 @@ it("aborts nested pools", async () => {
 
     const result = doubled();
     await result.next();
-    expect(result.next()).rejects.toBeInstanceOf(Error);
+    expect(result.next()).resolves.toEqual({ value: undefined, done: true });
     doubled.close();
     resolve();
     await delay();
@@ -250,7 +250,7 @@ it("aborts nested pools", async () => {
 
     const result = doubled();
     await result.next();
-    expect(result.next()).rejects.toBeInstanceOf(Error);
+    expect(result.next()).resolves.toEqual({ value: undefined, done: true });
     doubled.close();
     resolve();
     await delay();
@@ -267,4 +267,59 @@ it("supports synchronous non-generator handlers", async () => {
   expect(await iterator.next()).toEqual({ value: 84, done: false });
   expect(await iterator.next()).toEqual({ value: undefined, done: true });
   event.close();
+});
+
+it("catches thrown exceptions", async () => {
+  const event = pool<() => number>("event");
+  event(function* () {
+    yield 1;
+    throw 2;
+    yield 3;
+  });
+  event(function* () {
+    yield 10;
+    yield 11;
+    yield 12;
+  });
+
+  const handler = vi.fn((error: PoolError) => {
+    expect(error).toBeInstanceOf(PoolError);
+    expect(error.pool).toBe("event");
+    expect(error.caller).toBe("test");
+    expect(error.handler).toBe("test");
+  });
+  event.catch(handler);
+  expect(await all(event())).toEqual([1, 10, 11, 12]);
+  expect(handler).toHaveBeenCalledTimes(1);
+  event.close();
+});
+
+it("catches with global handler", async () => {
+  const space = pools();
+  const handler = vi.fn((error: PoolError) => {
+    expect(error).toBeInstanceOf(PoolError);
+    expect(error.pool).toBe("event");
+    expect(error.caller).toBeUndefined();
+    expect(error.handler).toBeUndefined();
+  });
+  space.catch(handler);
+
+  const event = space.pool("event");
+  event(() => {
+    throw new Error(1 as any);
+  });
+  expect(await all(event())).toEqual([]);
+  expect(handler).toHaveBeenCalledTimes(1);
+  event.close();
+});
+
+it("catches async rejections", async () => {
+  const event = pool<() => number>("event");
+  event(function* () {
+    yield 1;
+    yield* async(Promise.reject());
+    yield 2;
+  });
+  event.catch();
+  expect(await all(event())).toEqual([1]);
 });

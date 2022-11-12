@@ -1,3 +1,5 @@
+import { handle } from "./error";
+
 const passthrough = Symbol();
 type SomeIterator<T = any> = Iterator<T> | AsyncIterator<T>;
 type Passthrough<T> = PromiseLike<T> & { [passthrough]: true };
@@ -14,21 +16,30 @@ const async = function* <T>(promise: PromiseLike<T>) {
 };
 
 const context = { signal: undefined as AbortSignal | undefined };
-async function* wrap<T, U>(iterator: Iterator<T>, signal?: AbortSignal) {
-  for (let value, done; ; ) {
-    signal?.throwIfAborted();
-    const previous = context.signal;
-    context.signal = signal;
-    ({ value, done } = iterator.next(value));
-    context.signal = previous;
+async function* wrap<T, U>(
+  iterator: Iterator<T>,
+  signal?: AbortSignal,
+  catcher?: (error: Error) => void
+) {
+  try {
+    for (let value, done; ; ) {
+      signal?.throwIfAborted();
+      const previous = context.signal;
+      context.signal = signal;
+      /// Consider creating a pool stack for error reporting, like `init -> search -> load -> fetch [ERROR!]`
+      ({ value, done } = iterator.next(value));
+      context.signal = previous;
 
-    if (done) return value as U;
-    if (!thenable(value)) yield value as T;
-    else {
-      const skip = passable(value);
-      value = await cancelable(value, signal);
-      if (!skip) yield value as Awaited<T>;
+      if (done) return value as U;
+      if (!thenable(value)) yield value as T;
+      else {
+        const skip = passable(value);
+        value = await cancelable(value, signal);
+        if (!skip) yield value as Awaited<T>;
+      }
     }
+  } catch (error) {
+    handle(error, catcher);
   }
 }
 
@@ -154,21 +165,30 @@ function all<T extends SomeIterator>(
 
 function block<T extends AsyncGenerator>(
   condition: () => true | number,
-  resolve: () => T
+  resolve: () => T,
+  catcher?: (error: Error) => void
 ) {
-  const ready = condition();
-  if (ready === true) return resolve();
-
-  const blocking = new Promise<void>(function poll(resolve) {
+  try {
     const ready = condition();
-    if (ready === true) resolve();
-    else setTimeout(() => poll(resolve), ready);
-  });
+    if (ready === true) return resolve();
 
-  return (async function* () {
-    await blocking;
-    yield* resolve();
-  })();
+    const blocking = new Promise<void>(function poll(resolve) {
+      const ready = condition();
+      if (ready === true) resolve();
+      else setTimeout(() => poll(resolve), ready);
+    });
+
+    return (async function* () {
+      try {
+        await blocking;
+        yield* resolve();
+      } catch (error) {
+        handle(error, catcher);
+      }
+    })();
+  } catch (error) {
+    return handle(error, catcher, (async function* () {})());
+  }
 }
 
 export { wrap, merge, all, block, async, thenable, map, context, generate };
