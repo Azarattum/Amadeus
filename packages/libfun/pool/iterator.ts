@@ -1,4 +1,4 @@
-import { cancel, thenable } from "../utils/promise";
+import { cancel, thenable } from "../utils/async";
 import { handle } from "../utils/error";
 
 const passthrough = Symbol();

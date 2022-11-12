@@ -14,6 +14,20 @@ function cancel<T>(promise: T, signal?: AbortSignal) {
   return Promise.race([promise, cancel]) as T;
 }
 
+function derive(parent?: AbortController | AbortSignal) {
+  const signal = parent instanceof AbortSignal ? parent : parent?.signal;
+  const derived = new AbortController();
+  const abort = () => derived.abort();
+  const remove = () => {
+    derived.signal.removeEventListener("abort", remove);
+    signal?.removeEventListener("abort", abort);
+  };
+
+  derived.signal.addEventListener("abort", remove);
+  signal?.addEventListener("abort", abort);
+  return derived;
+}
+
 function thenable<T = unknown>(value: any): value is PromiseLike<T> {
   return (
     value !== null &&
@@ -23,4 +37,4 @@ function thenable<T = unknown>(value: any): value is PromiseLike<T> {
   );
 }
 
-export { cancel, thenable };
+export { cancel, thenable, derive };

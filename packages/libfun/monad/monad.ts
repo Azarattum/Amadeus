@@ -12,7 +12,7 @@ import type {
   Monad,
   All,
 } from "./monad.types";
-import { thenable } from "../utils/promise";
+import { thenable } from "../utils/async";
 import { errorify } from "../utils/error";
 
 const error = Symbol();
