@@ -22,7 +22,9 @@ type Schedule = (
 };
 
 interface Executor {
+  tasks: Set<{ controller: AbortController; group: string | undefined }>;
   controller: AbortController;
+  group: string | undefined;
 }
 
 interface Context {
@@ -56,8 +58,13 @@ type Handler<T extends Fn> = ((
       void
     >
   | (ReturnType<T> extends Promise<any> ? never : ReturnType<T>)) & {
-  group?: string; /// Not sure if this is a good solution (but it works...)
+  group?: string;
 };
+
+type Filter =
+  | { group: string; caller?: never; handler?: never }
+  | { group?: never; caller: string; handler?: string }
+  | { group?: never; caller?: string; handler: string };
 
 type Pool<T extends Fn = (..._: any) => any> = {
   (this: Override, handler: Handler<T>): () => void;
@@ -66,21 +73,28 @@ type Pool<T extends Fn = (..._: any) => any> = {
   schedule: (
     when: Schedule
   ) => (...args: Parameters<T>) => AsyncGenerator<ReturnType<T>>;
+  bind: (context: Override) => Pool<T>;
   catch: (handler?: Catcher) => void;
+  abort: (filter?: Filter) => void;
+  drain: (filter?: Filter) => void;
   status: () => State<T>;
-  abort: () => void;
   close: () => void;
-  drain: () => void;
 
   [state: symbol]: State<T>;
 };
 
-type Pools = {
-  [key in keyof Pool]: Pool[key] extends Fn<infer A, infer R>
-    ? Fn<A, R extends void ? R : R[]>
-    : never;
-} & {
-  status(id: string): State<Fn>;
+type Pools = Omit<
+  {
+    [key in keyof Pool]: Pool[key] extends (..._: infer A) => infer R
+      ? {
+          (id?: null, ..._: A): R extends void ? R : R[];
+          (id: string, ..._: A): R;
+        }
+      : never;
+  },
+  "bind" | "catch"
+> & {
+  catch: (handler?: Catcher) => void;
   count(): number;
   pool<T extends Fn = () => void>(
     this: Override | Pools,
@@ -89,4 +103,14 @@ type Pools = {
   ): Pool<T>;
 };
 
-export type { Options, Pool, Pools, Handler, Catcher, PoolError, Override };
+export type {
+  PoolError,
+  Executor,
+  Override,
+  Options,
+  Handler,
+  Catcher,
+  Filter,
+  Pools,
+  Pool,
+};

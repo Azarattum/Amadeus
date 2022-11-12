@@ -6,14 +6,11 @@ import type {
   Options,
   Pools,
   Pool,
+  Executor,
+  Filter,
 } from "./pool.types";
-import {
-  context as globalContext,
-  generate,
-  block,
-  merge,
-  wrap,
-} from "./iterator";
+import { context as globalContext, generate, merge, wrap } from "./iterator";
+import { derive, block } from "../utils/async";
 import type { Fn } from "../utils/types";
 
 /// TODO: feature list
@@ -23,8 +20,13 @@ import type { Fn } from "../utils/types";
 //    / group limits
 //    + abort
 //    + catch error handling
-//   +- groups
+//    + groups
+//    + global filtering
+//    - stack tracing
+//      - nested groups test
 //    - request caching
+//    - timeouts
+//    - schedule
 
 const defaults: Options = {
   concurrency: Infinity,
@@ -39,28 +41,41 @@ function pools(options: Partial<Options> = {}): Pools {
   const all = new Map<string, Pool>();
   const catchers = new Set<Catcher>();
 
-  /// Add group[handler/executor]/id filtering
   function each<T extends keyof Omit<Pool, symbol>>(method: T) {
-    return function (...args: Parameters<Pool[T]>) {
-      return Array.from(all.values()).map((x) =>
-        x[method](...(args as [any]))
-      ) as ReturnType<Pool[T]>[];
+    return function (id?: string | null, ...args: Parameters<Pool[T]>): any {
+      if (id == null || id == "*") {
+        return Array.from(all.values()).map((x) =>
+          x[method](...(args as [any]))
+        );
+      }
+
+      const target = all.get(id);
+      if (!target) throw new Error(`Pool with id ${id} not found!`);
+      return target[method](...(args as [any]));
     };
   }
 
   const prototype: Pick<Pool, keyof Pool> = {
-    abort() {
-      this[state].executing.forEach((x) => x.controller.abort());
+    abort(filter) {
+      this[state].executing.forEach((executor) => {
+        match(executor, filter).forEach((x) => x.controller.abort());
+      });
       this[state].executing.clear();
     },
-    drain() {
-      this[state].pending.forEach((x) => x.controller.abort());
-      this[state].pending.clear();
-      this.abort();
+    drain(filter) {
+      this[state].pending.forEach((executor) => {
+        match(executor, filter).forEach((x) => {
+          x.controller.abort();
+          this[state].pending.delete(x as Executor);
+        });
+      });
+      this.abort(filter);
     },
     close() {
       this[state].listeners.clear();
       this.drain();
+      this[state].executing.clear();
+      this[state].pending.clear();
       all.delete(this[state].id);
     },
     status() {
@@ -70,21 +85,19 @@ function pools(options: Partial<Options> = {}): Pools {
       this[state].catchers.add(handler || (() => {}));
     },
     schedule(when) {
-      /// TODO
-      throw new Error("Unimplemented!");
+      throw new Error("Unimplemented!"); /// TODO
+    },
+    bind(context) {
+      const fn = Function.bind.call(this as any, context);
+      const pool = Object.setPrototypeOf(fn, prototype);
+      return Object.assign(pool, { [state]: this[state] });
     },
   };
   Object.setPrototypeOf(prototype, Function);
 
-  function create(this: Override, id: string, options: Partial<Options> = {}) {
-    return pool.bind(this, { all, prototype, catchers, options: globals })(
-      id,
-      options
-    );
-  }
-
   return {
     schedule: each("schedule"),
+    status: each("status"),
     abort: each("abort"),
     drain: each("drain"),
     close: each("close"),
@@ -92,13 +105,12 @@ function pools(options: Partial<Options> = {}): Pools {
     catch(handler) {
       catchers.add(handler || (() => {}));
     },
-    status(id?: string) {
-      if (id == null) return each("status")();
-      const status = all.get(id)?.status();
-      if (!status) throw new Error(`Pool with id ${id} not found!`);
-      return status as any;
+    pool(this: Override, id: string, options: Partial<Options> = {}) {
+      return pool.bind(this, { all, prototype, catchers, options: globals })(
+        id,
+        options
+      );
     },
-    pool: create,
   };
 }
 
@@ -141,12 +153,12 @@ function pool<T extends Fn = () => void>(
     }
 
     // Call all event handlers
-    /// Implement a proper caller->handler group support ↓
-    const executor = { controller: new AbortController() };
+    const executor: Executor = {
+      controller: derive(globalContext.signal),
+      tasks: new Set(),
+      group,
+    };
     const context = { signal: executor.controller.signal };
-    globalContext.signal?.addEventListener("abort", () =>
-      executor.controller.abort()
-    );
     const catcher = (handler?: string) => (reason: Error) => {
       if (reason instanceof DOMException && reason.name === "AbortError") {
         return;
@@ -165,7 +177,9 @@ function pool<T extends Fn = () => void>(
     self.pending.add(executor);
     return block(
       () => {
+        if (context.signal.aborted) self.pending.delete(executor);
         context.signal.throwIfAborted();
+
         const interval = 60000 / self.rate;
         const left = interval - (Date.now() - +(self.last || new Date(0)));
         if (self.executing.size < self.concurrency && left <= 0) return true;
@@ -176,18 +190,30 @@ function pool<T extends Fn = () => void>(
         self.executing.add(executor);
         self.last = new Date();
         const generators = [...self.listeners.values()];
-        const iterables = generators.map((handler) =>
-          wrap(
+        const iterables = generators.map((handler) => {
+          const task = {
+            group: handler.group,
+            controller: derive(context.signal),
+          };
+          const generator = wrap(
             generate(handler.bind(context)(...params)),
-            /// Should receive individual signals!
-            context.signal,
-            catcher(handler.group)
-          )
-        );
+            task.controller.signal,
+            catcher(task.group)
+          );
+
+          return (async function* () {
+            executor.tasks.add(task);
+            yield* generator;
+            executor.tasks.delete(task);
+          })();
+        });
 
         return (async function* () {
-          yield* merge(...iterables);
-          self.executing.delete(executor);
+          try {
+            yield* merge(...iterables);
+          } finally {
+            self.executing.delete(executor);
+          }
         })();
       },
       catcher()
@@ -196,8 +222,21 @@ function pool<T extends Fn = () => void>(
 
   const pool = Object.setPrototypeOf(apply, global.prototype);
   Object.assign(pool, data);
-  /// Add a proper bind
   return pool;
+}
+
+function match(executor: Executor, filter?: Filter) {
+  if (!filter) return [executor];
+  if (filter.group && executor.group === filter.group) {
+    return [executor];
+  }
+  if (filter.caller && executor.group === filter.caller) {
+    return [executor];
+  }
+  return [...executor.tasks.values()].filter((x) => {
+    if (filter.group && x.group === filter.group) return true;
+    if (filter.handler && x.group === filter.handler) return true;
+  });
 }
 
 class PoolError extends Error implements Details {

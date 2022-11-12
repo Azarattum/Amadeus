@@ -1,4 +1,4 @@
-import { take, async, context, map } from "./iterator";
+import { take, async, context, map, first } from "./iterator";
 import { PoolError, pools } from "./pool";
 import type { Fn } from "../utils/types";
 import { expect, it, vi } from "vitest";
@@ -322,4 +322,60 @@ it("catches async rejections", async () => {
   });
   event.catch();
   expect(await take(event())).toEqual([1]);
+});
+
+it("supports context groups", async () => {
+  const space = pools({ group: "core" });
+  const event = space.pool<() => string>("event");
+  const g1Event = event.bind({ group: "g1" });
+  const g2Event = event.bind({ group: "g2" });
+
+  const block1 = barrier();
+  const block2 = barrier();
+
+  g1Event(function* () {
+    yield* async(block1.promise);
+    yield "g1";
+  });
+  g2Event(function* () {
+    yield* async(block2.promise);
+    yield "g2";
+  });
+
+  const result = take(event());
+  const status = space.status("event");
+  const executor = first(status.executing.values());
+  expect(executor.group).toBe("core");
+  const tasks = take(executor.tasks.values());
+  expect(tasks).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ group: "g1" }),
+      expect.objectContaining({ group: "g2" }),
+    ])
+  );
+  space.abort("event", { handler: "g1" });
+  block1.resolve();
+  block2.resolve();
+  expect(await result).toEqual(["g2"]);
+  expect(await take(g1Event())).toEqual(["g1", "g2"]);
+  expect(await take(g2Event())).toEqual(["g1", "g2"]);
+
+  {
+    const result = take(g1Event());
+    space.drain("event", { caller: "g1" });
+    expect(await result).toEqual([]);
+  }
+  {
+    const result = take(g1Event());
+    space.drain("event", { group: "g1" });
+    expect(await result).toEqual([]);
+  }
+  {
+    const result = take(g1Event());
+    space.drain("event", { handler: "g1" });
+    expect(await result).toEqual(["g2"]);
+  }
+
+  event.close();
+  expect(space.count()).toBe(0);
 });
