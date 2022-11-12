@@ -1,4 +1,4 @@
-import { monad, type Monad } from "../core/monad";
+import { monad, type Monad } from "..";
 
 interface Maybe extends Monad<"Maybe"> {
   then: NonNullable<this[""]>;

@@ -1,4 +1,5 @@
-import { handle } from "./error";
+import { cancel, thenable } from "../utils/promise";
+import { handle } from "../utils/error";
 
 const passthrough = Symbol();
 type SomeIterator<T = any> = Iterator<T> | AsyncIterator<T>;
@@ -34,7 +35,7 @@ async function* wrap<T, U>(
       if (!thenable(value)) yield value as T;
       else {
         const skip = passable(value);
-        value = await cancelable(value, signal);
+        value = await cancel(value, signal);
         if (!skip) yield value as Awaited<T>;
       }
     }
@@ -70,31 +71,6 @@ function generate<T>(
   return (function* () {
     yield value;
   })() as any;
-}
-
-function cancelable<T>(promise: T, signal?: AbortSignal) {
-  const cancel = new Promise<void>((_, reject) => {
-    const remove = () => signal?.removeEventListener("abort", abort);
-    function abort() {
-      reject(new DOMException("This operation was aborted", "AbortError"));
-      remove();
-    }
-
-    if (signal?.aborted) return abort();
-    Promise.resolve(promise).then(remove, remove);
-    signal?.addEventListener("abort", abort);
-  });
-
-  return Promise.race([promise, cancel]) as T;
-}
-
-function thenable<T = unknown>(value: any): value is PromiseLike<T> {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    "then" in value &&
-    typeof value["then"] === "function"
-  );
 }
 
 function passable(value: any) {
@@ -138,7 +114,7 @@ async function* merge<T, U>(...iterators: SomeIterator<T>[]) {
   return results;
 }
 
-function all<T extends SomeIterator>(
+function take<T extends SomeIterator>(
   iterator: T,
   limit = Infinity
 ): Iterated<T> {
@@ -191,5 +167,5 @@ function block<T extends AsyncGenerator>(
   }
 }
 
-export { wrap, merge, all, block, async, thenable, map, context, generate };
+export { wrap, merge, take, block, async, map, context, generate };
 export type { Passthrough };

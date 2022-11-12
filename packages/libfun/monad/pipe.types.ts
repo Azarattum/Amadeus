@@ -1,5 +1,5 @@
 import type { Monad, MonadsTransform, Unwrapped, Wrapped } from "./monad.types";
-import type { Last } from "./types";
+import type { Last } from "../utils/types";
 
 type γs = γ<any[], any>[];
 type λs = λ<any, any, any[]>[];

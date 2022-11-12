@@ -1,5 +1,6 @@
 import type { Pipe, Pipeline } from "./pipe.types";
-import type { Fn } from "./types";
+import { errorify } from "../utils/error";
+import type { Fn } from "../utils/types";
 import { all } from "./monad";
 
 const pipeline: Pipeline = (...fns: Fn[]) => {
@@ -32,7 +33,6 @@ const fallback = <T>(value: T | ((e: any) => T)) => {
   return handler;
 };
 
-const errorify = (e: any) => (e instanceof Error ? e : new Error(e));
 const expose = [
   <T>(data: T) => ({ data, error: undefined }),
   fallback((e: any) => ({ error: errorify(e), data: undefined })),

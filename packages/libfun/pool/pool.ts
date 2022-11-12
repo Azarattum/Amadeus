@@ -1,4 +1,5 @@
 import type {
+  PoolError as Details,
   Override,
   Catcher,
   Handler,
@@ -13,8 +14,7 @@ import {
   merge,
   wrap,
 } from "./iterator";
-import { PoolError } from "./error";
-import type { Fn } from "./types";
+import type { Fn } from "../utils/types";
 
 /// TODO: feature list
 //    + id
@@ -116,7 +116,7 @@ function pool<T extends Fn = () => void>(
   const existing = global.all.get(id);
   if (existing) return existing;
 
-  options.group = options.group || this?.group;
+  options.group = options.group || this?.group || global.options.group;
   const data: Pick<Pool, symbol> = {
     [state]: {
       id,
@@ -198,6 +198,36 @@ function pool<T extends Fn = () => void>(
   Object.assign(pool, data);
   /// Add a proper bind
   return pool;
+}
+
+class PoolError extends Error implements Details {
+  pool: string;
+  caller?: string;
+  handler?: string;
+
+  constructor(error: Error, details: Details) {
+    super(error.message);
+    this.pool = details.pool;
+    this.caller = details.caller;
+    this.handler = details.handler;
+    this.name = this.constructor.name;
+    if (this.caller === this.handler) {
+      this.message =
+        `${this.pool.toUpperCase()} in ${(
+          this.handler || "unknown"
+        ).toUpperCase()} ` + `failed with: ${this.message}`;
+    } else {
+      this.message =
+        `${(
+          this.caller || "unknown"
+        ).toUpperCase()} pooled ${this.pool.toUpperCase()}` +
+        (this.handler ? ` in ${this.handler.toUpperCase()}` : "") +
+        `, but failed with: ${this.message}`;
+    }
+    this.stack = error.stack
+      ?.replace(error.name, this.name)
+      .replace(error.message, this.message);
+  }
 }
 
 export { pools, PoolError };

@@ -1,5 +1,5 @@
 import type { Passthrough } from "./iterator";
-import type { Fn } from "./types";
+import type { Fn } from "../utils/types";
 
 interface Options {
   concurrency: number;
@@ -83,7 +83,7 @@ type Pools = {
   status(id: string): State<Fn>;
   count(): number;
   pool<T extends Fn = () => void>(
-    this: Override,
+    this: Override | Pools,
     id: string,
     options?: Partial<Options>
   ): Pool<T>;

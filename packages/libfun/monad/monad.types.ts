@@ -1,5 +1,5 @@
-import type { Combine, Contains, IsNever, IsTuple } from "./types";
-import type { HKT, Piped, Composed, Kind } from "./hkt";
+import type { Combine, Contains, IsNever, IsTuple } from "../utils/types";
+import type { HKT, Piped, Composed, Kind } from "../utils/hkt";
 
 type Transforms = readonly Transform[];
 type Resolve<T, R = any> = ((value: T) => R) | null;

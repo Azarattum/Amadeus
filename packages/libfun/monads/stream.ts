@@ -1,5 +1,5 @@
-import { monad, state, transform, type Monad } from "../core/monad";
-import type { Reject, Resolve } from "../core/monad.types";
+import { monad, state, transform, type Monad } from "../monad";
+import type { Reject, Resolve } from "../monad/monad.types";
 
 // This would cause a MEMORY LEAK on older platforms, but at least nothing will break
 if (!("WeakRef" in globalThis)) {

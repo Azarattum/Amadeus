@@ -1,6 +1,6 @@
 import { pipeline, pipe, fallback, expose } from "./pipe";
 import { it, expect, vitest } from "vitest";
-import { maybe, spread } from "./monads";
+import { maybe, spread } from "../monads";
 import { monad } from "./monad";
 
 function adders(length: number) {

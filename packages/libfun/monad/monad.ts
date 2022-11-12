@@ -12,7 +12,8 @@ import type {
   Monad,
   All,
 } from "./monad.types";
-import { thenable } from "./iterator";
+import { thenable } from "../utils/promise";
+import { errorify } from "../utils/error";
 
 const error = Symbol();
 const state = Symbol();
@@ -46,12 +47,12 @@ function monad<F extends Transform = Identity>(
         if (thenable(data)) {
           return data.then(
             (x) => ({ data: x }),
-            (e) => ({ error: errorify(e)[error] })
+            (e) => ({ error: invalidate(e)[error] })
           );
         }
         return { data };
       } catch (reason) {
-        return { error: errorify(reason)[error] };
+        return { error: invalidate(reason)[error] };
       }
     },
     get [Symbol.toStringTag]() {
@@ -123,9 +124,9 @@ function transform<T, F extends Transform = Identity>(
     },
     (reason) => {
       try {
-        return reject ? transformer(reason, reject) : errorify(reason);
+        return reject ? transformer(reason, reject) : invalidate(reason);
       } catch (reason) {
-        return errorify(reason);
+        return invalidate(reason);
       }
     }
   )(value);
@@ -154,10 +155,6 @@ function unwrappable<T = unknown>(value: any): value is Wrappable<T> {
   );
 }
 
-function invalid(value: any): value is { [error]: any } {
-  return value !== null && typeof value === "object" && error in value;
-}
-
 function native(fn: any, args = 1): fn is (...args: any[]) => void {
   if (typeof fn !== "function") return false;
   const signature = Function.prototype.toString.call(fn);
@@ -168,14 +165,13 @@ function native(fn: any, args = 1): fn is (...args: any[]) => void {
   );
 }
 
-function errorify(what: unknown): { [error]: Error } {
+function invalid(value: any): value is { [error]: any } {
+  return value !== null && typeof value === "object" && error in value;
+}
+
+function invalidate(what: unknown): { [error]: Error } {
   if (invalid(what)) what = what[error];
-  return {
-    [error]:
-      what instanceof Error
-        ? what
-        : new Error(typeof what === "string" ? what : JSON.stringify(what)),
-  };
+  return { [error]: errorify(what) };
 }
 
 export { monad, all, unwrap, transform, state };

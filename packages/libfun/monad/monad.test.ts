@@ -1,7 +1,7 @@
 import { monad, unwrap, all } from "./monad";
 import { expect, it, vitest } from "vitest";
 import type { Monad } from "./monad.types";
-import { maybe, spread } from "./monads";
+import { maybe, spread } from "../monads";
 
 const check = (x: any) => expect(unwrap(x));
 const identity = monad();

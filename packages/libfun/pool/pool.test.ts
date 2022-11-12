@@ -1,7 +1,7 @@
-import { all, async, context, map } from "./iterator";
+import { take, async, context, map } from "./iterator";
 import { PoolError, pools } from "./pool";
+import type { Fn } from "../utils/types";
 import { expect, it, vi } from "vitest";
-import type { Fn } from "./types";
 
 const { pool, count, status } = pools({ group: "test" });
 const delay = (ms = 1) => new Promise((x) => setTimeout(x, ms));
@@ -35,7 +35,7 @@ it("yields results", async () => {
     yield x * 2;
   });
 
-  expect(await all(double(4))).toEqual([8]);
+  expect(await take(double(4))).toEqual([8]);
   double.close();
 });
 
@@ -92,9 +92,9 @@ it("limits concurrency", async () => {
 
   event(impl);
   expect(impl).not.toHaveBeenCalled();
-  expect(all(event())).resolves.toEqual([42]);
+  expect(take(event())).resolves.toEqual([42]);
   expect(impl).toHaveBeenCalledTimes(1);
-  expect(all(event())).resolves.toEqual([]);
+  expect(take(event())).resolves.toEqual([]);
   expect(impl).toHaveBeenCalledTimes(1);
   resolve();
   await delay(100);
@@ -114,9 +114,9 @@ it("rates calls per minute", async () => {
 
   event(impl);
   expect(impl).not.toHaveBeenCalled();
-  expect(all(event())).resolves.toEqual([42]);
+  expect(take(event())).resolves.toEqual([42]);
   expect(impl).toHaveBeenCalledTimes(1);
-  expect(all(event())).resolves.toEqual([42]);
+  expect(take(event())).resolves.toEqual([42]);
   expect(impl).toHaveBeenCalledTimes(1);
   await delay(10);
   expect(impl).toHaveBeenCalledTimes(1);
@@ -139,7 +139,7 @@ it("establishes asynchronous workflow", async () => {
     yield 4;
   });
 
-  const results = all(event());
+  const results = take(event());
   expect(await results).toEqual([1, 2, 3, 4]);
   event.close();
 });
@@ -154,7 +154,7 @@ it("can be aborted", async () => {
     spy();
   });
 
-  const loading = all(event());
+  const loading = take(event());
   await delay();
   event.abort();
   await loading.catch((e) => expect(e).toBeInstanceOf(Error));
@@ -179,7 +179,7 @@ it("supports nested generators", async () => {
     yield* squared;
   });
 
-  expect(await all(doubled())).toEqual([2, 4, 6, 1, 4, 9]);
+  expect(await take(doubled())).toEqual([2, 4, 6, 1, 4, 9]);
   numbers.close();
   doubled.close();
 });
@@ -196,7 +196,7 @@ it("resolves signal context", async () => {
     yield stuff;
   });
 
-  const result = await all(event());
+  const result = await take(event());
   expect(result).toHaveLength(1);
   expect(result[0]).toBeInstanceOf(AbortSignal);
   event.close();
@@ -289,7 +289,7 @@ it("catches thrown exceptions", async () => {
     expect(error.handler).toBe("test");
   });
   event.catch(handler);
-  expect(await all(event())).toEqual([1, 10, 11, 12]);
+  expect(await take(event())).toEqual([1, 10, 11, 12]);
   expect(handler).toHaveBeenCalledTimes(1);
   event.close();
 });
@@ -308,7 +308,7 @@ it("catches with global handler", async () => {
   event(() => {
     throw new Error(1 as any);
   });
-  expect(await all(event())).toEqual([]);
+  expect(await take(event())).toEqual([]);
   expect(handler).toHaveBeenCalledTimes(1);
   event.close();
 });
@@ -321,5 +321,5 @@ it("catches async rejections", async () => {
     yield 2;
   });
   event.catch();
-  expect(await all(event())).toEqual([1]);
+  expect(await take(event())).toEqual([1]);
 });
