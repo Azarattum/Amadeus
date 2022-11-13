@@ -1,6 +1,6 @@
+import { unwrap, nothing } from "..";
 import { expect, it } from "vitest";
-import { spread, nothing } from ".";
-import { unwrap } from "..";
+import { spread } from ".";
 
 const check = (x: any) => expect(unwrap(x));
 const invalid = (x: any) => expect(() => unwrap(x)).toThrow();

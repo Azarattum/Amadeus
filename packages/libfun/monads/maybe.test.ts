@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { unwrap } from "..";
+import { nothing, unwrap } from "..";
 import { maybe } from ".";
 
 const check = (x: any) => expect(unwrap(x));
@@ -94,4 +94,10 @@ it("catches async errors", async () => {
     expect(rejected).toBeCalled();
     expect(result).toBe(42);
   }
+});
+
+it("handles nothing", () => {
+  const result = maybe(nothing).expose();
+  expect(result.error).toBeInstanceOf(Error);
+  expect(result.data).toBeUndefined();
 });

@@ -1,15 +1,13 @@
+import { monad, nothing, type Monad, type Nothing } from "..";
 import type { Flatten } from "../utils/types";
-import { monad, type Monad } from "..";
 
 interface Spread extends Monad<"Spread"> {
   accept: { [Symbol.iterator]: () => any };
-  then: Exclude<Flatten<this[""]>, typeof nothing | typeof empty>;
+  then: Exclude<Flatten<this[""]>, Nothing>;
   unwrap: this[""][];
 }
 
 const error = Symbol();
-const empty = Symbol();
-const nothing = [empty] as const;
 const spread = monad<Spread>((value, fn) => {
   if (value instanceof Error) {
     if (!Array.isArray(value.cause)) return fn(value) as unknown[];
@@ -41,4 +39,4 @@ const spread = monad<Spread>((value, fn) => {
   return result;
 });
 
-export { spread, nothing, type Spread };
+export { spread, type Spread };

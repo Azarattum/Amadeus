@@ -1,3 +1,3 @@
-export { pools, async, map, take, first, PoolError } from "./pool";
+export { monad, unwrap, all, nothing, type Monad, type Nothing } from "./monad";
+export { pools, async, map, take, first, context, PoolError } from "./pool";
 export { pipe, pipeline, expose, fallback } from "./monad";
-export { monad, unwrap, all, type Monad } from "./monad";

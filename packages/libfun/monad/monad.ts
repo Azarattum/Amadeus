@@ -15,6 +15,10 @@ import type {
 import { thenable } from "../utils/async";
 import { errorify } from "../utils/error";
 
+const empty = Symbol();
+const nothing = [empty] as const;
+type Nothing = typeof empty | typeof nothing;
+
 const error = Symbol();
 const state = Symbol();
 
@@ -174,5 +178,5 @@ function invalidate(what: unknown): { [error]: Error } {
   return { [error]: errorify(what) };
 }
 
-export { monad, all, unwrap, transform, state };
-export type { Transform as Monad };
+export { monad, all, unwrap, transform, state, nothing };
+export type { Transform as Monad, Nothing };
