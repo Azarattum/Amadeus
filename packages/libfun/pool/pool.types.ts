@@ -3,6 +3,7 @@ import type { Fn } from "../utils/types";
 
 interface Options {
   concurrency: number;
+  timeout: number;
   group?: string;
   cache: number;
   rate: number;
@@ -80,8 +81,8 @@ type Pool<T extends Fn = (..._: any) => any> = {
   catch: (handler?: Catcher) => void;
   abort: (filter?: Filter) => void;
   drain: (filter?: Filter) => void;
+  close: (filter?: Filter) => void;
   status: () => State<T>;
-  close: () => void;
 
   [state: symbol]: State<T>;
 };

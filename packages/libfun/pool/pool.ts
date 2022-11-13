@@ -30,11 +30,12 @@ import type { Fn } from "../utils/types";
 //    + global filtering
 //    + pool tracing
 //    + request caching
-//    - timeouts
+//    + timeouts
 //    - schedule
 
 const defaults: Options = {
   concurrency: Infinity,
+  timeout: Infinity,
   rate: Infinity,
   cache: 0,
 };
@@ -63,9 +64,11 @@ function pools(options: Partial<Options> = {}): Pools {
   const prototype: Pick<Pool, keyof Pool> = {
     abort(filter) {
       this[state].executing.forEach((executor) => {
-        match(executor, filter).forEach((x) => x.controller.abort());
+        match(executor, filter).forEach((x) => {
+          x.controller.abort();
+          this[state].executing.delete(x as Executor);
+        });
       });
-      this[state].executing.clear();
     },
     drain(filter) {
       this[state].pending.forEach((executor) => {
@@ -76,12 +79,15 @@ function pools(options: Partial<Options> = {}): Pools {
       });
       this.abort(filter);
     },
-    close() {
-      this[state].listeners.clear();
-      this.drain();
-      this[state].executing.clear();
-      this[state].pending.clear();
-      all.delete(this[state].id);
+    close(filter) {
+      const { listeners } = this[state];
+      listeners.forEach((x) => {
+        if (!filter) listeners.delete(x);
+        if (filter?.group && x.group === filter.group) listeners.delete(x);
+        if (filter?.handler && x.group === filter.handler) listeners.delete(x);
+      });
+      this.drain(filter);
+      if (!listeners.size) all.delete(this[state].id);
     },
     status() {
       return this[state];
@@ -221,11 +227,17 @@ function pool<T extends Fn = () => void>(
         const iterable = () => merge(...iterables());
         const key = self.cache ? JSON.stringify(params) : "";
         const cached = reuse(iterable, self.cached, key, self.cache);
+
+        let timeout = undefined;
+        if (Number.isFinite(self.timeout)) {
+          timeout = setTimeout(() => executor.controller.abort(), self.timeout);
+        }
         return (async function* () {
           try {
             yield* cached;
           } finally {
             self.executing.delete(executor);
+            clearTimeout(timeout);
           }
         })();
       },

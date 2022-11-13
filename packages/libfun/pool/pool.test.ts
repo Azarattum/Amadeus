@@ -97,7 +97,7 @@ it("limits concurrency", async () => {
   expect(take(event())).resolves.toEqual([]);
   expect(impl).toHaveBeenCalledTimes(1);
   resolve();
-  await delay(100);
+  await delay(60);
   expect(impl).toHaveBeenCalledTimes(2);
   event.close();
 });
@@ -326,6 +326,7 @@ it("catches async rejections", async () => {
   });
   event.catch();
   expect(await take(event())).toEqual([1]);
+  event.close();
 });
 
 it("supports context groups", async () => {
@@ -460,4 +461,23 @@ it("caches pool calls", async () => {
     expect(square).toHaveBeenCalledTimes(5);
     expect(double).toHaveBeenCalledTimes(5);
   }
+  cached.close();
+});
+
+it("handles timeouts", async () => {
+  const { promise, resolve } = barrier();
+  const spy = vi.fn();
+
+  const event = pool<() => string>("event", { timeout: 25 });
+  event(function* () {
+    yield* async(promise);
+    spy();
+    yield "test";
+  });
+  expect(take(event())).resolves.toEqual([]);
+  await delay(50);
+  resolve();
+  await delay();
+  expect(spy).not.toHaveBeenCalled();
+  event.close();
 });
