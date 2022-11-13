@@ -423,3 +423,41 @@ it("traces pools on catch", async () => {
   second.close();
   third.close();
 });
+
+it("caches pool calls", async () => {
+  const square = vi.fn((x) => x * x);
+  const double = vi.fn((x) => x * 2);
+  const cached = pool<(x: number) => number>("cached", { cache: 3 });
+  cached(double);
+  cached(square);
+  for (let i = 0; i < 5; i++) {
+    expect(await take(cached(4))).toEqual([8, 16]);
+    expect(square).toHaveBeenCalledTimes(1);
+    expect(double).toHaveBeenCalledTimes(1);
+  }
+  for (let i = 0; i < 5; i++) {
+    expect(await take(cached(7))).toEqual([14, 49]);
+    expect(square).toHaveBeenCalledTimes(2);
+    expect(double).toHaveBeenCalledTimes(2);
+  }
+  for (let i = 0; i < 5; i++) {
+    expect(await take(cached(5))).toEqual([10, 25]);
+    expect(square).toHaveBeenCalledTimes(3);
+    expect(double).toHaveBeenCalledTimes(3);
+  }
+  for (let i = 0; i < 5; i++) {
+    expect(await take(cached(4))).toEqual([8, 16]);
+    expect(square).toHaveBeenCalledTimes(3);
+    expect(double).toHaveBeenCalledTimes(3);
+  }
+  for (let i = 0; i < 5; i++) {
+    expect(await take(cached(10))).toEqual([20, 100]);
+    expect(square).toHaveBeenCalledTimes(4);
+    expect(double).toHaveBeenCalledTimes(4);
+  }
+  for (let i = 0; i < 5; i++) {
+    expect(await take(cached(4))).toEqual([8, 16]);
+    expect(square).toHaveBeenCalledTimes(5);
+    expect(double).toHaveBeenCalledTimes(5);
+  }
+});

@@ -9,7 +9,13 @@ import type {
   Executor,
   Filter,
 } from "./pool.types";
-import { context as globalContext, generate, merge, wrap } from "./iterator";
+import {
+  context as globalContext,
+  generate,
+  merge,
+  reuse,
+  wrap,
+} from "./iterator";
 import { derive, block } from "../utils/async";
 import type { Fn } from "../utils/types";
 
@@ -23,7 +29,7 @@ import type { Fn } from "../utils/types";
 //    + groups
 //    + global filtering
 //    + pool tracing
-//    - request caching
+//    + request caching
 //    - timeouts
 //    - schedule
 
@@ -131,6 +137,7 @@ function pool<T extends Fn = () => void>(
   const data: Pick<Pool, symbol> = {
     [state]: {
       id,
+      cached: new Map(),
       pending: new Set(),
       catchers: new Set(),
       executing: new Set(),
@@ -191,28 +198,32 @@ function pool<T extends Fn = () => void>(
         self.executing.add(executor);
         self.last = new Date();
         const generators = [...self.listeners.values()];
-        const iterables = generators.map((handler) => {
-          const task = {
-            group: handler.group,
-            controller: derive(context.signal),
-          };
-          const generator = wrap(
-            generate(handler.bind(context)(...params)),
-            task.controller.signal,
-            catcher(task.group),
-            self.id
-          );
+        const iterables = () =>
+          generators.map((handler) => {
+            const task = {
+              group: handler.group,
+              controller: derive(context.signal),
+            };
+            const generator = wrap(
+              generate(handler.bind(context)(...params)),
+              task.controller.signal,
+              catcher(task.group),
+              self.id
+            );
 
-          return (async function* () {
-            executor.tasks.add(task);
-            yield* generator;
-            executor.tasks.delete(task);
-          })();
-        });
+            return (async function* () {
+              executor.tasks.add(task);
+              yield* generator;
+              executor.tasks.delete(task);
+            })();
+          });
 
+        const iterable = () => merge(...iterables());
+        const key = self.cache ? JSON.stringify(params) : "";
+        const cached = reuse(iterable, self.cached, key, self.cache);
         return (async function* () {
           try {
-            yield* merge(...iterables);
+            yield* cached;
           } finally {
             self.executing.delete(executor);
           }

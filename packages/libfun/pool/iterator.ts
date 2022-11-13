@@ -86,6 +86,31 @@ function generate<T>(
   })() as any;
 }
 
+function reuse<T>(
+  generator: () => AsyncGenerator<T>,
+  cache: Map<string, T[]>,
+  key: string,
+  limit: number
+): AsyncGenerator<T> {
+  if (limit <= 0) return generator();
+  let cached = cache.get(key);
+  if (cached) {
+    return (async function* () {
+      yield* cached;
+    })();
+  }
+
+  cached = [];
+  cache.set(key, cached);
+  while (cache.size > limit) cache.delete(first(cache.keys()));
+  return (async function* () {
+    for await (const item of generator()) {
+      cached.push(item);
+      yield item;
+    }
+  })();
+}
+
 async function* merge<T, U>(...iterators: SomeIterator<T>[]) {
   const never = new Promise<any>(() => {});
 
@@ -168,5 +193,5 @@ function passable(value: any) {
   );
 }
 
-export { wrap, merge, take, first, async, map, context, generate };
+export { wrap, merge, take, first, async, map, context, generate, reuse };
 export type { Passthrough };

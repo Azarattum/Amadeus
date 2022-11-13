@@ -43,6 +43,7 @@ interface PoolError {
 }
 
 interface State<T extends Fn> extends Options {
+  cached: Map<string, ReturnType<T>[]>;
   listeners: Set<Handler<T>>;
   executing: Set<Executor>;
   pending: Set<Executor>;
