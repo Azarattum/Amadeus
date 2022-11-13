@@ -20,20 +20,29 @@ const async = function* <T>(promise: PromiseLike<T>) {
   return result;
 };
 
-const context = { signal: undefined as AbortSignal | undefined };
+const context = {
+  signal: undefined as AbortSignal | undefined,
+  trace: [] as string[],
+};
 async function* wrap<T, U>(
   iterator: Iterator<T>,
   signal?: AbortSignal,
-  catcher?: (error: Error) => void
+  catcher?: (error: Error) => void,
+  name?: string
 ) {
   try {
     for (let value, done; ; ) {
       signal?.throwIfAborted();
+
       const previous = context.signal;
       context.signal = signal;
-      /// Consider creating a pool stack for error reporting, like `init -> search -> load -> fetch [ERROR!]`
-      ({ value, done } = iterator.next(value));
-      context.signal = previous;
+      if (name) context.trace.push(name);
+      try {
+        ({ value, done } = iterator.next(value));
+      } finally {
+        if (name) context.trace.pop();
+        context.signal = previous;
+      }
 
       if (done) return value as U;
       if (!thenable(value)) yield value as T;

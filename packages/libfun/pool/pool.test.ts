@@ -287,6 +287,7 @@ it("catches thrown exceptions", async () => {
     expect(error.pool).toBe("event");
     expect(error.caller).toBe("test");
     expect(error.handler).toBe("test");
+    expect(error.trace).toEqual(["event"]);
   });
   event.catch(handler);
   expect(await take(event())).toEqual([1, 10, 11, 12]);
@@ -301,6 +302,7 @@ it("catches with global handler", async () => {
     expect(error.pool).toBe("event");
     expect(error.caller).toBeUndefined();
     expect(error.handler).toBeUndefined();
+    expect(error.trace).toEqual(["event"]);
   });
   space.catch(handler);
 
@@ -378,4 +380,43 @@ it("supports context groups", async () => {
 
   event.close();
   expect(space.count()).toBe(0);
+});
+
+it("traces pools on catch", async () => {
+  const first = pool<() => number>("first");
+  const second = pool<() => number>("second");
+  const third = pool<() => number>("third");
+
+  third.bind({ group: "broken" })(function* () {
+    throw new Error("No!");
+  });
+  second.bind({ group: "before" })(function* () {
+    const result = yield* map(third.bind({ group: "before" })(), function* (x) {
+      yield x;
+    });
+    yield result.length;
+  });
+  first(function* () {
+    yield 10;
+    const result = yield* map(second(), function* (x) {
+      yield x;
+    });
+    yield result.length;
+  });
+
+  const caught = vi.fn();
+  third.catch((error) => {
+    expect(error.trace).toEqual(["first", "second", "third"]);
+    expect(error.message).toContain("No!");
+    expect(error.handler).toBe("broken");
+    expect(error.caller).toBe("before");
+    expect(error.pool).toBe("third");
+    caught();
+  });
+
+  expect(await take(first())).toEqual([10, 0, 1]);
+  expect(caught).toHaveBeenCalled();
+  first.close();
+  second.close();
+  third.close();
 });

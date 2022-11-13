@@ -37,6 +37,7 @@ type Override = Pick<Options, "group"> | void;
 interface PoolError {
   handler?: string;
   caller?: string;
+  trace: string[];
   pool: string;
 }
 

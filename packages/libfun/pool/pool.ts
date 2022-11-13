@@ -22,8 +22,7 @@ import type { Fn } from "../utils/types";
 //    + catch error handling
 //    + groups
 //    + global filtering
-//    - stack tracing
-//      - nested groups test
+//    + pool tracing
 //    - request caching
 //    - timeouts
 //    - schedule
@@ -158,6 +157,7 @@ function pool<T extends Fn = () => void>(
       tasks: new Set(),
       group,
     };
+    const trace = [...globalContext.trace, self.id];
     const context = { signal: executor.controller.signal };
     const catcher = (handler?: string) => (reason: Error) => {
       if (reason instanceof DOMException && reason.name === "AbortError") {
@@ -167,6 +167,7 @@ function pool<T extends Fn = () => void>(
         caller: group,
         pool: id,
         handler,
+        trace,
       });
 
       if (!self.catchers.size && !global.catchers.size) throw error;
@@ -198,7 +199,8 @@ function pool<T extends Fn = () => void>(
           const generator = wrap(
             generate(handler.bind(context)(...params)),
             task.controller.signal,
-            catcher(task.group)
+            catcher(task.group),
+            self.id
           );
 
           return (async function* () {
@@ -243,13 +245,16 @@ class PoolError extends Error implements Details {
   pool: string;
   caller?: string;
   handler?: string;
+  trace: string[] = [];
 
   constructor(error: Error, details: Details) {
     super(error.message);
     this.pool = details.pool;
+    this.trace = details.trace;
     this.caller = details.caller;
     this.handler = details.handler;
     this.name = this.constructor.name;
+    this.message += `\n    trace: ${this.trace.join(" -> ")}`;
     if (this.caller === this.handler) {
       this.message =
         `${this.pool.toUpperCase()} in ${(
