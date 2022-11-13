@@ -63,7 +63,7 @@ const logger = monad((value, fn) => {
 
 ## Pipe
 Naming stuff is hard. This is why we love pipes! Here are some reasons why you should love them even more:
-<details><summary><b>⚒️ <code>pipe</code> and <code>pipeline</code> patterns to cover all use cases</b></summary>
+<details><summary><b>⚒️ <code>pipe</code> and <code>pipeline</code> patterns to cover all your use cases</b></summary>
 
 ```ts
 const transform = pipeline(
@@ -122,7 +122,7 @@ pipe(unsafe())(
 
 
 ## Pool
-Pools are LibFun's state event handling solution. Here is a basic example:
+Pools are LibFun's event handling solution. Here is a basic example:
 ```ts
 // Get `pool` from global controller
 const { pool } = pools();
