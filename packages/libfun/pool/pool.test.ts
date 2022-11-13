@@ -284,6 +284,7 @@ it("catches thrown exceptions", async () => {
 
   const handler = vi.fn((error: PoolError) => {
     expect(error).toBeInstanceOf(PoolError);
+    expect(error.reason).toBe("2");
     expect(error.pool).toBe("event");
     expect(error.caller).toBe("test");
     expect(error.handler).toBe("test");
@@ -299,6 +300,7 @@ it("catches with global handler", async () => {
   const space = pools();
   const handler = vi.fn((error: PoolError) => {
     expect(error).toBeInstanceOf(PoolError);
+    expect(error.reason).toBe("1");
     expect(error.pool).toBe("event");
     expect(error.caller).toBeUndefined();
     expect(error.handler).toBeUndefined();
@@ -411,6 +413,7 @@ it("traces pools on catch", async () => {
     expect(error.handler).toBe("broken");
     expect(error.caller).toBe("before");
     expect(error.pool).toBe("third");
+    expect(error.reason).toBe("No!");
     caught();
   });
 

@@ -38,6 +38,7 @@ interface PoolError {
   handler?: string;
   caller?: string;
   trace: string[];
+  reason: string;
   pool: string;
 }
 

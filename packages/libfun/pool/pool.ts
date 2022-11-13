@@ -243,11 +243,12 @@ function match(executor: Executor, filter?: Filter) {
 
 class PoolError extends Error implements Details {
   pool: string;
+  reason: string;
   caller?: string;
   handler?: string;
   trace: string[] = [];
 
-  constructor(error: Error, details: Details) {
+  constructor(error: Error, details: Omit<Details, "reason">) {
     super(error.message);
     this.pool = details.pool;
     this.trace = details.trace;
@@ -255,6 +256,7 @@ class PoolError extends Error implements Details {
     this.handler = details.handler;
     this.name = this.constructor.name;
     this.message += `\n    trace: ${this.trace.join(" -> ")}`;
+    this.reason = error instanceof PoolError ? error.reason : error.message;
     if (this.caller === this.handler) {
       this.message =
         `${this.pool.toUpperCase()} in ${(
