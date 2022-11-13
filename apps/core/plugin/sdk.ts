@@ -1,24 +1,38 @@
+/// TODO: `fetch` generator
+//    - global iterator context based abort signal
+//    - error prone (log errors per module)
+//    - auto superstruct validation
+//    - maybe use gretchen
+//    - auto json parse (mb when validated?)
+//      - this should be type specific (e.g. do not json parse streams)
+//
+// Consider the API:
+//  yield* fetch(User, "...");
+// vs
+//  yield* fetch("...").json(); ← gretchen under the hood
+//  yield* fetch("...").as(User);
+
 function init(impl: Init) {
-  ///TODO
+  /// TODO
 }
 
 function stop(impl: Stop) {
-  ///TODO
+  /// TODO
 }
 
 function search(impl: Search) {
-  ///TODO
+  /// TODO
 }
 
 function relate(impl: Relate) {
-  ///TODO
+  /// TODO
 }
 
 function recognize(impl: Recognize) {
-  ///TODO
+  /// TODO
 }
 
-///TODO: result type
+/// TODO: result type
 type TODO = void;
 
 type Init = (config: Record<string, any>) => void;

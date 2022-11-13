@@ -1,10 +1,9 @@
 import { monad, unwrap, all } from "./monad";
 import { expect, it, vitest } from "vitest";
-import { maybe, spread } from "./monads";
+import type { Monad } from "./monad.types";
+import { maybe, spread } from "../monads";
 
 const check = (x: any) => expect(unwrap(x));
-const invalid = (x: any) => expect(() => unwrap(x)).toThrow();
-
 const identity = monad();
 
 it("monad chains thens", () => {
@@ -45,97 +44,6 @@ it("transforming monad", () => {
   check(fortyTwo.then().then((x) => x / 2)).toBe(21);
 });
 
-it("throws & catches errors", async () => {
-  const oneish = maybe(1);
-  check(oneish).toBe(1);
-
-  invalid(maybe(null));
-
-  const nullish = oneish.then(() => null).then(() => 2);
-  invalid(nullish);
-
-  check(nullish.catch(() => 3)).toBe(3);
-
-  const chain = maybe(1)
-    .then(() => null)
-    .catch(() => 2)
-    .then(() => null)
-    .catch(() => 3);
-
-  check(chain).toBe(3);
-  check(chain.catch(() => 4)).toBe(3);
-  check(chain.then(() => 4)).toBe(4);
-  invalid(chain.then(() => null));
-
-  expect(maybe(Promise.resolve()).unwrap()).rejects.toEqual(
-    new Error("Value is nothing!")
-  );
-
-  invalid(maybe(null).catch(() => null));
-});
-
-it("is awaited properly", async () => {
-  expect(maybe(42)).resolves.toBe(42);
-  expect(maybe(null)).rejects.toEqual(new Error("Value is nothing!"));
-});
-
-it("rejects inline", () => {
-  {
-    const resolve = vitest.fn();
-    const reject = vitest.fn();
-    maybe(null).then(resolve, reject);
-    expect(resolve).not.toBeCalled();
-    expect(reject).toBeCalled();
-  }
-  {
-    const monad = maybe(null)
-      .then(() => null)
-      .then(
-        () => 42,
-        () => null
-      );
-    invalid(monad);
-  }
-  {
-    const monad = maybe(1)
-      .then(
-        () => null,
-        () => 2
-      )
-      .then(
-        () => 3,
-        () => 4
-      );
-    check(monad).toBe(3);
-  }
-});
-
-it("catches async errors", async () => {
-  const promise = Promise.reject("Error");
-
-  {
-    const monad = maybe(promise);
-    const caught = monad.catch(() => 42);
-    expect(caught).not.toBeInstanceOf(Promise);
-    expect(await caught).toBe(42);
-  }
-
-  {
-    const monad = maybe(promise);
-    expect(monad).rejects.toBe("Error");
-    expect(monad.unwrap()).rejects.toBe("Error");
-    const never = vitest.fn<[], undefined>();
-    const rejected = vitest.fn<[], undefined>();
-    const result = await monad
-      .then(never, rejected)
-      .then(never)
-      .catch(() => 42);
-    expect(never).not.toBeCalled();
-    expect(rejected).toBeCalled();
-    expect(result).toBe(42);
-  }
-});
-
 it("mixes with promises", async () => {
   check(maybe(maybe(1))).toBe(1);
   check(maybe(maybe(maybe(1).then((x) => x + 2)).then((x) => x + 3))).toBe(6);
@@ -149,49 +57,6 @@ it("mixes with promises", async () => {
   expect(await maybeMaybe).toBe(1);
   check(await maybeMaybe.then((x) => x.toFixed())).toBe("1");
   check(maybeMaybe.unwrap()).toBeInstanceOf(Promise);
-});
-
-it("spreads array", async () => {
-  const list = spread([1, 2, 3, 4]);
-
-  const result = list
-    .then((x) => x * 2)
-    .then((x) => x.toString())
-    .then((x) => [x])
-    .then((x) => x);
-
-  check(result).toEqual(["2", "4", "6", "8"]);
-  expect(await result.unwrap()).toEqual(["2", "4", "6", "8"]);
-  expect(await result).toEqual(["2", "4", "6", "8"]);
-
-  const broken = spread(1).catch(() => [123]);
-
-  check(spread([[[1, 2, [[3], 4]]]])).toEqual([1, 2, 3, 4]);
-  check(broken).toEqual([123]);
-  invalid(spread(1));
-});
-
-it("spreads iterable", async () => {
-  function* iterable() {
-    yield 1;
-    yield [2];
-    yield* [3, 4];
-  }
-
-  const list = spread(iterable());
-  const result = list
-    .then((x) => {
-      if (x % 2) throw "";
-      return x;
-    })
-    .then((x) => x * 2)
-    .then((x) => x.toString())
-    .then((x) => [x])
-    .then();
-
-  check(result).toEqual([["4"], ["8"]]);
-  expect(await result.unwrap()).toEqual([["4"], ["8"]]);
-  expect(await result).toEqual([["4"], ["8"]]);
 });
 
 it("calls inner thenable", async () => {
@@ -210,10 +75,8 @@ it("calls inner thenable", async () => {
   mayThen.then();
   expect(then).toBeCalledTimes(3);
 
-  check(mayThen.then((x) => x * 2)).toBe(84);
-  expect(then).toBeCalledTimes(5);
-  expect(await mayThen.then((x) => x * 2)).toBe(168);
-  expect(then).toBeCalledTimes(7);
+  expect(await mayThen.then((x) => x * 2)).toBe(84);
+  expect(then).toBeCalledTimes(6);
 });
 
 it("return a string tag", () => {
@@ -290,7 +153,7 @@ it("alls primitives", () => {
 });
 
 it("alls monads", () => {
-  const values = [1, maybe(2), 3 as never, maybe(identity(4))] as const;
+  const values = [1, maybe(2), 3, maybe(identity(4))] as const;
   const single = all(values);
 
   expect("then" in single);
@@ -328,7 +191,7 @@ it("alls monads & promises", async () => {
 
 it("correctly rejects promises", async () => {
   const value = maybe(Promise.resolve(1));
-  let target = identity([] as any);
+  let target: Monad<any, any> = identity([] as any);
   target = target.then((x: any) => value.then((y) => [...x, y]));
 
   expect(target.then(() => null)).rejects.toEqual(
@@ -356,4 +219,46 @@ it("unwraps for native await", async () => {
 
   spread([1]).then(mock, mock);
   expect(check).toBeCalledTimes(1);
+});
+
+it("respects unwrap fallback", () => {
+  function bad() {
+    throw new Error();
+    return 123;
+  }
+
+  const monad = maybe(42).then(bad);
+  const result = monad.unwrap("1337");
+  expect(result).toBe("1337");
+
+  const future = identity(Promise.resolve(42)).then(bad);
+  const result2 = future.unwrap(":(");
+  expect(result2).resolves.toBe(":(");
+});
+
+it("exposes data & error", async () => {
+  {
+    const monad = maybe(42);
+    const { data, error } = monad.expose();
+    expect(data).toBe(42);
+    expect(error).toBeTypeOf("undefined");
+  }
+  {
+    const monad = maybe<number>(undefined as any);
+    const { data, error } = monad.expose();
+    expect(data).toBeTypeOf("undefined");
+    expect(error).toBeInstanceOf(Error);
+  }
+  {
+    const monad = maybe(Promise.resolve(42));
+    const { data, error } = await monad.expose();
+    expect(data).toBe(42);
+    expect(error).toBeTypeOf("undefined");
+  }
+  {
+    const monad = maybe(Promise.reject("123"));
+    const { data, error } = await monad.expose();
+    expect(data).toBeTypeOf("undefined");
+    expect(error).toBeInstanceOf(Error);
+  }
 });

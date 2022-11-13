@@ -4,6 +4,8 @@ import { info, logged } from "./log";
 
 function handle(command: string) {
   /// TODO: handle command (mb filesystem based)
+  //    - create a pool builder like: `command("test")(() => ...)
+  //    - plugins should be able to register commands too
 }
 
 function interactive() {
