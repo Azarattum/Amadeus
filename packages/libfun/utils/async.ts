@@ -1,5 +1,7 @@
 import { handle } from "./error";
 
+const delay = (ms = 1) => new Promise((x) => setTimeout(x, ms));
+
 function cancel<T>(promise: T, signal?: AbortSignal) {
   const cancel = new Promise<void>((_, reject) => {
     const remove = () => signal?.removeEventListener("abort", abort);
@@ -67,4 +69,4 @@ function block<T extends AsyncGenerator>(
   }
 }
 
-export { cancel, thenable, derive, block };
+export { cancel, thenable, derive, block, delay };

@@ -16,7 +16,7 @@ type Schedule = (
     }
   | {
       relative?: never;
-      absolute: Date;
+      absolute: number;
     }
 ) & {
   interval?: number;

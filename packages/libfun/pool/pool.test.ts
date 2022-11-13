@@ -2,9 +2,9 @@ import { take, async, context, map, first } from "./iterator";
 import { PoolError, pools } from "./pool";
 import type { Fn } from "../utils/types";
 import { expect, it, vi } from "vitest";
+import { delay } from "../utils/async";
 
 const { pool, count, status } = pools({ group: "test" });
-const delay = (ms = 1) => new Promise((x) => setTimeout(x, ms));
 const barrier = () => {
   let resolve: () => void = () => {};
   const promise = new Promise<void>((r) => (resolve = r));
@@ -480,4 +480,27 @@ it("handles timeouts", async () => {
   await delay();
   expect(spy).not.toHaveBeenCalled();
   event.close();
+});
+
+it("schedules events", async () => {
+  let counter = 0;
+  const event = pool<() => number>("event");
+  event(() => counter++);
+  expect(await take(event.schedule({ relative: 10 })())).toEqual([0]);
+  const repeating = event.schedule({
+    absolute: Date.now() + 30,
+    interval: 30,
+  });
+
+  expect(take(repeating())).resolves.toEqual([1, 2]);
+  expect(counter).toBe(1);
+  await delay(31);
+  expect(counter).toBeGreaterThan(1);
+  let last = counter;
+  await delay(31);
+  expect(counter).toBeGreaterThan(last);
+  last = counter;
+  event.close();
+  await delay(31);
+  expect(counter).toBe(last);
 });

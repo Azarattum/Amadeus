@@ -16,22 +16,8 @@ import {
   reuse,
   wrap,
 } from "./iterator";
-import { derive, block } from "../utils/async";
+import { derive, block, delay } from "../utils/async";
 import type { Fn } from "../utils/types";
-
-/// TODO: feature list
-//    + id
-//    + concurrency
-//    + rate limits
-//    / group limits
-//    + abort
-//    + catch error handling
-//    + groups
-//    + global filtering
-//    + pool tracing
-//    + request caching
-//    + timeouts
-//    - schedule
 
 const defaults: Options = {
   concurrency: Infinity,
@@ -96,7 +82,28 @@ function pools(options: Partial<Options> = {}): Pools {
       this[state].catchers.add(handler || (() => {}));
     },
     schedule(when) {
-      throw new Error("Unimplemented!"); /// TODO
+      const self = this as Pool;
+      let time =
+        when.absolute === undefined
+          ? Date.now() + when.relative
+          : when.absolute;
+
+      return async function* (...args) {
+        const now = Date.now();
+        if (time > now) {
+          await delay(time - now);
+          yield* self(...args);
+        }
+        while (when.interval && all.has(self[state].id)) {
+          const now = Date.now();
+          if (time <= now) {
+            const times = Math.max(Math.ceil((now - time) / when.interval), 1);
+            time += times * when.interval;
+          }
+          await delay(time - now);
+          yield* self(...args);
+        }
+      };
     },
     bind(context) {
       const fn = Function.bind.call(this as any, context);
