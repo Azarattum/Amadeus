@@ -13,10 +13,9 @@
   },
   "dependencies": {
     "@amadeus/util": "workspace:*",
-    "tsee": "^1.3.2"
+    "libfun": "workspace:*"
   },
   "devDependencies": {
-    "vite-node": "0.22.1",
-    "vite-plugin-copy": "^0.1.6"
+    "vite-node": "0.22.1"
   }
 }

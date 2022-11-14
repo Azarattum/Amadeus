@@ -1,6 +1,7 @@
 import { createInterface } from "node:readline/promises";
+import { log, stop as close } from "../event";
 import { stdin, stdout } from "node:process";
-import { info, logged } from "./log";
+import { stop } from ".";
 
 function handle(command: string) {
   /// TODO: handle command (mb filesystem based)
@@ -17,16 +18,18 @@ function interactive() {
     output: stdout,
     prompt: "> ",
   });
+  const unsubscribe = log(() => cli.prompt(true));
+  close(() => cli.close());
 
-  logged(() => cli.prompt(true));
+  cli.on("close", () => {
+    cli.removeAllListeners();
+    unsubscribe();
+    return stop();
+  });
   cli.on("line", (input) => {
     handle(input);
     cli.prompt();
   });
-  cli.on("close", () => {
-    /// TODO: emit global close event!
-  });
-
   cli.prompt();
 }
 

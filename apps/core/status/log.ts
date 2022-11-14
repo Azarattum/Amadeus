@@ -11,71 +11,69 @@ import {
   type Color,
 } from "@amadeus/util/color";
 import { offset, rescape } from "@amadeus/util/string";
-import type { PluginContext } from "../plugin";
 import { StructError } from "superstruct";
+import { log as logged } from "../event";
 import { stdout } from "node:process";
-import { EventEmitter } from "tsee";
+import { PoolError } from "libfun";
 import { inspect } from "util";
 
 function time() {
   return new Date().toTimeString().slice(0, 8);
 }
 
-function log(
-  this: PluginContext,
-  { level, separator, color, data, pure }: LogInfo
-) {
+type Context = { group?: string } | void;
+
+function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
   separator ??= "|";
   level ??= "info";
   color ??= reset;
 
-  const module = this?.module?.toUpperCase() || "CORE";
+  const group = this?.group?.toUpperCase() || "CORE";
   const log = console[level];
 
   stdout.write(clear);
 
   if (pure) {
     log(...data);
-    return logger.emit("log", data.join(" "));
+    return logged(data.join(" "));
   }
 
   log(
     bright + black + time() + reset,
     color + separator + reset,
-    `[${bright}${module}${reset}]:`,
+    `[${bright}${group}${reset}]:`,
     ...data.map((x) => {
       if (typeof x !== "string") x = inspect(x);
       return paint(x, color || reset);
     })
   );
-  logger.emit(
-    "log",
+  logged(
     [
       time(),
       separator,
-      `[${module}]:`,
+      `[${group}]:`,
       ...data.map((x) => (typeof x !== "string" ? inspect(x) : x)),
     ].join(" ")
   );
 }
 
 /** Logs a successful message */
-function ok(this: PluginContext, ...data: any[]) {
+function ok(this: Context, ...data: any[]) {
   log.bind(this)({ color: green, separator: "+", data });
 }
 
 /** Logs a informational message */
-function info(this: PluginContext, ...data: any[]) {
+function info(this: Context, ...data: any[]) {
   log.bind(this)({ separator: "|", data });
 }
 
 /** Logs a warning message */
-function wrn(this: PluginContext, ...data: any[]) {
+function wrn(this: Context, ...data: any[]) {
   log.bind(this)({ level: "warn", color: yellow, separator: "?", data });
 }
 
 /** Logs an error message */
-function err(this: PluginContext, ...data: any[]) {
+function err(this: Context, ...data: any[]) {
   // Filter silent errors
   data = data.filter((x) => !(x instanceof SilentError));
   if (!data.length) return;
@@ -85,6 +83,7 @@ function err(this: PluginContext, ...data: any[]) {
     data.push(new Error().stack?.replace(/^.*$/m, "") || "");
   }
 
+  let context: Context = undefined;
   // Format errors properly
   data = data.map((e) => {
     if (e instanceof StructError) {
@@ -102,11 +101,13 @@ function err(this: PluginContext, ...data: any[]) {
 
       return stack + "\nReceived:\n" + received;
     }
+    if (e instanceof PoolError) context = { group: e.handler || e.caller };
     if (e instanceof Error) return e.stack || "";
     return e;
   });
 
-  log.bind(this)({ level: "error", color: red, separator: "!", data });
+  if (context === undefined) context = this;
+  log.bind(context)({ level: "error", color: red, separator: "!", data });
 }
 
 /** Prints a visual log divider  */
@@ -130,9 +131,4 @@ class SilentError extends Error {
   }
 }
 
-type LogEvent = (text: string) => any;
-const logger = new EventEmitter<{ log: LogEvent }>();
-const logged = (x: LogEvent) => logger.on("log", x);
-/// TODO: removeAllListeners on close!
-
-export { ok, info, wrn, err, divide, SilentError, logged };
+export { ok, info, wrn, err, divide, SilentError };

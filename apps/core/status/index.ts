@@ -1,18 +1,36 @@
 import { divide, info, ok, SilentError } from "./log";
 import { name, version } from "../package.json";
+import { stop as close, pools } from "../event";
+import { plugins } from "../plugin";
+import { take } from "libfun";
 
-let stared: null | number = null;
+let started: null | number = null;
 
 async function start() {
-  if (stared) throw new SilentError();
+  if (started) throw new SilentError();
   info(`Starting ${name} v${version}...`);
-  stared = Date.now();
+  started = Date.now();
 }
 
 async function complete() {
-  if (!stared) throw new Error("The application did not start!");
-  ok(`Successfully initialized in ${(Date.now() - stared) / 1000}s!`);
+  if (!started) throw new Error("The application did not start!");
+  ok(`Successfully initialized in ${(Date.now() - started) / 1000}s!`);
   divide();
 }
 
-export { start, complete };
+async function stop() {
+  if (!started) return;
+  started = null;
+
+  divide();
+  info("Stopping all the plugins...");
+  pools.drain();
+  await take(close());
+  info("Cleaning up all the event handlers...");
+  pools.close();
+  info("Unloading plugins...");
+  plugins.clear();
+  ok("Successfully stopped!");
+}
+
+export { start, complete, stop };

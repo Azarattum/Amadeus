@@ -66,15 +66,13 @@ importers:
   apps/core:
     specifiers:
       '@amadeus/util': workspace:*
-      tsee: ^1.3.2
+      libfun: workspace:*
       vite-node: 0.22.1
-      vite-plugin-copy: ^0.1.6
     dependencies:
       '@amadeus/util': link:../../packages/util
-      tsee: 1.3.2
+      libfun: link:../../packages/libfun
     devDependencies:
       vite-node: 0.22.1
-      vite-plugin-copy: 0.1.6
 
   apps/web:
     specifiers:
@@ -84,6 +82,9 @@ importers:
       '@amadeus/ui': link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static': 1.0.0-next.39
+
+  packages/libfun:
+    specifiers: {}
 
   packages/ui:
     specifiers:
@@ -98,15 +99,11 @@ importers:
     specifiers:
       '@amadeus/core': workspace:*
       '@amadeus/util': workspace:*
-      '@rollup/plugin-node-resolve': ^13.3.0
-      rollup: ^2.79.0
       vite: 3.0.9
     dependencies:
       '@amadeus/core': link:../../apps/core
       '@amadeus/util': link:../../packages/util
     devDependencies:
-      '@rollup/plugin-node-resolve': 13.3.0_rollup@2.79.0
-      rollup: 2.79.0
       vite: 3.0.9
 
 packages:
@@ -327,10 +324,6 @@ packages:
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: true
-
-  /@types/node/12.20.55:
-    resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
-    dev: false
 
   /@types/node/18.7.14:
     resolution: {integrity: sha512-6bbDaETVi8oyIARulOE9qF1/Qdi/23z6emrUh0fNJRUmjznqrixD4MpGDdgOFk5Xb0m2H6Xu42JGdvAxaJR/wA==}
@@ -2779,12 +2772,6 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /tsee/1.3.2:
-    resolution: {integrity: sha512-+oKU7u1d5J+AEwbA4S7+aF3jdPS1RLcf5fzB6z6CMwJE1U2DCPD0AcaPmAisVEBQx6+ssUyThAEzSNZ59UmvXA==}
-    dependencies:
-      '@types/node': 12.20.55
-    dev: false
-
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: true
@@ -3013,13 +3000,6 @@ packages:
       - stylus
       - supports-color
       - terser
-    dev: true
-
-  /vite-plugin-copy/0.1.6:
-    resolution: {integrity: sha512-bqIaefZOE2Jx8P5wJuHKL5GzCERa/pcwdUQWaocyTNXgalN2xkxXH7LmqRJ34V2OlKF2F9E/zj0zITS7U6PpUg==}
-    engines: {node: '>=14.8.0'}
-    dependencies:
-      fast-glob: 3.2.11
     dev: true
 
   /vite/3.0.8:

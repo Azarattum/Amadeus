@@ -1,33 +1,27 @@
+import { array, defaulted, intersection, type, type Infer } from "superstruct";
 import { create } from "@amadeus/util/superstruct";
-import { object, Struct } from "superstruct";
-import { existsSync } from "fs";
+import { readFile, writeFile } from "fs/promises";
+import type { Plugin } from "../plugin";
+import { fallback, pipe } from "libfun";
 
-async function resolve(file: string) {
-  const paths = [`../config/${file}`, `./config/${file}`, `./${file}`];
-  const path = paths.find((x) => existsSync(x));
-  if (!path) throw new Error(`Configuration "${file}" not found!`);
-  return path;
+const Config = type({
+  users: defaulted(array(), []),
+});
+type BaseConfig = Infer<typeof Config>;
+
+async function configure(plugins: Set<Plugin>) {
+  const Plugins = [...plugins].map((x) => type(x.config || {}));
+  const Settings = intersection([Config, ...Plugins]);
+  const file = "./config.json";
+
+  return pipe(file)(
+    (x) => readFile(x, "utf8"),
+    JSON.parse,
+    fallback({}),
+    (x) => create(x, Settings, "Invalid configuration!"),
+    (x) => writeFile(file, JSON.stringify(x, null, 2)).then(() => x)
+  );
 }
-
-async function configure() {
-  const load = async <T, S>(file: string, struct: Struct<T, S>) =>
-    resolve(file)
-      .then((x) => import(x))
-      .then((x) => x.default)
-      .then((x) => create(x, struct, `Invalid "${file}" configuration!`));
-
-  return {
-    settings: await load("settings.json", Settings),
-    users: await load("users.json", Users),
-  };
-}
-
-/// TODO: add users schema
-const Users = object({});
-/// TODO: add settings schema
-const Settings = object({});
-
-type Config = Awaited<ReturnType<typeof configure>>;
 
 export { configure };
-export type { Config };
+export type { BaseConfig };
