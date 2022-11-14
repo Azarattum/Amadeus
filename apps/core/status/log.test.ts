@@ -49,7 +49,7 @@ it("prints info", async () => {
   ]);
 
   info("hello");
-  info.bind({ module: "module" })("other");
+  info.bind({ group: "module" })("other");
   info({ hello: 123 }, "hello");
 
   expect(console.info).toBeCalledTimes(3);
@@ -66,7 +66,7 @@ it("prints ok", async () => {
   ]);
 
   ok("hello");
-  ok.bind({ module: "module" })("other");
+  ok.bind({ group: "module" })("other");
   ok({ hello: 123 }, "hello");
 
   expect(console.info).toBeCalledTimes(3);
@@ -83,7 +83,7 @@ it("prints warning", async () => {
   ]);
 
   wrn("hello");
-  wrn.bind({ module: "module" })("other");
+  wrn.bind({ group: "module" })("other");
   wrn("data", Buffer.from("AAA"));
 
   expect(console.warn).toBeCalledTimes(3);
@@ -127,7 +127,7 @@ it("prints error", async () => {
   ]);
 
   err("broken");
-  err.bind({ module: "fail" })(new Error("failed"));
+  err.bind({ group: "fail" })(new Error("failed"));
 
   const [error] = validate({ name: 42 }, object({ name: string() }));
   expect(error).toBeInstanceOf(StructError);
