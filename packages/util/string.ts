@@ -34,3 +34,14 @@ export function offset(string: string, offset = 4) {
 export function rescape(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+/**
+ * Returns the given word in it's plural form
+ * @param word Word to change
+ * @param count How many of this word
+ */
+export function plural(word: string, count?: number) {
+  if (count === 1) return word;
+  if (word.endsWith("s")) return word + "es";
+  return word + "s";
+}
