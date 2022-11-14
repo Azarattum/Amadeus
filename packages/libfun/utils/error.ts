@@ -12,7 +12,7 @@ function handle<T = void>(
   const exception = errorify(error);
   if (!catcher) throw exception;
   catcher(exception);
-  return fallback;
+  return fallback as T;
 }
 
 export { errorify, handle };

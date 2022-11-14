@@ -18,6 +18,7 @@ import {
 } from "./iterator";
 import { derive, block, delay } from "../utils/async";
 import type { Fn } from "../utils/types";
+import { handle } from "../utils/error";
 
 const defaults: Options = {
   concurrency: Infinity,
@@ -217,18 +218,26 @@ function pool<T extends Fn = () => void>(
               group: handler.group,
               controller: derive(context.signal),
             };
-            const generator = wrap(
-              generate(handler.bind(context)(...params)),
-              task.controller.signal,
-              catcher(task.group),
-              self.id
-            );
+            try {
+              const generator = wrap(
+                generate(handler.bind(context)(...params)),
+                task.controller.signal,
+                catcher(task.group),
+                self.id
+              );
 
-            return (async function* () {
-              executor.tasks.add(task);
-              yield* generator;
-              executor.tasks.delete(task);
-            })();
+              return (async function* () {
+                executor.tasks.add(task);
+                yield* generator;
+                executor.tasks.delete(task);
+              })();
+            } catch (error) {
+              return handle(
+                error,
+                catcher(task.group),
+                (async function* () {})()
+              );
+            }
           });
 
         const iterable = () => merge(...iterables());
