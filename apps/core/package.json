@@ -16,6 +16,6 @@
     "libfun": "workspace:*"
   },
   "devDependencies": {
-    "vite-node": "0.22.1"
+    "vite-node": "0.25.2"
   }
 }

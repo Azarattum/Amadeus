@@ -8,10 +8,9 @@ const config = {
   kit: {
     files: {
       routes: "routes",
-      template: "routes/+layout.html",
+      appTemplate: "routes/+layout.html",
     },
 
-    prerender: { default: true },
     adapter: adapter({ pages: "../../build/public" }),
   },
 };
