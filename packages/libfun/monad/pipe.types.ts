@@ -1,4 +1,10 @@
-import type { Monad, MonadsTransform, Unwrapped, Wrapped } from "./monad.types";
+import type {
+  MonadsTransform,
+  Unwrapped,
+  Promised,
+  Wrapped,
+  Monad,
+} from "./monad.types";
 import type { Last } from "../utils/types";
 
 type γs = γ<any[], any>[];
@@ -33,7 +39,7 @@ type λn<A, Z extends λs, H extends any[] = []> = Z extends [
 type Type = "pipe" | "pipeline";
 type Awaits<T> = { -readonly [P in keyof T]: Awaited<T[P]> };
 type Returns<T extends γs> = { -readonly [P in keyof T]: ReturnType<T[P]> };
-type Thenable<T> = T | Monad<T, any[]> | Promise<T>;
+type Thenable<T> = T | Monad<T, any> | Promise<T>;
 type Thenify<T> = T extends [infer Item, ...infer Rest]
   ? [Thenable<Item>, ...Thenify<Rest>]
   : T;
@@ -50,7 +56,9 @@ type Resolve<M extends any[]> = MonadsTransform<Spread<M>> extends []
   : Rewrap<M, Last<M>>;
 
 type To<Y extends Type, M extends any[]> = Y extends "pipeline"
-  ? (..._: Thenify<M[0]>) => Resolve<M>
+  ? <T extends Thenify<M[0]>>(
+      ..._: T
+    ) => Promised<MonadsTransform<T>, Resolve<M>>
   : Resolve<M>;
 
 // prettier-ignore
