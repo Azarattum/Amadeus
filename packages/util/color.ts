@@ -1,17 +1,31 @@
 import { rescape } from "./string";
 
-export const clear: Color = "\x1b[2K\r";
-export const reset: Color = "\x1b[0m";
-export const bright: Color = "\x1b[1m";
-export const dim: Color = "\x1b[2m";
-export const black: Color = "\x1b[30m";
-export const red: Color = "\x1b[31m";
-export const green: Color = "\x1b[32m";
-export const yellow: Color = "\x1b[33m";
-export const blue: Color = "\x1b[34m";
-export const magenta: Color = "\x1b[35m";
-export const cyan: Color = "\x1b[36m";
-export const white: Color = "\x1b[37m";
+export const clear = "\x1b[2K\r";
+export const reset = "\x1b[0m";
+export const bright = "\x1b[1m";
+export const dim = "\x1b[2m";
+export const black = "\x1b[30m";
+export const red = "\x1b[31m";
+export const green = "\x1b[32m";
+export const yellow = "\x1b[33m";
+export const blue = "\x1b[34m";
+export const magenta = "\x1b[35m";
+export const cyan = "\x1b[36m";
+export const white = "\x1b[37m";
+export const colors = [
+  clear,
+  reset,
+  bright,
+  dim,
+  black,
+  red,
+  green,
+  yellow,
+  blue,
+  magenta,
+  cyan,
+  white,
+] as const;
 
 /**
  * Colors a given string with respect to multiple lines
@@ -49,17 +63,15 @@ export function highlight(
   return string;
 }
 
+/**
+ * Cleans the given string from any colors
+ * @param string Text to clean
+ */
+export function clean(string: string) {
+  let clean = string;
+  colors.forEach((x) => (clean = clean.replaceAll(x, "")));
+  return clean;
+}
+
 /** Color type */
-export type Color =
-  | "\x1b[2K\r"
-  | "\x1b[0m"
-  | "\x1b[1m"
-  | "\x1b[2m"
-  | "\x1b[30m"
-  | "\x1b[31m"
-  | "\x1b[32m"
-  | "\x1b[33m"
-  | "\x1b[34m"
-  | "\x1b[35m"
-  | "\x1b[36m"
-  | "\x1b[37m";
+export type Color = typeof colors[number];

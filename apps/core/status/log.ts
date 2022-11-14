@@ -1,6 +1,7 @@
 import {
   black,
   bright,
+  clean,
   clear,
   green,
   highlight,
@@ -11,10 +12,10 @@ import {
   type Color,
 } from "@amadeus/util/color";
 import { offset, rescape } from "@amadeus/util/string";
+import { pipeline, PoolError, take } from "libfun";
 import { StructError } from "superstruct";
 import { log as logged } from "../event";
 import { stdout } from "node:process";
-import { PoolError } from "libfun";
 import { inspect } from "util";
 
 function time() {
@@ -29,13 +30,14 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
   color ??= reset;
 
   const group = this?.group?.toUpperCase() || "CORE";
+  const save = pipeline(clean, logged, take);
   const log = console[level];
 
   stdout.write(clear);
 
   if (pure) {
     log(...data);
-    return logged(data.join(" "));
+    return save(data.join(" "));
   }
 
   log(
@@ -47,7 +49,7 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
       return paint(x, color || reset);
     })
   );
-  logged(
+  save(
     [
       time(),
       separator,

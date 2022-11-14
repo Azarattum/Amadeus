@@ -45,3 +45,13 @@ export function plural(word: string, count?: number) {
   if (word.endsWith("s")) return word + "es";
   return word + "s";
 }
+
+/**
+ * Splits the given text into space separated parts, respecting quotes
+ * @param text Text to splits
+ */
+export function split(text: string) {
+  return (text.trim().match(/(--\S+=)?"(\\"|[^"])*"|[^ "]+/g) || []).map((x) =>
+    x.replace(/^"|"$/g, "").trim()
+  );
+}

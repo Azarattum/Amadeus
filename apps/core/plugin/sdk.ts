@@ -7,11 +7,12 @@ import {
 import { bright, reset } from "@amadeus/util/color";
 import { assert } from "@amadeus/util/superstruct";
 import { init, stop, pool } from "../event";
+import { command } from "../status/cli";
 import * as log from "../status/log";
 import { info } from "../status/log";
 import { format, plugins } from ".";
 
-const bound = { pool, init, stop, ...log };
+const bound = { pool, init, stop, command, ...log };
 
 function register<T extends ConfigStruct = undefined>(plugin: Plugin<T>) {
   assert(plugin, PluginInfo, "Tried to register an invalid plugin!");
