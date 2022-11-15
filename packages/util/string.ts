@@ -55,3 +55,36 @@ export function split(text: string) {
     x.replace(/^"|"$/g, "").trim()
   );
 }
+
+/**
+ * Creates an approximate relative date string representation
+ * @param date Relative date
+ */
+export function format(date: Date) {
+  const intl = new Intl.RelativeTimeFormat("en");
+
+  const seconds = Math.floor((Date.now() - +date) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  if (seconds <= 1) return "just now";
+  if (seconds < 60) return intl.format(-seconds, "seconds");
+  if (minutes < 60) return intl.format(-minutes, "minutes");
+  if (hours < 24) return intl.format(-hours, "hours");
+  return intl.format(-days, "days");
+}
+
+/**
+ * Finds the longest common prefix within given words
+ * @param words Words to search in
+ * @returns
+ */
+export function prefix(words: string[]) {
+  if (!words[0] || words.length == 1) return words[0] || "";
+  let i = 0;
+  while (words[0][i] && words.every((w) => w[i] === words[0][i])) {
+    i++;
+  }
+
+  return words[0].substring(0, i);
+}
