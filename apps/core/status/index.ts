@@ -7,9 +7,19 @@ import { take } from "libfun";
 let started: null | number = null;
 
 async function start() {
+  if (import.meta.hot) await import.meta.hot.data.stopping;
   if (started) throw new SilentError();
+
   info(`Starting ${name} v${version}...`);
   started = Date.now();
+  if (import.meta.hot) {
+    let reload = () => (info("Performing an HMR reload..."), stop());
+    import.meta.hot.on("vite:beforeFullReload", () => {
+      const stopping = reload();
+      reload = () => Promise.resolve();
+      if (import.meta.hot) import.meta.hot.data.stopping = stopping;
+    });
+  }
 }
 
 async function complete() {
