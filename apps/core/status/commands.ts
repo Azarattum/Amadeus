@@ -7,8 +7,8 @@ import {
   yellow,
 } from "@amadeus/util/color";
 import { capitalize, format } from "@amadeus/util/string";
-import { arg, command, commands } from "./cli";
-import { log, pools } from "../event";
+import { arg, command, commands, usage } from "./cli";
+import { log, pool, pools } from "../event";
 import { async, take } from "libfun";
 import { info, wrn } from "./log";
 import { stop } from ".";
@@ -22,6 +22,7 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
   const [running, pending, handlers] = glyphs;
   const status = pools.status();
 
+  filter = filter?.toLowerCase();
   let message = filter
     ? `Status report for ${bright}${filter}${reset}:\n`
     : "Status report:\n";
@@ -74,7 +75,9 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
 
 command("help", [arg.command])((command) => {
   if (!command) {
-    return info(`Available commands: ${take(commands.keys()).join(", ")}.`);
+    return info(
+      `Available commands: ${take(commands.keys()).sort().join(", ")}.`
+    );
   }
   const docs = commands.get(command);
   if (!docs) return wrn(`No such command "${command}"!`);
@@ -97,4 +100,40 @@ command("help", [arg.command])((command) => {
 command("clear")(() => {
   console.clear();
   take(log(""));
+});
+
+command("abort", ["all", arg.plugin, arg.pool])(function* (filter) {
+  if (!filter) return yield* usage("abort");
+  filter = filter.toLowerCase();
+  const status = pools.status().find((x) => x.id === filter);
+
+  if (filter === "all") {
+    pools.abort();
+    info("Aborted all running pools!");
+  } else if (status) {
+    const target = pool(status.id);
+    target.abort();
+    info(`Aborted pool ${bright}${status.id}${reset}!`);
+  } else {
+    pools.abort("*", { group: filter });
+    info(`Aborted everything matching ${bright}${filter}${reset}!`);
+  }
+});
+
+command("drain", ["all", arg.plugin, arg.pool])(function* (filter) {
+  if (!filter) return yield* usage("drain");
+  filter = filter.toLowerCase();
+  const status = pools.status().find((x) => x.id === filter);
+
+  if (filter === "all") {
+    pools.drain();
+    info("Drained all the pools!");
+  } else if (status) {
+    const target = pool(status.id);
+    target.drain();
+    info(`Drained pool ${bright}${status.id}${reset}!`);
+  } else {
+    pools.drain("*", { group: filter });
+    info(`Drained everything matching ${bright}${filter}${reset}!`);
+  }
 });

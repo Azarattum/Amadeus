@@ -5,7 +5,7 @@ import { prefix, split } from "@amadeus/util/string";
 import { stdin, stdout } from "node:process";
 import type { WriteStream } from "node:tty";
 import { plugins } from "../plugin";
-import { take } from "libfun";
+import { map, take } from "libfun";
 import { wrn } from "./log";
 import { stop } from ".";
 
@@ -22,6 +22,13 @@ function command(
   return pool<(...args: (string | undefined)[]) => void>(
     `command/${what}`
   ).bind(this);
+}
+
+function* usage(this: { group?: string } | void, command: string) {
+  const help = pool<(filter: string) => void>("command/help");
+  yield* map(help.bind(this)(command), function* (x) {
+    yield x;
+  });
 }
 
 function handle(command: string) {
@@ -44,7 +51,7 @@ async function interactive() {
   const colorizer = colorize(cli);
   stdin.on("data", colorizer);
 
-  const unsubscribe = log(() => cli.prompt(true));
+  const unsubscribe = log(() => (cli.prompt(true), colorizer()));
   close(() => cli.close());
 
   cli.on("close", () => {
@@ -119,4 +126,4 @@ const arg = {
   command: Symbol("command"),
 };
 
-export { interactive, command, commands, arg };
+export { interactive, command, commands, arg, usage };
