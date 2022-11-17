@@ -7,11 +7,12 @@ import { take } from "libfun";
 let started: null | number = null;
 
 async function start() {
+  if (started) throw new SilentError();
   if (import.meta.hot) await import.meta.hot.data.stopping;
   if (started) throw new SilentError();
 
-  info(`Starting ${name} v${version}...`);
   started = Date.now();
+  info(`Starting ${name} v${version}...`);
   if (import.meta.hot) {
     let reload = () => (info("Performing an HMR reload..."), stop());
     import.meta.hot.on("vite:beforeFullReload", () => {

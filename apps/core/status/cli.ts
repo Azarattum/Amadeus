@@ -1,4 +1,4 @@
-import { createInterface, Interface } from "node:readline/promises";
+import { createInterface, type Interface } from "node:readline/promises";
 import { log, pool, pools, stop as close } from "../event";
 import { cyan, highlight } from "@amadeus/util/color";
 import { prefix, split } from "@amadeus/util/string";

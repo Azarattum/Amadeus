@@ -48,3 +48,26 @@ export function slice<T>(iterator: Iterator<T>, start: number, end: number) {
 
   return slice;
 }
+
+/**
+ * Deeply merges two objects and returns their intersection.
+ */
+export function merge<
+  A extends Record<string, any>,
+  B extends Record<string, any>
+>(a: A, b: B) {
+  const target: Record<string, any> = { ...a };
+
+  for (const key in b) {
+    if (Array.isArray(b[key])) {
+      if (!Array.isArray(target[key])) target[key] = [];
+      target[key].push(...(b[key] as []));
+    } else if (typeof b[key] === "object" && b[key]) {
+      if (!target[key]) target[key] = {};
+      target[key] = merge(target[key], b[key]);
+    } else {
+      target[key] = b[key];
+    }
+  }
+  return target as A & B;
+}
