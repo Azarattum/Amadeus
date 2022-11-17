@@ -232,6 +232,7 @@ function pool<T extends Fn = () => void>(
                 executor.tasks.delete(task);
               })();
             } catch (error) {
+              task.controller.abort();
               return handle(
                 error,
                 catcher(task.group),
@@ -252,6 +253,7 @@ function pool<T extends Fn = () => void>(
           try {
             yield* cached;
           } finally {
+            executor.controller.abort();
             self.executing.delete(executor);
             clearTimeout(timeout);
           }
