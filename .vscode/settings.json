@@ -31,6 +31,7 @@
     "preprocess",
     "rescape",
     "resizer",
+    "reyield",
     "rgba",
     "rimraf",
     "rollup",

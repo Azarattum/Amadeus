@@ -14,6 +14,10 @@ type Iterated<T extends SomeIterator, One = false> = T extends AsyncIterator<
     : U[]
   : never;
 
+const reyield = function* <T>(item: T) {
+  yield item;
+};
+
 const async = function* <T>(promise: PromiseLike<T>) {
   (promise as any)[passthrough] = true;
   const result: T = yield promise as any as Passthrough<T>;
@@ -57,16 +61,16 @@ async function* wrap<T, U>(
   }
 }
 
-function* map<T, M, R>(
+function* map<T, M = T, R = void>(
   iterator: AsyncIterator<T>,
-  map: (item: T) => Generator<M, R>
+  map?: (item: T) => Generator<M, R>
 ) {
   const all: R[] = [];
   for (let value, done; ; ) {
     ({ value, done } = yield* async(iterator.next()));
     if (done) return all;
 
-    const mapped = wrap(map(value as T), context.signal);
+    const mapped = wrap((map || reyield)(value as T), context.signal);
     for (let value, done; !done; ) {
       ({ value, done } = yield* async(mapped.next()));
       if (done) all.push(value as R);
