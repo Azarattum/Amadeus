@@ -4,9 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "vite build --emptyOutDir=false --mode node",
-    "coverage": "vitest run --coverage --mode node",
-    "test": "vitest run --mode node"
+    "build": "vite build --emptyOutDir=false"
   },
   "dependencies": {
     "@amadeus/core": "workspace:*",
