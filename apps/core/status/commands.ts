@@ -1,4 +1,11 @@
-import { black, bright, green, reset, yellow } from "@amadeus/util/color";
+import {
+  black,
+  bright,
+  green,
+  magenta,
+  reset,
+  yellow,
+} from "@amadeus/util/color";
 import { capitalize, format } from "@amadeus/util/string";
 import { arg, command, commands } from "./cli";
 import { log, pools } from "../event";
@@ -22,7 +29,9 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
   const filtered = status.filter((x) => {
     if (filter === "all") return true;
     if (filter === x.id) return true;
-    if (filter === x.group) return true;
+    const executors = [...x.executing.values(), ...x.pending.values()];
+    executors.push(...executors.flatMap((x: any) => [...x.tasks.values()]));
+    if (executors.find((x) => filter === x.group)) return true;
     if (!filter) {
       return ["command/", "init", "stop", "log"].every(
         (y) => !x.id.startsWith(y)
@@ -63,8 +72,26 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
   info(message);
 });
 
-command("help")(() => {
-  info(`Available commands: ${take(commands.keys()).join(", ")}.`);
+command("help", [arg.command])((command) => {
+  if (!command) {
+    return info(`Available commands: ${take(commands.keys()).join(", ")}.`);
+  }
+  const docs = commands.get(command);
+  if (!docs) return wrn(`No such command "${command}"!`);
+  let usage = `Usage for "${command}" command is:\n  `;
+  usage += `${bright}${command}${reset} `;
+  const args = docs.map((x) => {
+    if (!Array.isArray(x)) x = [x as any];
+    return x
+      .map((type) =>
+        type.description
+          ? `${bright + magenta}${type.description}${reset}`
+          : type
+      )
+      .join(`${bright + black}/${reset}`);
+  });
+  usage += args.join(" ") + "\n";
+  info(usage);
 });
 
 command("clear")(() => {

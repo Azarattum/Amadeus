@@ -113,10 +113,10 @@ function colorize(cli: Interface) {
 }
 
 const arg = {
-  text: Symbol(),
-  pool: Symbol(),
-  plugin: Symbol(),
-  command: Symbol(),
+  text: Symbol("text"),
+  pool: Symbol("pool"),
+  plugin: Symbol("plugin"),
+  command: Symbol("command"),
 };
 
 export { interactive, command, commands, arg };
