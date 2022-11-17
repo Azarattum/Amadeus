@@ -291,11 +291,11 @@ class PoolError extends Error implements Details {
 
   constructor(error: Error, details: Omit<Details, "reason">) {
     super(error.message);
+    this.name = "PoolError";
     this.pool = details.pool;
     this.trace = details.trace;
     this.caller = details.caller;
     this.handler = details.handler;
-    this.name = this.constructor.name;
     this.message += `\n    trace: ${this.trace.join(" -> ")}`;
     this.reason = error instanceof PoolError ? error.reason : error.message;
     if (this.caller === this.handler) {
