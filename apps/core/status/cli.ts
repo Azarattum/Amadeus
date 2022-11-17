@@ -26,9 +26,7 @@ function command(
 
 function* usage(this: { group?: string } | void, command: string) {
   const help = pool<(filter: string) => void>("command/help");
-  yield* map(help.bind(this)(command), function* (x) {
-    yield x;
-  });
+  yield* map(help.bind(this)(command));
 }
 
 function handle(command: string) {
