@@ -5,7 +5,7 @@ import type {
   Wrapped,
   Monad,
 } from "./monad.types";
-import type { Last } from "../utils/types";
+import type { Equal, Last } from "../utils/types";
 
 type γs = γ<any[], any>[];
 type λs = λ<any, any, any[]>[];
@@ -56,26 +56,28 @@ type Resolve<M extends any[]> = MonadsTransform<Spread<M>> extends []
   : Rewrap<M, Last<M>>;
 
 type To<Y extends Type, M extends any[]> = Y extends "pipeline"
-  ? <T extends Thenify<M[0]>>(
-      ..._: T
+  ? <T extends any[]>(
+      ..._: Equal<Thenify<M[0]>, T, T, Thenify<M[0]>>
     ) => Promised<MonadsTransform<T>, Resolve<M>>
   : Resolve<M>;
+
+type Either<A, B> = Equal<A, unknown[], B, A>;
 
 // prettier-ignore
 type Flow<Y extends Type, X extends any[] = unknown[]> = {
   <A = X>(): To<Y, [A extends any[] ? A[0] : A]>;
-  <B, A = X>(_: γ<Awaits<A>, B>): To<Y, [A, B]>;
-  <C, B, A = X>(..._: λ2<Awaits<A>, A, B, C>): To<Y, [A, B, C]>;
-  <D, C, B, A = X>(..._: λ3<Awaits<A>, A, B, C, D>): To<Y, [A, B, C, D]>;
-  <E, D, C, B, A = X>(..._: λ4<Awaits<A>, A, B, C, D, E>): To<Y, [A, B, C, D, E]>;
-  <F, E, D, C, B, A = X>(..._: λ5<Awaits<A>, A, B, C, D, E, F>): To<Y, [A, B, C, D, E, F]>;
-  <G, F, E, D, C, B, A = X>(..._: λ6<Awaits<A>, A, B, C, D, E, F, G>): To<Y, [A, B, C, D, E, F, G]>;
-  <H, G, F, E, D, C, B, A = X>(..._: λ7<Awaits<A>, A, B, C, D, E, F, G, H>): To<Y, [A, B, C, D, E, F, G, H]>;
-  <I, H, G, F, E, D, C, B, A = X>(..._: λ8<Awaits<A>, A, B, C, D, E, F, G, H, I>): To<Y, [A, B, C, D, E, F, G, H, I]>;
+  <B, A = X>(_: γ<Awaits<A>, B>): To<Y, [Either<X, A>, B]>;
+  <C, B, A = X>(..._: λ2<Awaits<A>, Either<X, A>, B, C>): To<Y, [Either<X, A>, B, C]>;
+  <D, C, B, A = X>(..._: λ3<Awaits<A>, Either<X, A>, B, C, D>): To<Y, [Either<X, A>, B, C, D]>;
+  <E, D, C, B, A = X>(..._: λ4<Awaits<A>, Either<X, A>, B, C, D, E>): To<Y, [Either<X, A>, B, C, D, E]>;
+  <F, E, D, C, B, A = X>(..._: λ5<Awaits<A>, Either<X, A>, B, C, D, E, F>): To<Y, [Either<X, A>, B, C, D, E, F]>;
+  <G, F, E, D, C, B, A = X>(..._: λ6<Awaits<A>, Either<X, A>, B, C, D, E, F, G>): To<Y, [Either<X, A>, B, C, D, E, F, G]>;
+  <H, G, F, E, D, C, B, A = X>(..._: λ7<Awaits<A>, Either<X, A>, B, C, D, E, F, G, H>): To<Y, [Either<X, A>, B, C, D, E, F, G, H]>;
+  <I, H, G, F, E, D, C, B, A = X>(..._: λ8<Awaits<A>, Either<X, A>, B, C, D, E, F, G, H, I>): To<Y, [Either<X, A>, B, C, D, E, F, G, H, I]>;
 
   <Z extends λs, I, H, G, F, E, D, C, B, A = X>(
-    ..._: λ_<Awaits<A>, A, B, C, D, E, F, G, H, I, Z>
-  ): To<Y, [A, B, C, D, E, F, G, H, I, ...Returns<Z>]>;
+    ..._: λ_<Awaits<A>, Either<X, A>, B, C, D, E, F, G, H, I, Z>
+  ): To<Y, [Either<X, A>, B, C, D, E, F, G, H, I, ...Returns<Z>]>;
 };
 
 type Pipeline = Flow<"pipeline">;
