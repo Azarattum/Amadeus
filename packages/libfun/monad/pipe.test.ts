@@ -255,4 +255,8 @@ it("respects fallback", () => {
     expect(error).toBeTypeOf("undefined");
     expect(data).toBe(2);
   }
+  {
+    const result = pipe(maybe(undefined))(fallback(42));
+    expect(result).toBe(42);
+  }
 });

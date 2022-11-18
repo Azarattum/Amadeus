@@ -5,10 +5,18 @@ import { all } from "./monad";
 
 const pipeline: Pipeline = (...fns: Fn[]) => {
   return (...data: any[]) => {
-    let value = all(data).then((x: any) => {
-      if (!fns.length) return x[0];
-      return fns[0](...x);
-    });
+    let value = all(data).then(
+      (x: any) => {
+        if (!fns.length) return x[0];
+        if (error in fns[0]) return x[0];
+        else return fns[0](...x);
+      },
+      (reason) => {
+        if (!fns.length) throw reason;
+        if (error in fns[0]) return fns[0](reason);
+        else throw reason;
+      }
+    );
 
     for (let i = 1; i < fns.length; i++) {
       if (error in fns[i]) value = value.catch(fns[i]);
