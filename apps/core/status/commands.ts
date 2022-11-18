@@ -7,11 +7,51 @@ import {
   yellow,
 } from "@amadeus/util/color";
 import { capitalize, format } from "@amadeus/util/string";
-import { arg, command, commands, usage } from "./cli";
 import { log, pool, pools } from "../event";
 import { async, take } from "libfun";
 import { info, wrn } from "./log";
 import { stop } from ".";
+
+type Argument = readonly (string | symbol)[] | string | symbol;
+const commands = new Map<string, Argument[] | []>();
+
+const arg = {
+  text: Symbol("text"),
+  pool: Symbol("pool"),
+  plugin: Symbol("plugin"),
+  command: Symbol("command"),
+};
+
+function command(
+  this: { group?: string } | void,
+  what: string,
+  ...args: readonly Argument[]
+) {
+  if (!what) throw new Error("Invalid command!");
+  commands.set(what, (args || []) as any);
+  return pool<(...args: (string | undefined)[]) => void>(
+    `command/${what}`
+  ).bind(this);
+}
+
+function usage(this: { group?: string } | void, command: string) {
+  const docs = commands.get(command);
+  if (!docs) return wrn(`No such command "${command}"!`);
+  let usage = `Usage for "${command}" command is:\n  `;
+  usage += `${bright}${command}${reset} `;
+  const args = docs.map((x) => {
+    if (!Array.isArray(x)) x = [x as any];
+    return x
+      .map((type) =>
+        type.description
+          ? `${bright + magenta}${type.description}${reset}`
+          : type
+      )
+      .join(`${bright + black}/${reset}`);
+  });
+  usage += args.join(" ") + "\n";
+  info(usage);
+}
 
 command("stop")(function* () {
   yield* async(stop());
@@ -74,27 +114,8 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
 });
 
 command("help", [arg.command])((command) => {
-  if (!command) {
-    return info(
-      `Available commands: ${take(commands.keys()).sort().join(", ")}.`
-    );
-  }
-  const docs = commands.get(command);
-  if (!docs) return wrn(`No such command "${command}"!`);
-  let usage = `Usage for "${command}" command is:\n  `;
-  usage += `${bright}${command}${reset} `;
-  const args = docs.map((x) => {
-    if (!Array.isArray(x)) x = [x as any];
-    return x
-      .map((type) =>
-        type.description
-          ? `${bright + magenta}${type.description}${reset}`
-          : type
-      )
-      .join(`${bright + black}/${reset}`);
-  });
-  usage += args.join(" ") + "\n";
-  info(usage);
+  if (command) return usage(command);
+  info(`Available commands: ${take(commands.keys()).sort().join(", ")}.`);
 });
 
 command("clear")(() => {
@@ -103,7 +124,7 @@ command("clear")(() => {
 });
 
 command("abort", ["all", arg.plugin, arg.pool])(function* (filter) {
-  if (!filter) return yield* usage("abort");
+  if (!filter) return usage("abort");
   filter = filter.toLowerCase();
   const status = pools.status().find((x) => x.id === filter);
 
@@ -121,7 +142,7 @@ command("abort", ["all", arg.plugin, arg.pool])(function* (filter) {
 });
 
 command("drain", ["all", arg.plugin, arg.pool])(function* (filter) {
-  if (!filter) return yield* usage("drain");
+  if (!filter) return usage("drain");
   filter = filter.toLowerCase();
   const status = pools.status().find((x) => x.id === filter);
 
@@ -137,3 +158,5 @@ command("drain", ["all", arg.plugin, arg.pool])(function* (filter) {
     info(`Drained everything matching ${bright}${filter}${reset}!`);
   }
 });
+
+export { command, commands, arg, usage };

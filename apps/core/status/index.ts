@@ -24,7 +24,7 @@ async function start() {
 }
 
 async function complete() {
-  if (!started) throw new Error("The application did not start!");
+  if (!started) throw new Error("The application did not start properly!");
   ok(`Successfully initialized in ${(Date.now() - started) / 1000}s!`);
   divide();
 }

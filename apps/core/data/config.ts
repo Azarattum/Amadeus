@@ -1,5 +1,11 @@
-import { array, defaulted, intersection, type, type Infer } from "superstruct";
-import { create } from "@amadeus/util/superstruct";
+import {
+  array,
+  defaulted,
+  intersection,
+  type,
+  create,
+  type Infer,
+} from "superstruct";
 import { readFile, writeFile } from "fs/promises";
 import type { Plugin } from "../plugin";
 import { fallback, pipe } from "libfun";

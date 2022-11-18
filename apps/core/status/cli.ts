@@ -4,30 +4,12 @@ import { cyan, highlight } from "@amadeus/util/color";
 import { prefix, split } from "@amadeus/util/string";
 import { stdin, stdout } from "node:process";
 import type { WriteStream } from "node:tty";
+import { arg, commands } from "./commands";
 import { plugins } from "../plugin";
-import { map, take } from "libfun";
+import { take } from "libfun";
 import { wrn } from "./log";
 import { stop } from ".";
-
-type Argument = readonly (string | symbol)[] | string | symbol;
-const commands = new Map<string, Argument[] | []>();
-
-function command(
-  this: { group?: string } | void,
-  what: string,
-  ...args: readonly Argument[]
-) {
-  if (!what) throw new Error("Invalid command!");
-  commands.set(what, (args || []) as any);
-  return pool<(...args: (string | undefined)[]) => void>(
-    `command/${what}`
-  ).bind(this);
-}
-
-function* usage(this: { group?: string } | void, command: string) {
-  const help = pool<(filter: string) => void>("command/help");
-  yield* map(help.bind(this)(command));
-}
+import "./commands";
 
 function handle(command: string) {
   const parts = split(command);
@@ -38,7 +20,6 @@ function handle(command: string) {
 }
 
 async function interactive() {
-  await import("./commands");
   const cli = createInterface({
     input: stdin,
     output: stdout,
@@ -117,11 +98,4 @@ function colorize(cli: Interface) {
   };
 }
 
-const arg = {
-  text: Symbol("text"),
-  pool: Symbol("pool"),
-  plugin: Symbol("plugin"),
-  command: Symbol("command"),
-};
-
-export { interactive, command, commands, arg, usage };
+export { interactive };

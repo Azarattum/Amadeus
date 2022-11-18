@@ -94,12 +94,14 @@ function err(this: Context, ...data: any[]) {
       const pattern = new RegExp(
         rescape(target || "").replace(/(\s|\n)+/g, "(\\s|\\n)*") || "$^"
       );
-      const important = [e.path.join("."), e.value + "", e.type].map(
-        (x) => new RegExp("\\b" + rescape(x) + "\\b", "g")
-      );
+      const important = [e.path.join("."), e.value + "", e.type]
+        .filter((x) => x)
+        .map((x) => new RegExp("\\b" + rescape(x) + "\\b", "g"));
 
       const received = offset(highlight(root, pattern, bright, red));
-      const stack = highlight(e.stack || "", important, bright, red);
+      let stack = e.stack || e.message;
+      if (e.cause) stack = stack.replace(e.message, e.message + "\n" + e.cause);
+      stack = highlight(stack, important, bright, red);
 
       return stack + "\nReceived:\n" + received;
     }

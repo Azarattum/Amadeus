@@ -1,10 +1,10 @@
 import { capitalize, plural, unprefix } from "@amadeus/util/string";
 import { ok, wrn, err } from "../status/log";
+import { extname, resolve } from "path";
 import { readdir } from "fs/promises";
 import type { Plugin } from "./types";
 import { pipeline } from "libfun";
 import { existsSync } from "fs";
-import { resolve } from "path";
 
 const format = pipeline(unprefix, capitalize);
 const plugins: Set<Plugin> = new Set();
@@ -22,13 +22,15 @@ async function load() {
 
   const files = await readdir(from);
   const results = await Promise.allSettled(
-    files.map((x) =>
-      import(resolve(from, x)).catch((e) => {
-        wrn(`Failed to load plugin "${x}" from ${from}!`);
-        err.bind({ group: x })(e);
-        throw e;
-      })
-    )
+    files
+      .filter((x) => ["js", "cjs", "ts", ""].includes(extname(x)))
+      .map((x) =>
+        import(resolve(from, x)).catch((e) => {
+          wrn(`Failed to load plugin "${x}" from ${from}!`);
+          err.bind({ group: x })(e);
+          throw e;
+        })
+      )
   );
 
   const successes = results.filter((x) => x.status === "fulfilled").length;
