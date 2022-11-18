@@ -1,1 +1,1 @@
-export default require("@amadeus/core/plugin/config.cjs")();
+export default require("@amadeus-music/core/plugin/config.cjs")();

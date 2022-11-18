@@ -1,5 +1,5 @@
 {
-  "name": "@amadeus/util",
+  "name": "@amadeus-music/util",
   "type": "module",
   "scripts": {
     "dev": "vitest -c ../../vite.config.js --mode node",

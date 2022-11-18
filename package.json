@@ -10,7 +10,7 @@
     "build": "rimraf build && turbo run build --parallel --no-daemon",
     "clean": "rimraf build */coverage",
     "coverage": "turbo run coverage --parallel --no-daemon",
-    "dev": "turbo run dev --parallel --filter !libfun --filter !@amadeus/util --no-daemon",
+    "dev": "turbo run dev --parallel --filter !libfun --filter !@amadeus-music/util --no-daemon",
     "preview": "turbo run preview --parallel --no-daemon",
     "test": "turbo run test --parallel --no-daemon"
   },

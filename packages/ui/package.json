@@ -1,5 +1,5 @@
 {
-  "name": "@amadeus/ui",
+  "name": "@amadeus-music/ui",
   "type": "module",
   "types": "./component.ts",
   "exports": {
@@ -11,6 +11,6 @@
     "dev": "vite dev -c ../../vite.config.js --mode svelte --port 5174"
   },
   "dependencies": {
-    "@amadeus/util": "workspace:*"
+    "@amadeus-music/util": "workspace:*"
   }
 }

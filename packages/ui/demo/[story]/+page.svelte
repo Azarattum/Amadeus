@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Spinner } from "@amadeus/ui";
+  import { Spinner } from "@amadeus-music/ui";
   import { page } from "$app/stores";
 
   $: ({ story } = $page.params);

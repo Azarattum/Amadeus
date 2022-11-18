@@ -10,8 +10,8 @@ import {
   reset,
   yellow,
   type Color,
-} from "@amadeus/util/color";
-import { offset, rescape } from "@amadeus/util/string";
+} from "@amadeus-music/util/color";
+import { offset, rescape } from "@amadeus-music/util/string";
 import { pipeline, PoolError, take } from "libfun";
 import { StructError } from "superstruct";
 import { log as logged } from "../event";

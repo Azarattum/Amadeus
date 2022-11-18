@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { delay } from "@amadeus/util/throttle";
-  import { Virtual } from "@amadeus/ui";
+  import { delay } from "@amadeus-music/util/throttle";
+  import { Virtual } from "@amadeus-music/ui";
   import { onMount } from "svelte";
 
   let items = Array.from({ length: 30 }).map((_, i) => i);

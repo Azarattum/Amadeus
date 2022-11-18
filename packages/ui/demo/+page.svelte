@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { capitalize } from "@amadeus/util/string";
+  import { capitalize } from "@amadeus-music/util/string";
   import type { PageData } from "./$types";
 
   export let data: PageData;

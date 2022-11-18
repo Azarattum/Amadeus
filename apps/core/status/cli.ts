@@ -1,7 +1,7 @@
 import { createInterface, type Interface } from "node:readline/promises";
+import { cyan, highlight } from "@amadeus-music/util/color";
+import { prefix, split } from "@amadeus-music/util/string";
 import { log, pool, pools, stop as close } from "../event";
-import { cyan, highlight } from "@amadeus/util/color";
-import { prefix, split } from "@amadeus/util/string";
 import { stdin, stdout } from "node:process";
 import type { WriteStream } from "node:tty";
 import { arg, commands } from "./commands";

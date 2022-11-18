@@ -4,12 +4,12 @@ import {
   type Configure,
   type Plugin,
 } from "./types";
+import { bright, reset } from "@amadeus-music/util/color";
 import { gretch, type GretchOptions } from "gretchen";
-import { bright, reset } from "@amadeus/util/color";
 import { command, usage } from "../status/commands";
+import { merge } from "@amadeus-music/util/object";
 import { assert, type Struct } from "superstruct";
 import { errorify } from "libfun/utils/error";
-import { merge } from "@amadeus/util/object";
 import { init, stop, pool } from "../event";
 import { async, context } from "libfun";
 import * as log from "../status/log";

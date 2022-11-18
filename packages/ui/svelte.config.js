@@ -11,9 +11,9 @@ const config = {
       appTemplate: "demo/+layout.html",
     },
     alias: {
-      "@amadeus/ui/internal": "./internal",
-      "@amadeus/ui/action": "./action.ts",
-      "@amadeus/ui": "./component.ts",
+      "@amadeus-music/ui/internal": "./internal",
+      "@amadeus-music/ui/action": "./action.ts",
+      "@amadeus-music/ui": "./component.ts",
     },
   },
 };

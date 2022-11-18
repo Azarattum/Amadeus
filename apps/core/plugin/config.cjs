@@ -19,8 +19,7 @@ function config(name, config = {}) {
   return mergeConfig(
     {
       plugins: [{ ...node(), enforce: "pre" }],
-      // We want to include sdk from the app itself in runtime
-      define: { '"@amadeus/core"': '"../app.cjs"' },
+      resolve: { alias: { "@amadeus-music/core": "../app.cjs" } },
       build: {
         outDir: dest,
         lib: {

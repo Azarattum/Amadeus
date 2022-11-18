@@ -5,8 +5,8 @@ import {
   magenta,
   reset,
   yellow,
-} from "@amadeus/util/color";
-import { capitalize, format } from "@amadeus/util/string";
+} from "@amadeus-music/util/color";
+import { capitalize, format } from "@amadeus-music/util/string";
 import { log, pool, pools } from "../event";
 import { async, take } from "libfun";
 import { info, wrn } from "./log";

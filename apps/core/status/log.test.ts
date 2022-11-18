@@ -1,7 +1,7 @@
-import { bright, green, red, reset, yellow } from "@amadeus/util/color";
+import { bright, green, red, reset, yellow } from "@amadeus-music/util/color";
 import { object, string, StructError, validate } from "superstruct";
 import { divide, err, info, ok, SilentError, wrn } from "./log";
-import { rescape } from "@amadeus/util/string";
+import { rescape } from "@amadeus-music/util/string";
 import { expect, it, vi } from "vitest";
 import { PassThrough } from "stream";
 import { Console } from "console";

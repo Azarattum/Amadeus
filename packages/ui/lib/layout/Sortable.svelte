@@ -1,9 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy } from "svelte";
   import { rigid, select } from "../../internal/haptic";
+  import { minmax } from "@amadeus-music/util/math";
   import { position } from "../../internal/pointer";
   import { draggable, hold } from "../../action";
-  import { minmax } from "@amadeus/util/math";
 
   import Virtual from "./Virtual.svelte";
 

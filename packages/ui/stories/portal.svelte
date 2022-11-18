@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Portal } from "@amadeus/ui";
+  import { Button, Portal } from "@amadeus-music/ui";
 
   let toggle = false;
 </script>

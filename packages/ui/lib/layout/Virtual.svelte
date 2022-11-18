@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { derive, slice as take } from "@amadeus-music/util/object";
   import { afterUpdate, onDestroy, onMount, tick } from "svelte";
-  import { derive, slice as take } from "@amadeus/util/object";
-  import { finitify, minmax } from "@amadeus/util/math";
+  import { finitify, minmax } from "@amadeus-music/util/math";
 
   export let items: any[];
   export let animation = 0;

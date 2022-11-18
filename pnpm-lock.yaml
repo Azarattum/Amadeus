@@ -67,21 +67,21 @@ importers:
 
   apps/core:
     specifiers:
-      '@amadeus/util': workspace:*
+      '@amadeus-music/util': workspace:*
       libfun: workspace:*
       vite-node: 0.25.2
     dependencies:
-      '@amadeus/util': link:../../packages/util
+      '@amadeus-music/util': link:../../packages/util
       libfun: link:../../packages/libfun
     devDependencies:
       vite-node: 0.25.2
 
   apps/web:
     specifiers:
-      '@amadeus/ui': workspace:*
+      '@amadeus-music/ui': workspace:*
       '@sveltejs/adapter-static': 1.0.0-next.48
     dependencies:
-      '@amadeus/ui': link:../../packages/ui
+      '@amadeus-music/ui': link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static': 1.0.0-next.48
 
@@ -90,21 +90,21 @@ importers:
 
   packages/ui:
     specifiers:
-      '@amadeus/util': workspace:*
+      '@amadeus-music/util': workspace:*
     dependencies:
-      '@amadeus/util': link:../util
+      '@amadeus-music/util': link:../util
 
   packages/util:
     specifiers: {}
 
   plugins/template:
     specifiers:
-      '@amadeus/core': workspace:*
-      '@amadeus/util': workspace:*
+      '@amadeus-music/core': workspace:*
+      '@amadeus-music/util': workspace:*
       vite: 3.2.4
     dependencies:
-      '@amadeus/core': link:../../apps/core
-      '@amadeus/util': link:../../packages/util
+      '@amadeus-music/core': link:../../apps/core
+      '@amadeus-music/util': link:../../packages/util
     devDependencies:
       vite: 3.2.4
 

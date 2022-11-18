@@ -1,4 +1,4 @@
-import { throttle } from "@amadeus/util/throttle";
+import { throttle } from "@amadeus-music/util/throttle";
 import { readable } from "svelte/store";
 
 export type Point = { x: number; y: number };

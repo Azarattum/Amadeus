@@ -1,4 +1,4 @@
-import { capitalize, plural, unprefix } from "@amadeus/util/string";
+import { capitalize, plural, unprefix } from "@amadeus-music/util/string";
 import { ok, wrn, err } from "../status/log";
 import { extname, resolve } from "path";
 import { readdir } from "fs/promises";
@@ -23,7 +23,7 @@ async function load() {
   const files = await readdir(from);
   const results = await Promise.allSettled(
     files
-      .filter((x) => ["js", "cjs", "ts", ""].includes(extname(x)))
+      .filter((x) => [".js", ".cjs", ".ts", ""].includes(extname(x)))
       .map((x) =>
         import(resolve(from, x)).catch((e) => {
           wrn(`Failed to load plugin "${x}" from ${from}!`);
