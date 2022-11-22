@@ -4,10 +4,10 @@ import {
   type Configure,
   type Plugin,
 } from "./types";
+import { fetch, fetcher, type FetchOptions } from "./fetch";
 import { bright, reset } from "@amadeus-music/util/color";
 import { command, usage } from "../status/commands";
 import { init, stop, pool } from "../event";
-import { fetch, fetcher } from "./fetch";
 import * as log from "../status/log";
 import { info } from "../status/log";
 import { assert } from "superstruct";
@@ -31,3 +31,4 @@ function register<T extends ConfigStruct = undefined>(plugin: Plugin<T>) {
 
 export { register, fetch, fetcher };
 export { async, take, first, map } from "libfun";
+export type { FetchOptions };

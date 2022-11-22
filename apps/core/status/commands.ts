@@ -7,8 +7,9 @@ import {
   yellow,
 } from "@amadeus-music/util/color";
 import { capitalize, format } from "@amadeus-music/util/string";
+import { pretty } from "@amadeus-music/util/object";
 import { log, pool, pools } from "../event";
-import { async, take } from "libfun";
+import { async, map, take } from "libfun";
 import { info, wrn } from "./log";
 import { stop } from ".";
 
@@ -157,6 +158,19 @@ command("drain", ["all", arg.plugin, arg.pool])(function* (filter) {
     pools.drain("*", { group: filter });
     info(`Drained everything matching ${bright}${filter}${reset}!`);
   }
+});
+
+command("exec", [arg.pool])(function* (what, ...args) {
+  if (!what) return usage("exec");
+  const name = `${bright}${what}${reset}`;
+  if (!pools.status().find((x) => x.id === what)) {
+    return wrn(`No such pool ${name}!`);
+  }
+  const target = pool(what);
+  yield* map(target(...(args as [])), function* (item: any) {
+    info(`${name} responds with: ${pretty(item)}`);
+  });
+  info(`${name} done executing!`);
 });
 
 export { command, commands, arg, usage };
