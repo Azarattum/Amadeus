@@ -70,18 +70,18 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
   const filtered = status.filter((x) => {
     if (filter === "all") return true;
     if (filter === x.id) return true;
+    if (x.id.startsWith(filter + "/")) return true;
     const executors = [...x.executing.values(), ...x.pending.values()];
     executors.push(...executors.flatMap((x: any) => [...x.tasks.values()]));
     if (executors.find((x) => filter === x.group)) return true;
     if (!filter) {
-      return ["command/", "init", "stop", "log"].every(
-        (y) => !x.id.startsWith(y)
-      );
+      if (!executors.length) return false;
+      return ["command/status", "log"].every((y) => x.id !== y);
     }
   });
   if (!filtered.length) {
     if (filter) return wrn(`No pools found with filter "${filter}"!`);
-    return info(`No pools to show. (Maybe try ${bright}status all${reset}).`);
+    return info(`No pools running. (Maybe try ${bright}status all${reset}).`);
   }
 
   filtered.forEach((x) => {

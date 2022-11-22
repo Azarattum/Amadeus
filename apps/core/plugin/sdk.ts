@@ -22,7 +22,8 @@ function register<T extends ConfigStruct = undefined>(plugin: Plugin<T>) {
 
   info(`Loading ${bright}${plugin.name}${reset} plugin v${plugin.version}...`);
 
-  const context = { group: plugin.name.toLowerCase() };
+  const name = plugin.name.toLowerCase();
+  const context = { group: name, scope: name };
   return Object.fromEntries(
     Object.entries(bound).map(([key, fn]) => [key, (fn as any).bind(context)])
   ) as Configure<typeof bound, T>;
