@@ -293,6 +293,7 @@ class PoolError extends Error implements Details {
     super(error.message);
     this.name = "PoolError";
     this.pool = details.pool;
+    this.cause = error.cause;
     this.trace = details.trace;
     this.caller = details.caller;
     this.handler = details.handler;
