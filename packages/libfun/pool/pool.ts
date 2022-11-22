@@ -144,6 +144,7 @@ function pool<T extends Fn = () => void>(
   id: string,
   options: Partial<Options> = {}
 ): Pool<T> {
+  if (this?.scope) id = `${this.scope}/${id}`;
   const existing = global.all.get(id);
   if (existing) return existing;
 

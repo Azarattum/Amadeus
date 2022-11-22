@@ -33,7 +33,7 @@ interface Context {
 }
 
 type Catcher = (error: Error & PoolError) => void;
-type Override = Pick<Options, "group"> | void;
+type Override = (Pick<Options, "group"> & { scope?: string }) | void;
 
 interface PoolError {
   handler?: string;

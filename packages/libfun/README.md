@@ -348,3 +348,16 @@ const time = new Date(0).setHours(10);
 task.schedule({absolute: time, interval: day})(data);
 ```
 </details>
+
+<details><summary>🔭 <b>Scope pool ids</b></summary>
+
+```ts
+const { pool, status } = pools();
+const a = pool.bind({ scope: "a" });
+const b = pool.bind({ scope: "b" });
+const event1 = a("event"); // Creates "event" pool in scope "a"
+const event2 = b("event"); // Creates "event" pool in scope "b"
+
+status(); // [ {id: "a/event"}, {id: "b/event"} ]
+```
+</details>

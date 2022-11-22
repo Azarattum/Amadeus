@@ -504,3 +504,21 @@ it("schedules events", async () => {
   await delay(31);
   expect(counter).toBe(last);
 });
+
+it("respects scopes", async () => {
+  const all = pools();
+  const a = all.pool.bind({ scope: "a" });
+  const b = all.pool.bind({ scope: "b" });
+  const event1 = a("event");
+  const event2 = b("event");
+  const spy = vi.fn();
+  event1(spy);
+  event2(spy);
+
+  await take(event1());
+  expect(spy).toHaveBeenCalledTimes(1);
+  await take(event2());
+  expect(spy).toHaveBeenCalledTimes(2);
+  const ids = all.status().map((x) => x.id);
+  expect(ids).toEqual(["a/event", "b/event"]);
+});
