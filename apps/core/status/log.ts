@@ -106,7 +106,12 @@ function err(this: Context, ...data: any[]) {
       return stack + "\nReceived:\n" + received;
     }
     if (e instanceof PoolError) context = { group: e.handler || e.caller };
-    if (e instanceof Error) return e.stack || "";
+    if (e instanceof Error) {
+      if (e.cause) {
+        e.stack = e.stack?.replace(e.message, e.message + "\n" + e.cause);
+      }
+      return e.stack || "";
+    }
     return e;
   });
 

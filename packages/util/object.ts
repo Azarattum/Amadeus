@@ -1,4 +1,5 @@
 const derivatives = new WeakMap<object, object>();
+const picked = new WeakMap<object, number>();
 
 /**
  * Derives a weakly mapped object symbol from the given object
@@ -71,3 +72,37 @@ export function merge<
   }
   return target as A & B;
 }
+
+/**
+ * Sequentially picks values from arrays (including nested).
+ * @param from Source object
+ */
+export function pick<T>(from: T): Picked<T> {
+  if (!from) return from as any;
+  if (typeof from !== "object") return from as any;
+  if (Array.isArray(from)) {
+    const index = picked.get(from) || 0;
+    picked.set(from, index + 1);
+    return from[index % from.length];
+  }
+
+  const result: Record<string, any> = {};
+  for (const key in from) {
+    const item = from[key];
+    if (!Array.isArray(item)) {
+      result[key] = item;
+      continue;
+    }
+    if (!item.length) continue;
+    const index = picked.get(item) || 0;
+    result[key] = item[index % item.length];
+    picked.set(item, index + 1);
+  }
+  return result as any;
+}
+
+type Picked<T> = T extends (infer U)[]
+  ? U
+  : T extends Record<string, any>
+  ? { [key in keyof T]: T[key] extends infer U | (infer U)[] ? U : T[key] }
+  : T;
