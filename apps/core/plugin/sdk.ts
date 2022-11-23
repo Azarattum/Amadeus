@@ -35,8 +35,10 @@ function register<T extends ConfigStruct = undefined>(plugin: Plugin<T>) {
 }
 
 export { register };
-export * from "superstruct";
 export { http } from "../network/http";
-export { async, take, first, map } from "libfun";
-export { fetch, fetcher } from "../network/fetch";
-export type { FetchOptions } from "../network/fetch";
+export { fetch, fetcher, type FetchOptions } from "../network/fetch";
+
+export * from "libfun";
+export { map } from "libfun";
+export * from "superstruct";
+export { map as dict } from "superstruct";

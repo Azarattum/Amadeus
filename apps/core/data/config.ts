@@ -1,11 +1,12 @@
 import {
-  array,
   defaulted,
   intersection,
   type,
   create,
   number,
   type Infer,
+  string,
+  record,
 } from "superstruct";
 import { readFile, writeFile } from "node:fs/promises";
 import type { Plugin } from "../plugin/types";
@@ -13,7 +14,7 @@ import { fallback, pipe } from "libfun";
 import { resolve } from "node:path";
 
 const Config = type({
-  users: defaulted(array(), []),
+  users: defaulted(record(string(), type({})), {}),
   port: defaulted(number(), 8080),
 });
 type BaseConfig = Infer<typeof Config>;
