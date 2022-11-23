@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@amadeus-music/util": "workspace:*",
-    "libfun": "workspace:*"
+    "gretchen": "^1.5.0",
+    "libfun": "workspace:*",
+    "superstruct": "^1.0.3"
   },
   "devDependencies": {
     "vite-node": "0.25.3"

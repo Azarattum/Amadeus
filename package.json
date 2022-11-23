@@ -14,13 +14,9 @@
     "preview": "turbo run preview --parallel --no-daemon",
     "test": "turbo run test --parallel --no-daemon"
   },
-  "dependencies": {
-    "gretchen": "^1.5.0",
-    "superstruct": "^1.0.3"
-  },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",
-    "@sveltejs/kit": "1.0.0-next.551",
+    "@sveltejs/kit": "1.0.0-next.560",
     "@types/node": "18.11.9",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
