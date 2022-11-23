@@ -1,12 +1,11 @@
 import { mergeConfig, defineConfig } from "vite";
 
-import base from "../../vite.config.js";
-const dest = "../../build";
+import base from "../../vite.node.js";
 
-const config = defineConfig((options) =>
-  mergeConfig(base(options), {
+const config = defineConfig(
+  mergeConfig(base, {
     build: {
-      outDir: dest,
+      outDir: "../../build",
       lib: {
         formats: ["cjs"],
         entry: "./app.ts",

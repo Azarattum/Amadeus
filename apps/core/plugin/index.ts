@@ -1,36 +1,32 @@
-import { capitalize, plural, unprefix } from "@amadeus-music/util/string";
+import { plural, capitalize, unprefix } from "@amadeus-music/util/string";
 import { ok, wrn, err } from "../status/log";
-import { extname, resolve } from "path";
-import { readdir } from "fs/promises";
+import { readdir } from "node:fs/promises";
+import { parse, resolve } from "node:path";
 import type { Plugin } from "./types";
 import { pipeline } from "libfun";
-import { existsSync } from "fs";
 
 const format = pipeline(unprefix, capitalize);
-const plugins: Set<Plugin> = new Set();
+const plugins = new Map<string, Plugin>();
 
 async function load() {
-  // Resolve from the file when compiled
-  let from = __filename.endsWith(".cjs")
-    ? resolve(__dirname, "./plugins")
-    : "./plugins";
+  const path = resolve(__dirname, "./plugins");
+  const imports = import.meta.env.DEV
+    ? import.meta.glob("../../../plugins/*/index.ts")
+    : await readdir(path).then((x) =>
+        Object.fromEntries(
+          x.map((file) => [file, () => import(resolve(path, file))])
+        )
+      );
 
-  // Load the monorepo plugins in a development environment
-  if (import.meta.env.DEV && existsSync("../../package.json")) {
-    from = resolve("../..", from);
-  }
-
-  const files = await readdir(from);
   const results = await Promise.allSettled(
-    files
-      .filter((x) => [".js", ".cjs", ".ts", ""].includes(extname(x)))
-      .map((x) =>
-        import(resolve(from, x)).catch((e) => {
-          wrn(`Failed to load plugin "${x}" from ${from}!`);
-          err.bind({ group: x })(e);
-          throw e;
-        })
-      )
+    Object.entries(imports).map(([file, load]) =>
+      load().catch((e) => {
+        const name = format(parse(file).name);
+        wrn(`Failed to load plugin "${name}"!`);
+        err.bind({ group: name })(e);
+        throw e;
+      })
+    )
   );
 
   const successes = results.filter((x) => x.status === "fulfilled").length;
@@ -46,4 +42,3 @@ async function load() {
 }
 
 export { load, format, plugins };
-export type { Plugin };

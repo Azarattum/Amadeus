@@ -8,7 +8,7 @@
     "./internal/*": "./internal/*.ts"
   },
   "scripts": {
-    "dev": "vite dev -c ../../vite.config.js --mode svelte --port 5174"
+    "dev": "vite dev -c ../../vite.web.js --port 5174"
   },
   "dependencies": {
     "@amadeus-music/util": "workspace:*"

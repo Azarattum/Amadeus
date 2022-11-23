@@ -4,21 +4,26 @@ import {
   intersection,
   type,
   create,
+  number,
   type Infer,
 } from "superstruct";
-import { readFile, writeFile } from "fs/promises";
-import type { Plugin } from "../plugin";
+import { readFile, writeFile } from "node:fs/promises";
+import type { Plugin } from "../plugin/types";
 import { fallback, pipe } from "libfun";
+import { resolve } from "node:path";
 
 const Config = type({
   users: defaulted(array(), []),
+  port: defaulted(number(), 8080),
 });
 type BaseConfig = Infer<typeof Config>;
 
-async function configure(plugins: Set<Plugin>) {
-  const Plugins = [...plugins].map((x) => type(x.config || {}));
+async function configure(plugins: Map<string, Plugin>) {
+  const Plugins = [...plugins.values()].map((x) => type(x.config || {}));
   const Settings = intersection([Config, ...Plugins]);
-  const file = "./config.json";
+  const file = import.meta.env.DEV
+    ? "./config.json"
+    : resolve(__dirname, "./config.json");
 
   return pipe(file)(
     (x) => readFile(x, "utf8"),

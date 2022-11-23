@@ -5,17 +5,17 @@
   "main": "app.ts",
   "types": "app.ts",
   "scripts": {
-    "build": "vite build --emptyOutDir=false --mode node",
-    "coverage": "vitest run --coverage --mode node",
+    "build": "vite build --emptyOutDir=false",
+    "coverage": "vitest run --coverage",
     "dev": "vite-node -w app.ts",
     "preview": "(cd ../../build && node app.cjs)",
-    "test": "vitest run --mode node"
+    "test": "vitest run"
   },
   "dependencies": {
     "@amadeus-music/util": "workspace:*",
     "libfun": "workspace:*"
   },
   "devDependencies": {
-    "vite-node": "0.25.2"
+    "vite-node": "0.25.3"
   }
 }

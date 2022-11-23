@@ -4,7 +4,6 @@ import {
   type Configure,
   type Plugin,
 } from "./types";
-import { fetch, fetcher, type FetchOptions } from "./fetch";
 import { bright, reset } from "@amadeus-music/util/color";
 import { command, usage } from "../status/commands";
 import { init, stop, pool } from "../event";
@@ -18,17 +17,26 @@ const bound = { pool, init, stop, command, usage, ...log };
 function register<T extends ConfigStruct = undefined>(plugin: Plugin<T>) {
   assert(plugin, PluginInfo, "Tried to register an invalid plugin!");
   plugin.name = format(plugin.name);
-  plugins.add(plugin);
+
+  const id = plugin.name.toLowerCase();
+  if (plugins.has(id)) {
+    throw new Error(
+      `Plugin ${bright}${id}${reset} has already been registered!`
+    );
+  }
 
   info(`Loading ${bright}${plugin.name}${reset} plugin v${plugin.version}...`);
+  plugins.set(id, plugin);
 
-  const name = plugin.name.toLowerCase();
-  const context = { group: name, scope: name };
+  const context = { group: id, scope: id };
   return Object.fromEntries(
     Object.entries(bound).map(([key, fn]) => [key, (fn as any).bind(context)])
   ) as Configure<typeof bound, T>;
 }
 
-export { register, fetch, fetcher };
+export { register };
+export * from "superstruct";
+export { http } from "../network/http";
 export { async, take, first, map } from "libfun";
-export type { FetchOptions };
+export { fetch, fetcher } from "../network/fetch";
+export type { FetchOptions } from "../network/fetch";

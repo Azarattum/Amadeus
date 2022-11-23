@@ -27,8 +27,8 @@
   "main": "index.ts",
   "types": "index.ts",
   "scripts": {
-    "dev": "vitest -c ../../vite.config.js --mode node",
-    "coverage": "vitest run -c ../../vite.config.js --coverage --mode node",
-    "test": "vitest run -c ../../vite.config.js --mode node"
+    "dev": "vitest -c ../../vite.node.js",
+    "coverage": "vitest run -c ../../vite.node.js --coverage",
+    "test": "vitest run -c ../../vite.node.js"
   }
 }
