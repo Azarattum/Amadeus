@@ -28,12 +28,16 @@ interface Executor {
   group: string | undefined;
 }
 
-interface Context {
+type Ctx = Record<string, any> | unknown;
+
+type Context<T extends Ctx> = T & {
   signal: AbortSignal;
-}
+};
 
 type Catcher = (error: Error & PoolError) => void;
-type Override = (Pick<Options, "group"> & { scope?: string }) | void;
+type Override<T = unknown> =
+  | ({ group?: string; context?: never } | { group: string; context: T })
+  | void;
 
 interface PoolError {
   handler?: string;
@@ -43,9 +47,9 @@ interface PoolError {
   pool: string;
 }
 
-interface State<T extends Fn> extends Options {
+interface State<T extends Fn, C> extends Options {
   cached: Map<string, ReturnType<T>[]>;
-  listeners: Set<Handler<T>>;
+  listeners: Set<Handler<T, C>>;
   executing: Set<Executor>;
   pending: Set<Executor>;
   catchers: Set<Catcher>;
@@ -53,8 +57,8 @@ interface State<T extends Fn> extends Options {
   id: string;
 }
 
-type Handler<T extends Fn> = ((
-  this: Context,
+type Handler<T extends Fn, C = unknown> = ((
+  this: Context<C>,
   ...args: Parameters<T>
 ) =>
   | Generator<
@@ -76,20 +80,31 @@ type Filter =
   | { group?: never; caller: string; handler?: string }
   | { group?: never; caller?: string; handler: string };
 
-type Pool<T extends Fn = (..._: any) => any> = {
-  (this: Override, handler: Handler<T>): () => void;
+type Pool<T extends Fn = (..._: any) => any, C extends Ctx = unknown> = {
+  (this: Override, handler: Handler<T, C>): () => void;
 
+  bind: <C extends Ctx>(context: Override<C>) => Pool<T, C>;
   schedule: (when: Schedule) => Caller<T>;
-  bind: (context: Override) => Pool<T>;
   where: (group: string) => Caller<T>;
   catch: (handler?: Catcher) => void;
   abort: (filter?: Filter) => void;
   drain: (filter?: Filter) => void;
   close: (filter?: Filter) => void;
-  status: () => State<T>;
+  status: () => State<T, C>;
 
-  [state: symbol]: State<T>;
-} & Caller<T>;
+  [state: symbol]: State<T, C>;
+} & Caller<T> &
+  (C extends Record<string, any>
+    ? { context: (context: Partial<C>) => void }
+    : unknown);
+
+type PoolMaker<C extends Ctx = unknown> = {
+  <T extends Fn = () => void>(id: string, options?: Partial<Options>): Pool<
+    T,
+    C
+  >;
+  bind<T>(context: Override<T> & { scope?: string }): PoolMaker<T>;
+};
 
 type Pools = Omit<
   {
@@ -100,19 +115,17 @@ type Pools = Omit<
         }
       : never;
   },
-  "bind" | "catch"
+  "bind" | "catch" | "context"
 > & {
   catch: (handler?: Catcher) => void;
+  contexts: Map<string, Ctx>;
   count(): number;
-  pool<T extends Fn = () => void>(
-    this: Override | Pools,
-    id: string,
-    options?: Partial<Options>
-  ): Pool<T>;
+  pool: PoolMaker;
 };
 
 export type {
   PoolError,
+  PoolMaker,
   Executor,
   Override,
   Options,
@@ -121,4 +134,5 @@ export type {
   Filter,
   Pools,
   Pool,
+  Ctx,
 };

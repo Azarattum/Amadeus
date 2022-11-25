@@ -8,6 +8,7 @@ import type {
   Pool,
   Executor,
   Filter,
+  Ctx,
 } from "./pool.types";
 import {
   context as globalContext,
@@ -31,6 +32,7 @@ const state = Symbol();
 
 function pools(options: Partial<Options> = {}): Pools {
   const globals = { ...defaults, ...options };
+  const contexts = new Map<string, Ctx>();
   const all = new Map<string, Pool>();
   const catchers = new Set<Catcher>();
 
@@ -48,7 +50,8 @@ function pools(options: Partial<Options> = {}): Pools {
     };
   }
 
-  const prototype: Pick<Pool, keyof Pool> = {
+  type ProtoPool = Pool<Fn<unknown[], unknown>, Record<string, any>>;
+  const prototype: Pick<ProtoPool, keyof ProtoPool> = {
     abort(filter) {
       this[state].executing.forEach((executor) => {
         match(executor, filter).forEach((x) => {
@@ -74,7 +77,16 @@ function pools(options: Partial<Options> = {}): Pools {
         if (filter?.handler && x.group === filter.handler) listeners.delete(x);
       });
       this.drain(filter);
-      if (!listeners.size) all.delete(this[state].id);
+      if (!listeners.size) {
+        all.delete(this[state].id);
+
+        for (const group of contexts.keys()) {
+          const obsolete = [...all.values()].every(
+            (x: any) => x.group !== group && x[state].group !== group
+          );
+          if (obsolete) contexts.delete(group);
+        }
+      }
     },
     status() {
       return this[state];
@@ -83,7 +95,7 @@ function pools(options: Partial<Options> = {}): Pools {
       this[state].catchers.add(handler || (() => {}));
     },
     schedule(when) {
-      const self = this as Pool;
+      const self = this as ProtoPool;
       let time =
         when.absolute === undefined
           ? Date.now() + when.relative
@@ -106,19 +118,33 @@ function pools(options: Partial<Options> = {}): Pools {
         }
       };
     },
-    where(group) {
-      const self = this as Pool;
-      return self.bind({ filter: group } as any);
+    where(filter) {
+      const group = this[state].group;
+      const context = { group, filter };
+      return Function.bind.call(this as any, context) as any;
+    },
+    context(context) {
+      this.bind({ context });
     },
     bind(context: Override) {
+      if (context?.context) {
+        const group =
+          context?.group || (this as any).group || this[state].group;
+        if (!group) throw new Error("Cannot set a context without a group!");
+        const data = contexts.get(group) || {};
+        contexts.set(group, Object.assign(data, context.context));
+      }
+
       const fn = Function.bind.call(this as any, context);
       const pool = Object.setPrototypeOf(fn, prototype);
+      if (context?.group) pool.group = context.group;
       return Object.assign(pool, { [state]: this[state] });
     },
   };
   Object.setPrototypeOf(prototype, Function);
 
   return {
+    contexts,
     schedule: each("schedule"),
     status: each("status"),
     abort: each("abort"),
@@ -129,22 +155,30 @@ function pools(options: Partial<Options> = {}): Pools {
     catch(handler) {
       catchers.add(handler || (() => {}));
     },
-    pool(this: Override, id: string, options: Partial<Options> = {}) {
-      return pool.bind(this, { all, prototype, catchers, options: globals })(
-        id,
-        options
-      ) as any;
+    pool(
+      this: Override & { scope?: string },
+      id: string,
+      options: Partial<Options> = {}
+    ) {
+      return pool.bind(this, {
+        all,
+        catchers,
+        contexts,
+        prototype,
+        options: globals,
+      })(id, options) as any;
     },
   };
 }
 
 function pool<T extends Fn = () => void>(
-  this: Override,
+  this: Override & { scope?: string },
   global: {
     options: Options;
     prototype: object;
     all: Map<string, Pool>;
     catchers: Set<Catcher>;
+    contexts: Map<string, Ctx>;
   },
   id: string,
   options: Partial<Options> = {}
@@ -204,6 +238,18 @@ function pool<T extends Fn = () => void>(
       global.catchers.forEach((x) => x(error));
       self.catchers.forEach((x) => x(error));
     };
+    const generators = [...self.listeners.values()]
+      .filter(filter)
+      .map((handler) => ({
+        handler: handler.bind({
+          ...context,
+          ...(handler.group ? global.contexts.get(handler.group) || {} : {}),
+        }),
+        task: {
+          group: handler.group,
+          controller: derive(context.signal),
+        },
+      }));
 
     self.pending.add(executor);
     return block(
@@ -220,17 +266,13 @@ function pool<T extends Fn = () => void>(
         self.pending.delete(executor);
         self.executing.add(executor);
         self.last = new Date();
-        const generators = [...self.listeners.values()];
         const iterables = () =>
-          generators.filter(filter).map((handler) => {
-            const task = {
-              group: handler.group,
-              controller: derive(context.signal),
-            };
+          generators.map(({ handler, task }) => {
             try {
               const generator = wrap(
-                generate(handler.bind(context)(...params)),
+                generate(handler(...params)),
                 task.controller.signal,
+                task.group,
                 catcher(task.group),
                 self.id
               );

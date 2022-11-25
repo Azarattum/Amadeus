@@ -362,7 +362,7 @@ status(); // [ {id: "a/event"}, {id: "b/event"} ]
 ```
 </details>
 
-<details><summary>🏽 <b>Filter handlers</b></summary>
+<details><summary>🏽 <b>Filter group handlers</b></summary>
 
 ```ts
   const event = pool("event");
@@ -371,5 +371,28 @@ status(); // [ {id: "a/event"}, {id: "b/event"} ]
 
   // Execute only handlers from group `1`
   event.where("1")();
+```
+</details>
+
+<details><summary>✍ <b>Setup group contexts</b></summary>
+
+```ts
+  const event = pool("event");
+  // Setup an event with group `1` and some context
+  const event1 = event.bind({ group: "1", context: { val: 42 } });
+
+  event1(function* () {
+    // We can access the context from `this`:
+    this.val; // <- number (it's TypeSafe!)
+  });
+
+  // We can update the context at any time
+  event1.context({ val: 10 });
+
+  const event2 = event.bind({ group: "2" });
+  event2(function* () {
+    // Events from different groups have different contexts!
+    this.val; // <- undefined (TypeScript error)
+  });  
 ```
 </details>

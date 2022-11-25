@@ -26,11 +26,13 @@ const async = function* <T>(promise: PromiseLike<T>) {
 
 const context = {
   signal: undefined as AbortSignal | undefined,
+  group: undefined as string | undefined,
   trace: [] as string[],
 };
 async function* wrap<T, U>(
   iterator: Iterator<T>,
   signal?: AbortSignal,
+  group?: string,
   catcher?: (error: Error) => void,
   name?: string
 ) {
@@ -38,14 +40,16 @@ async function* wrap<T, U>(
     for (let value, done; ; ) {
       signal?.throwIfAborted();
 
-      const previous = context.signal;
+      const previous = { ...context };
       context.signal = signal;
+      context.group = group;
       if (name) context.trace.push(name);
       try {
         ({ value, done } = iterator.next(value));
       } finally {
         if (name) context.trace.pop();
-        context.signal = previous;
+        context.signal = previous.signal;
+        context.group = previous.group;
       }
 
       if (done) return value as U;
@@ -70,7 +74,11 @@ function* map<T, M = T, R = void>(
     ({ value, done } = yield* async(iterator.next()));
     if (done) return all;
 
-    const mapped = wrap((map || reyield)(value as T), context.signal);
+    const mapped = wrap(
+      (map || reyield)(value as T),
+      context.signal,
+      context.group
+    );
     for (let value, done; !done; ) {
       ({ value, done } = yield* async(mapped.next()));
       if (done) all.push(value as R);

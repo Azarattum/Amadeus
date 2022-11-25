@@ -186,17 +186,22 @@ it("supports nested generators", async () => {
 
 it("resolves signal context", async () => {
   const fetch = function* () {
+    expect(context.group).toBe("fetcher");
     const awaited = yield* async(Promise.resolve(context.signal));
     return awaited;
   };
 
-  const event = pool<() => AbortSignal | undefined>("event");
+  const event = pool<() => AbortSignal | undefined>("event", {
+    group: "fetcher",
+  });
   event(function* () {
     const stuff = yield* fetch();
     yield stuff;
   });
 
+  expect(context.group).not.toBe("fetcher");
   const result = await take(event());
+  expect(context.group).not.toBe("fetcher");
   expect(result).toHaveLength(1);
   expect(result[0]).toBeInstanceOf(AbortSignal);
   event.close();
@@ -523,7 +528,7 @@ it("respects scopes", async () => {
   expect(ids).toEqual(["a/event", "b/event"]);
 });
 
-it("does filtered calls", async () => {
+it("does filtered calls", () => {
   const event = pool("event");
   const spy1 = vi.fn();
   const spy2 = vi.fn();
@@ -544,7 +549,7 @@ it("does filtered calls", async () => {
   event.close();
 });
 
-it("keeps the original error", async () => {
+it("keeps the original error", () => {
   class CustomError extends Error {}
   const spy = vi.fn((error) => {
     expect(error).toBeInstanceOf(PoolError);
@@ -559,4 +564,52 @@ it("keeps the original error", async () => {
   });
 
   event();
+  event.close();
+});
+
+it("creates bound context", async () => {
+  const all = pools();
+  const event = all.pool("event");
+  event(function* () {
+    expect((this as any).context).toBeUndefined();
+  });
+  const bound = event.bind({ group: "bound", context: { value: 42 } });
+  expect(all.contexts.get("bound")).toEqual({ value: 42 });
+
+  let counter = 0;
+  bound(function* () {
+    expect(this.value).toBe([42, 42, 10][counter++]);
+  });
+
+  await take(event());
+  await take(bound());
+  bound.context({ value: 10 });
+  expect(all.contexts.get("bound")).toEqual({ value: 10 });
+  await take(bound());
+
+  const hanging = all.pool("hang", { group: "bound" });
+  hanging(() => {});
+
+  event.close();
+  expect(all.contexts.get("bound")).toEqual({ value: 10 });
+  hanging.close();
+  expect(all.contexts.get("bound")).toBeUndefined();
+});
+
+it("does not leak contexts from groups", async () => {
+  const event = pool("event");
+  const event1 = event.bind({ group: "1", context: { val: 42 } });
+
+  event1(function* () {
+    expect(this.val).toBe(10);
+  });
+
+  event1.context({ val: 10 });
+
+  const event2 = event.bind({ group: "2" });
+  event2(function* () {
+    expect((this as any).val).toBeUndefined();
+  });
+
+  await take(event());
 });
