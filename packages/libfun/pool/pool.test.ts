@@ -522,3 +522,22 @@ it("respects scopes", async () => {
   const ids = all.status().map((x) => x.id);
   expect(ids).toEqual(["a/event", "b/event"]);
 });
+
+it("does filtered calls", async () => {
+  const event = pool("event");
+  const spy1 = vi.fn();
+  const spy2 = vi.fn();
+
+  event.bind({ group: "1" })(spy1);
+  event.bind({ group: "2" })(spy2);
+
+  event.where("1")();
+  expect(spy1).toHaveBeenCalled();
+  expect(spy2).not.toHaveBeenCalled();
+  event.where("2")();
+  expect(spy1).toHaveBeenCalledTimes(1);
+  expect(spy2).toHaveBeenCalled();
+  event();
+  expect(spy1).toHaveBeenCalledTimes(2);
+  expect(spy2).toHaveBeenCalledTimes(2);
+});

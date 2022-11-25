@@ -81,6 +81,7 @@ type Pool<T extends Fn = (..._: any) => any> = {
 
   schedule: (when: Schedule) => Caller<T>;
   bind: (context: Override) => Pool<T>;
+  where: (group: string) => Caller<T>;
   catch: (handler?: Catcher) => void;
   abort: (filter?: Filter) => void;
   drain: (filter?: Filter) => void;

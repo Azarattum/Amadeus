@@ -106,7 +106,11 @@ function pools(options: Partial<Options> = {}): Pools {
         }
       };
     },
-    bind(context) {
+    where(group) {
+      const self = this as Pool;
+      return self.bind({ filter: group } as any);
+    },
+    bind(context: Override) {
       const fn = Function.bind.call(this as any, context);
       const pool = Object.setPrototypeOf(fn, prototype);
       return Object.assign(pool, { [state]: this[state] });
@@ -120,6 +124,7 @@ function pools(options: Partial<Options> = {}): Pools {
     abort: each("abort"),
     drain: each("drain"),
     close: each("close"),
+    where: each("where"),
     count: () => all.size,
     catch(handler) {
       catchers.add(handler || (() => {}));
@@ -128,7 +133,7 @@ function pools(options: Partial<Options> = {}): Pools {
       return pool.bind(this, { all, prototype, catchers, options: globals })(
         id,
         options
-      );
+      ) as any;
     },
   };
 }
@@ -146,7 +151,7 @@ function pool<T extends Fn = () => void>(
 ): Pool<T> {
   if (this?.scope) id = `${this.scope}/${id}`;
   const existing = global.all.get(id);
-  if (existing) return existing;
+  if (existing) return existing as Pool<T>;
 
   options.group = options.group || this?.group || global.options.group;
   const data: Pick<Pool, symbol> = {
@@ -165,6 +170,9 @@ function pool<T extends Fn = () => void>(
   function apply(this: Override, ...params: [Handler<T>] | any[]) {
     const self = data[state];
     const group = this?.group || self.group;
+    const filter = (handler: Handler<any>) =>
+      !(this as any)?.filter || handler.group === (this as any)?.filter;
+
     // Register a new handler
     if (params.length === 1 && typeof params[0] === "function") {
       if (!("group" in params[0])) params[0].group = group;
@@ -214,7 +222,7 @@ function pool<T extends Fn = () => void>(
         self.last = new Date();
         const generators = [...self.listeners.values()];
         const iterables = () =>
-          generators.map((handler) => {
+          generators.filter(filter).map((handler) => {
             const task = {
               group: handler.group,
               controller: derive(context.signal),

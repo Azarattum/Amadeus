@@ -361,3 +361,15 @@ const event2 = b("event"); // Creates "event" pool in scope "b"
 status(); // [ {id: "a/event"}, {id: "b/event"} ]
 ```
 </details>
+
+<details><summary>🏽 <b>Filter handlers</b></summary>
+
+```ts
+  const event = pool("event");
+  event.bind({ group: "1" })(() => { ... }); // Only this gets called
+  event.bind({ group: "2" })(() => { ... });
+
+  // Execute only handlers from group `1`
+  event.where("1")();
+```
+</details>
