@@ -10,15 +10,11 @@ npm install -D vite
 ```
 > Note that `@amadeus-music/util` package is optional, but might be useful for your plugin development.
 
-Now create a `vite.config.cjs`, and put there:
-```js
-export default require("@amadeus-music/core/plugin/config.cjs")();
-```
-> You might optionally provide a name for your plugin (the default is your package name from `package.json`), and custom vite config override. To do so, you should specify them as parameters to the config function call (like `...("MyPlugin", {});`).
-
-You might also want to add a build script to your `package.json`:
+Now add a build script to your `package.json`:
 ```json
-"build": "vite build"
+"scripts": {
+  "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.cjs"
+},
 ```
 
 To start developing your plugin create an `index.ts` file and register your plugin there:
@@ -44,5 +40,6 @@ stop(() => {
   info("Plugin stopped!");
 });
 ```
+> Note that `@amadeus-music/core` reexports everything from [libfun](https://www.npmjs.com/package/libfun) and [superstruct](https://www.npmjs.com/package/superstruct) as these are common shared dependencies.
 
 Amadeus plugin system uses [pools](../packages/libfun/README.md#pool) to manage events for your plugin.
