@@ -7,6 +7,7 @@ import {
   yellow,
 } from "@amadeus-music/util/color";
 import { capitalize, format } from "@amadeus-music/util/string";
+import { format as formatPlugin } from "../plugin/loader";
 import { pretty } from "@amadeus-music/util/object";
 import { log, pool, pools } from "../event/pool";
 import { async, map, take } from "libfun";
@@ -113,6 +114,14 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
   message = message.trimEnd() + "\n";
   message = message.replace(/\n/g, "\n  ");
   info(message);
+});
+
+command("context", [arg.plugin])((group) => {
+  if (!group) return usage("context");
+  const ctx = pools.contexts.get(group);
+  if (!ctx) return wrn(`No context state for "${group}"!`);
+  const name = `${bright}${formatPlugin(group)}${reset}`;
+  info(`Context state for ${name}:`, pretty(ctx));
 });
 
 command("help", [arg.command])((command) => {
