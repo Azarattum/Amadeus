@@ -1,4 +1,11 @@
-import { literal, number, optional, string, type } from "@amadeus-music/core";
+import {
+  intersection,
+  literal,
+  number,
+  optional,
+  string,
+  type,
+} from "@amadeus-music/core";
 
 const Text = type({
   message: type({
@@ -75,19 +82,24 @@ const Me = type({
   }),
 });
 
-const From = optional(
-  type({
-    from: type({
-      id: number(),
-      username: optional(string()),
-    }),
-  })
-);
+const From = type({
+  from: type({
+    id: number(),
+    username: optional(string()),
+  }),
+});
+
+const Chat = type({
+  chat: type({
+    id: number(),
+  }),
+});
 
 const Sender = type({
-  message: From,
-  my_chat_member: From,
-  callback_query: From,
+  message: optional(intersection([From, Chat])),
+  my_chat_member: optional(intersection([From, Chat])),
+  callback_query: optional(intersection([From, type({ message: Chat })])),
+  channel_post: optional(Chat),
 });
 
 export { Text, Audio, Voice, Post, Me, Query, Callback, Invite, Sender };

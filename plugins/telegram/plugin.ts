@@ -1,7 +1,5 @@
 import {
   defaulted,
-  fetcher,
-  FetchOptions,
   Infer,
   number,
   object,
@@ -13,7 +11,7 @@ import {
 import { name, version } from "./package.json";
 import { Me, Query } from "./types";
 
-export const { info, err, wrn, init, stop, pool } = register({
+export const { info, err, wrn, init, stop, search, pool } = register({
   name,
   version,
   config: {
@@ -31,14 +29,17 @@ export const { info, err, wrn, init, stop, pool } = register({
       {}
     ),
   },
+  context: {
+    chat: "",
+    name: "",
+    state: {
+      users: {} as Record<string, number>,
+      me: {} as Infer<typeof Me>["result"],
+    },
+  },
 });
 
-const state = {
-  request: {} as FetchOptions,
-  users: {} as Record<string, number>,
-  me: {} as Infer<typeof Me>["result"],
-};
-
+const update = pool<(data: string) => void>("update");
 const message = pool<(text: string) => void>("message");
 const command = pool<(command: string, replied?: number) => void>("command");
 const mention = pool<(chat: number) => void>("mention");
@@ -50,16 +51,8 @@ const callback =
     "callback"
   );
 
-const fetch = fetcher(state.request);
+update.catch((error: any) =>
+  wrn(error.cause?.message || error.cause || error.message)
+);
 
-export {
-  callback,
-  message,
-  command,
-  mention,
-  invite,
-  state,
-  fetch,
-  voice,
-  post,
-};
+export { callback, message, command, mention, invite, update, voice, post };

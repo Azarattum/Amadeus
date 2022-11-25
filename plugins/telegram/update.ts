@@ -7,88 +7,87 @@ import {
   mention,
   callback,
   invite,
-  state,
+  update,
 } from "./plugin";
 import { Text, Audio, Voice, Post, Callback, Invite, Sender } from "./types";
-import { fallback, pipe, take } from "@amadeus-music/core";
 import { IncomingMessage, ServerResponse } from "http";
+import { map, take } from "@amadeus-music/core";
 
 const secret = crypto.randomUUID();
 
-function update(req: IncomingMessage, res: ServerResponse) {
+function request(req: IncomingMessage, res: ServerResponse) {
   if (req.url !== "/telegram") return;
   const token = req.headers["x-telegram-bot-api-secret-token"];
   if (token !== secret) {
-    wrn(
-      "A suspicious webhook request " +
-        `has been intercepted with secret "${token}"!`
-    );
-    res.statusCode = 403;
-    res.end();
-    return;
+    wrn(`An invalid webhook request with secret "${token}"!`);
+    return res.writeHead(403).end();
   }
 
   let body = "";
   req.on("readable", () => (body += req.read() || ""));
   req.on("end", () => {
-    pipe(body)(
-      JSON.parse,
-      // (x) => (info("Update:", pretty(x)), x), // For debugging
-      verify,
-      handle,
-      fallback((e) => wrn(e?.message || e))
-    );
-    res.statusCode = 200;
-    res.end();
+    take(update(body));
+    res.writeHead(200).end();
   });
 }
 
-function verify(update: unknown) {
+update(function* (body) {
+  const data = JSON.parse(body);
+  update.context(yield* verify.bind(this)(data));
+  yield* map(handle.bind(this)(data));
+});
+
+function* verify(update: unknown) {
   const sender = Sender.create(update);
   const from =
     sender.callback_query?.from ||
     sender.my_chat_member?.from ||
     sender.message?.from;
+  const chat =
+    sender.callback_query?.message.chat.id ||
+    sender.channel_post?.chat.id ||
+    sender.message?.chat.id ||
+    sender.my_chat_member?.chat.id;
 
   if (Post.is(update)) {
     /// TODO: Verify channel posts
     //    Look for channel id in user's playlists
-    return update;
+    return { chat: chat?.toString() };
   }
 
-  if (!from) throw new Error("The update does not have a sender!");
-  if (!Object.values(state.users).includes(from.id)) {
-    throw new Error(`Unauthorized access from @${from.username} (${from.id})!`);
-  }
+  if (!from) throw "The update does not have a sender!";
+  const entry = Object.entries(this.state.users).find((x) => x[1] === from.id);
+  if (!entry) throw `Unauthorized access from @${from.username} (${from.id})!`;
 
-  return update;
+  return { chat: chat?.toString(), name: entry[0] };
 }
 
-function handle(update: unknown) {
-  if (Voice.is(update)) take(voice(update.message.voice.file_id));
+async function* handle(update: unknown) {
+  if (Voice.is(update)) yield* voice(update.message.voice.file_id);
   if (Text.is(update)) {
     const { text, reply_to_message } = update.message;
-    if (!text.startsWith("/")) take(message(text));
-    else take(command(text.slice(1), reply_to_message?.message_id));
+    if (!text.startsWith("/")) yield* message(text);
+    else yield* command(text.slice(1), reply_to_message?.message_id);
   }
   if (Audio.is(update)) {
     const { performer, title } = update.message.audio;
     const text = [performer, title].filter((x) => x).join(" - ");
-    if (text) take(message(text));
+    if (text) yield* message(text);
   }
   if (Post.is(update)) {
     const { chat, audio, text } = update.channel_post;
-    if (text?.includes(`@${state.me.username}`)) take(mention(chat.id));
-    if (audio) take(post(audio.file_id, chat.id));
+    if (text?.includes(`@${this.state.me.username}`)) yield* mention(chat.id);
+    if (audio) yield* post(audio.file_id, chat.id);
   }
   if (Callback.is(update)) {
     const { data, from, message } = update.callback_query;
-    take(callback(data, message.message_id, from.id));
+    yield* callback(data, message.message_id, from.id);
   }
   if (Invite.is(update)) {
     const { chat } = update.my_chat_member;
-    take(invite(chat.id, chat.title));
+    yield* invite(chat.id, chat.title);
   }
+  /// AutoRemove message?
 }
 
-export { update, secret };
+export { request, secret };
