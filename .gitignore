@@ -6,3 +6,4 @@ coverage
 build
 *.log
 config.json
+*.acebase
