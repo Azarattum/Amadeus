@@ -4,17 +4,15 @@ import {
   clean,
   clear,
   green,
-  highlight,
   paint,
   red,
   reset,
   yellow,
   type Color,
 } from "@amadeus-music/util/color";
-import { offset, rescape } from "@amadeus-music/util/string";
-import { pipeline, PoolError, take } from "libfun";
-import { StructError } from "superstruct";
-import { log as logged } from "../event";
+import { log as logged } from "../event/pool";
+import { pipeline, take } from "libfun";
+import { format } from "../data/error";
 import { stdout } from "node:process";
 import { inspect } from "util";
 
@@ -85,37 +83,10 @@ function err(this: Context, ...data: any[]) {
     data.push(new Error().stack?.replace(/^.*$/m, "") || "");
   }
 
-  let context: Context = undefined;
-  // Format errors properly
-  data = data.map((e) => {
-    if (e instanceof StructError) {
-      const root = JSON.stringify(e.branch[0], null, 2);
-      const target = JSON.stringify(e.branch[e.branch.length - 1], null, 2);
-      const pattern = new RegExp(
-        rescape(target || "").replace(/(\s|\n)+/g, "(\\s|\\n)*") || "$^"
-      );
-      const important = [e.path.join("."), e.value + "", e.type]
-        .filter((x) => x)
-        .map((x) => new RegExp("\\b" + rescape(x) + "\\b", "g"));
+  // Format errors
+  const context: Context = { ...(this || {}) };
+  data = data.map((x) => format(x, context));
 
-      const received = offset(highlight(root, pattern, bright, red));
-      let stack = e.stack || e.message;
-      if (e.cause) stack = stack.replace(e.message, e.message + "\n" + e.cause);
-      stack = highlight(stack, important, bright, red);
-
-      return stack + "\nReceived:\n" + received;
-    }
-    if (e instanceof PoolError) context = { group: e.handler || e.caller };
-    if (e instanceof Error) {
-      if (e.cause) {
-        e.stack = e.stack?.replace(e.message, e.message + "\n" + e.cause);
-      }
-      return e.stack || "";
-    }
-    return e;
-  });
-
-  if (context === undefined) context = this;
   log.bind(context)({ level: "error", color: red, separator: "!", data });
 }
 
