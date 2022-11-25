@@ -300,9 +300,9 @@ class PoolError extends Error implements Details {
 
   constructor(error: Error, details: Omit<Details, "reason">) {
     super(error.message);
+    this.cause = error;
     this.name = "PoolError";
     this.pool = details.pool;
-    this.cause = error.cause;
     this.trace = details.trace;
     this.caller = details.caller;
     this.handler = details.handler;

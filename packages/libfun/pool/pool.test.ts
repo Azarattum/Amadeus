@@ -540,4 +540,23 @@ it("does filtered calls", async () => {
   event();
   expect(spy1).toHaveBeenCalledTimes(2);
   expect(spy2).toHaveBeenCalledTimes(2);
+
+  event.close();
+});
+
+it("keeps the original error", async () => {
+  class CustomError extends Error {}
+  const spy = vi.fn((error) => {
+    expect(error).toBeInstanceOf(PoolError);
+    expect(error.cause).toBeInstanceOf(CustomError);
+  });
+
+  const event = pool("event");
+
+  event.catch(spy);
+  event(() => {
+    throw new CustomError();
+  });
+
+  event();
 });
