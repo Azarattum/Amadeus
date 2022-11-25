@@ -240,9 +240,12 @@ function pool<T extends Fn = () => void>(
       });
 
       if (!self.catchers.size && !global.catchers.size) throw error;
-      self.catchers.forEach((x) => x(error));
-      if (self.catchers.size) return;
-      global.catchers.forEach((x) => x(error));
+      try {
+        self.catchers.forEach((x) => x(error));
+        if (!self.catchers.size) throw error;
+      } catch {
+        global.catchers.forEach((x) => x(error));
+      }
     };
     const generators = [...self.listeners.values()]
       .filter(filter)
