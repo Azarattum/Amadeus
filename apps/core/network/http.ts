@@ -1,6 +1,6 @@
 import { createServer, Server } from "node:http";
+import { init, stop } from "../event/pool";
 import { err, info } from "../status/log";
-import { init, stop } from "../event";
 import { async } from "libfun";
 
 let server: Server | undefined;

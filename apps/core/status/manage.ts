@@ -1,7 +1,7 @@
 import { divide, info, ok, SilentError } from "./log";
+import { stop as close, pools } from "../event/pool";
 import { name, version } from "../package.json";
-import { stop as close, pools } from "../event";
-import { plugins } from "../plugin";
+import { plugins } from "../plugin/loader";
 import { take } from "libfun";
 
 let started: null | number = null;
@@ -38,6 +38,7 @@ async function stop() {
   pools.drain();
   await take(close());
   info("Cleaning up all the event handlers...");
+  process.removeAllListeners();
   pools.close();
   info("Unloading plugins...");
   plugins.clear();
