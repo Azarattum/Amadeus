@@ -1,11 +1,9 @@
 import type { Album, Artist, Track } from "@amadeus-music/protocol";
 import type { BaseConfig } from "../data/config";
-import { err } from "../status/log";
 import { pools } from "libfun";
 
 const all = pools({ group: "core" });
 const { pool } = all;
-all.catch(err);
 
 // Internal events
 const log = pool<(text: string) => void>("log");
