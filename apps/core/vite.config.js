@@ -1,5 +1,4 @@
 import { mergeConfig, defineConfig } from "vite";
-
 import base from "../../vite.node.js";
 
 const config = defineConfig(

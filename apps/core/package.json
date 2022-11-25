@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@amadeus-music/util": "workspace:*",
+    "@amadeus-music/protocol": "workspace:*",
     "gretchen": "^1.5.0",
     "libfun": "workspace:*",
     "superstruct": "^1.0.3"

@@ -1,0 +1,8 @@
+{
+  "name": "@amadeus-music/protocol",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "superstruct": "^1.0.3"
+  }
+}
