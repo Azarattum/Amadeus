@@ -84,7 +84,10 @@ function pools(options: Partial<Options> = {}): Pools {
 
         for (const group of contexts.keys()) {
           const obsolete = [...all.values()].every(
-            (x: any) => x.group !== group && x[state].group !== group
+            (x) =>
+              x[state].group !== group &&
+              (x as any).group !== group &&
+              [...x[state].listeners].every((y) => y.group !== group)
           );
           if (obsolete) contexts.delete(group);
         }
