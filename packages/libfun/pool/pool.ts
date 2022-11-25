@@ -70,7 +70,7 @@ function pools(options: Partial<Options> = {}): Pools {
       this.abort(filter);
     },
     close(filter) {
-      const { listeners } = this[state];
+      const { listeners, cached, catchers } = this[state];
       listeners.forEach((x) => {
         if (!filter) listeners.delete(x);
         if (filter?.group && x.group === filter.group) listeners.delete(x);
@@ -79,6 +79,8 @@ function pools(options: Partial<Options> = {}): Pools {
       this.drain(filter);
       if (!listeners.size) {
         all.delete(this[state].id);
+        cached.clear();
+        catchers.clear();
 
         for (const group of contexts.keys()) {
           const obsolete = [...all.values()].every(
