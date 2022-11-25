@@ -8,10 +8,10 @@ import {
 } from "@amadeus-music/util/color";
 import { capitalize, format } from "@amadeus-music/util/string";
 import { pretty } from "@amadeus-music/util/object";
-import { log, pool, pools } from "../event";
+import { log, pool, pools } from "../event/pool";
 import { async, map, take } from "libfun";
 import { info, wrn } from "./log";
-import { stop } from ".";
+import { stop } from "./manage";
 
 type Argument = readonly (string | symbol)[] | string | symbol;
 const commands = new Map<string, Argument[] | []>();
@@ -23,19 +23,20 @@ const arg = {
   command: Symbol("command"),
 };
 
-function command(
-  this: { group?: string } | void,
+function command<T extends Record<string, any> = Record<string, never>>(
+  this: { group?: string } | { group: string; context: T } | void,
   what: string,
   ...args: readonly Argument[]
 ) {
   if (!what) throw new Error("Invalid command!");
   commands.set(what, (args || []) as any);
-  return pool<(...args: (string | undefined)[]) => void>(
+  const command = pool<(...args: (string | undefined)[]) => void>(
     `command/${what}`
-  ).bind(this);
+  );
+  return command.bind(this) as typeof command;
 }
 
-function usage(this: { group?: string } | void, command: string) {
+function usage(command: string) {
   const docs = commands.get(command);
   if (!docs) return wrn(`No such command "${command}"!`);
   let usage = `Usage for "${command}" command is:\n  `;

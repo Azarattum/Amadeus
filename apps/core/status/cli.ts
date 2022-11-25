@@ -1,14 +1,14 @@
 import { createInterface, type Interface } from "node:readline/promises";
+import { log, pool, pools, stop as close } from "../event/pool";
 import { cyan, highlight } from "@amadeus-music/util/color";
 import { prefix, split } from "@amadeus-music/util/string";
-import { log, pool, pools, stop as close } from "../event";
 import { stdin, stdout } from "node:process";
 import type { WriteStream } from "node:tty";
+import { plugins } from "../plugin/loader";
 import { arg, commands } from "./commands";
-import { plugins } from "../plugin";
+import { stop } from "./manage";
 import { take } from "libfun";
 import { wrn } from "./log";
-import { stop } from ".";
 import "./commands";
 
 function handle(command: string) {

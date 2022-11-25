@@ -3,12 +3,17 @@ import { gretch, type GretchOptions } from "gretchen";
 import { errorify } from "libfun/utils/error";
 import type { Struct } from "superstruct";
 import { async, context } from "libfun";
+import { pools } from "../event/pool";
 
 type FetchOptions = {
-  baseURL?: string | string[];
+  [K in keyof GretchOptions]: K extends "baseURL"
+    ? string | string[]
+    : K extends "headers"
+    ? Record<string, string | string[]>
+    : GretchOptions[K];
+} & {
   params?: Record<string, string | string[]>;
-  headers?: Record<string, string | string[]>;
-} & Omit<GretchOptions, "baseURL" | "headers">;
+};
 
 function fetcher(defaults: FetchOptions = {}) {
   return (url: string, options: FetchOptions = {}) =>
@@ -16,6 +21,9 @@ function fetcher(defaults: FetchOptions = {}) {
 }
 
 function fetch(url: string, options: FetchOptions = {}) {
+  const ctx: any = context.group ? pools.contexts.get(context.group) || {} : {};
+  if (typeof ctx.fetch === "object") options = merge(ctx.fetch, options);
+
   const params = new URLSearchParams(pick(options.params)).toString();
   if (params) {
     if (url.includes("?")) url += "&" + params;
