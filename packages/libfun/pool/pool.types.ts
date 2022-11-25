@@ -1,5 +1,5 @@
+import type { Fn, Intersected } from "../utils/types";
 import type { Passthrough } from "./iterator";
-import type { Fn } from "../utils/types";
 
 interface Options {
   concurrency: number;
@@ -65,6 +65,12 @@ type Handler<T extends Fn> = ((
   group?: string;
 };
 
+type Caller<T> = Intersected<
+  T extends (..._: infer A) => infer R
+    ? (this: Override, ...args: A) => AsyncGenerator<R>
+    : unknown
+>;
+
 type Filter =
   | { group: string; caller?: never; handler?: never }
   | { group?: never; caller: string; handler?: string }
@@ -72,11 +78,8 @@ type Filter =
 
 type Pool<T extends Fn = (..._: any) => any> = {
   (this: Override, handler: Handler<T>): () => void;
-  (this: Override, ...args: Parameters<T>): AsyncGenerator<ReturnType<T>>;
 
-  schedule: (
-    when: Schedule
-  ) => (...args: Parameters<T>) => AsyncGenerator<ReturnType<T>>;
+  schedule: (when: Schedule) => Caller<T>;
   bind: (context: Override) => Pool<T>;
   catch: (handler?: Catcher) => void;
   abort: (filter?: Filter) => void;
@@ -85,7 +88,7 @@ type Pool<T extends Fn = (..._: any) => any> = {
   status: () => State<T>;
 
   [state: symbol]: State<T>;
-};
+} & Caller<T>;
 
 type Pools = Omit<
   {

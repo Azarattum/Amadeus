@@ -70,4 +70,21 @@ type Contains<
   T extends (infer Item)[] ? (U extends Item ? True : False) : never
 >;
 
-export type { Contains, Combine, IsTuple, IsNever, Flatten, Equal, Last, Fn };
+/** Converts any union to its intersection. Eg. `A | B` to `A & B` */
+type Intersected<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I
+) => void
+  ? I
+  : never;
+
+export type {
+  Intersected,
+  Contains,
+  Combine,
+  IsTuple,
+  IsNever,
+  Flatten,
+  Equal,
+  Last,
+  Fn,
+};
