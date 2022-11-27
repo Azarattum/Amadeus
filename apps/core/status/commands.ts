@@ -10,9 +10,10 @@ import { capitalize, format } from "@amadeus-music/util/string";
 import { format as formatPlugin } from "../plugin/loader";
 import { pretty } from "@amadeus-music/util/object";
 import { log, pool, pools } from "../event/pool";
+import { register } from "../data/config";
 import { async, map, take } from "libfun";
-import { info, wrn } from "./log";
-import { stop } from "./manage";
+import { launch, stop } from "./manage";
+import { info, ok, wrn } from "./log";
 
 type Argument = readonly (string | symbol)[] | string | symbol;
 const commands = new Map<string, Argument[] | []>();
@@ -181,6 +182,25 @@ command("exec", [arg.pool])(function* (what, ...args) {
     info(`${name} responds with: ${pretty(item)}`);
   });
   info(`${name} done executing!`);
+});
+
+command("register")(function* (username) {
+  if (!username) return wrn("Provide a username!");
+  const config = yield* async(register(username).catch(wrn));
+  if (!config) return;
+  info(
+    `Added new user to "config.json". ${bright}${username}${reset}:`,
+    pretty(config.users[username])
+  );
+  info("Restart the application to apply changes!");
+});
+
+command("restart")(() => {
+  (async () => {
+    await stop(true);
+    await launch();
+    ok("Successfully restarted the application!");
+  })();
 });
 
 export { command, commands, arg, usage };

@@ -1,10 +1,25 @@
-import { divide, info, ok, SilentError } from "./log";
-import { stop as close, pools } from "../event/pool";
+import { stop as close, pools, init } from "../event/pool";
+import { divide, err, info, ok, SilentError } from "./log";
+import { load, plugins } from "../plugin/loader";
 import { name, version } from "../package.json";
-import { plugins } from "../plugin/loader";
-import { take } from "libfun";
+import { fallback, pipe, take } from "libfun";
+import { configure } from "../data/config";
+import { commands } from "./commands";
+import { interactive } from "./cli";
 
 let started: null | number = null;
+
+const launch = () =>
+  pipe(pools.catch(err))(
+    start,
+    load,
+    configure,
+    init,
+    take,
+    complete,
+    interactive,
+    fallback(err)
+  );
 
 async function start() {
   if (started) throw new SilentError();
@@ -29,7 +44,7 @@ async function complete() {
   divide();
 }
 
-async function stop() {
+async function stop(restart = false) {
   if (!started) return;
   started = null;
 
@@ -39,10 +54,13 @@ async function stop() {
   await take(close());
   info("Cleaning up all the event handlers...");
   process.removeAllListeners();
-  pools.close();
-  info("Unloading plugins...");
-  plugins.clear();
+  if (!restart) {
+    commands.clear();
+    pools.close();
+    info("Unloading plugins...");
+    plugins.clear();
+  }
   ok("Successfully stopped!");
 }
 
-export { start, complete, stop };
+export { start, complete, stop, launch };

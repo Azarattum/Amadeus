@@ -13,7 +13,7 @@ import "./commands";
 
 function handle(command: string) {
   const parts = split(command);
-  const main = parts.shift();
+  const main = parts.shift()?.toLowerCase();
   if (!main) return;
   if (!commands.has(main)) return wrn(`No such command "${main}"!`);
   take(pool(`command/${main}`)(...(parts as [])));
@@ -36,13 +36,12 @@ async function interactive() {
   cli.on("close", () => {
     stdin.removeListener("data", colorizer);
     cli.removeAllListeners();
-    commands.clear();
     unsubscribe();
     return stop();
   });
   cli.on("line", (input) => {
     take(log(cli.getPrompt() + input));
-    handle(input.toLowerCase());
+    handle(input);
   });
   cli.prompt();
 }
