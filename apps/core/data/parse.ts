@@ -3,7 +3,7 @@ import { pipeline } from "libfun";
 
 /// NOT USED! (yet)
 const uuid = pipeline(
-  (x: Track) => `${x.artists.join(",")}-${x.title}-${x.album}`,
+  (x: Track) => `${x.artists.sort().join(",")}-${x.title}-${x.album}`,
   (x) => x.toLowerCase().replace(/\s/g, " "),
   (x) => new TextEncoder().encode(x),
   (x) => crypto.subtle.digest("SHA-1", x),

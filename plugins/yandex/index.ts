@@ -1,6 +1,7 @@
-import { init, wrn, search } from "./plugin";
+import { convert, Download, Source, Tracks } from "./types";
+import { init, wrn, search, desource } from "./plugin";
 import { fetch } from "@amadeus-music/core";
-import { convert, Tracks } from "./types";
+import { createHash } from "node:crypto";
 
 init(function* (config) {
   const { token } = config.yandex;
@@ -28,4 +29,21 @@ search(function* (type, query) {
     if (!result.tracks) break;
     yield* result.tracks.results.map(convert);
   }
+});
+
+desource(function* (sources: string[]) {
+  const schema = "amadeus://yandex/";
+  const source = sources.find((x) => x.startsWith(schema));
+  if (!source) return;
+  const id = source.slice(schema.length);
+
+  const { result } = yield* fetch(`tracks/${id}/download-info`).as(Source);
+  const url = result[0].downloadInfoUrl + "&format=json";
+  const info = yield* fetch(url).as(Download);
+
+  const trackUrl = `XGRlBW9FXlekgbPrRHuSiA${info.path.slice(1)}${info.s}`;
+  const sign = createHash("md5").update(trackUrl).digest("hex");
+  yield {
+    url: `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`,
+  };
 });

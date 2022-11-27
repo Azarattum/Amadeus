@@ -19,6 +19,11 @@ const track = object({
   sources: array(string()),
 });
 
+type Source = Infer<typeof source>;
+const source = object({
+  url: string(),
+});
+
 type Artist = Infer<typeof artist>;
 const artist = object({
   /// Formalize an artist representation
@@ -29,5 +34,5 @@ const album = object({
   /// Formalize an album representation
 });
 
-export { track, artist, album };
-export type { Track, Artist, Album };
+export { track, artist, album, source };
+export type { Track, Artist, Album, Source };

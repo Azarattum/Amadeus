@@ -1,4 +1,4 @@
-import type { Album, Artist, Track } from "@amadeus-music/protocol";
+import type { Album, Artist, Source, Track } from "@amadeus-music/protocol";
 import type { BaseConfig } from "../data/config";
 import { pools } from "libfun";
 
@@ -18,11 +18,11 @@ const search = pool<
   | ((type: "album", query: string) => Album)
   | ((type: "artist", query: string) => Artist)
 >("search");
+const desource = pool<(sources: string[]) => Source>("desource");
 /// TODO:
 //  Provider
 //    - relate
 //    - recognize
-//    - desource
 //  Preserver
 //    - retrieve
 //    - save
@@ -32,5 +32,5 @@ const search = pool<
 //    - follow
 //    - unfollow
 
-export { log, init, stop, search };
+export { log, init, stop, search, desource };
 export { all as pools, pool };

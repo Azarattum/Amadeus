@@ -32,6 +32,17 @@ const Tracks = type({
   }),
 });
 
+const Source = type({
+  result: array(type({ downloadInfoUrl: string() })),
+});
+
+const Download = type({
+  path: string(),
+  host: string(),
+  s: string(),
+  ts: string(),
+});
+
 function convert(track: Infer<typeof Track>) {
   return {
     title: track.title,
@@ -47,4 +58,4 @@ function convert(track: Infer<typeof Track>) {
   };
 }
 
-export { Tracks, convert };
+export { Tracks, Source, Download, convert };
