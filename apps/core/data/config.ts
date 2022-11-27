@@ -9,7 +9,6 @@ import {
   record,
   any,
 } from "superstruct";
-import { bright, reset } from "@amadeus-music/util/color";
 import { readFile, writeFile } from "node:fs/promises";
 import { merge } from "@amadeus-music/util/object";
 import type { Plugin } from "../plugin/types";
@@ -51,7 +50,7 @@ async function register(username: string) {
   coercers.forEach(({ config, plugin }) => {
     users = config.create(
       users,
-      `Sorry, ${bright}${plugin}${reset} ` +
+      `Sorry, "${plugin}" ` +
         "doesn't support user registration! " +
         "Please ask the developer to add default " +
         "values for users configuration."

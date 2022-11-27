@@ -24,9 +24,7 @@ function register<
 
   const id = plugin.name.toLowerCase();
   if (plugins.has(id)) {
-    throw new Error(
-      `Plugin ${bright}${id}${reset} has already been registered!`
-    );
+    throw new Error(`Plugin "${id}" has already been registered!`);
   }
 
   info(`Loading ${bright}${plugin.name}${reset} plugin v${plugin.version}...`);

@@ -10,6 +10,9 @@ const config = defineConfig(
         entry: "./app.ts",
         fileName: (ext) => `app.${ext}`,
       },
+      rollupOptions: {
+        external: /..\/..\/..\/plugins/,
+      },
     },
   })
 );

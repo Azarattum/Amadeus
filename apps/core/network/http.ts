@@ -1,4 +1,4 @@
-import { createServer, Server } from "node:http";
+import { createServer, type Server } from "node:http";
 import { init, stop } from "../event/pool";
 import { err, info } from "../status/log";
 import { async } from "libfun";

@@ -7,7 +7,7 @@ const name = require(resolve("./package.json")).name;
 const monorepo = existsSync(resolve("../../package.json"));
 
 export default defineConfig({
-  plugins: [{ ...node(), enforce: "pre" }],
+  plugins: [{ ...node({ preferBuiltins: true }), enforce: "pre" }],
   resolve: { alias: { "@amadeus-music/core": "../app.cjs" } },
   build: {
     emptyOutDir: monorepo ? false : true,

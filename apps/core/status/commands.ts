@@ -186,8 +186,8 @@ command("exec", [arg.pool])(function* (what, ...args) {
 
 command("register")(function* (username) {
   if (!username) return wrn("Provide a username!");
-  const config = yield* async(register(username).catch(wrn));
-  if (!config) return;
+  const config = yield* async(register(username).catch((x) => wrn(x.message)));
+  if (!config) return wrn(`Failed to register new user "${username}"!`);
   info(
     `Added new user to "config.json". ${bright}${username}${reset}:`,
     pretty(config.users[username])
