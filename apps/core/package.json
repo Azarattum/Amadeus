@@ -12,13 +12,14 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@amadeus-music/util": "workspace:*",
     "@amadeus-music/protocol": "workspace:*",
+    "@amadeus-music/util": "workspace:*",
     "gretchen": "^1.5.0",
     "libfun": "workspace:*",
     "superstruct": "^1.0.3"
   },
   "devDependencies": {
+    "@rollup/plugin-replace": "^5.0.1",
     "vite-node": "0.25.3"
   }
 }

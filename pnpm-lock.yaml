@@ -64,6 +64,7 @@ importers:
     specifiers:
       '@amadeus-music/protocol': workspace:*
       '@amadeus-music/util': workspace:*
+      '@rollup/plugin-replace': ^5.0.1
       gretchen: ^1.5.0
       libfun: workspace:*
       superstruct: ^1.0.3
@@ -75,6 +76,7 @@ importers:
       libfun: link:../../packages/libfun
       superstruct: 1.0.3
     devDependencies:
+      '@rollup/plugin-replace': 5.0.1
       vite-node: 0.25.3
 
   apps/web:
@@ -107,12 +109,16 @@ importers:
   plugins/acebase:
     specifiers:
       '@amadeus-music/core': workspace:*
+      '@amadeus-music/util': workspace:*
       acebase: ^1.26.2
+      acebase-core: ^1.24.0
       acebase-server: ^1.15.2
       vite: 3.2.4
     dependencies:
       '@amadeus-music/core': link:../../apps/core
+      '@amadeus-music/util': link:../../packages/util
       acebase: 1.26.2
+      acebase-core: 1.24.0
       acebase-server: 1.15.2
     devDependencies:
       vite: 3.2.4
@@ -294,6 +300,19 @@ packages:
       rollup: 3.4.0
     dev: true
 
+  /@rollup/plugin-replace/5.0.1:
+    resolution: {integrity: sha512-Z3MfsJ4CK17BfGrZgvrcp/l6WXoKb0kokULO+zt/7bmcyayokDaQ2K3eDJcRLCTAlp5FPI4/gz9MHAsosz4Rag==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.0.2
+      magic-string: 0.26.7
+    dev: true
+
   /@rollup/pluginutils/3.1.0_rollup@3.4.0:
     resolution: {integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==}
     engines: {node: '>= 8.0.0'}
@@ -304,6 +323,20 @@ packages:
       estree-walker: 1.0.1
       picomatch: 2.3.1
       rollup: 3.4.0
+    dev: true
+
+  /@rollup/pluginutils/5.0.2:
+    resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@types/estree': 1.0.0
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
     dev: true
 
   /@socket.io/component-emitter/3.1.0:
@@ -394,6 +427,10 @@ packages:
 
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
+    dev: true
+
+  /@types/estree/1.0.0:
+    resolution: {integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==}
     dev: true
 
   /@types/istanbul-lib-coverage/2.0.4:
@@ -1614,6 +1651,10 @@ packages:
 
   /estree-walker/1.0.1:
     resolution: {integrity: sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==}
+    dev: true
+
+  /estree-walker/2.0.2:
+    resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
     dev: true
 
   /esutils/2.0.3:

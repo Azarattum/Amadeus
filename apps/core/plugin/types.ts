@@ -42,6 +42,8 @@ type Configure<
 > = {
   [K in keyof T]: K extends "init"
     ? Pool<(config: PluginConfig<U>) => void, C>
+    : K extends "stop"
+    ? Pool<() => void, Partial<C>>
     : T[K] extends Pool<infer U, infer R>
     ? Pool<U, R & C>
     : T[K] extends PoolMaker<infer R>

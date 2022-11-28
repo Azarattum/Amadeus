@@ -1,4 +1,5 @@
 const node = require("@rollup/plugin-node-resolve").default;
+const replace = require("@rollup/plugin-replace").default;
 const { existsSync } = require("node:fs");
 const { resolve } = require("node:path");
 const { defineConfig } = require("vite");
@@ -7,7 +8,13 @@ const name = require(resolve("./package.json")).name;
 const monorepo = existsSync(resolve("../../package.json"));
 
 export default defineConfig({
-  plugins: [{ ...node({ preferBuiltins: true }), enforce: "pre" }],
+  plugins: [
+    { ...node({ preferBuiltins: true }), enforce: "pre" },
+    replace({
+      "process.env.NODE_ENV": '"production"',
+      preventAssignment: true,
+    }),
+  ],
   resolve: { alias: { "@amadeus-music/core": "../app.cjs" } },
   build: {
     emptyOutDir: monorepo ? false : true,

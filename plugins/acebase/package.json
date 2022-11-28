@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
+    "@amadeus-music/util": "workspace:*",
     "acebase": "^1.26.2",
+    "acebase-core": "^1.24.0",
     "acebase-server": "^1.15.2"
   },
   "devDependencies": {
