@@ -16,6 +16,7 @@
     "@amadeus-music/util": "workspace:*",
     "gretchen": "^1.5.0",
     "libfun": "workspace:*",
+    "string-similarity-js": "^2.1.4",
     "superstruct": "^1.0.3"
   },
   "devDependencies": {

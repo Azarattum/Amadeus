@@ -1,7 +1,6 @@
 import {
   init,
   stop,
-  wrn,
   info,
   message,
   command,
@@ -10,13 +9,11 @@ import {
   post,
   invite,
   callback,
-  search,
   desource,
 } from "./plugin";
-import { async, http, take, fetch, first } from "@amadeus-music/core";
+import { async, http, fetch, first, map, tracks } from "@amadeus-music/core";
 import { bright, reset } from "@amadeus-music/util/color";
 import { keyboard, escape, markdown } from "./markup";
-import { plural } from "@amadeus-music/util/string";
 import { secret, request } from "./update";
 import { Me } from "./types";
 
@@ -50,23 +47,26 @@ stop(() => {
 message(function* (text) {
   info(`${this.name} is searching for "${text}"...`);
 
-  const tracks = yield* async(take(search("track", text), 10));
-  const { length } = tracks;
-  if (!length) wrn(`No results found for "${text}"!`);
-  else info(`Found ${length} ${plural("result", length)} for "${text}"!`);
+  const aggregator = tracks(text, 5);
+  const chat = this.chat;
 
-  const results = tracks.map((x) => `${x.artists.join(", ")} - ${x.title}`);
-  const sources = tracks.map((x) => JSON.stringify(x.sources));
+  /// Fix `this` mapped in context
+  yield* map(aggregator, function* ({ page }) {
+    /// Properly use pagination, cache page status
+    const results = page.map((x) => `${x.artists.join(", ")} - ${x.title}`);
+    const sources = page.map((x) => JSON.stringify(x.source));
 
-  /// Make an actual response! (with pages, etc)
-  yield* fetch("sendMessage", {
-    params: {
-      ...markdown(),
-      text: `🔎 *${escape(text)}*`,
-      chat_id: this.chat,
-      ...keyboard(results, sources),
-    },
-  }).text();
+    /// Edit message
+    yield* fetch("sendMessage", {
+      params: {
+        ...markdown(),
+        text: `🔎 *${escape(text)}*`,
+        chat_id: chat,
+        /// Special keyboard for pages
+        ...keyboard(results, sources),
+      },
+    }).text();
+  });
 });
 
 command((command) => {

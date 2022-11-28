@@ -67,6 +67,7 @@ importers:
       '@rollup/plugin-replace': ^5.0.1
       gretchen: ^1.5.0
       libfun: workspace:*
+      string-similarity-js: ^2.1.4
       superstruct: ^1.0.3
       vite-node: 0.25.3
     dependencies:
@@ -74,6 +75,7 @@ importers:
       '@amadeus-music/util': link:../../packages/util
       gretchen: 1.5.0
       libfun: link:../../packages/libfun
+      string-similarity-js: 2.1.4
       superstruct: 1.0.3
     devDependencies:
       '@rollup/plugin-replace': 5.0.1
@@ -3148,6 +3150,10 @@ packages:
     resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
     engines: {node: '>=10.0.0'}
     dev: true
+
+  /string-similarity-js/2.1.4:
+    resolution: {integrity: sha512-uApODZNjCHGYROzDSAdCmAHf60L/pMDHnP/yk6TAbvGg7JSPZlSto/ceCI7hZEqzc53/juU2aOJFkM2yUVTMTA==}
+    dev: false
 
   /string-width/4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
