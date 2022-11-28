@@ -7,6 +7,7 @@ import {
   reset,
   yellow,
 } from "./color";
+import { delay } from "./throttle";
 
 const derivatives = new WeakMap<object, object>();
 const picked = new WeakMap<object, number>();
@@ -58,6 +59,100 @@ export function slice<T>(iterator: Iterator<T>, start: number, end: number) {
   }
 
   return slice;
+}
+
+/**
+ * Performs as binary insertion upon a collection
+ * @param collection Target array
+ * @param item Element to insert
+ * @param options Options, such as custom compare or insertion handlers
+ */
+export function binsert<T>(
+  collection: T[],
+  item: T,
+  {
+    insert = (where: number, item: T): any => collection.splice(where, 0, item),
+    compare = (a: T, b: T) => +a - +b,
+    end = collection.length - 1,
+    start = 0,
+  } = {}
+) {
+  if (!collection.length) {
+    insert(0, item);
+    return;
+  }
+  if (end - start <= 1) {
+    if (compare(item, collection[start]) < 0) insert(start, item);
+    else if (compare(item, collection[end]) >= 0) insert(end + 1, item);
+    else insert(end, item);
+  } else {
+    const mid = Math.floor((end - start) / 2) + start;
+    const left = compare(item, collection[mid]) < 0;
+    if (left) binsert(collection, item, { insert, compare, start, end: mid });
+    else binsert(collection, item, { insert, compare, start: mid, end });
+  }
+}
+
+/**
+ * Combine two collections, keeping the first one sorted and merging duplicates.
+ * @param a First collection
+ * @param b Second collection
+ * @param options Combine options
+ */
+export async function combine<T, U>(
+  a: T[],
+  b: U[],
+  {
+    identify,
+    compare,
+    convert,
+    merge,
+    map,
+  }: {
+    identify: (item: T | U) => string;
+    compare: (a: T, b: T) => number;
+    merge: (a: T, b: U) => void;
+    convert: (item: U) => T;
+    map: Map<string, T>;
+  }
+) {
+  const insert = (where: number, item: T) => {
+    map.set(identify(item), item);
+    a.splice(where, 0, item);
+  };
+
+  for (const item of b) {
+    const id = identify(item);
+    const existing = map.get(id);
+    if (existing) merge(existing, item);
+    else binsert(a, convert(item), { insert, compare });
+  }
+}
+
+/**
+ * Returns results from the generator in batches.
+ * @param generator Generator to take batches from
+ */
+export async function* batch<T>(generator: AsyncGenerator<T>) {
+  let next = generator.next();
+  let batch: T[] = [];
+  for (;;) {
+    const result = await Promise.race([next, delay(16)]);
+    if (!result) {
+      if (batch.length) yield batch;
+      batch = [];
+      continue;
+    }
+
+    const { value, done } = result;
+    if (done) {
+      if (batch.length) yield batch;
+      return;
+    }
+
+    next = generator.next();
+    batch.push(value);
+  }
 }
 
 /**

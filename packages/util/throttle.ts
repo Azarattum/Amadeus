@@ -67,5 +67,17 @@ export function debounce<T extends Func>(func: T, delay = 300) {
  * @param duration Delay duration
  */
 export function delay(duration: number) {
-  return new Promise((resolve) => setTimeout(resolve, duration));
+  if (duration === Infinity) return new Promise<void>(() => {});
+  return new Promise<void>((resolve) => setTimeout(resolve, duration));
+}
+
+/**
+ * Creates an asynchronous lock that can be waited
+ * from multiple places and resolved at any moment.
+ */
+export function lock() {
+  const resolves = new Set<() => void>();
+  const wait = () => new Promise<void>((r) => resolves.add(r));
+  const resolve = () => (resolves.forEach((x) => x()), resolves.clear());
+  return { wait, resolve };
 }

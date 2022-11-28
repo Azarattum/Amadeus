@@ -88,3 +88,11 @@ export function prefix(words: string[]) {
 
   return words[0].substring(0, i);
 }
+
+/**
+ * Normalizes and cleans given text
+ * @param text Text to clean
+ */
+export function clean(text: string) {
+  return text.normalize().trim().toLowerCase().replace(/\s/g, " ");
+}
