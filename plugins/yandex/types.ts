@@ -53,7 +53,7 @@ function convert(track: Infer<typeof Track>) {
         track.coverUri.slice(0, track.coverUri.length - 2) +
         "800x800"
       : undefined,
-    sources: [`amadeus://yandex/${track.id}`],
+    source: `amadeus://yandex/${track.id}`,
     length: track.durationMs / 1000,
   };
 }

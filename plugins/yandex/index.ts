@@ -21,7 +21,8 @@ search(function* (type, query) {
       type,
       text: query,
       nococrrect: "false",
-      "page-size": "20",
+      /// Consider page size
+      "page-size": "30",
       page: (page++).toString(),
     };
 

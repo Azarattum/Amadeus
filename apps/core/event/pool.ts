@@ -1,4 +1,4 @@
-import type { Album, Artist, Source, Track } from "@amadeus-music/protocol";
+import type { Album, Artist, Source, Record } from "@amadeus-music/protocol";
 import type { BaseConfig } from "../data/config";
 import { pools } from "libfun";
 
@@ -14,7 +14,7 @@ const stop = pool("stop");
 
 // Aggregator events
 const search = pool<
-  | ((type: "track", query: string) => Track)
+  | ((type: "track", query: string) => Record)
   | ((type: "album", query: string) => Album)
   | ((type: "artist", query: string) => Artist)
 >("search");

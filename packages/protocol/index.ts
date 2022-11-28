@@ -5,19 +5,31 @@ import {
   array,
   optional,
   type Infer,
+  intersection,
+  omit,
 } from "superstruct";
 
-type Track = Infer<typeof track>;
-const track = object({
+type Record = Infer<typeof record>;
+const record = object({
   title: string(),
   artists: array(string()),
   album: string(),
 
   length: number(),
+  source: string(),
   year: optional(number()),
   cover: optional(string()),
-  sources: array(string()),
 });
+
+type Track = Infer<typeof track>;
+const track = intersection([
+  omit(record, ["cover", "source"]),
+  object({
+    id: string(),
+    cover: array(string()),
+    source: array(string()),
+  }),
+]);
 
 type Source = Infer<typeof source>;
 const source = object({
@@ -34,5 +46,5 @@ const album = object({
   /// Formalize an album representation
 });
 
-export { track, artist, album, source };
-export type { Track, Artist, Album, Source };
+export { track, record, artist, album, source };
+export type { Track, Record, Artist, Album, Source };
