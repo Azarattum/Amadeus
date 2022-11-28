@@ -1,4 +1,5 @@
 import {
+  any,
   intersection,
   literal,
   number,
@@ -49,7 +50,7 @@ const Post = type({
   }),
 });
 
-const Query = type({});
+const Query = any();
 
 const Callback = type({
   callback_query: type({

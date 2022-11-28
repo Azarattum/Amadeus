@@ -11,9 +11,11 @@ import {
   invite,
   callback,
   search,
+  desource,
 } from "./plugin";
-import { async, http, take, fetch } from "@amadeus-music/core";
+import { async, http, take, fetch, first } from "@amadeus-music/core";
 import { bright, reset } from "@amadeus-music/util/color";
+import { keyboard, escape, markdown } from "./markup";
 import { plural } from "@amadeus-music/util/string";
 import { secret, request } from "./update";
 import { Me } from "./types";
@@ -23,7 +25,9 @@ init(function* (config) {
   if (!token) throw "Please set a bot token!";
   this.fetch.baseURL = `https://api.telegram.org/bot${token}/`;
   this.state.users = Object.fromEntries(
-    Object.entries(config.users).map(([name, user]) => [name, user.telegram])
+    Object.entries(config.users)
+      .filter((x) => x[1].telegram !== -1)
+      .map(([name, user]) => [name, user.telegram])
   );
 
   if (!webhook) throw "Please set a webhook URL!";
@@ -51,15 +55,18 @@ message(function* (text) {
   if (!length) wrn(`No results found for "${text}"!`);
   else info(`Found ${length} ${plural("result", length)} for "${text}"!`);
 
+  const results = tracks.map((x) => `${x.artists.join(", ")} - ${x.title}`);
+  const sources = tracks.map((x) => JSON.stringify(x.sources));
+
   /// Make an actual response! (with pages, etc)
   yield* fetch("sendMessage", {
     params: {
+      ...markdown(),
+      text: `🔎 *${escape(text)}*`,
       chat_id: this.chat,
-      text: tracks
-        .map((x) => `${x.artists.join(", ")} - ${x.title}`)
-        .join("\n"),
+      ...keyboard(results, sources),
     },
-  }).flush();
+  }).text();
 });
 
 command((command) => {
@@ -82,6 +89,19 @@ invite((chat, title) => {
   info("invite", chat, title);
 });
 
-callback((request, message, chat) => {
-  info("callback", request, message, chat);
+callback(function* (request, message, chat) {
+  /// Handles more than source
+  const sources = JSON.parse(request) as string[];
+  info(`Sourcing ${request} for ${this.name}...`);
+  const { url } = yield* async(first(desource(sources)));
+
+  info(url);
+  yield* fetch("sendAudio", {
+    params: {
+      chat_id: this.chat,
+      audio: url,
+      performer: "test",
+      title: "hello",
+    },
+  }).flush();
 });

@@ -11,7 +11,7 @@ import {
 import { name, version } from "./package.json";
 import { Me, Query } from "./types";
 
-export const { info, err, wrn, init, stop, search, pool } = register({
+export const { info, err, wrn, init, stop, search, desource, pool } = register({
   name,
   version,
   config: {

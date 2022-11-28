@@ -1,11 +1,11 @@
 import { convert, Download, Source, Tracks } from "./types";
-import { init, wrn, search, desource } from "./plugin";
+import { init, search, desource } from "./plugin";
 import { fetch } from "@amadeus-music/core";
 import { createHash } from "node:crypto";
 
 init(function* (config) {
   const { token } = config.yandex;
-  if (!token) return wrn("Plugin disabled! No token found!");
+  if (!token) throw "Plugin disabled! No token found!";
   this.fetch.baseURL = "https://api.music.yandex.net/";
   this.fetch.headers = {
     "User-Agent": "Yandex-Music-API",
