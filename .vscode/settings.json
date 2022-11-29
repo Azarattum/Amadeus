@@ -61,7 +61,8 @@
     "unprefixes",
     "unwrappable",
     "vitest",
-    "Wrappable"
+    "Wrappable",
+    "Xlekgb"
   ],
   "eslint.validate": ["javascript", "typescript", "svelte"],
   "prettier.documentSelectors": ["**/*.svelte"],

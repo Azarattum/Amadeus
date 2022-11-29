@@ -43,8 +43,8 @@ function register<
 }
 
 export { register, usage };
+export * from "../data/aggregate";
 export { http } from "../network/http";
-export { tracks } from "../data/aggregate";
 export { inferTrack, inferArtists } from "../data/infer";
 export { fetch, fetcher, type FetchOptions } from "../network/fetch";
 

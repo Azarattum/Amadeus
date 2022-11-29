@@ -54,6 +54,7 @@ message(function* (text) {
   yield* map(aggregator, function* ({ page }) {
     /// Properly use pagination, cache page status
     const results = page.map((x) => `${x.artists.join(", ")} - ${x.title}`);
+    /// Move to an `id` based system & caches
     const sources = page.map((x) => JSON.stringify(x.source));
 
     /// Edit message

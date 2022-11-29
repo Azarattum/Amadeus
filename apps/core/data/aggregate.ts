@@ -1,36 +1,43 @@
-import type { Record, Track } from "@amadeus-music/protocol";
+import type {
+  Track,
+  Media,
+  Unique,
+  Artist,
+  Album,
+} from "@amadeus-music/protocol";
 import { batch, combine } from "@amadeus-music/util/object";
 import { stringSimilarity } from "string-similarity-js";
 import { lock } from "@amadeus-music/util/throttle";
 import { clean } from "@amadeus-music/util/string";
+import { identify, normalize } from "./identity";
 import { merge as parallel } from "libfun/pool";
-import { identify, normalize } from "./track";
 import { search } from "../event/pool";
 import { inferTrack } from "./infer";
 import { pipe } from "libfun";
 
 /// Probably should be a pool, consider aborts, consider status graph...
-function tracks(query: string, page = 10) {
-  /// Consider source parsing
+function aggregate<T extends Media>(
+  type: "track" | "artist" | "album",
+  query: string,
+  page = 10
+) {
   const providers = pipe(search.status())(
     (x) => Array.from(x.listeners),
     (x) => x.map((x) => x.group),
     (x) => x.filter((x) => x) as string[],
     (x) => [...new Set(x)],
     /// Native libfun implementation for proper status reports
-    (x) => x.map((x) => batch(search.where(x)("track", query)))
+    (x) => x.map((x) => batch<T>(search.where(x)(type as any, query) as any))
   );
 
-  const map = new Map<string, Track>();
-  const aggregated: Track[] = [];
+  const map = new Map<string, Unique<T>>();
+  const aggregated: Unique<T>[] = [];
   const compare = match(query);
-  const convert = (x: Record) => ({
-    ...x,
-    id: identify(x),
-    artists: x.artists.sort(),
-    cover: x.cover ? [x.cover] : [],
-    source: x.source ? [x.source] : [],
-  });
+  const convert = (x: T) => {
+    const unique = { ...x, id: identify(x) };
+    if ("artists" in unique) unique.artists.sort();
+    return unique;
+  };
 
   const pages = { shown: 0, current: 0, last: 0 };
   const state = () => {
@@ -73,7 +80,7 @@ function tracks(query: string, page = 10) {
   });
 }
 
-function merge(target: Track, source: Record) {
+function merge<T extends Media>(target: Unique<T>, source: T) {
   const upperLetters = (text: string) => {
     let count = 0;
     const lower = text.toLowerCase();
@@ -85,51 +92,60 @@ function merge(target: Track, source: Record) {
   const better = (a: string, b: string) =>
     upperLetters(a) > upperLetters(b) ? a : b;
 
-  if (source.source) target.source.push(source.source);
-  if (source.cover) target.cover.push(source.cover);
-  if (
-    target.album.toLowerCase() === target.title.toLowerCase() &&
-    source.album.toLowerCase() !== target.title.toLowerCase()
-  ) {
-    target.album = source.album;
-  } else target.album = better(target.album, source.album);
-
-  target.year ||= source.year;
-  target.length ||= source.length;
   target.title = better(target.title, source.title);
 
-  source.artists.sort();
-  target.artists = target.artists.map((x, i) => better(x, source.artists[i]));
+  if (source.art) target.art.push(...source.art);
+  if (source.source) target.source.push(...source.source);
+  if ("year" in target && "year" in source) target.year ||= source.year;
+  if ("length" in target && "length" in source) target.length ||= source.length;
+  if ("name" in target && "name" in source) {
+    target.title = better(target.title, source.title);
+  }
+  if ("artists" in target && "artists" in source) {
+    source.artists.sort();
+    target.artists = target.artists.map((x, i) => better(x, source.artists[i]));
+  }
+  if ("album" in target && "album" in source) {
+    if (
+      target.album.toLowerCase() === target.title.toLowerCase() &&
+      source.album.toLowerCase() !== target.title.toLowerCase()
+    ) {
+      target.album = source.album;
+    } else target.album = better(target.album, source.album);
+  }
 }
 
-function match(query: string) {
-  const trackQ = normalize(inferTrack(query));
-  const cleanQ = clean(query);
-  const compare = (x: typeof trackQ, key: keyof typeof trackQ) =>
-    Math.max(
-      stringSimilarity(x[key], trackQ[key]),
-      stringSimilarity(x[key], cleanQ)
-    );
+function match<T extends Media>(query: string) {
+  const track = normalize(inferTrack(query));
+  query = clean(query);
 
-  return (a: Track, b: Track) => {
-    const trackA = normalize(a);
-    const trackB = normalize(b);
+  const compare = (x: T, key: string) => {
+    const target = (x as any)[key]?.toString();
+    const source = (track as any)[key]?.toString();
+    if (!target) return 0;
+    const withQuery = stringSimilarity(target, query);
+    if (!source) return withQuery;
+    return Math.max(withQuery, stringSimilarity(target, source));
+  };
 
-    const titleA = compare(trackA, "title");
-    const titleB = compare(trackB, "title");
-    const artistsA = compare(trackA, "artists");
-    const artistsB = compare(trackB, "artists");
-    const albumA = compare(trackA, "album");
-    const albumB = compare(trackB, "album");
+  return (a: T, b: T) => {
+    a = normalize(a) as T;
+    b = normalize(b) as T;
 
-    const title = titleA - titleB * 4;
-    if (!title && titleA === 1) return 0;
-    const artists = artistsA - artistsB * 2;
-    if (!artists && artistsA === 1) return 0;
-    const album = albumA - albumB;
-    if (!album && albumA === 1) return 0;
-    return -(title + artists + album);
+    const keys = ["title", "artists", "album"];
+    const weights = [4, 2, 1];
+
+    const scores = keys.map((key) => [compare(a, key), compare(b, key)]);
+    if (scores.find((x) => x[0] === x[1] && x[0] === 1)) return 0;
+    return scores.reduce((acc, [a, b], i) => acc + (b - a) * weights[i], 0);
   };
 }
 
-export { tracks };
+const tracks = (query: string, page = 10) =>
+  aggregate<Track>("track", query, page);
+const artists = (query: string, page = 10) =>
+  aggregate<Artist>("artist", query, page);
+const albums = (query: string, page = 10) =>
+  aggregate<Album>("album", query, page);
+
+export { tracks, artists, albums };

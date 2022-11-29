@@ -3,48 +3,55 @@ import {
   number,
   string,
   array,
-  optional,
   type Infer,
   intersection,
+  Struct,
+  union,
   omit,
+  nullable,
 } from "superstruct";
+import type { ObjectSchema, ObjectType } from "superstruct/dist/utils";
 
-type Record = Infer<typeof record>;
-const record = object({
+type Track = Infer<typeof track>;
+const track = object({
   title: string(),
   artists: array(string()),
   album: string(),
-
+  year: nullable(number()),
+  source: array(string()),
+  art: array(string()),
   length: number(),
-  source: string(),
-  year: optional(number()),
-  cover: optional(string()),
 });
 
-type Track = Infer<typeof track>;
-const track = intersection([
-  omit(record, ["cover", "source"]),
-  object({
-    id: string(),
-    cover: array(string()),
-    source: array(string()),
-  }),
-]);
+type Artist = Infer<typeof artist>;
+const artist = object({
+  title: string(),
+  source: array(string()),
+  art: array(string()),
+});
+
+type Album = Infer<typeof album>;
+const album = object({
+  title: string(),
+  source: array(string()),
+  art: array(string()),
+});
+
+type Unique<T> = T & { id: string };
+const unique = <T extends Struct<any>>(t: T) =>
+  intersection([t, object({ id: string() })]);
+
+type Abstract<T> = T extends any ? Omit<T, "source" | "art" | "length"> : never;
+const abstract = <T extends ObjectSchema>(t: Struct<ObjectType<T>, T>) =>
+  omit(t, ["source", "art", "length"]);
+
+type Media = Infer<typeof media>;
+const media = union([track, artist, album]);
 
 type Source = Infer<typeof source>;
 const source = object({
   url: string(),
 });
 
-type Artist = Infer<typeof artist>;
-const artist = object({
-  /// Formalize an artist representation
-});
-
-type Album = Infer<typeof album>;
-const album = object({
-  /// Formalize an album representation
-});
-
-export { track, record, artist, album, source };
-export type { Track, Record, Artist, Album, Source };
+export { media, track, artist, album, source, unique, abstract };
+export type { Media, Track, Artist, Album, Source, Unique, Abstract };

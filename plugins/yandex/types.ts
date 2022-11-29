@@ -48,13 +48,17 @@ function convert(track: Infer<typeof Track>) {
     title: track.title,
     artists: track.artists.map((x) => x.name),
     album: track.albums[0]?.title || track.title,
-    cover: track.coverUri
-      ? "https://" +
-        track.coverUri.slice(0, track.coverUri.length - 2) +
-        "800x800"
-      : undefined,
-    source: `amadeus://yandex/${track.id}`,
+    art: track.coverUri
+      ? [
+          "https://" +
+            track.coverUri.slice(0, track.coverUri.length - 2) +
+            "800x800",
+        ]
+      : [],
+    source: [`amadeus://yandex/${track.id}`],
     length: track.durationMs / 1000,
+    /// INVESTIGATE: Yandex doesn't returns a year?
+    year: null,
   };
 }
 
