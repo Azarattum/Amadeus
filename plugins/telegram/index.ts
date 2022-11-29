@@ -41,7 +41,7 @@ init(function* (config) {
 });
 
 stop(() => {
-  http().off("request", request);
+  http(false).off("request", request);
 });
 
 message(function* (text) {
