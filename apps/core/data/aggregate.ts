@@ -44,8 +44,9 @@ function aggregate<T extends Media>(
     const start = pages.current * page;
     const end = start + page;
     return {
-      page: aggregated.splice(start, end),
+      page: aggregated.slice(start, end),
       all: aggregated,
+      at: pages.current,
     };
   };
 
@@ -55,6 +56,7 @@ function aggregate<T extends Media>(
     return (async function* () {
       let loaded = 0;
       for await (const batch of generator) {
+        /// Consider page consistency...
         combine(aggregated, batch, options);
         loaded += batch.length;
         yield state();

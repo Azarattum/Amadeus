@@ -1,9 +1,34 @@
-function keyboard(buttons: string[], callbacks: string[]) {
+type Buttons = { text: string; callback: Record<string, any> }[][];
+
+function pager(id: string, page: number, options: Buttons[number]) {
+  const controls: Buttons = [[], []];
+  if (page > 0) {
+    controls[0].push({
+      text: "👈",
+      callback: { page: id, number: page - 1 },
+    });
+  }
+  controls[0].push({
+    text: "👉",
+    callback: { page: id, number: page + 1 },
+  });
+  controls[1].push({
+    text: "🗑️",
+    callback: { invalidate: id },
+  });
+
+  return keyboard([...options.map((x) => [x]), ...controls]);
+}
+
+function keyboard(buttons: Buttons) {
   return {
     reply_markup: JSON.stringify({
-      inline_keyboard: buttons.map((x, i) => [
-        { text: x, callback_data: callbacks[i] },
-      ]),
+      inline_keyboard: buttons.map((x) =>
+        x.map(({ text, callback }) => ({
+          text,
+          callback_data: JSON.stringify(callback),
+        }))
+      ),
     }),
   };
 }
@@ -36,4 +61,4 @@ function markdown() {
   };
 }
 
-export { keyboard, markdown, escape };
+export { keyboard, markdown, escape, pager };

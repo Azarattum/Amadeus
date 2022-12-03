@@ -9,13 +9,20 @@ import {
   post,
   invite,
   callback,
-  desource,
 } from "./plugin";
-import { async, http, fetch, first, map, tracks } from "@amadeus-music/core";
+import {
+  http,
+  fetch,
+  map,
+  tracks,
+  cache,
+  identify,
+  invalidate,
+} from "@amadeus-music/core";
+import { Download, Invalidate, Me, Page, Sent } from "./types";
 import { bright, reset } from "@amadeus-music/util/color";
-import { keyboard, escape, markdown } from "./markup";
+import { escape, markdown, pager } from "./markup";
 import { secret, request } from "./update";
-import { Me } from "./types";
 
 init(function* (config) {
   const { token, webhook } = config.telegram;
@@ -46,28 +53,51 @@ stop(() => {
 
 message(function* (text) {
   info(`${this.name} is searching for "${text}"...`);
-
-  const aggregator = tracks(text, 5);
+  const aggregator = tracks(text, 9);
+  const id = identify(text);
   const chat = this.chat;
 
-  /// Fix `this` mapped in context
-  yield* map(aggregator, function* ({ page }) {
-    /// Properly use pagination, cache page status
-    const results = page.map((x) => `${x.artists.join(", ")} - ${x.title}`);
-    /// Move to an `id` based system & caches
-    const sources = page.map((x) => JSON.stringify(x.source));
+  const {
+    result: { message_id },
+  } = yield* fetch("sendMessage", {
+    params: {
+      ...markdown(),
+      chat_id: chat,
+      text: "⏳",
+    },
+  }).as(Sent);
 
-    /// Edit message
-    yield* fetch("sendMessage", {
+  cache(id, aggregator, {
+    invalidator: () => {
+      /// This breaks badly (because not in the pool!)
+      fetch("deleteMessage", {
+        params: {
+          chat_id: chat,
+          message_id: message_id.toString(),
+        },
+      }).flush();
+    },
+  });
+
+  /// Make this somewhat independent (from the parent pool (consider))
+  yield* map(aggregator, function* ({ page, at }) {
+    const buttons = page.map((x) => ({
+      text: `${x.artists.join(", ")} - ${x.title}`,
+      callback: { download: x.id },
+    }));
+
+    yield* fetch("editMessageText", {
       params: {
-        ...markdown(),
-        text: `🔎 *${escape(text)}*`,
+        message_id: message_id.toString(),
         chat_id: chat,
-        /// Special keyboard for pages
-        ...keyboard(results, sources),
+
+        text: `🔎 *${escape(text)}*`,
+        ...pager(id, at, buttons),
+        ...markdown(),
       },
     }).text();
   });
+  /// Invalidate when nothing
 });
 
 command((command) => {
@@ -90,19 +120,25 @@ invite((chat, title) => {
   info("invite", chat, title);
 });
 
-callback(function* (request, message, chat) {
-  /// Handles more than source
-  const sources = JSON.parse(request) as string[];
-  info(`Sourcing ${request} for ${this.name}...`);
-  const { url } = yield* async(first(desource(sources)));
-
-  info(url);
-  yield* fetch("sendAudio", {
-    params: {
-      chat_id: this.chat,
-      audio: url,
-      performer: "test",
-      title: "hello",
-    },
-  }).flush();
+callback(function* (action, message, chat) {
+  if (Page.is(action)) {
+    const aggregator = cache(action.page) as { page: (number: number) => void };
+    if (!aggregator) return; /// Handle gracefully
+    aggregator.page(action.number);
+  } else if (Invalidate.is(action)) {
+    invalidate(action.invalidate);
+  } else if (Download.is(action)) {
+    /// Fetch from db
+    // info(`Sourcing ${request} for ${this.name}...`);
+    // const { url } = yield* async(first(desource(action.download)));
+    // info(url);
+    // yield* fetch("sendAudio", {
+    //   params: {
+    //     chat_id: this.chat,
+    //     audio: url,
+    //     performer: "test",
+    //     title: "hello",
+    //   },
+    // }).flush();
+  }
 });

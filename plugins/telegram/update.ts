@@ -10,8 +10,8 @@ import {
   update,
 } from "./plugin";
 import { Text, Audio, Voice, Post, Callback, Invite, Sender } from "./types";
+import { map, take, fetch } from "@amadeus-music/core";
 import { IncomingMessage, ServerResponse } from "http";
-import { map, take } from "@amadeus-music/core";
 
 const secret = crypto.randomUUID();
 
@@ -48,6 +48,7 @@ function* verify(update: unknown) {
     sender.channel_post?.chat.id ||
     sender.message?.chat.id ||
     sender.my_chat_member?.chat.id;
+  const message = sender.message?.message_id || sender.channel_post?.message_id;
 
   if (Post.is(update)) {
     /// TODO: Verify channel posts
@@ -58,6 +59,15 @@ function* verify(update: unknown) {
   if (!from) throw "The update does not have a sender!";
   const entry = Object.entries(this.state.users).find((x) => x[1] === from.id);
   if (!entry) throw `Unauthorized access from @${from.username} (${from.id})!`;
+
+  if (message && chat) {
+    fetch("deleteMessage", {
+      params: {
+        chat_id: chat?.toString(),
+        message_id: message.toString(),
+      },
+    }).flush();
+  }
 
   return { chat: chat?.toString(), name: entry[0] };
 }
@@ -81,13 +91,13 @@ async function* handle(update: unknown) {
   }
   if (Callback.is(update)) {
     const { data, from, message } = update.callback_query;
-    yield* callback(data, message.message_id, from.id);
+    const action = JSON.parse(data);
+    yield* callback(action, message.message_id, from.id);
   }
   if (Invite.is(update)) {
     const { chat } = update.my_chat_member;
     yield* invite(chat.id, chat.title);
   }
-  /// AutoRemove message?
 }
 
 export { request, secret };

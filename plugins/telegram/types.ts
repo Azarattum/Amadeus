@@ -1,12 +1,28 @@
 import {
-  any,
   intersection,
+  optional,
   literal,
   number,
-  optional,
+  object,
   string,
   type,
+  union,
 } from "@amadeus-music/core";
+
+const Download = object({
+  download: string(),
+});
+
+const Page = object({
+  page: string(),
+  number: number(),
+});
+
+const Invalidate = object({
+  invalidate: string(),
+});
+
+const Query = union([Download, Page, Invalidate]);
 
 const Text = type({
   message: type({
@@ -50,11 +66,9 @@ const Post = type({
   }),
 });
 
-const Query = any();
-
 const Callback = type({
   callback_query: type({
-    data: Query,
+    data: string(),
     message: type({
       message_id: number(),
     }),
@@ -84,6 +98,7 @@ const Me = type({
 });
 
 const From = type({
+  message_id: optional(number()),
   from: type({
     id: number(),
     username: optional(string()),
@@ -91,6 +106,7 @@ const From = type({
 });
 
 const Chat = type({
+  message_id: optional(number()),
   chat: type({
     id: number(),
   }),
@@ -103,4 +119,25 @@ const Sender = type({
   channel_post: optional(Chat),
 });
 
-export { Text, Audio, Voice, Post, Me, Query, Callback, Invite, Sender };
+const Sent = type({
+  ok: literal(true),
+  result: type({
+    message_id: number(),
+  }),
+});
+
+export {
+  Invalidate,
+  Callback,
+  Download,
+  Invite,
+  Sender,
+  Query,
+  Audio,
+  Voice,
+  Text,
+  Sent,
+  Page,
+  Post,
+  Me,
+};
