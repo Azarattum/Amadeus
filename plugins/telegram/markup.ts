@@ -21,16 +21,14 @@ function pager(id: string, page: number, options: Buttons[number]) {
 }
 
 function keyboard(buttons: Buttons) {
-  return {
-    reply_markup: JSON.stringify({
-      inline_keyboard: buttons.map((x) =>
-        x.map(({ text, callback }) => ({
-          text,
-          callback_data: JSON.stringify(callback),
-        }))
-      ),
-    }),
-  };
+  return JSON.stringify({
+    inline_keyboard: buttons.map((x) =>
+      x.map(({ text, callback }) => ({
+        text,
+        callback_data: JSON.stringify(callback),
+      }))
+    ),
+  });
 }
 
 function escape(text: string) {
@@ -56,9 +54,7 @@ function escape(text: string) {
 }
 
 function markdown() {
-  return {
-    parse_mode: "MarkdownV2",
-  };
+  return "MarkdownV2";
 }
 
 export { keyboard, markdown, escape, pager };

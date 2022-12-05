@@ -109,6 +109,7 @@ const Chat = type({
   message_id: optional(number()),
   chat: type({
     id: number(),
+    type: string(),
   }),
 });
 

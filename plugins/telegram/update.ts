@@ -13,6 +13,7 @@ import {
 import { Text, Audio, Voice, Post, Callback, Invite, Sender } from "./types";
 import { IncomingMessage, ServerResponse } from "http";
 import { map, take } from "@amadeus-music/core";
+import { replier, editor } from "./reply";
 
 const secret = crypto.randomUUID();
 
@@ -38,42 +39,54 @@ update(function* (body) {
   yield* map(handle.bind(this)(data));
 });
 
-function* verify(update: unknown) {
+function* verify(
+  this: { state: { users: Record<string, number> } },
+  update: unknown
+) {
   const sender = Sender.create(update);
   const from =
     sender.callback_query?.from ||
     sender.my_chat_member?.from ||
     sender.message?.from;
   const chat =
-    sender.callback_query?.message.chat.id ||
-    sender.channel_post?.chat.id ||
-    sender.message?.chat.id ||
-    sender.my_chat_member?.chat.id;
+    sender.callback_query?.message.chat ||
+    sender.channel_post?.chat ||
+    sender.message?.chat ||
+    sender.my_chat_member?.chat;
   const message = sender.message?.message_id || sender.channel_post?.message_id;
+  if (!chat) throw "Failed to get a chat from update!";
 
   if (Post.is(update)) {
     /// TODO: Verify channel posts
     //    Look for channel id in user's playlists
-    return { chat: chat?.toString() };
+    return { chat: chat.id };
   }
 
   if (!from) throw "The update does not have a sender!";
   const entry = Object.entries(this.state.users).find((x) => x[1] === from.id);
   if (!entry) throw `Unauthorized access from @${from.username} (${from.id})!`;
 
-  if (message && chat) {
+  if (message) {
     fetch("deleteMessage", {
       params: {
-        chat_id: chat?.toString(),
+        chat_id: chat?.id.toString(),
         message_id: message.toString(),
       },
     }).flush();
   }
 
-  return { chat: chat?.toString(), name: entry[0] };
+  return {
+    chat: chat.id,
+    name: entry[0],
+    edit: editor(chat.id),
+    reply: replier(chat.id, chat.type !== "private"),
+  };
 }
 
-async function* handle(update: unknown) {
+async function* handle(
+  this: { state: { me: { username: string } } },
+  update: unknown
+) {
   if (Voice.is(update)) yield* voice(update.message.voice.file_id);
   if (Text.is(update)) {
     const { text, reply_to_message } = update.message;

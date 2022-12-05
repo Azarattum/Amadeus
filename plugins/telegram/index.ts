@@ -11,16 +11,9 @@ import {
   invite,
   callback,
 } from "./plugin";
-import {
-  map,
-  http,
-  tracks,
-  cache,
-  identify,
-  invalidate,
-} from "@amadeus-music/core";
-import { Download, Invalidate, Me, Page, Sent } from "./types";
+import { http, tracks, cache, identify, invalidate } from "@amadeus-music/core";
 import { bright, reset } from "@amadeus-music/util/color";
+import { Download, Invalidate, Me, Page } from "./types";
 import { escape, markdown, pager } from "./markup";
 import { secret, request } from "./update";
 
@@ -57,50 +50,47 @@ message(function* (text) {
   const id = identify(text);
   const chat = this.chat;
 
-  const {
-    result: { message_id },
-  } = yield* fetch("sendMessage", {
-    params: {
-      ...markdown(),
-      chat_id: chat,
-      text: "⏳",
-    },
-  }).as(Sent);
+  const { message_id: message } = yield* this.reply({ text: "⏳" });
 
   cache(id, aggregator, {
     invalidator: () => {
+      /// The returns does not work! Aggregator is still there!
+      aggregator.return([]);
       fetch("deleteMessage", {
         params: {
-          chat_id: chat,
-          message_id: message_id.toString(),
+          message_id: message.toString(),
+          chat_id: chat.toString(),
         },
       }).flush();
     },
   });
 
+  /// Save pages to cache
+  //   Need to have some kind of message cache
+  //   (with messages, aggregators & temp states)
   /// Make this somewhat independent (from the parent pool (consider))
-  yield* map(aggregator, function* ({ page, at }) {
+
+  /// FIX! This hangs indefinitely!
+  yield* this.edit(message, aggregator, ({ page, at }) => {
     const buttons = page.map((x) => ({
       text: `${x.artists.join(", ")} - ${x.title}`,
       callback: { download: x.id },
     }));
 
-    yield* fetch("editMessageText", {
-      params: {
-        message_id: message_id.toString(),
-        chat_id: chat,
-
-        text: `🔎 *${escape(text)}*`,
-        ...pager(id, at, buttons),
-        ...markdown(),
-      },
-    }).text();
+    return {
+      mode: markdown(),
+      text: `🔎 *${escape(text)}*`,
+      markup: pager(id, at, buttons),
+    };
   });
   /// Invalidate when nothing
 });
 
-command((command) => {
-  info("command", command);
+command(function* (command) {
+  if (command === "start") {
+    yield* this.reply({ text: "👋" });
+    /// Add to temp messages
+  }
 });
 
 mention((chat) => {

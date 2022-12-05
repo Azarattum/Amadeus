@@ -9,6 +9,7 @@ import {
   type,
 } from "@amadeus-music/core";
 import { name, version } from "./package.json";
+import { Reply, Edit } from "./reply";
 import { Me, Query } from "./types";
 
 export const { info, err, wrn, init, stop, search, desource, pool, fetch } =
@@ -31,8 +32,10 @@ export const { info, err, wrn, init, stop, search, desource, pool, fetch } =
       ),
     },
     context: {
-      chat: "",
+      chat: 0,
       name: "",
+      edit: null as any as Edit,
+      reply: null as any as Reply,
       state: {
         users: {} as Record<string, number>,
         me: {} as Infer<typeof Me>["result"],
