@@ -1,4 +1,5 @@
-const caches = new Map<string, { value: unknown; invalidator: Invalidator }>();
+type Cache = { value: unknown; invalidator: Invalidator; timeout: any };
+const caches = new Map<string, Cache>();
 
 type Invalidator<T = unknown> = (value: T) => void;
 interface Options<T = unknown> {
@@ -20,10 +21,13 @@ function cache<T>(
   options?: Partial<Options<T>>
 ): void;
 function cache(key: string, value?: unknown, options: Partial<Options> = {}) {
-  if (value === undefined) return caches.get(key)?.value;
+  const existing = caches.get(key);
+  if (value === undefined) return existing?.value;
+
+  clearTimeout(existing?.timeout);
   const { lifetime, invalidator } = { ...defaults, ...options };
-  setTimeout(() => invalidate(key), lifetime);
-  caches.set(key, { value, invalidator });
+  const timeout = setTimeout(() => invalidate(key), lifetime);
+  caches.set(key, { value, invalidator, timeout });
 }
 
 function invalidate(key?: string) {
