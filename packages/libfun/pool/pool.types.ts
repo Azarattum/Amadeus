@@ -69,12 +69,14 @@ type Handler<T extends Fn, C = unknown> = ((
   group?: string;
 };
 
-type Caller<T> = Intersected<
+type Caller<T, Split = false> = Intersected<
   T extends (..._: infer A) => infer R
     ? (
         this: Override,
         ...args: A
-      ) => AsyncGenerator<R, void> & { executor: Executor }
+      ) => Split extends false
+        ? AsyncGenerator<R, void> & { executor: Executor }
+        : Map<string, AsyncGenerator<R, void> & { executor: Executor }>
     : unknown
 >;
 
@@ -94,6 +96,7 @@ type Pool<T extends Fn = (..._: any) => any, C extends Ctx = unknown> = {
   drain: (filter?: Filter) => void;
   close: (filter?: Filter) => void;
   status: () => State<T, C>;
+  split(): Caller<T, true>;
 
   [state: symbol]: State<T, C>;
 } & Caller<T> &

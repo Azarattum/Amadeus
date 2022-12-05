@@ -416,3 +416,24 @@ for await (const item of generator) {
 }
 ```
 </details>
+
+<details><summary>🌓 <b>Split pool generators by group</b></summary>
+
+```ts
+const event = pool("event");
+const a = event.bind({ group: "a" });
+const b = event.bind({ group: "b" });
+a(function* () { ... });
+b(function* () { ... });
+
+// Split generators by groups and call them
+const map = event.split()(); // Map<string, AsyncGenerator>
+
+for await (const item of map.get("a")) {
+  // Stuff from group "a"
+}
+for await (const item of map.get("b")) {
+  // Stuff from group "b"
+}
+```
+</details>

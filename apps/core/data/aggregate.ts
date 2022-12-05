@@ -13,7 +13,6 @@ import { identify, normalize } from "./identity";
 import { merge as parallel } from "libfun/pool";
 import { search } from "../event/pool";
 import { inferTrack } from "./infer";
-import { pipe } from "libfun";
 
 /// Probably should be a pool, consider aborts, consider status graph...
 function aggregate<T extends Media>(
@@ -21,14 +20,11 @@ function aggregate<T extends Media>(
   query: string,
   page = 10
 ) {
-  const providers = pipe(search.status())(
-    (x) => Array.from(x.listeners),
-    (x) => x.map((x) => x.group),
-    (x) => x.filter((x) => x) as string[],
-    (x) => [...new Set(x)],
-    /// Native libfun implementation for proper status reports
-    (x) => x.map((x) => batch<T>(search.where(x)(type as any, query) as any))
-  );
+  const providers = [
+    ...search
+      .split()(type as any, query)
+      .values(),
+  ].map((x: any) => batch<T>(x));
 
   const map = new Map<string, Unique<T>>();
   const aggregated: Unique<T>[] = [];

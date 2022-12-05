@@ -160,6 +160,44 @@ function pools(options: Partial<Options> = {}): Pools {
       const context = { group, filter };
       return Function.bind.call(this as any, context) as any;
     },
+    split() {
+      const group = this[state].group;
+      return (...args: any[]) => {
+        const results = new Map();
+        let main = null as Executor | null;
+        const groups = new Set(
+          [...this[state].listeners]
+            .map((x) => x.group as string)
+            .filter((x) => x)
+        );
+
+        groups.forEach((filter) => {
+          const context = { group, filter };
+          const generator = (this as any).bind(context)(...args);
+          const current = generator.executor as Executor;
+
+          if (!main) main = current;
+          else {
+            const abort = () => (current.controller.abort(), remove());
+            const remove = () => {
+              main?.controller.signal.removeEventListener("abort", abort);
+              current.controller.signal.removeEventListener("abort", remove);
+            };
+            main.controller.signal.addEventListener("abort", abort);
+            current.controller.signal.addEventListener("abort", remove);
+            current.tasks.forEach((x) => main?.tasks.add(x));
+            current.tasks = main.tasks;
+            generator.executor = main;
+            this[state].pending.delete(current);
+            this[state].executing.delete(current);
+          }
+
+          results.set(filter, generator);
+        });
+
+        return results;
+      };
+    },
     context(context) {
       this.bind({ context });
     },
@@ -188,6 +226,7 @@ function pools(options: Partial<Options> = {}): Pools {
     drain: each("drain"),
     close: each("close"),
     where: each("where"),
+    split: each("split"),
     count: () => all.size,
     catch(handler) {
       catchers.add(handler || (() => {}));

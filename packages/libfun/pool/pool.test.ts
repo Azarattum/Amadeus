@@ -668,4 +668,38 @@ it("aborts schedules with executor", async () => {
   expect(event.status().executing.size).toBe(0);
 
   expect(spy).not.toHaveBeenCalled();
+  event.close();
+});
+
+it("splits group calls", async () => {
+  const { promise, resolve } = barrier();
+  const unreachable = vi.fn();
+
+  const event = pool<() => number>("event");
+  const a = event.bind({ group: "a" });
+  const b = event.bind({ group: "b" });
+  a(function* () {
+    yield 1;
+    yield* async(promise);
+    unreachable();
+  });
+  b(function* () {
+    yield 2;
+    yield* async(promise);
+    unreachable();
+  });
+
+  const results = event.split()();
+  const promises = [...results.values()].map((x) => first(x));
+  const status = event.status();
+  expect(status.executing.size).toBe(1);
+  expect([...status.executing][0].tasks.size).toBe(2);
+  expect(await Promise.all(promises)).toEqual([1, 2]);
+  [...results.values()][0].executor.controller.abort();
+  resolve();
+  await delay();
+  expect(status.executing.size).toBe(0);
+  expect(unreachable).not.toHaveBeenCalled();
+
+  event.close();
 });
