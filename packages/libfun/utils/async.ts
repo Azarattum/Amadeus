@@ -41,14 +41,18 @@ function thenable<T = unknown>(value: any): value is PromiseLike<T> {
   );
 }
 
-function block<T extends AsyncGenerator>(
+function block<
+  T extends AsyncGenerator,
+  U extends Record<string, any> = Record<string, never>
+>(
   condition: () => true | number,
   resolve: () => T,
-  catcher?: (error: Error) => void
+  catcher?: (error: Error) => void,
+  meta = {} as U
 ) {
   try {
     const ready = condition();
-    if (ready === true) return resolve();
+    if (ready === true) return Object.assign(resolve(), meta);
 
     const blocking = new Promise<void>(function poll(resolve) {
       const ready = condition();
@@ -56,16 +60,22 @@ function block<T extends AsyncGenerator>(
       else setTimeout(() => poll(resolve), ready);
     });
 
-    return (async function* () {
-      try {
-        await blocking;
-        yield* resolve();
-      } catch (error) {
-        handle(error, catcher);
-      }
-    })();
+    return Object.assign(
+      (async function* () {
+        try {
+          await blocking;
+          yield* resolve();
+        } catch (error) {
+          handle(error, catcher);
+        }
+      })(),
+      meta
+    );
   } catch (error) {
-    return handle(error, catcher, (async function* () {})());
+    return Object.assign(
+      handle(error, catcher, (async function* () {})()),
+      meta
+    );
   }
 }
 

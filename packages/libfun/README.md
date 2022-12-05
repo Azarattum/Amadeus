@@ -365,34 +365,54 @@ status(); // [ {id: "a/event"}, {id: "b/event"} ]
 <details><summary>🏽 <b>Filter group handlers</b></summary>
 
 ```ts
-  const event = pool("event");
-  event.bind({ group: "1" })(() => { ... }); // Only this gets called
-  event.bind({ group: "2" })(() => { ... });
+const event = pool("event");
+event.bind({ group: "1" })(() => { ... }); // Only this gets called
+event.bind({ group: "2" })(() => { ... });
 
-  // Execute only handlers from group `1`
-  event.where("1")();
+// Execute only handlers from group `1`
+event.where("1")();
 ```
 </details>
 
 <details><summary>✍ <b>Setup group contexts</b></summary>
 
 ```ts
-  const event = pool("event");
-  // Setup an event with group `1` and some context
-  const event1 = event.bind({ group: "1", context: { val: 42 } });
+const event = pool("event");
+// Setup an event with group `1` and some context
+const event1 = event.bind({ group: "1", context: { val: 42 } });
 
-  event1(function* () {
-    // We can access the context from `this`:
-    this.val; // <- number (it's TypeSafe!)
-  });
+event1(function* () {
+  // We can access the context from `this`:
+  this.val; // <- number (it's TypeSafe!)
+});
 
-  // We can update the context at any time
-  event1.context({ val: 10 });
+// We can update the context at any time
+event1.context({ val: 10 });
 
-  const event2 = event.bind({ group: "2" });
-  event2(function* () {
-    // Events from different groups have different contexts!
-    this.val; // <- undefined (TypeScript error)
-  });  
+const event2 = event.bind({ group: "2" });
+event2(function* () {
+  // Events from different groups have different contexts!
+  this.val; // <- undefined (TypeScript error)
+});  
+```
+</details>
+
+<details><summary>🔑 <b>Access executor from pool generators</b></summary>
+
+```ts
+const event = pool("event");
+event(function* () { ... });
+
+const generator = event();
+
+generator.executor; // This has some info about the executing generator
+generator.executor.controller; // Abort controller
+generator.executor.group; // Pool's group
+generator.executor.tasks; // A set of tasks (executors for each listener)
+
+// This is still a normal generator
+for await (const item of generator) {
+  // Do stuff...
+}
 ```
 </details>

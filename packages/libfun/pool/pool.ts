@@ -17,7 +17,7 @@ import {
   reuse,
   wrap,
 } from "./iterator";
-import { derive, block, delay } from "../utils/async";
+import { derive, block, delay, cancel } from "../utils/async";
 import type { Fn } from "../utils/types";
 import { handle } from "../utils/error";
 
@@ -100,27 +100,59 @@ function pools(options: Partial<Options> = {}): Pools {
       this[state].catchers.add(handler || (() => {}));
     },
     schedule(when) {
+      const group = (this as any).group || this[state].group;
       const self = this as ProtoPool;
       let time =
         when.absolute === undefined
           ? Date.now() + when.relative
           : when.absolute;
 
-      return async function* (...args) {
-        const now = Date.now();
-        if (time > now) {
-          await delay(time - now);
-          yield* self(...args);
+      return function (...args: any[]) {
+        const executor = {
+          controller: new AbortController(),
+          tasks: new Set(),
+          group,
+        } satisfies Executor;
+
+        async function* run() {
+          const originalSignal = globalContext.signal;
+          globalContext.signal = executor.controller.signal;
+          const generator = self(...args);
+          globalContext.signal = originalSignal;
+          yield* generator;
         }
-        while (when.interval && all.has(self[state].id)) {
-          const now = Date.now();
-          if (time <= now) {
-            const times = Math.max(Math.ceil((now - time) / when.interval), 1);
-            time += times * when.interval;
+
+        const generator = (async function* () {
+          try {
+            while (all.has(self[state].id)) {
+              const now = Date.now();
+              if (when.interval && time <= now) {
+                const times = Math.max(
+                  Math.ceil((now - time) / when.interval),
+                  1
+                );
+                time += times * when.interval;
+              }
+              if (time >= now) {
+                await cancel(delay(time - now), executor.controller.signal);
+                yield* run();
+              }
+              if (!when.interval) break;
+            }
+          } catch (error) {
+            handle(error, (error) => {
+              if (
+                error instanceof DOMException &&
+                error.name === "AbortError"
+              ) {
+                return;
+              }
+              throw error;
+            });
           }
-          await delay(time - now);
-          yield* self(...args);
-        }
+        })();
+
+        return Object.assign(generator, { executor });
       };
     },
     where(filter) {
@@ -319,7 +351,8 @@ function pool<T extends Fn = () => void>(
           }
         })();
       },
-      catcher()
+      catcher(),
+      { executor }
     );
   }
 

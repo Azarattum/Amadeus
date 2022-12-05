@@ -71,7 +71,10 @@ type Handler<T extends Fn, C = unknown> = ((
 
 type Caller<T> = Intersected<
   T extends (..._: infer A) => infer R
-    ? (this: Override, ...args: A) => AsyncGenerator<R>
+    ? (
+        this: Override,
+        ...args: A
+      ) => AsyncGenerator<R, void> & { executor: Executor }
     : unknown
 >;
 
@@ -110,7 +113,7 @@ type Pools = Omit<
   {
     [key in keyof Pool]: Pool[key] extends (..._: infer A) => infer R
       ? {
-          (id?: null, ..._: A): R extends void ? R : R[];
+          (id?: null | "*", ..._: A): R extends void ? R : R[];
           (id: string, ..._: A): R;
         }
       : never;

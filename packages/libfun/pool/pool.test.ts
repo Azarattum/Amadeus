@@ -77,6 +77,8 @@ it("reports status", () => {
   b(function* () {});
   expect(status()).toHaveLength(2);
   expect(status()).toMatchObject([{ id: "a" }, { id: "b" }]);
+  a.close();
+  b.close();
 });
 
 it("limits concurrency", async () => {
@@ -248,7 +250,7 @@ it("aborts nested pools", async () => {
     const doubled = pool<() => number>("doubled");
     doubled(function* () {
       const generator = numbers();
-      yield (yield* async(generator.next())).value;
+      yield (yield* async(generator.next())).value as number;
       (yield* async(generator.next())).value;
       unreachable();
     });
@@ -612,4 +614,58 @@ it("does not leak contexts from groups", async () => {
   });
 
   await take(event());
+  event.close();
+});
+
+it("exposes an executor", async () => {
+  const event = pool("event");
+  const { promise, resolve } = barrier();
+  const unreachable = vi.fn();
+  event(function* () {
+    yield* async(promise);
+    unreachable();
+  });
+
+  const generator = event();
+  take(generator);
+
+  expect(generator.executor).toBeTypeOf("object");
+  expect(count()).toBe(1);
+  expect(generator.executor.tasks.size).toBe(1);
+  expect(generator.executor.group).toBe("test");
+
+  generator.executor.controller.abort();
+  await delay();
+  expect(event.status().executing.size).toBe(0);
+  expect(generator.executor.tasks.size).toBe(0);
+  expect(unreachable).not.toHaveBeenCalled();
+
+  const scheduled = event.schedule({ relative: 0 })();
+  take(scheduled);
+  await delay();
+  scheduled.executor.controller.abort();
+  resolve();
+  await delay();
+  expect(unreachable).not.toHaveBeenCalled();
+
+  event.close();
+});
+
+it("aborts schedules with executor", async () => {
+  const event = pool("event");
+  const spy = vi.fn();
+  event(spy);
+
+  const generator = event.schedule({ relative: 10 })();
+  take(generator);
+  await delay();
+
+  expect(event.status().pending.size).toBe(0);
+  expect(event.status().executing.size).toBe(0);
+  generator.executor.controller.abort();
+  await delay(15);
+  expect(event.status().pending.size).toBe(0);
+  expect(event.status().executing.size).toBe(0);
+
+  expect(spy).not.toHaveBeenCalled();
 });
