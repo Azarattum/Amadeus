@@ -2,6 +2,7 @@ import {
   init,
   stop,
   info,
+  fetch,
   message,
   command,
   mention,
@@ -11,9 +12,8 @@ import {
   callback,
 } from "./plugin";
 import {
-  http,
-  fetch,
   map,
+  http,
   tracks,
   cache,
   identify,
@@ -69,7 +69,6 @@ message(function* (text) {
 
   cache(id, aggregator, {
     invalidator: () => {
-      /// This breaks badly (because not in the pool!)
       fetch("deleteMessage", {
         params: {
           chat_id: chat,

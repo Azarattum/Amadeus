@@ -8,10 +8,11 @@ import {
   callback,
   invite,
   update,
+  fetch,
 } from "./plugin";
 import { Text, Audio, Voice, Post, Callback, Invite, Sender } from "./types";
-import { map, take, fetch } from "@amadeus-music/core";
 import { IncomingMessage, ServerResponse } from "http";
+import { map, take } from "@amadeus-music/core";
 
 const secret = crypto.randomUUID();
 

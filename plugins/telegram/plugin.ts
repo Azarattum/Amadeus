@@ -11,33 +11,34 @@ import {
 import { name, version } from "./package.json";
 import { Me, Query } from "./types";
 
-export const { info, err, wrn, init, stop, search, desource, pool } = register({
-  name,
-  version,
-  config: {
-    users: record(
-      string(),
-      type({
-        telegram: defaulted(number(), -1),
-      })
-    ),
-    telegram: defaulted(
-      object({
-        token: defaulted(string(), ""),
-        webhook: defaulted(string(), ""),
-      }),
-      {}
-    ),
-  },
-  context: {
-    chat: "",
-    name: "",
-    state: {
-      users: {} as Record<string, number>,
-      me: {} as Infer<typeof Me>["result"],
+export const { info, err, wrn, init, stop, search, desource, pool, fetch } =
+  register({
+    name,
+    version,
+    config: {
+      users: record(
+        string(),
+        type({
+          telegram: defaulted(number(), -1),
+        })
+      ),
+      telegram: defaulted(
+        object({
+          token: defaulted(string(), ""),
+          webhook: defaulted(string(), ""),
+        }),
+        {}
+      ),
     },
-  },
-});
+    context: {
+      chat: "",
+      name: "",
+      state: {
+        users: {} as Record<string, number>,
+        me: {} as Infer<typeof Me>["result"],
+      },
+    },
+  });
 
 const update = pool<(data: string) => void>("update");
 const message = pool<(text: string) => void>("message");

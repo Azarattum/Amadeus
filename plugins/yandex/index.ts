@@ -1,6 +1,5 @@
 import { convert, Download, Source, Tracks } from "./types";
-import { init, search, desource } from "./plugin";
-import { fetch } from "@amadeus-music/core";
+import { init, search, desource, fetch } from "./plugin";
 import { createHash } from "node:crypto";
 
 init(function* (config) {

@@ -5,6 +5,8 @@ import type { Struct } from "superstruct";
 import { async, context } from "libfun";
 import { pools } from "../event/pool";
 
+type Context = void | { group?: string };
+
 type FetchOptions = {
   [K in keyof GretchOptions]: K extends "baseURL"
     ? string | string[]
@@ -15,13 +17,15 @@ type FetchOptions = {
   params?: Record<string, string | string[]>;
 };
 
-function fetcher(defaults: FetchOptions = {}) {
+function fetcher(this: Context, defaults: FetchOptions = {}) {
+  const bound = fetch.bind(this);
   return (url: string, options: FetchOptions = {}) =>
-    fetch(url, merge(defaults, options));
+    bound(url, merge(defaults, options));
 }
 
-function fetch(url: string, options: FetchOptions = {}) {
-  const ctx: any = context.group ? pools.contexts.get(context.group) || {} : {};
+function fetch(this: Context, url: string, options: FetchOptions = {}) {
+  const group = this?.group || context.group;
+  const ctx: any = group ? pools.contexts.get(group) || {} : {};
   if (typeof ctx.fetch === "object") options = merge(ctx.fetch, options);
 
   const params = new URLSearchParams(pick(options.params)).toString();
@@ -39,6 +43,7 @@ function fetch(url: string, options: FetchOptions = {}) {
   });
 
   return {
+    request,
     *flush() {
       return yield* async(request.flush());
     },
