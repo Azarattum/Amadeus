@@ -1,4 +1,5 @@
 import { plural, capitalize, unprefix } from "@amadeus-music/util/string";
+import { delay } from "@amadeus-music/util/throttle";
 import { init, pools, stop } from "../event/pool";
 import { commands } from "../status/commands";
 import { ok, wrn, err } from "../status/log";
@@ -11,6 +12,9 @@ const format = pipeline(unprefix, capitalize);
 const plugins = new Map<string, Plugin>();
 
 async function load() {
+  // Wait a bit to make sure everything is initialized
+  await delay(100);
+
   init.catch((error) => {
     if (error.handler) unload(error.handler);
     wrn.bind({ group: error.handler })(
