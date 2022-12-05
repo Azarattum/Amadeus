@@ -14,7 +14,8 @@ import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 
 init(function* () {
-  const path = import.meta.env.DEV
+  throw "In development!";
+  const path = (import.meta as any).env.DEV
     ? "../../data"
     : resolve(__dirname, "../data");
   yield* async(mkdir(path, { recursive: true }));
