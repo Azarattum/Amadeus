@@ -4,7 +4,7 @@ import type { Fn } from "../utils/types";
 import { expect, it, vi } from "vitest";
 import { delay } from "../utils/async";
 
-const { pool, count, status } = pools({ group: "test" });
+const { pool, count, status, abort } = pools({ group: "test" });
 const barrier = () => {
   let resolve: () => void = () => {};
   const promise = new Promise<void>((r) => (resolve = r));
@@ -699,6 +699,32 @@ it("splits group calls", async () => {
   resolve();
   await delay();
   expect(status.executing.size).toBe(0);
+  expect(unreachable).not.toHaveBeenCalled();
+
+  event.close();
+});
+
+it("returns iterators properly", async () => {
+  const { promise, resolve } = barrier();
+  const unreachable = vi.fn();
+
+  const event = pool<() => number>("event");
+  event.bind({ group: "g" })(function* () {
+    yield 1;
+    yield 2;
+    yield* async(promise);
+    unreachable();
+  });
+  // Didn't finish yielding
+  event().next();
+
+  expect(event.status().executing.size).toBe(1);
+  abort("*", { group: "g" });
+  event.abort({ group: "g" });
+  await delay();
+  expect(event.status().executing.size).toBe(0);
+  resolve();
+  await delay();
   expect(unreachable).not.toHaveBeenCalled();
 
   event.close();

@@ -62,6 +62,8 @@ async function* wrap<T, U>(
     }
   } catch (error) {
     handle(error, catcher);
+  } finally {
+    iterator.return?.();
   }
 }
 
@@ -150,7 +152,7 @@ async function* merge<T, U>(...iterators: SomeIterator<T>[]) {
     }
   } finally {
     for (const [index, iterator] of iterators.entries())
-      if (promises[index] !== never) iterator.return?.(null as any);
+      if (promises[index] !== never) iterator.return?.();
   }
   return results;
 }

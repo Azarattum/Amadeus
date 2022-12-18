@@ -17,7 +17,7 @@ import {
   reuse,
   wrap,
 } from "./iterator";
-import { derive, block, delay, cancel } from "../utils/async";
+import { derive, block, delay, cancel, cleanup } from "../utils/async";
 import type { Fn } from "../utils/types";
 import { handle } from "../utils/error";
 
@@ -54,18 +54,12 @@ function pools(options: Partial<Options> = {}): Pools {
   const prototype: Pick<ProtoPool, keyof ProtoPool> = {
     abort(filter) {
       this[state].executing.forEach((executor) => {
-        match(executor, filter).forEach((x) => {
-          x.controller.abort();
-          this[state].executing.delete(x as Executor);
-        });
+        match(executor, filter).forEach((x) => x.controller.abort());
       });
     },
     drain(filter) {
       this[state].pending.forEach((executor) => {
-        match(executor, filter).forEach((x) => {
-          x.controller.abort();
-          this[state].pending.delete(x as Executor);
-        });
+        match(executor, filter).forEach((x) => x.controller.abort());
       });
       this.abort(filter);
     },
@@ -349,7 +343,7 @@ function pool<T extends Fn = () => void>(
         const iterables = () =>
           generators.map(({ handler, task }) => {
             try {
-              const generator = wrap(
+              const generator = wrap<unknown, void>(
                 generate(handler(...params)),
                 task.controller.signal,
                 task.group,
@@ -359,8 +353,13 @@ function pool<T extends Fn = () => void>(
 
               return (async function* () {
                 executor.tasks.add(task);
-                yield* generator;
-                executor.tasks.delete(task);
+                yield* cleanup(generator, task.controller, () => {
+                  executor.tasks.delete(task);
+                  const done = generators.every(
+                    ({ task }) => task.controller.signal.aborted
+                  );
+                  if (done) executor.controller.abort();
+                });
               })();
             } catch (error) {
               task.controller.abort();
@@ -376,18 +375,15 @@ function pool<T extends Fn = () => void>(
         const key = self.cache ? JSON.stringify(params) : "";
         const cached = reuse(iterable, self.cached, key, self.cache);
 
-        let timeout = undefined;
+        let timeout: any = undefined;
         if (Number.isFinite(self.timeout)) {
           timeout = setTimeout(() => executor.controller.abort(), self.timeout);
         }
         return (async function* () {
-          try {
-            yield* cached;
-          } finally {
-            executor.controller.abort();
+          yield* cleanup(cached, executor.controller, () => {
             self.executing.delete(executor);
             clearTimeout(timeout);
-          }
+          });
         })();
       },
       catcher(),

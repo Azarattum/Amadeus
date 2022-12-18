@@ -18,6 +18,22 @@ function cancel<T>(promise: T, signal?: AbortSignal) {
   return Promise.race([promise, cancel]) as T;
 }
 
+async function* cleanup<T>(
+  generator: AsyncGenerator<T, void>,
+  controller: AbortController,
+  cleanup: () => void
+) {
+  const aborted = () => (generator.return(), cleanup());
+  controller.signal.addEventListener("abort", aborted, { once: true });
+  try {
+    yield* generator;
+  } finally {
+    controller.abort();
+    // eslint-disable-next-line no-unsafe-finally
+    return;
+  }
+}
+
 function derive(parent?: AbortController | AbortSignal) {
   const signal = parent instanceof AbortSignal ? parent : parent?.signal;
   const derived = new AbortController();
@@ -79,4 +95,4 @@ function block<
   }
 }
 
-export { cancel, thenable, derive, block, delay };
+export { cancel, cleanup, thenable, derive, block, delay };
