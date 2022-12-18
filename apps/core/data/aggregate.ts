@@ -57,6 +57,7 @@ function aggregate<T extends Media>(
         loaded += batch.length;
         yield state();
         while (loaded >= (pages.last + 1) * page) {
+          /// Should this be abortable?
           await wait();
           if (pages.shown !== pages.current) {
             pages.shown = pages.current;
@@ -75,6 +76,7 @@ function aggregate<T extends Media>(
       pages.current = number;
       resolve();
     },
+    /// Expose some kind of a `close`/`abort` function to stop pulling
   });
 }
 

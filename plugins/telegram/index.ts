@@ -55,6 +55,7 @@ message(function* (text) {
   cache(id, aggregator, {
     invalidator: () => {
       /// The returns does not work! Aggregator is still there!
+      //    Should use a custom function like `aggregator.abort()`
       aggregator.return([]);
       fetch("deleteMessage", {
         params: {
