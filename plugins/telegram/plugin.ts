@@ -9,8 +9,9 @@ import {
   type,
 } from "@amadeus-music/core";
 import { name, version } from "./package.json";
+import { Query } from "./types/action";
 import { Reply, Edit } from "./reply";
-import { Me, Query } from "./types";
+import { Me } from "./types/core";
 
 export const { info, err, wrn, init, stop, search, desource, pool, fetch } =
   register({

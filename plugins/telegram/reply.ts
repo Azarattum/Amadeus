@@ -1,6 +1,6 @@
 import { Infer, map } from "@amadeus-music/core";
 import { fetch, pool } from "./plugin";
-import { Sent } from "./types";
+import { Sent } from "./types/core";
 
 type Replier = (message: Message) => Infer<typeof Sent>["result"];
 type Reply = ReturnType<typeof replier>;
@@ -49,31 +49,20 @@ function replier(chat: number, group = true) {
   };
 }
 
-function* edit<T>(
-  chat: number,
-  message: number,
-  aggregator: AsyncGenerator<T>,
-  convert: (item: T) => Message
-) {
-  yield* map(aggregator, function* (item) {
-    yield* fetch("editMessageText", {
-      params: {
-        chat_id: chat.toString(),
-        message_id: message.toString(),
-        ...paramify(convert(item)),
-      },
-    }).flush();
-  });
+function* edit(chat: number, message: number, params: Message) {
+  yield* fetch("editMessageText", {
+    params: {
+      chat_id: chat.toString(),
+      message_id: message.toString(),
+      ...paramify(params),
+    },
+  }).flush();
 }
 
 function editor(chat: number) {
-  return function* <T>(
-    message: number,
-    aggregator: AsyncGenerator<T>,
-    convert: (item: T) => Message
-  ) {
-    yield* edit(chat, message, aggregator, convert);
+  return function* (message: number, params: Message) {
+    yield* edit(chat, message, params);
   };
 }
 
-export { replier, editor, type Reply, type Edit };
+export { replier, editor, paramify, type Reply, type Edit };

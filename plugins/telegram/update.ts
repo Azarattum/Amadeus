@@ -10,10 +10,11 @@ import {
   update,
   fetch,
 } from "./plugin";
-import { Text, Audio, Voice, Post, Callback, Invite, Sender } from "./types";
+import { Text, Audio, Voice, Post, Callback, Invite } from "./types/core";
 import { IncomingMessage, ServerResponse } from "http";
 import { map, take } from "@amadeus-music/core";
 import { replier, editor } from "./reply";
+import { Sender } from "./types/sender";
 
 const secret = crypto.randomUUID();
 
