@@ -729,3 +729,26 @@ it("returns iterators properly", async () => {
 
   event.close();
 });
+
+it("does not abort split executions", async () => {
+  const event = pool<(data: number) => number>("event");
+  event.bind({ group: "a" })(function* (number) {
+    yield number + 1;
+    yield number + 2;
+  });
+  event.bind({ group: "b" })(function* (number) {
+    yield number * 1;
+    yield* async(delay(100));
+    yield number * 2;
+  });
+
+  const results = event.split()(123);
+  const promises = [...results.values()].map((x) => take(x));
+  const values = await Promise.all(promises);
+  expect(values).toEqual([
+    [124, 125],
+    [123, 246],
+  ]);
+
+  event.close();
+});

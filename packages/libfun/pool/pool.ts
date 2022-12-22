@@ -158,34 +158,50 @@ function pools(options: Partial<Options> = {}): Pools {
       const group = this[state].group;
       return (...args: any[]) => {
         const results = new Map();
-        let main = null as Executor | null;
         const groups = new Set(
           [...this[state].listeners]
             .map((x) => x.group as string)
             .filter((x) => x)
         );
+        const executor: Executor = {
+          controller: derive(globalContext.signal),
+          tasks: new Set(),
+          group,
+        };
+        executor.controller.signal.addEventListener(
+          "abort",
+          () => {
+            this[state].pending.delete(executor);
+            this[state].executing.delete(executor);
+          },
+          { once: true }
+        );
 
+        let running = 0;
         groups.forEach((filter) => {
           const context = { group, filter };
           const generator = (this as any).bind(context)(...args);
           const current = generator.executor as Executor;
 
-          if (!main) main = current;
-          else {
-            const abort = () => (current.controller.abort(), remove());
-            const remove = () => {
-              main?.controller.signal.removeEventListener("abort", abort);
-              current.controller.signal.removeEventListener("abort", remove);
-            };
-            main.controller.signal.addEventListener("abort", abort);
-            current.controller.signal.addEventListener("abort", remove);
-            current.tasks.forEach((x) => main?.tasks.add(x));
-            current.tasks = main.tasks;
-            generator.executor = main;
-            this[state].pending.delete(current);
-            this[state].executing.delete(current);
+          const abort = () => (current.controller.abort(), remove());
+          const remove = () => {
+            executor?.controller.signal.removeEventListener("abort", abort);
+            current.controller.signal.removeEventListener("abort", remove);
+            if (!--running) executor.controller.abort();
+          };
+          executor.controller.signal.addEventListener("abort", abort);
+          current.controller.signal.addEventListener("abort", remove);
+          current.tasks.forEach((x) => executor?.tasks.add(x));
+          current.tasks = executor.tasks;
+          generator.executor = executor;
+          if (this[state].pending.delete(current)) {
+            this[state].pending.add(executor);
+          }
+          if (this[state].executing.delete(current)) {
+            this[state].executing.add(executor);
           }
 
+          running += 1;
           results.set(filter, generator);
         });
 
