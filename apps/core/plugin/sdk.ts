@@ -47,7 +47,6 @@ export { register, usage };
 export * from "../data/aggregate";
 export { http } from "../network/http";
 export { identify } from "../data/identity";
-export { cache, invalidate } from "../data/cache";
 export { inferTrack, inferArtists } from "../data/infer";
 
 export * from "superstruct";

@@ -1,118 +1,85 @@
-import type {
-  Track,
-  Media,
-  Unique,
-  Artist,
-  Album,
-} from "@amadeus-music/protocol";
-import { batch, combine } from "@amadeus-music/util/object";
+import { async, map, merge as parallel, take } from "libfun/pool";
+import { pages, type PaginationOptions } from "./pagination";
 import { stringSimilarity } from "string-similarity-js";
-import { lock } from "@amadeus-music/util/throttle";
+import { pool as makePool, pools } from "../event/pool";
+import type { Media } from "@amadeus-music/protocol";
 import { clean } from "@amadeus-music/util/string";
-import { identify, normalize } from "./identity";
-import { merge as parallel } from "libfun/pool";
-import { search } from "../event/pool";
+import { batch } from "@amadeus-music/util/object";
+import type { Fn } from "libfun/utils/types";
+import { normalize } from "./identity";
 import { inferTrack } from "./infer";
+import { wrn } from "../status/log";
+import type { Pool } from "libfun";
 
-/// Probably should be a pool, consider aborts, consider status graph...
-function aggregate<T extends Media>(
-  type: "track" | "artist" | "album",
-  query: string,
-  page = 10
+/// This should be bound
+function aggregate<T extends Record<string, any>, A extends any[]>(
+  pool: Pool<(..._: A) => T>,
+  options: PaginationOptions<T>
 ) {
-  const providers = [
-    ...search
-      .split()(type as any, query)
-      .values(),
-  ].map((x: any) => batch<T>(x));
+  const id = Math.random().toString(36).slice(2);
+  const timeout = 1000 * 60 * 60;
+  const aggregator = makePool<(..._: A) => void>(`aggregate/${id}`, {
+    timeout,
+  });
 
-  const map = new Map<string, Unique<T>>();
-  const aggregated: Unique<T>[] = [];
-  const compare = match(query);
-  const convert = (x: T) => {
-    const unique = { ...x, id: identify(x) };
-    if ("artists" in unique) unique.artists.sort();
-    return unique;
-  };
+  aggregator(function* (...args) {
+    const parts = (pool.split() as Fn)(...args) as Map<string, AsyncGenerator>;
+    const generators = [...parts.values()].map((x: any) => batch<T>(x));
+    const groups = [...parts.keys()];
 
-  const pages = { shown: 0, current: 0, last: 0 };
-  const state = () => {
-    const start = pages.current * page;
-    const end = start + page;
-    return {
-      page: aggregated.slice(start, end),
-      all: aggregated,
-      at: pages.current,
-    };
-  };
-
-  const { resolve, wait } = lock();
-  const options = { compare, map, merge, identify, convert };
-  const curated = providers.map((generator) => {
-    return (async function* () {
-      let loaded = 0;
-      for await (const batch of generator) {
-        /// Consider page consistency...
-        combine(aggregated, batch, options);
-        loaded += batch.length;
-        yield state();
-        while (loaded >= (pages.last + 1) * page) {
-          /// Should this be abortable?
-          await wait();
-          if (pages.shown !== pages.current) {
-            pages.shown = pages.current;
-            yield state();
-          }
+    const data = pages(groups, options);
+    const curated = generators.map((generator, id) => {
+      return (async function* () {
+        let empty = true;
+        for await (const batch of generator) {
+          if (batch.length) empty = false;
+          await data.append(id, batch);
         }
-      }
-      /// Warn on empty
-      providers.splice(providers.indexOf(generator), 1);
-    })();
+        data.complete(id);
+        if (empty) wrn.bind({ group: groups[id] })("No results aggregated!");
+      })();
+    });
+
+    Object.assign(aggregator.status(), {
+      next: data.next,
+      prev: data.prev,
+    });
+
+    yield* map(parallel(...curated));
+    // Don't end until aborted
+    yield* async(
+      new Promise((resolve) =>
+        this.signal.addEventListener("abort", resolve, { once: true })
+      )
+    );
   });
 
-  return Object.assign(parallel(...curated), {
-    page(number: number) {
-      pages.last = Math.max(pages.current, number);
-      pages.current = number;
-      resolve();
-    },
-    /// Expose some kind of a `close`/`abort` function to stop pulling
-  });
+  return (...args: A) => {
+    if (pools.status(`aggregate/${id}`).executing.size) return id;
+    setTimeout(() => {
+      const generator = aggregator(...args);
+      generator.executor.controller.signal.addEventListener(
+        "abort",
+        () => {
+          options.invalidate?.();
+          aggregator.close();
+        },
+        { once: true }
+      );
+      take(generator);
+    });
+    return id;
+  };
 }
 
-function merge<T extends Media>(target: Unique<T>, source: T) {
-  const upperLetters = (text: string) => {
-    let count = 0;
-    const lower = text.toLowerCase();
-    for (let i = 0; i < text.length; i++) {
-      if (lower[i] !== text[i]) count++;
-    }
-    return count;
+function aggregator(id: string) {
+  const pool: any =
+    pools.status().find((x) => x.id === `aggregate/${id}`) || {};
+  return {
+    next: (pool.next as () => void) || (() => {}),
+    prev: (pool.prev as () => void) || (() => {}),
+    close: () => pools.abort(`aggregate/${id}`),
   };
-  const better = (a: string, b: string) =>
-    upperLetters(a) > upperLetters(b) ? a : b;
-
-  target.title = better(target.title, source.title);
-
-  if (source.art) target.art.push(...source.art);
-  if (source.source) target.source.push(...source.source);
-  if ("year" in target && "year" in source) target.year ||= source.year;
-  if ("length" in target && "length" in source) target.length ||= source.length;
-  if ("name" in target && "name" in source) {
-    target.title = better(target.title, source.title);
-  }
-  if ("artists" in target && "artists" in source) {
-    source.artists.sort();
-    target.artists = target.artists.map((x, i) => better(x, source.artists[i]));
-  }
-  if ("album" in target && "album" in source) {
-    if (
-      target.album.toLowerCase() === target.title.toLowerCase() &&
-      source.album.toLowerCase() !== target.title.toLowerCase()
-    ) {
-      target.album = source.album;
-    } else target.album = better(target.album, source.album);
-  }
 }
 
 function match<T extends Media>(query: string) {
@@ -141,11 +108,4 @@ function match<T extends Media>(query: string) {
   };
 }
 
-const tracks = (query: string, page = 10) =>
-  aggregate<Track>("track", query, page);
-const artists = (query: string, page = 10) =>
-  aggregate<Artist>("artist", query, page);
-const albums = (query: string, page = 10) =>
-  aggregate<Album>("album", query, page);
-
-export { tracks, artists, albums };
+export { aggregate, aggregator, match };
