@@ -1,41 +1,38 @@
-import type { Abstract, Media, Unique } from "@amadeus-music/protocol";
 import { clean } from "@amadeus-music/util/string";
-import { createHash } from "node:crypto";
-import { pipe } from "libfun";
+import { v3 } from "murmurhash";
 
-type Entity = string | Media | Abstract<Media> | Unique<Media>;
+function normalize<T extends Record<string, any> | string>(
+  data: T
+): T extends string ? string : T {
+  if (typeof data === "string") return clean(data) as any;
+  if (typeof data !== "object") return data as any;
+  const copy = { ...data };
+  for (const key in copy) {
+    if (Array.isArray(copy[key])) copy[key] = copy[key].map(normalize).sort();
+    else copy[key] = normalize(copy[key] as any);
+  }
 
-const sha = createHash("SHA1");
-
-function hash(text: string) {
-  return sha.update(text).copy().digest("hex");
+  return copy as any;
 }
 
-function normalize<T extends Entity>(entity: T): T extends string ? string : T {
-  if (typeof entity !== "object") return clean(entity) as any;
-  const norm = { ...entity };
-  if ("artists" in norm) norm.artists = norm.artists.map(clean).sort();
-  if ("title" in norm) norm.title = clean(entity.title);
-  if ("album" in norm) norm.album = clean(norm.album);
-  return norm as any;
+function stringify(data: any) {
+  data = normalize(data);
+  return typeof data === "string"
+    ? data
+    : typeof data !== "object"
+    ? clean(String(data))
+    : "artists" in data && "title" in data && "album" in data
+    ? `${data.artists}-${data.title}-${data.album}`
+    : "artists" in data && "title" in data
+    ? `${data.artists}-${data.title}`
+    : "title" in data
+    ? data.title
+    : JSON.stringify(data);
 }
 
-function stringify(entity: Entity) {
-  entity = normalize(entity);
-  return typeof entity === "string"
-    ? entity
-    : "artists" in entity && "title" in entity && "album" in entity
-    ? `${entity.artists}-${entity.title}-${entity.album}`
-    : "artists" in entity && "title" in entity
-    ? `${entity.artists}-${entity.title}`
-    : "title" in entity
-    ? entity.title
-    : entity;
-}
-
-function identify(data: Entity) {
+function identify(data: any) {
   if (data && typeof data === "object" && "id" in data) return data.id;
-  return pipe(data)(normalize, stringify, hash);
+  return v3(stringify(data));
 }
 
-export { identify, stringify, normalize, hash };
+export { identify, stringify, normalize };
