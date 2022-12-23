@@ -182,18 +182,21 @@ function take<T extends SomeIterator>(
   })() as any;
 }
 
-function first<T extends SomeIterator>(iterator: T): Iterated<T, true> {
+function first<T extends SomeIterator>(
+  iterator: T,
+  close = true
+): Iterated<T, true> {
   if (Symbol.iterator in iterator) {
     const { value, done } = (iterator as any).next();
     if (done) throw new Error("No values to take from the iterator!");
-    iterator.return?.();
+    if (close) iterator.return?.();
     return value;
   }
 
   return (async () => {
     const { value, done } = await (iterator as any).next();
     if (done) throw new Error("No values to take from the iterator!");
-    iterator.return?.();
+    if (close) iterator.return?.();
     return value;
   })() as any;
 }
