@@ -1,5 +1,5 @@
 import { delay } from "@amadeus-music/util/throttle";
-import { aggregate, aggregator } from "./aggregate";
+import { aggregate } from "./aggregate";
 import { expect, it, vi } from "vitest";
 import { async, pools } from "libfun";
 
@@ -23,7 +23,7 @@ it("aggregates pool", async () => {
   let calls: any[] = [];
   const spy = vi.fn((x, z) => calls.push([x.map((y: any) => y.data), z]));
 
-  const id = aggregate(event, [123])({
+  const id = aggregate(event, [123], {
     compare: (a, b) => a.data - b.data,
     update: spy,
     page: 4,
@@ -37,7 +37,7 @@ it("aggregates pool", async () => {
   ]);
 
   calls = [];
-  aggregator(id).next();
+  aggregate(id).next();
   await delay(10);
   expect(spy).toHaveBeenCalledTimes(4);
   expect(calls).toEqual([[[369], 1]]);

@@ -1,5 +1,5 @@
 import { clean } from "@amadeus-music/util/string";
-import { v3 } from "murmurhash";
+import hash from "murmurhash";
 
 function normalize<T extends Record<string, any> | string>(
   data: T
@@ -32,7 +32,7 @@ function stringify(data: any) {
 
 function identify(data: any) {
   if (data && typeof data === "object" && "id" in data) return data.id;
-  return v3(stringify(data));
+  return hash(stringify(data));
 }
 
 export { identify, stringify, normalize };

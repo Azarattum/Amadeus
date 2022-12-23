@@ -1,6 +1,14 @@
-import { info, message, search, fetch, voice, post } from "../plugin";
-import { aggregate, match } from "@amadeus-music/core";
+import {
+  aggregate,
+  message,
+  search,
+  fetch,
+  voice,
+  info,
+  post,
+} from "../plugin";
 import { markdown, pager } from "../api/markup";
+import { match } from "@amadeus-music/core";
 import { paramify } from "../api/reply";
 
 message(function* (text) {
@@ -8,7 +16,7 @@ message(function* (text) {
   const chat = this.chat;
 
   const { message_id: message } = yield* this.reply({ text: "⏳" });
-  const id = aggregate(search, ["track", text] as const)({
+  const id = aggregate(search, ["track", text] as const, {
     update(tracks, progress, page) {
       const buttons = tracks.map((x) => ({
         text: `${x.artists.join(", ")} - ${x.title}`,

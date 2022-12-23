@@ -1,11 +1,11 @@
-import { callback, info, invite, mention } from "../plugin";
-import { aggregator, is } from "@amadeus-music/core";
+import { aggregate, callback, info, invite, mention } from "../plugin";
 import { Close, Next, Prev } from "../types/action";
+import { is } from "@amadeus-music/core";
 
 callback(function* (action, message, chat) {
-  if (is(action, Next)) aggregator(action.next).next();
-  if (is(action, Prev)) aggregator(action.prev).prev();
-  if (is(action, Close)) aggregator(action.close).close();
+  if (is(action, Next)) aggregate(action.next).next();
+  if (is(action, Prev)) aggregate(action.prev).prev();
+  if (is(action, Close)) aggregate(action.close).close();
 
   // else if (Download.is(action)) {
   /// Fetch from db

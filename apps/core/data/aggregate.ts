@@ -1,87 +1,98 @@
-import { async, map, merge as parallel, take } from "libfun/pool";
+import { async, context, first, map, merge as parallel } from "libfun/pool";
 import { pages, type PaginationOptions } from "./pagination";
 import { stringSimilarity } from "string-similarity-js";
+import type { Executor } from "libfun/pool/pool.types";
 import type { Media } from "@amadeus-music/protocol";
 import { clean } from "@amadeus-music/util/string";
 import { batch } from "@amadeus-music/util/object";
 import type { Fn } from "libfun/utils/types";
-import { pool, pools } from "../event/pool";
+import { aggregate } from "../event/pool";
+import { err, wrn } from "../status/log";
 import { normalize } from "./identity";
 import { inferTrack } from "./infer";
-import { wrn } from "../status/log";
 import type { Pool } from "libfun";
 
-/// This should be bound
-function aggregate<T extends Fn, A extends Readonly<Parameters<T>>>(
+aggregate(function* (from, args, options) {
+  type Parts = Map<string, AsyncGenerator<any>>;
+  const parts: Parts = (from.split() as Fn)(...args);
+  const generators = [...parts.values()].map(batch);
+  const groups = [...parts.keys()];
+
+  const data = pages(groups, options);
+  const curated = generators.map((generator, id) => {
+    return (async function* () {
+      let empty = true;
+      for await (const batch of generator) {
+        if (batch.length) empty = false;
+        await data.append(id, batch);
+      }
+      data.complete(id);
+      if (empty) wrn.bind({ group: groups[id] })("No results aggregated!");
+    })();
+  });
+
+  yield {
+    next: data.next,
+    prev: data.prev,
+  };
+
+  yield* map(parallel(...curated));
+  // Don't end until aborted
+  yield* async(
+    new Promise((resolve) =>
+      this.signal.addEventListener("abort", resolve, { once: true })
+    )
+  );
+});
+
+function aggregator(id: string): Controls;
+function aggregator<T extends Fn, A extends Readonly<Parameters<T>>>(
+  this: Context,
   from: Pool<T, any>,
-  args: A
+  args: A,
+  options: PaginationOptions<ReturnType<Extract<T, (..._: A) => any>>>
+): string;
+function aggregator(
+  this: Context,
+  source: string | Pool<any, any>,
+  args: any[] = [],
+  options: PaginationOptions<any> = { page: 10, compare: () => 0 }
 ) {
-  type Item = ReturnType<Extract<T, (..._: A) => any>>;
+  if (typeof source === "string") {
+    const controls = [...aggregate.status().executing.values()].find(
+      (x: any) => x.controls === source
+    ) as (Executor & Partial<Controls>) | undefined;
 
-  const timeout = 1000 * 60 * 60;
-  const id = `aggregate/${Math.random().toString(36).slice(2)}`;
-  const aggregator = pool<(options: PaginationOptions<Item>) => void>(id, {
-    timeout,
-  });
+    return {
+      next: () => controls?.next?.(),
+      prev: () => controls?.prev?.(),
+      close: () => controls?.controller.abort(),
+    } as Controls;
+  }
 
-  aggregator(function* (options) {
-    type Parts = Map<string, AsyncGenerator<Item>>;
-    const parts: Parts = (from.split() as Fn)(...args);
-    const generators = [...parts.values()].map(batch);
-    const groups = [...parts.keys()];
-
-    const data = pages(groups, options);
-    const curated = generators.map((generator, id) => {
-      return (async function* () {
-        let empty = true;
-        for await (const batch of generator) {
-          if (batch.length) empty = false;
-          await data.append(id, batch);
-        }
-        data.complete(id);
-        if (empty) wrn.bind({ group: groups[id] })("No results aggregated!");
-      })();
-    });
-
-    Object.assign(aggregator.status(), {
-      next: data.next,
-      prev: data.prev,
-    });
-
-    yield* map(parallel(...curated));
-    // Don't end until aborted
-    yield* async(
-      new Promise((resolve) =>
-        this.signal.addEventListener("abort", resolve, { once: true })
-      )
-    );
-  });
-
-  return (options: PaginationOptions<Item>) => {
-    setTimeout(() => {
-      const generator = aggregator(options);
-      generator.executor.controller.signal.addEventListener(
-        "abort",
-        () => {
-          options.invalidate?.();
-          const { executing, pending } = aggregator.status();
-          if (!executing.size && !pending.size) aggregator.close();
-        },
-        { once: true }
+  const group = this?.group || context.group;
+  const id = options.id || Math.random().toString(36).slice(2);
+  async function invalidate() {
+    try {
+      await options.invalidate?.();
+    } catch (error) {
+      err.bind({ group })(
+        "Error encountered during aggregator invalidation!",
+        error
       );
-      take(generator);
-    });
-    return id;
-  };
-}
+    }
+  }
 
-function aggregator(id: string) {
-  const pool: any = pools.status().find((x) => x.id === id) || {};
-  return {
-    next: (pool.next as () => void) || (() => {}),
-    prev: (pool.prev as () => void) || (() => {}),
-    close: () => pools.abort(id),
-  };
+  setTimeout(async () => {
+    const generator = aggregate.bind({ group })(source, args, options);
+    const { signal } = generator.executor.controller;
+    signal.addEventListener("abort", invalidate, { once: true });
+    const controls = await first(generator, false);
+    Object.assign(generator.executor, { controls: id });
+    Object.assign(generator.executor, controls);
+  });
+
+  return id;
 }
 
 function match<T extends Media>(query: string) {
@@ -110,4 +121,7 @@ function match<T extends Media>(query: string) {
   };
 }
 
-export { aggregate, aggregator, match };
+type Context = void | { group?: string };
+type Controls = { next(): void; prev(): void; close(): void };
+
+export { aggregator as aggregate, match, type Controls };

@@ -146,6 +146,7 @@ function merge<T extends Record<string, any>>(target: T, source: T) {
 }
 
 type PaginationOptions<T> = {
+  id?: string;
   page: number;
   invalidate?: () => void;
   compare: (a: T, b: T) => number;

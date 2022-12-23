@@ -1,11 +1,11 @@
 import {
   defaulted,
-  Infer,
+  register,
   number,
   object,
   record,
-  register,
   string,
+  Infer,
   type,
 } from "@amadeus-music/core";
 import { name, version } from "./package.json";
@@ -13,36 +13,46 @@ import { Reply, Edit } from "./api/reply";
 import { Query } from "./types/action";
 import { Me } from "./types/core";
 
-export const { info, err, wrn, init, stop, search, desource, pool, fetch } =
-  register({
-    name,
-    version,
-    config: {
-      users: record(
-        string(),
-        type({
-          telegram: defaulted(number(), -1),
-        })
-      ),
-      telegram: defaulted(
-        object({
-          token: defaulted(string(), ""),
-          webhook: defaulted(string(), ""),
-        }),
-        {}
-      ),
+export const {
+  err,
+  wrn,
+  info,
+  init,
+  pool,
+  stop,
+  fetch,
+  search,
+  desource,
+  aggregate,
+} = register({
+  name,
+  version,
+  config: {
+    users: record(
+      string(),
+      type({
+        telegram: defaulted(number(), -1),
+      })
+    ),
+    telegram: defaulted(
+      object({
+        token: defaulted(string(), ""),
+        webhook: defaulted(string(), ""),
+      }),
+      {}
+    ),
+  },
+  context: {
+    chat: 0,
+    name: "",
+    edit: null as any as Edit,
+    reply: null as any as Reply,
+    state: {
+      users: {} as Record<string, number>,
+      me: {} as Infer<typeof Me>["result"],
     },
-    context: {
-      chat: 0,
-      name: "",
-      edit: null as any as Edit,
-      reply: null as any as Reply,
-      state: {
-        users: {} as Record<string, number>,
-        me: {} as Infer<typeof Me>["result"],
-      },
-    },
-  });
+  },
+});
 
 const update = pool<(data: string) => void>("update");
 const message = pool<(text: string) => void>("message");
