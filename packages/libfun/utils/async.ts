@@ -24,6 +24,7 @@ async function* cleanup<T>(
   cleanup: () => void
 ) {
   const aborted = () => (generator.return(), cleanup());
+  if (controller.signal.aborted) return aborted();
   controller.signal.addEventListener("abort", aborted, { once: true });
   try {
     yield* generator;

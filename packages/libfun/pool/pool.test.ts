@@ -752,3 +752,13 @@ it("does not abort split executions", async () => {
 
   event.close();
 });
+
+it("stops after async abort", async () => {
+  const event = pool("event");
+  event(() => {
+    (async () => event.abort())();
+  });
+  take(event());
+  await delay(1);
+  expect(event.status().executing.size).toBe(0);
+});
