@@ -192,7 +192,7 @@ command("register")(function* (username) {
     `Added new user to "config.json". ${bright}${username}${reset}:`,
     pretty(config.users[username])
   );
-  info("Restart the application to apply changes!");
+  info("Restart the application to apply the changes!");
 });
 
 command("restart")(() => {
