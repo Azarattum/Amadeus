@@ -1,30 +1,33 @@
 import { async, map, merge as parallel, take } from "libfun/pool";
 import { pages, type PaginationOptions } from "./pagination";
 import { stringSimilarity } from "string-similarity-js";
-import { pool as makePool, pools } from "../event/pool";
 import type { Media } from "@amadeus-music/protocol";
 import { clean } from "@amadeus-music/util/string";
 import { batch } from "@amadeus-music/util/object";
 import type { Fn } from "libfun/utils/types";
+import { pool, pools } from "../event/pool";
 import { normalize } from "./identity";
 import { inferTrack } from "./infer";
 import { wrn } from "../status/log";
 import type { Pool } from "libfun";
 
 /// This should be bound
-function aggregate<T extends Record<string, any>, A extends any[]>(
-  pool: Pool<(..._: A) => T>,
-  options: PaginationOptions<T>
+function aggregate<T extends Fn, A extends Readonly<Parameters<T>>>(
+  from: Pool<T, any>,
+  args: A
 ) {
-  const id = Math.random().toString(36).slice(2);
+  type Item = ReturnType<Extract<T, (..._: A) => any>>;
+
   const timeout = 1000 * 60 * 60;
-  const aggregator = makePool<(..._: A) => void>(`aggregate/${id}`, {
+  const id = `aggregate/${Math.random().toString(36).slice(2)}`;
+  const aggregator = pool<(options: PaginationOptions<Item>) => void>(id, {
     timeout,
   });
 
-  aggregator(function* (...args) {
-    const parts = (pool.split() as Fn)(...args) as Map<string, AsyncGenerator>;
-    const generators = [...parts.values()].map((x: any) => batch<T>(x));
+  aggregator(function* (options) {
+    type Parts = Map<string, AsyncGenerator<Item>>;
+    const parts: Parts = (from.split() as Fn)(...args);
+    const generators = [...parts.values()].map(batch);
     const groups = [...parts.keys()];
 
     const data = pages(groups, options);
@@ -54,15 +57,15 @@ function aggregate<T extends Record<string, any>, A extends any[]>(
     );
   });
 
-  return (...args: A) => {
-    if (pools.status(`aggregate/${id}`).executing.size) return id;
+  return (options: PaginationOptions<Item>) => {
     setTimeout(() => {
-      const generator = aggregator(...args);
+      const generator = aggregator(options);
       generator.executor.controller.signal.addEventListener(
         "abort",
         () => {
           options.invalidate?.();
-          aggregator.close();
+          const { executing, pending } = aggregator.status();
+          if (!executing.size && !pending.size) aggregator.close();
         },
         { once: true }
       );
@@ -73,12 +76,11 @@ function aggregate<T extends Record<string, any>, A extends any[]>(
 }
 
 function aggregator(id: string) {
-  const pool: any =
-    pools.status().find((x) => x.id === `aggregate/${id}`) || {};
+  const pool: any = pools.status().find((x) => x.id === id) || {};
   return {
     next: (pool.next as () => void) || (() => {}),
     prev: (pool.prev as () => void) || (() => {}),
-    close: () => pools.abort(`aggregate/${id}`),
+    close: () => pools.abort(id),
   };
 }
 

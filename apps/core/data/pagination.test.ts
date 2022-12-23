@@ -28,7 +28,7 @@ it("appends pages", async () => {
   await delay(10);
   expect(spy).toHaveBeenCalledTimes(3);
   expect(calls[2]).toEqual([3, 4, 5]);
-  expect(data.current.progress).toBe(0);
+  expect(data.current.progress).approximately(0.6, 0.1);
 
   data.complete(0);
   data.complete(1);

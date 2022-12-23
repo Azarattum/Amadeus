@@ -23,16 +23,16 @@ it("aggregates pool", async () => {
   let calls: any[] = [];
   const spy = vi.fn((x, z) => calls.push([x.map((y: any) => y.data), z]));
 
-  const id = aggregate(event, {
+  const id = aggregate(event, [123])({
     compare: (a, b) => a.data - b.data,
     update: spy,
     page: 4,
-  })(123);
+  });
   await delay(64);
   expect(spy).toHaveBeenCalledTimes(3);
   expect(calls).toEqual([
     [[124, 125], 0.5],
-    [[123, 124, 125], 0.5],
+    [[123, 124, 125], 0.625],
     [[123, 124, 125, 246], 1],
   ]);
 

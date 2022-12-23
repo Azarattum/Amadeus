@@ -52,12 +52,9 @@ message(function* (text) {
   const chat = this.chat;
 
   const { message_id: message } = yield* this.reply({ text: "⏳" });
-  /// Consider a better API
-  const aggregator = aggregate(search, {
-    page: 8,
-    compare: match(text),
+  const id = aggregate(search, ["track", text] as const)({
     update(tracks, progress, page) {
-      const buttons = tracks.map((x: any) => ({
+      const buttons = tracks.map((x) => ({
         text: `${x.artists.join(", ")} - ${x.title}`,
         callback: { download: x.id },
       }));
@@ -68,7 +65,7 @@ message(function* (text) {
           progress < 1
             ? `${Math.round(progress * 100)}% ⏳ ${escape(text)}`
             : `🔎 *${escape(text)}*`,
-        markup: pager(aggregator, page, buttons),
+        markup: pager(id, page, buttons),
       };
 
       fetch("editMessageText", {
@@ -87,7 +84,9 @@ message(function* (text) {
         },
       }).flush();
     },
-  })("track", text);
+    compare: match(text),
+    page: 8,
+  });
 });
 
 command(function* (command) {
