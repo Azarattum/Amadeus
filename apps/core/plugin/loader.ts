@@ -12,9 +12,6 @@ const format = pipeline(unprefix, capitalize);
 const plugins = new Map<string, Plugin>();
 
 async function load() {
-  // Wait a bit to make sure everything is initialized
-  await delay(100);
-
   init.catch((error) => {
     if (error.handler) unload(error.handler);
     wrn.bind({ group: error.handler })(
@@ -32,6 +29,8 @@ async function load() {
         )
       );
 
+  // Wait a bit to make sure everything is initialized
+  await delay(500);
   const results = await Promise.allSettled(
     Object.entries(imports).map(([file, load]) =>
       load().catch((e) => {
