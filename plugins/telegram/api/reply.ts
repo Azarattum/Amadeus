@@ -1,6 +1,6 @@
 import { Infer, map } from "@amadeus-music/core";
-import { fetch, pool } from "./plugin";
-import { Sent } from "./types/core";
+import { fetch, pool } from "../plugin";
+import { Sent } from "../types/core";
 
 type Replier = (message: Message) => Infer<typeof Sent>["result"];
 type Reply = ReturnType<typeof replier>;

@@ -9,8 +9,8 @@ import {
   type,
 } from "@amadeus-music/core";
 import { name, version } from "./package.json";
+import { Reply, Edit } from "./api/reply";
 import { Query } from "./types/action";
-import { Reply, Edit } from "./reply";
 import { Me } from "./types/core";
 
 export const { info, err, wrn, init, stop, search, desource, pool, fetch } =
