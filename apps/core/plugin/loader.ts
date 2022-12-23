@@ -25,7 +25,7 @@ async function load() {
     ? import.meta.glob("../../../plugins/*/index.ts")
     : await readdir(path).then((x) =>
         Object.fromEntries(
-          x.map((file) => [file, () => import(resolve(path, file))])
+          x.map((file) => [file, () => import("file://" + resolve(path, file))])
         )
       );
 

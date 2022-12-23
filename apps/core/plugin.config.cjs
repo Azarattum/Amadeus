@@ -15,7 +15,15 @@ export default defineConfig({
       preventAssignment: true,
     }),
   ],
-  resolve: { alias: { "@amadeus-music/core": "../app.cjs" } },
+  resolve: {
+    alias: [
+      {
+        find: "@amadeus-music/core",
+        replacement: "../app.cjs",
+        customResolver: (id) => ({ external: "relative", id }),
+      },
+    ],
+  },
   build: {
     emptyOutDir: monorepo ? false : true,
     outDir: monorepo ? "../../build/plugins" : "./build",
@@ -24,9 +32,6 @@ export default defineConfig({
       entry: "./index.ts",
       fileName: (ext) =>
         `${name.replace(/(@(\w|-)*\/)|((\w|-)*-)/g, "")}.${ext}`,
-    },
-    rollupOptions: {
-      external: ["../app.cjs"],
     },
   },
 });
