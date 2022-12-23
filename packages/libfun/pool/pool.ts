@@ -150,12 +150,12 @@ function pools(options: Partial<Options> = {}): Pools {
       };
     },
     where(filter) {
-      const group = this[state].group;
+      const group = (this as any).group || this[state].group;
       const context = { group, filter };
       return Function.bind.call(this as any, context) as any;
     },
     split() {
-      const group = this[state].group;
+      const group = (this as any).group || this[state].group;
       return (...args: any[]) => {
         const results = new Map();
         const groups = new Set(
