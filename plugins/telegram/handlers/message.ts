@@ -7,7 +7,7 @@ import {
   info,
   post,
 } from "../plugin";
-import { markdown, pager } from "../api/markup";
+import { markdown, pager, escape } from "../api/markup";
 import { match } from "@amadeus-music/core";
 import { paramify } from "../api/reply";
 
@@ -29,7 +29,7 @@ message(function* (text) {
           progress < 1
             ? `${Math.round(progress * 100)}% ⏳ ${escape(text)}`
             : `🔎 *${escape(text)}*`,
-        markup: pager(id, page, buttons),
+        markup: pager(id, page, buttons, progress >= 1),
       };
 
       fetch("editMessageText", {

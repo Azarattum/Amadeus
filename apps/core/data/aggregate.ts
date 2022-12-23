@@ -64,8 +64,8 @@ function aggregator(
     ) as (Executor & Partial<Controls>) | undefined;
 
     return {
-      next: () => controls?.next?.(),
-      prev: () => controls?.prev?.(),
+      next: () => !!controls?.next?.(),
+      prev: () => !!controls?.prev?.(),
       close: () => controls?.controller.abort(),
     } as Controls;
   }
@@ -122,6 +122,6 @@ function match<T extends Media>(query: string) {
 }
 
 type Context = void | { group?: string };
-type Controls = { next(): void; prev(): void; close(): void };
+type Controls = { next(): boolean; prev(): boolean; close(): void };
 
 export { aggregator as aggregate, match, type Controls };

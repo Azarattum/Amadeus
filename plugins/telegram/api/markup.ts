@@ -1,6 +1,11 @@
 type Buttons = { text: string; callback: Record<string, any> }[][];
 
-function pager(aggregator: string, page: number, options: Buttons[number]) {
+function pager(
+  aggregator: string,
+  page: number,
+  options: Buttons[number],
+  next = true
+) {
   const controls: Buttons = [[], []];
   controls[0].push({
     text: page > 0 ? "👈" : "🤚",
@@ -11,8 +16,8 @@ function pager(aggregator: string, page: number, options: Buttons[number]) {
     callback: { close: aggregator },
   });
   controls[0].push({
-    text: "👉",
-    callback: { next: aggregator },
+    text: next ? "👉" : "🤚",
+    callback: next ? { next: aggregator } : {},
   });
 
   return keyboard([...options.map((x) => [x]), ...controls]);

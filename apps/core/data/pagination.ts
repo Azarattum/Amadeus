@@ -76,23 +76,26 @@ function pages<T extends Record<string, any>>(
       while (pages[selected].satisfied(id)) await wait();
     },
     next() {
+      if (pages[selected].progress < 1) return false;
       if (
         completed.size >= groups.length &&
         !pages[selected + 1]?.items.length
       ) {
-        return;
+        return false;
       }
       selected++;
       if (!pages[selected]) pages[selected] = create(selected);
       refresh();
       if (pages[selected].progress < 1) resolve();
+      return true;
     },
     prev() {
-      if (selected <= 0) return;
+      if (selected <= 0) return false;
       selected--;
       if (!pages[selected]) pages[selected] = create(selected);
       refresh();
       if (pages[selected].progress < 1) resolve();
+      return true;
     },
     complete(id: number) {
       const changed = !pages[selected].satisfied(id);
