@@ -9,11 +9,11 @@
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
     "@amadeus-music/util": "workspace:*",
-    "acebase": "^1.26.2",
-    "acebase-core": "^1.24.0",
-    "acebase-server": "^1.15.2"
+    "acebase": "^1.27.0",
+    "acebase-core": "^1.25.0",
+    "acebase-server": "^1.16.0"
   },
   "devDependencies": {
-    "vite": "3.2.4"
+    "vite": "4.0.3"
   }
 }
