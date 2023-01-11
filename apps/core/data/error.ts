@@ -1,13 +1,10 @@
 import { bright, highlight, red } from "@amadeus-music/util/color";
 import { offset, rescape } from "@amadeus-music/util/string";
+import type { Context } from "../plugin/types";
 import { StructError } from "superstruct";
 import { PoolError } from "libfun";
 
-function format(
-  error: any,
-  context?: { group?: string } | void,
-  message = false
-) {
+function format(error: any, context?: Context, message = false) {
   const original = error.message || "";
   if (error instanceof Error && error.cause) {
     error.message = error.message + "\n" + format(error.cause, context, true);

@@ -1,11 +1,10 @@
 import { merge, pick } from "@amadeus-music/util/object";
 import { gretch, type GretchOptions } from "gretchen";
+import type { Context } from "../plugin/types";
 import { errorify } from "libfun/utils/error";
 import type { Struct } from "superstruct";
 import { async, context } from "libfun";
 import { pools } from "../event/pool";
-
-type Context = void | { group?: string };
 
 type FetchOptions = {
   [K in keyof GretchOptions]: K extends "baseURL"

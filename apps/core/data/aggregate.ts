@@ -5,6 +5,7 @@ import type { Executor } from "libfun/pool/pool.types";
 import type { Media } from "@amadeus-music/protocol";
 import { clean } from "@amadeus-music/util/string";
 import { batch } from "@amadeus-music/util/object";
+import type { Context } from "../plugin/types";
 import type { Fn } from "libfun/utils/types";
 import { aggregate } from "../event/pool";
 import { err, wrn } from "../status/log";
@@ -121,7 +122,6 @@ function match<T extends Media>(query: string) {
   };
 }
 
-type Context = void | { group?: string };
 type Controls = { next(): boolean; prev(): boolean; close(): void };
 
 export { aggregator as aggregate, match, type Controls };

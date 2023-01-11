@@ -10,6 +10,7 @@ import {
   yellow,
   type Color,
 } from "@amadeus-music/util/color";
+import type { Context } from "../plugin/types";
 import { log as logged } from "../event/pool";
 import { pipeline, take } from "libfun";
 import { format } from "../data/error";
@@ -19,8 +20,6 @@ import { inspect } from "util";
 function time() {
   return new Date().toTimeString().slice(0, 8);
 }
-
-type Context = { group?: string } | void;
 
 function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
   separator ??= "|";

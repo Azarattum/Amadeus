@@ -10,6 +10,7 @@ import { capitalize, format } from "@amadeus-music/util/string";
 import { format as formatPlugin } from "../plugin/loader";
 import { pretty } from "@amadeus-music/util/object";
 import { log, pool, pools } from "../event/pool";
+import type { Context } from "../plugin/types";
 import { register } from "../data/config";
 import { async, map, take } from "libfun";
 import { launch, stop } from "./manage";
@@ -25,11 +26,7 @@ const arg = {
   command: Symbol("command"),
 };
 
-function command<T extends Record<string, any> = Record<string, never>>(
-  this: { group?: string } | { group: string; context: T } | void,
-  what: string,
-  ...args: readonly Argument[]
-) {
+function command(this: Context, what: string, ...args: readonly Argument[]) {
   if (!what) throw new Error("Invalid command!");
   commands.set(what, (args || []) as any);
   const command = pool<(...args: (string | undefined)[]) => void>(

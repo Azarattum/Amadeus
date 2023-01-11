@@ -53,5 +53,7 @@ type Configure<
     : T[K];
 };
 
+type Context = void | { group?: string };
+
 export { PluginInfo };
-export type { Plugin, PluginConfig, ConfigStruct, Configure };
+export type { Plugin, PluginConfig, ConfigStruct, Configure, Context };
