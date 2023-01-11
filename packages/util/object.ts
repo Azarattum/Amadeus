@@ -109,11 +109,11 @@ export async function combine<T, U>(
     merge,
     map,
   }: {
-    identify: (item: T | U) => string;
+    identify: (item: T | U) => number;
     compare: (a: T, b: T) => number;
     merge: (a: T, b: U) => void;
     convert: (item: U) => T;
-    map: Map<string, T>;
+    map: Map<number, T>;
   }
 ) {
   const insert = (where: number, item: T) => {

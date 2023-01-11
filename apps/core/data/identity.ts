@@ -30,7 +30,7 @@ function stringify(data: any) {
     : JSON.stringify(data);
 }
 
-function identify(data: any) {
+function identify(data: any): number {
   if (data && typeof data === "object" && "id" in data) return data.id;
   return hash(stringify(data));
 }

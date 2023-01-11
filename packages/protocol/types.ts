@@ -18,9 +18,10 @@ const track = object({
   artists: array(string()),
   album: string(),
   year: nullable(number()),
+  length: number(),
+
   source: array(string()),
   art: array(string()),
-  length: number(),
 });
 
 type Artist = Infer<typeof artist>;
@@ -37,9 +38,9 @@ const album = object({
   art: array(string()),
 });
 
-type Unique<T> = T & { id: string };
+type Unique<T> = T & { id: number };
 const unique = <T extends Struct<any>>(t: T) =>
-  intersection([t, object({ id: string() })]);
+  intersection([t, object({ id: number() })]);
 
 type Abstract<T> = T extends any ? Omit<T, "source" | "art" | "length"> : never;
 const abstract = <T extends ObjectSchema>(t: Struct<ObjectType<T>, T>) =>

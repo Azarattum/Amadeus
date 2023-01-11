@@ -10,7 +10,7 @@ function page<T extends Record<string, any>>(
   options: PaginationOptions<T>
 ) {
   const progress = groups.map(() => new Set());
-  const map = new Map<string, T>();
+  const map = new Map<number, T>();
   const size = options.page;
   const items: T[] = [];
 
