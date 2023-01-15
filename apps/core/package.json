@@ -14,7 +14,7 @@
   "dependencies": {
     "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/util": "workspace:*",
-    "gretchen": "^1.5.0",
+    "gretchen": "^1.5.1",
     "libfun": "workspace:*",
     "murmurhash": "^2.0.1",
     "string-similarity-js": "^2.1.4",
@@ -22,6 +22,6 @@
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.2",
-    "vite-node": "0.26.2"
+    "vite-node": "0.27.1"
   }
 }
