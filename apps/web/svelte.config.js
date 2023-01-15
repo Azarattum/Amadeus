@@ -7,6 +7,7 @@ const config = {
 
   kit: {
     files: {
+      lib: "lib",
       routes: "routes",
       appTemplate: "routes/+layout.html",
     },
