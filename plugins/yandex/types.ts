@@ -44,21 +44,37 @@ const Download = type({
 });
 
 function convert(track: Infer<typeof Track>) {
+  /// TODO: comply with protocol
   return {
     title: track.title,
-    artists: track.artists.map((x) => x.name),
-    album: track.albums[0]?.title || track.title,
-    art: track.coverUri
-      ? [
-          "https://" +
-            track.coverUri.slice(0, track.coverUri.length - 2) +
-            "800x800",
-        ]
-      : [],
-    source: [`amadeus://yandex/${track.id}`],
     length: track.durationMs / 1000,
-    /// INVESTIGATE: Yandex doesn't returns a year?
-    year: null,
+    album: {
+      title: track.albums[0]?.title || track.title,
+      artists: track.artists.map((x) => ({
+        title: x.name,
+        art: [],
+        source: [],
+      })),
+      year: track.albums[0].year || null,
+      art: track.coverUri
+        ? [
+            {
+              url:
+                "https://" +
+                track.coverUri.slice(0, track.coverUri.length - 2) +
+                "800x800",
+              priority: 0,
+            },
+          ]
+        : [],
+      source: [],
+    },
+    source: [
+      {
+        url: `amadeus://yandex/${track.id}`,
+        priority: 0,
+      },
+    ],
   };
 }
 
