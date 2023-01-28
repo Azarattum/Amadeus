@@ -1,7 +1,7 @@
 import { database, json } from "crstore";
 import { schema } from "./schema";
 
-const { store } = database(schema, { name: "library.db" });
+const { store, update } = database(schema, { name: "library.db" });
 
 const playlists = store((db) =>
   db
@@ -12,16 +12,16 @@ const playlists = store((db) =>
         .innerJoin("tracks", "tracks.id", "library.track")
         .innerJoin("albums", "albums.id", "tracks.album")
         .innerJoin("catalogue", "catalogue.album", "albums.id")
-        .innerJoin("artists", "artists.id", "catalogue.id")
-        /// Assets
+        .innerJoin("artists", "artists.id", "catalogue.artist")
         .select([
           "playlists.title as playlist",
+          "library.order as order",
           "library.id as key",
           "tracks.id as id",
           "tracks.title as title",
           "tracks.length as length",
-          "albums.title as album",
-          "albums.year as year",
+          "albums.title as album", /// album should have a source
+          "albums.year as year", /// guess it makes sense to put year in the album...
           (qb) =>
             json(qb, {
               title: "artists.title",
@@ -36,6 +36,7 @@ const playlists = store((db) =>
       (qb) =>
         json(qb, {
           key: "key",
+          order: "order",
           id: "id",
           title: "title",
           length: "length",
@@ -47,4 +48,4 @@ const playlists = store((db) =>
     .groupBy("playlist")
 );
 
-export { playlists };
+export { playlists, update };
