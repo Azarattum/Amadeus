@@ -12,6 +12,8 @@ import {
 } from "superstruct";
 import type { ObjectSchema, ObjectType } from "superstruct/dist/utils";
 
+/// TODO: rewrite protocol
+
 type Track = Infer<typeof track>;
 const track = object({
   title: string(),
