@@ -12,8 +12,4 @@ export default defineConfig({
   server: {
     fs: { allow: ["."], deny: ["node_modules"] },
   },
-  optimizeDeps: {
-    /// TODO: investigate why exactly we need it
-    exclude: ["crstore"],
-  },
 });

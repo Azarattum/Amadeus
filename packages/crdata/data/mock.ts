@@ -1,6 +1,7 @@
 import type { Infer } from "superstruct";
 import type { schema } from "./schema";
 import { update } from "./library";
+import { APPEND } from "crstore";
 
 function put<T extends keyof Infer<typeof schema>>(
   table: T,
@@ -17,7 +18,6 @@ function put<T extends keyof Infer<typeof schema>>(
 
 /** For development purposes only! Database mocking. */
 async function mock() {
-  /// Check that the data is properly mocked!
   await put("tracks", {
     id: 12345,
     title: "Test Song",
@@ -39,7 +39,6 @@ async function mock() {
   await put("artists", {
     id: 2345,
     title: "Test Artist",
-    following: false,
     source: '["http://123"]',
     art: '["http://1234"]',
   });
@@ -48,7 +47,14 @@ async function mock() {
     playlist: 9876,
     track: 12345,
     date: Date.now(),
-    order: "Z0",
+    order: APPEND,
+  });
+  await put("library", {
+    id: 354878,
+    playlist: 9876,
+    track: 12345,
+    date: Date.now(),
+    order: APPEND,
   });
   await put("playlists", {
     id: 9876,

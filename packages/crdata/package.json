@@ -1,0 +1,10 @@
+{
+  "name": "@amadeus-music/crdata",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@amadeus-music/protocol": "workspace:*",
+    "crstore": "^0.5.0",
+    "superstruct": "^1.0.3"
+  }
+}

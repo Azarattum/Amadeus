@@ -1,60 +1,41 @@
-import {
-  object,
-  number,
-  string,
-  array,
-  type Infer,
-  intersection,
-  Struct,
-  union,
-  omit,
-  nullable,
-} from "superstruct";
-import type { ObjectSchema, ObjectType } from "superstruct/dist/utils";
+import { array, number, object, string, union } from "superstruct";
+import type { Infer } from "superstruct";
+import { unique } from "./modifiers";
 
-/// TODO: rewrite protocol
-
-type Track = Infer<typeof track>;
 const track = object({
   title: string(),
-  artists: array(string()),
-  album: string(),
-  year: nullable(number()),
   length: number(),
-
-  source: array(string()),
-  art: array(string()),
+  source: string(),
 });
 
-type Artist = Infer<typeof artist>;
-const artist = object({
-  title: string(),
-  source: array(string()),
-  art: array(string()),
-});
-
-type Album = Infer<typeof album>;
 const album = object({
   title: string(),
-  source: array(string()),
-  art: array(string()),
+  year: number(),
+  source: string(),
+  art: string(),
 });
 
-type Unique<T> = T & { id: number };
-const unique = <T extends Struct<any>>(t: T) =>
-  intersection([t, object({ id: number() })]);
-
-type Abstract<T> = T extends any ? Omit<T, "source" | "art" | "length"> : never;
-const abstract = <T extends ObjectSchema>(t: Struct<ObjectType<T>, T>) =>
-  omit(t, ["source", "art", "length"]);
-
-type Media = Infer<typeof media>;
-const media = union([track, artist, album]);
-
-type Source = Infer<typeof source>;
-const source = object({
-  url: string(),
+const artist = object({
+  title: string(),
+  source: string(),
+  art: string(),
 });
 
-export { media, track, artist, album, source, unique, abstract };
-export type { Media, Track, Artist, Album, Source, Unique, Abstract };
+const details = union([
+  unique(track),
+  object({
+    album: unique(album),
+    artists: array(unique(artist)),
+  }),
+]);
+
+const meta = union([track, object({ album, artists: array(artist) })]);
+
+type Track = Infer<typeof track>;
+type Album = Infer<typeof album>;
+type Artist = Infer<typeof artist>;
+type Details = Infer<typeof details>;
+type Meta = Infer<typeof meta>;
+
+export type { Track, Album, Artist, Details, Meta };
+export { track, album, artist, details, meta };
