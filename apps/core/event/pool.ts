@@ -1,4 +1,4 @@
-import type { Album, Artist, Source, Track } from "@amadeus-music/protocol";
+import type { TrackInfo, AlbumInfo, ArtistInfo } from "@amadeus-music/protocol";
 import type { PaginationOptions } from "../data/pagination";
 import type { Controls } from "../data/aggregate";
 import type { BaseConfig } from "../data/config";
@@ -25,11 +25,11 @@ const stop = pool("stop");
 
 // Aggregator events
 const search = pool<
-  | ((type: "track", query: string) => Track)
-  | ((type: "album", query: string) => Album)
-  | ((type: "artist", query: string) => Artist)
+  | ((type: "track", query: string) => TrackInfo)
+  | ((type: "album", query: string) => AlbumInfo)
+  | ((type: "artist", query: string) => ArtistInfo)
 >("search");
-const desource = pool<(sources: string[]) => Source>("desource");
+const desource = pool<(sources: string[]) => string>("desource");
 /// TODO:
 //  Provider
 //    - relate

@@ -13,9 +13,16 @@ const Track = type({
   coverUri: optional(string()),
   durationMs: number(),
   title: string(),
-  artists: array(type({ name: string() })),
+  artists: array(
+    type({
+      name: string(),
+      id: number(),
+      cover: optional(type({ uri: string() })),
+    })
+  ),
   albums: array(
     type({
+      id: number(),
       year: optional(number()),
       title: optional(string()),
     })
@@ -44,37 +51,24 @@ const Download = type({
 });
 
 function convert(track: Infer<typeof Track>) {
-  /// TODO: comply with protocol
+  const toArt = (cover?: string) =>
+    cover ? ["https://" + cover.slice(0, -2) + "800x800"] : [];
+
   return {
     title: track.title,
     length: track.durationMs / 1000,
+    source: JSON.stringify([`yandex/${track.id}`]),
     album: {
       title: track.albums[0]?.title || track.title,
-      artists: track.artists.map((x) => ({
-        title: x.name,
-        art: [],
-        source: [],
-      })),
-      year: track.albums[0].year || null,
-      art: track.coverUri
-        ? [
-            {
-              url:
-                "https://" +
-                track.coverUri.slice(0, track.coverUri.length - 2) +
-                "800x800",
-              priority: 0,
-            },
-          ]
-        : [],
-      source: [],
+      year: track.albums[0]?.year || null,
+      art: JSON.stringify(toArt(track.coverUri)),
+      source: JSON.stringify([`yandex/${track.albums[0].id}`]),
     },
-    source: [
-      {
-        url: `amadeus://yandex/${track.id}`,
-        priority: 0,
-      },
-    ],
+    artists: track.artists.map((x) => ({
+      title: x.name,
+      art: JSON.stringify(toArt(x.cover?.uri)),
+      source: JSON.stringify([`yandex/${x.id}`]),
+    })),
   };
 }
 

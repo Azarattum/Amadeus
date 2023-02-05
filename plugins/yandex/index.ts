@@ -43,7 +43,5 @@ desource(function* (sources: string[]) {
 
   const trackUrl = `XGRlBW9FXlekgbPrRHuSiA${info.path.slice(1)}${info.s}`;
   const sign = createHash("md5").update(trackUrl).digest("hex");
-  yield {
-    url: `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`,
-  };
+  yield `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`;
 });

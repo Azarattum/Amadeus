@@ -2,7 +2,6 @@ import { async, context, first, map, merge as parallel } from "libfun/pool";
 import { pages, type PaginationOptions } from "./pagination";
 import { stringSimilarity } from "string-similarity-js";
 import type { Executor } from "libfun/pool/pool.types";
-import type { Media } from "@amadeus-music/protocol";
 import { clean } from "@amadeus-music/util/string";
 import { batch } from "@amadeus-music/util/object";
 import type { Context } from "../plugin/types";
@@ -96,24 +95,25 @@ function aggregator(
   return id;
 }
 
-function match<T extends Media>(query: string) {
+function match(query: string) {
   const track = normalize(inferTrack(query));
   query = clean(query);
 
-  const compare = (x: T, key: string) => {
-    const target = (x as any)[key]?.toString();
-    const source = (track as any)[key]?.toString();
+  type Media = Partial<Record<keyof typeof track, any>>;
+  const compare = (x: Media, key: keyof typeof track) => {
+    const target = x[key]?.toString();
+    const source = track[key]?.toString();
     if (!target) return 0;
     const withQuery = stringSimilarity(target, query);
     if (!source) return withQuery;
     return Math.max(withQuery, stringSimilarity(target, source));
   };
 
-  return (a: T, b: T) => {
-    a = normalize(a) as T;
-    b = normalize(b) as T;
+  return (a: Media, b: Media) => {
+    a = normalize(a);
+    b = normalize(b);
 
-    const keys = ["title", "artists", "album"];
+    const keys = ["title", "artists", "album"] as const;
     const weights = [4, 2, 1];
 
     const scores = keys.map((key) => [compare(a, key), compare(b, key)]);
