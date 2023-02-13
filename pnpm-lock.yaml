@@ -24,7 +24,7 @@ importers:
       prettier-plugin-sort-imports: ^1.7.1
       prettier-plugin-svelte: ^2.9.0
       prettier-plugin-tailwindcss: ^0.2.2
-      rimraf: ^3.0.2
+      rimraf: ^4.1.2
       rollup: ^3.15.0
       svelte: ^3.55.1
       svelte-preprocess: ^5.0.1
@@ -55,7 +55,7 @@ importers:
       prettier-plugin-sort-imports: 1.7.1_typescript@4.9.5
       prettier-plugin-svelte: 2.9.0_jrsxveqmsx2uadbqiuq74wlc4u
       prettier-plugin-tailwindcss: 0.2.2_yjdjpc7im5hvpskij45owfsns4
-      rimraf: 3.0.2
+      rimraf: 4.1.2
       rollup: 3.15.0
       svelte: 3.55.1
       svelte-preprocess: 5.0.1_k4bhxdknaltjvjwprbm23edr5q
@@ -2861,6 +2861,12 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
+    dev: true
+
+  /rimraf/4.1.2:
+    resolution: {integrity: sha512-BlIbgFryTbw3Dz6hyoWFhKk+unCcHMSkZGrTFVAx2WmttdBSonsdtRlwiuTbDqTKr+UlXIUqJVS4QT5tUzGENQ==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /rollup/3.15.0:
