@@ -10,13 +10,11 @@ importers:
       '@typescript-eslint/eslint-plugin': ^5.51.0
       '@typescript-eslint/parser': ^5.51.0
       '@vitest/coverage-c8': ^0.28.5
-      '@vlcn.io/wa-crsqlite': 0.7.4
       autoprefixer: ^10.4.13
       cssnano: ^5.1.14
       eslint: ^8.34.0
       eslint-config-prettier: ^8.6.0
       eslint-plugin-svelte3: ^4.0.0
-      ncp: ^2.0.0
       postcss: ^8.4.21
       postcss-import: ^15.1.0
       postcss-nested: ^6.0.0
@@ -41,13 +39,11 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.51.0_z4swst3wuuqk4hlme4ajzslgh4
       '@typescript-eslint/parser': 5.51.0_7kw3g6rralp5ps6mg3uyzz6azm
       '@vitest/coverage-c8': 0.28.5
-      '@vlcn.io/wa-crsqlite': 0.7.4
       autoprefixer: 10.4.13_postcss@8.4.21
       cssnano: 5.1.14_postcss@8.4.21
       eslint: 8.34.0
       eslint-config-prettier: 8.6.0_eslint@8.34.0
       eslint-plugin-svelte3: 4.0.0_dbthnr4b2bdkhyiebwn7su3hnq
-      ncp: 2.0.0
       postcss: 8.4.21
       postcss-import: 15.1.0_postcss@8.4.21
       postcss-nested: 6.0.0_postcss@8.4.21
@@ -103,11 +99,11 @@ importers:
   packages/crdata:
     specifiers:
       '@amadeus-music/protocol': workspace:*
-      crstore: ^0.5.1
+      crstore: ^0.5.2
       superstruct: ^1.0.3
     dependencies:
       '@amadeus-music/protocol': link:../protocol
-      crstore: 0.5.1
+      crstore: 0.5.2
       superstruct: 1.0.3
 
   packages/libfun:
@@ -798,14 +794,17 @@ packages:
       '@vlcn.io/wa-sqlite': 0.14.3
       '@vlcn.io/xplat-api': 0.6.2
       comlink: 4.4.1
+    dev: false
 
   /@vlcn.io/wa-sqlite/0.14.3:
     resolution: {integrity: sha512-O16OHakgR7udJJ7HxlXQSDq0Ez52WG4/jP63T+I1ECkvWdE3wgPfRVGNFKb8jDh2GgWw9EI37NTOMBiE3wVCXA==}
+    dev: false
 
   /@vlcn.io/xplat-api/0.6.2:
     resolution: {integrity: sha512-/DiSmga9koqWrn/oyevbhEkkIXeWKAJ4QU/D7jSUQGICo710tAJ9nVc5vgti/X8QJ1G57VwQq3gyudHaITNfJQ==}
     dependencies:
       comlink: 4.4.1
+    dev: false
 
   /acorn-jsx/5.3.2_acorn@8.8.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1137,6 +1136,7 @@ packages:
 
   /comlink/4.4.1:
     resolution: {integrity: sha512-+1dlx0aY5Jo1vHy/tSsIGpSkN4tS9rZSW8FIhG0JH/crs9wwweswIo/POr451r7bZww3hFbPAKnTpimzL/mm4Q==}
+    dev: false
 
   /commander/7.2.0:
     resolution: {integrity: sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==}
@@ -1165,8 +1165,8 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crstore/0.5.1:
-    resolution: {integrity: sha512-IcuKQXaRzZsiqx0rQ1y0/SvV98foYXmlpcmf3MqutsNkY6I+DlD+k7ZEaKwIycj6Q7cOYdQyOhMF3V2YVVmxNw==}
+  /crstore/0.5.2:
+    resolution: {integrity: sha512-C0i6D9BpXyLnaV1tJNH7xMt2TAii7hrR+WZnaTKPJQUgFj69D0R/PBPUiZ0Bx65cy2XBuT+8hBRD887GHOpg+A==}
     dependencies:
       '@vlcn.io/crsqlite': 0.7.2
       '@vlcn.io/wa-crsqlite': 0.7.4
@@ -2146,11 +2146,6 @@ packages:
   /navigator.locks/0.8.6:
     resolution: {integrity: sha512-3ykNHTGTGS2xgFlSUqc7fPGnrwpBiuNbYBdW3i3aSwu05nvYdk3D6qEidLxMqufxpLJ3VRnt4TBzNigNL6hcYA==}
     dev: false
-
-  /ncp/2.0.0:
-    resolution: {integrity: sha512-zIdGUrPRFTUELUvr3Gmc7KZ2Sw/h1PiVM0Af/oHB6zgnV1ikqSfRk+TOufi79aHYCW3NiOXmr1BP5nWbzojLaA==}
-    hasBin: true
-    dev: true
 
   /node-abi/3.33.0:
     resolution: {integrity: sha512-7GGVawqyHF4pfd0YFybhv/eM9JwTtPqx0mAanQ146O3FlSh3pA24zf9IRQTOsfTSqXTNzPSP5iagAJ94jjuVog==}

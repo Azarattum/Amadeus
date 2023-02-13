@@ -7,7 +7,6 @@
     "plugins/*"
   ],
   "scripts": {
-    "postinstall": "ncp node_modules/@vlcn.io/wa-crsqlite/dist/wa-sqlite-async.wasm apps/web/static/sqlite.wasm",
     "build": "rimraf build && turbo run build --parallel --no-daemon",
     "clean": "rimraf build */*/coverage",
     "coverage": "turbo run coverage --parallel --no-daemon",
@@ -22,13 +21,11 @@
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
     "@vitest/coverage-c8": "^0.28.5",
-    "@vlcn.io/wa-crsqlite": "0.7.4",
     "autoprefixer": "^10.4.13",
     "cssnano": "^5.1.14",
     "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-svelte3": "^4.0.0",
-    "ncp": "^2.0.0",
     "postcss": "^8.4.21",
     "postcss-import": "^15.1.0",
     "postcss-nested": "^6.0.0",
