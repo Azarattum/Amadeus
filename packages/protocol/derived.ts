@@ -1,17 +1,16 @@
-import { array, object, union } from "superstruct";
+import { array, assign, object } from "superstruct";
 import { album, artist, track } from "./base";
 import type { Infer } from "superstruct";
 import { unique } from "./modifiers";
 
-const trackInfo = union([track, object({ album, artists: array(artist) })]);
-
-const trackDetails = union([
+const trackInfo = assign(track, object({ album, artists: array(artist) }));
+const trackDetails = assign(
   unique(track),
   object({
     album: unique(album),
     artists: array(unique(artist)),
-  }),
-]);
+  })
+);
 
 const artistInfo = artist;
 const artistDetails = unique(artist);
