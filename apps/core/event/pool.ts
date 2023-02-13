@@ -43,5 +43,8 @@ const desource = pool<(sources: string[]) => string>("desource");
 //    - follow
 //    - unfollow
 
-export { log, init, stop, search, desource, aggregate };
+const database = pool<(user: string) => any>("database");
+const users = pool<() => number>("users");
+
+export { log, init, stop, search, desource, aggregate, database, users };
 export { all as pools, pool };

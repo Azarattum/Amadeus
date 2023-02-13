@@ -1,0 +1,16 @@
+{
+  "name": "@amadeus-music/plugin-sqlite",
+  "description": "Persist user data in SQLite databases.",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.cjs"
+  },
+  "dependencies": {
+    "@amadeus-music/core": "workspace:*",
+    "@amadeus-music/crdata": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "4.1.1"
+  }
+}
