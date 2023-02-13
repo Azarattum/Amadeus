@@ -1,23 +1,26 @@
 import type { Infer } from "superstruct";
+import type { connect } from "./library";
 import type { schema } from "./schema";
-import { update } from "./library";
 import { APPEND } from "crstore";
 
-function put<T extends keyof Infer<typeof schema>>(
-  table: T,
-  data: Infer<typeof schema>[T] | Infer<typeof schema>[T][]
-) {
-  return update((db) =>
-    db
-      .insertInto(table)
-      .onConflict((qb) => qb.doNothing())
-      .values(data as any)
-      .execute()
-  );
+function prepare(update: ReturnType<typeof connect>["update"]) {
+  return function <T extends keyof Infer<typeof schema>>(
+    table: T,
+    data: Infer<typeof schema>[T] | Infer<typeof schema>[T][]
+  ) {
+    return update((db) =>
+      db
+        .insertInto(table)
+        .onConflict((qb) => qb.doNothing())
+        .values(data as any)
+        .execute()
+    );
+  };
 }
 
 /** For development purposes only! Database mocking. */
-async function mock() {
+async function mock(update: ReturnType<typeof connect>["update"]) {
+  const put = prepare(update);
   await put("tracks", {
     id: 12345,
     title: "Test Song",

@@ -1,13 +1,8 @@
 <script lang="ts">
-  import { mock, playlists } from "@amadeus-music/crdata";
+  import { playlists } from "@amadeus-music/crdata/stores";
   import { Button } from "@amadeus-music/ui";
-  import { onMount } from "svelte";
 
-  onMount(async () => {
-    /// For testing
-    await mock();
-    console.log($playlists);
-  });
+  $: console.log($playlists);
 </script>
 
 <!-- ///Temporary example!!! -->

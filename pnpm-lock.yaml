@@ -99,11 +99,11 @@ importers:
   packages/crdata:
     specifiers:
       '@amadeus-music/protocol': workspace:*
-      crstore: ^0.5.2
+      crstore: ^0.5.3
       superstruct: ^1.0.3
     dependencies:
       '@amadeus-music/protocol': link:../protocol
-      crstore: 0.5.2
+      crstore: 0.5.3
       superstruct: 1.0.3
 
   packages/libfun:
@@ -123,6 +123,17 @@ importers:
 
   packages/util:
     specifiers: {}
+
+  plugins/sqlite:
+    specifiers:
+      '@amadeus-music/core': workspace:*
+      '@amadeus-music/crdata': workspace:*
+      vite: 4.1.1
+    dependencies:
+      '@amadeus-music/core': link:../../apps/core
+      '@amadeus-music/crdata': link:../../packages/crdata
+    devDependencies:
+      vite: 4.1.1
 
   plugins/telegram:
     specifiers:
@@ -1165,8 +1176,8 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crstore/0.5.2:
-    resolution: {integrity: sha512-C0i6D9BpXyLnaV1tJNH7xMt2TAii7hrR+WZnaTKPJQUgFj69D0R/PBPUiZ0Bx65cy2XBuT+8hBRD887GHOpg+A==}
+  /crstore/0.5.3:
+    resolution: {integrity: sha512-pHji3FYHV3Q81j+a3eChC8wtFk/NNeaXMauKxMBIMFDcxn5xcCJKCVFOLLANdAtJ9LuuAhk9KIZIKGst0zfuaA==}
     dependencies:
       '@vlcn.io/crsqlite': 0.7.2
       '@vlcn.io/wa-crsqlite': 0.7.4
