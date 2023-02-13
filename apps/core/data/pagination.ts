@@ -1,4 +1,4 @@
-import { identify, uniquify, type Uniqueified } from "./identity";
+import { identify, merge, uniquify, type Uniqueified } from "./identity";
 import { debounce, lock } from "@amadeus-music/util/throttle";
 import { combine } from "@amadeus-music/util/object";
 
@@ -106,40 +106,6 @@ function pages<T extends Record<string, any>>(
       return pages[selected];
     },
   };
-}
-
-function merge<T extends Record<string, any>>(target: T, source: T) {
-  function caseEntropy(text: string) {
-    let small = 0;
-    let big = 0;
-    const lower = text.toLowerCase();
-    const upper = text.toUpperCase();
-    for (let i = 0; i < text.length; i++) {
-      if (lower[i] !== text[i]) big++;
-      if (upper[i] !== text[i]) small++;
-    }
-
-    const all = big + small;
-    return 1 - (Math.abs(all / 2 - small) + Math.abs(all / 2 - big)) / all;
-  }
-
-  for (const key in target) {
-    const a = target[key] as any;
-    const b = source[key] as any;
-    let c = a;
-
-    if (typeof a !== typeof b) continue;
-    if (typeof a === "string") c = caseEntropy(a) >= caseEntropy(b) ? a : b;
-    if (Array.isArray(a) && Array.isArray(b)) {
-      const both = new Set(...a, ...b);
-      c = [...both].sort();
-    } else if (typeof a === "object") c = merge(a, b);
-    target[key] = c;
-  }
-
-  for (const key in source) {
-    if (!(key in target)) target[key] = source[key];
-  }
 }
 
 type PaginationOptions<T> = {

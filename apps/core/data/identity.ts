@@ -1,30 +1,32 @@
 import type { Unique } from "@amadeus-music/protocol";
 import { clean } from "@amadeus-music/util/string";
+import { has } from "@amadeus-music/util/object";
 import hash from "murmurhash";
 
-function destructure(target: any) {
-  if (
-    target &&
-    typeof target === "object" &&
-    "title" in target &&
-    !("album" in target) &&
-    !("artists" in target)
-  ) {
-    return target.title;
+function titled(data: any) {
+  if (has(data, "title")) return data.title;
+  return data;
+}
+
+function compare(a: any, b: any): number {
+  if (typeof a === "string" && typeof b === "string") return a.localeCompare(b);
+  if (typeof a === "number" && typeof b === "number") return a - b;
+  if (has(a, "title") && has(b, "title")) {
+    return compare(clean(titled(a)), clean(titled(b)));
   }
-  return target;
+  return 0;
 }
 
 function normalize<T extends Record<string, any> | string>(
   data: T
 ): T extends string ? string : T {
-  data = destructure(data);
   if (typeof data === "string") return clean(data) as any;
   if (typeof data !== "object") return data as any;
   const copy = { ...data };
   for (const key in copy) {
-    if (Array.isArray(copy[key])) copy[key] = copy[key].map(normalize).sort();
-    else copy[key] = normalize(copy[key] as any);
+    if (Array.isArray(copy[key])) {
+      copy[key] = copy[key].map(normalize).sort(compare);
+    } else copy[key] = normalize(copy[key] as any);
   }
 
   return copy as any;
@@ -36,18 +38,54 @@ function stringify(data: any) {
     ? data
     : typeof data !== "object"
     ? clean(String(data))
-    : "artists" in data && "title" in data && "album" in data
-    ? `${data.artists} - ${data.title} - ${data.album}`
-    : "artists" in data && "title" in data
+    : has(data, "artists") && has(data, "title") && has(data, "album")
+    ? `${data.artists.map(titled)} - ${data.title} - ${titled(data.album)}`
+    : has(data, "artists") && has(data, "title")
     ? `${data.artists} - ${data.title}`
-    : "title" in data
+    : has(data, "title")
     ? data.title
     : JSON.stringify(data);
 }
 
 function identify(data: any): number {
-  if (data && typeof data === "object" && "id" in data) return data.id;
+  if (has(data, "id")) return +data.id;
   return hash(stringify(data));
+}
+
+function merge<T extends Record<string, any>>(target: T, source: T) {
+  function caseEntropy(text: string) {
+    let small = 0;
+    let big = 0;
+    const lower = text.toLowerCase();
+    const upper = text.toUpperCase();
+    for (let i = 0; i < text.length; i++) {
+      if (lower[i] !== text[i]) big++;
+      if (upper[i] !== text[i]) small++;
+    }
+
+    const all = big + small;
+    return 1 - (Math.abs(all / 2 - small) + Math.abs(all / 2 - big)) / all;
+  }
+
+  for (const key in target) {
+    const a = target[key] as any;
+    const b = source[key] as any;
+    let c = a;
+
+    if (typeof a !== typeof b) continue;
+    if (typeof a === "string") c = caseEntropy(a) >= caseEntropy(b) ? a : b;
+    if (Array.isArray(a) && Array.isArray(b)) {
+      const sorted = [...a, ...b].sort(compare);
+      const identified = sorted.map(identify);
+      c = sorted.filter((x, i) => identified.indexOf(identify(x)) === i);
+    } else if (typeof a === "object") c = merge(a, b);
+    target[key] = c;
+  }
+
+  for (const key in source) {
+    if (!(key in target)) target[key] = source[key];
+  }
+  return target;
 }
 
 function uniquify<T>(target: T): Uniqueified<T> {
@@ -70,4 +108,4 @@ type Uniqueified<T> = T extends Record<any, any>
   : T;
 
 export type { Uniqueified };
-export { identify, stringify, normalize, uniquify };
+export { identify, stringify, normalize, uniquify, merge };

@@ -218,6 +218,23 @@ export function pick<T>(from: T): Picked<T> {
   return result as any;
 }
 
+/**
+ * Checks if the target is an object that has the given property defined.
+ * @param target Target in question
+ * @param property Property to check
+ */
+export function has<K extends string>(
+  target: unknown,
+  property: K
+): target is { [P in K]: any } {
+  return (
+    target !== null &&
+    typeof target === "object" &&
+    property in target &&
+    (target as any)[property] !== undefined
+  );
+}
+
 type Picked<T> = T extends (infer U)[]
   ? U
   : T extends Record<string, any>
