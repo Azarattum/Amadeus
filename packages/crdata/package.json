@@ -4,7 +4,7 @@
   "main": "index.ts",
   "dependencies": {
     "@amadeus-music/protocol": "workspace:*",
-    "crstore": "^0.5.0",
+    "crstore": "^0.5.1",
     "superstruct": "^1.0.3"
   }
 }

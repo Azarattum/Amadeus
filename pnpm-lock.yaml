@@ -10,7 +10,7 @@ importers:
       '@typescript-eslint/eslint-plugin': ^5.51.0
       '@typescript-eslint/parser': ^5.51.0
       '@vitest/coverage-c8': ^0.28.5
-      '@vlcn.io/wa-crsqlite': 0.7.3-next.2
+      '@vlcn.io/wa-crsqlite': 0.7.4
       autoprefixer: ^10.4.13
       cssnano: ^5.1.14
       eslint: ^8.34.0
@@ -41,7 +41,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.51.0_z4swst3wuuqk4hlme4ajzslgh4
       '@typescript-eslint/parser': 5.51.0_7kw3g6rralp5ps6mg3uyzz6azm
       '@vitest/coverage-c8': 0.28.5
-      '@vlcn.io/wa-crsqlite': 0.7.3-next.2
+      '@vlcn.io/wa-crsqlite': 0.7.4
       autoprefixer: 10.4.13_postcss@8.4.21
       cssnano: 5.1.14_postcss@8.4.21
       eslint: 8.34.0
@@ -103,11 +103,11 @@ importers:
   packages/crdata:
     specifiers:
       '@amadeus-music/protocol': workspace:*
-      crstore: ^0.5.0
+      crstore: ^0.5.1
       superstruct: ^1.0.3
     dependencies:
       '@amadeus-music/protocol': link:../protocol
-      crstore: 0.5.0
+      crstore: 0.5.1
       superstruct: 1.0.3
 
   packages/libfun:
@@ -784,26 +784,26 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@vlcn.io/crsqlite/0.7.2-next.3:
-    resolution: {integrity: sha512-wFAM4gjOTNcHAKJY96wXlcQkaayHu3rIOjbXSliaT0V0RCWBG+6yWYZEom8fxshduqTb7n872Vx4g40Movv1CQ==}
+  /@vlcn.io/crsqlite/0.7.2:
+    resolution: {integrity: sha512-DDtYIjSL+IQGVQ/ED76Z9w5Czko4BleIn1+f8b9lzmXwHgICc5lUOChvXI8SfSd6DwKkVSb9NI5YILWC6/eNzg==}
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.1
     dev: false
 
-  /@vlcn.io/wa-crsqlite/0.7.3-next.2:
-    resolution: {integrity: sha512-nm60q9fTc7HjGPOMBTd2ryGEJP6QYA8vnREHhlYDJgCFUO+5QM0JZTwX4Vsj70JGJHtLZGff4372VlBYtJ+kBQ==}
+  /@vlcn.io/wa-crsqlite/0.7.4:
+    resolution: {integrity: sha512-9W7/Cz8OrSXrPa6PHyArBAHZNN9iaWNd45V4LKh3mHZSez5vzghdRrqBu6Y6Aa5S8OjH0DZMxA6t4PbBRG7vHQ==}
     dependencies:
-      '@vlcn.io/wa-sqlite': 0.14.2-next.2
-      '@vlcn.io/xplat-api': 0.6.2-next.2
+      '@vlcn.io/wa-sqlite': 0.14.3
+      '@vlcn.io/xplat-api': 0.6.2
       comlink: 4.4.1
 
-  /@vlcn.io/wa-sqlite/0.14.2-next.2:
-    resolution: {integrity: sha512-MTMeShogUZQZ5mYH3yEzApcA9nn3EcTEmp9cd43/nUkIRPCUwWJ3dt9rAlg+UimscW0QuuXQBC7Xhl/P+doVmw==}
+  /@vlcn.io/wa-sqlite/0.14.3:
+    resolution: {integrity: sha512-O16OHakgR7udJJ7HxlXQSDq0Ez52WG4/jP63T+I1ECkvWdE3wgPfRVGNFKb8jDh2GgWw9EI37NTOMBiE3wVCXA==}
 
-  /@vlcn.io/xplat-api/0.6.2-next.2:
-    resolution: {integrity: sha512-2KokxqsFV4GoJvRPHcL9AfPNgV1zfvvjd6X7tJdaoJFnSxhWtAM7H/JY16Mr1Y95swq9Cefr/GK0YMpva2sbbg==}
+  /@vlcn.io/xplat-api/0.6.2:
+    resolution: {integrity: sha512-/DiSmga9koqWrn/oyevbhEkkIXeWKAJ4QU/D7jSUQGICo710tAJ9nVc5vgti/X8QJ1G57VwQq3gyudHaITNfJQ==}
     dependencies:
       comlink: 4.4.1
 
@@ -930,8 +930,8 @@ packages:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
     dev: false
 
-  /better-sqlite3/8.0.1:
-    resolution: {integrity: sha512-JhTZjpyapA1icCEjIZB4TSSgkGdFgpWZA2Wszg7Cf4JwJwKQmbvuNnJBeR+EYG/Z29OXvR4G//Rbg31BW/Z7Yg==}
+  /better-sqlite3/8.1.0:
+    resolution: {integrity: sha512-p1m09H+Oi8R9TPj810pdNswMFuVgRNgCJEWypp6jlkOgSwMIrNyuj3hW78xEuBRGok5RzeaUW8aBtTWF3l/TQA==}
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
@@ -1165,12 +1165,12 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crstore/0.5.0:
-    resolution: {integrity: sha512-NZgZNDZO81tIpl38c+/TJAOP9iAES01U/TmgC/bnOCxwytgudgakojUaL92ZZdu4Ok6sFIAMIBgY4HuHjzUg+Q==}
+  /crstore/0.5.1:
+    resolution: {integrity: sha512-IcuKQXaRzZsiqx0rQ1y0/SvV98foYXmlpcmf3MqutsNkY6I+DlD+k7ZEaKwIycj6Q7cOYdQyOhMF3V2YVVmxNw==}
     dependencies:
-      '@vlcn.io/crsqlite': 0.7.2-next.3
-      '@vlcn.io/wa-crsqlite': 0.7.3-next.2
-      better-sqlite3: 8.0.1
+      '@vlcn.io/crsqlite': 0.7.2
+      '@vlcn.io/wa-crsqlite': 0.7.4
+      better-sqlite3: 8.1.0
       kysely: 0.23.4
       navigator.locks: 0.8.6
       svelte: 3.55.1
@@ -2082,10 +2082,10 @@ packages:
 
   /minimist/1.2.7:
     resolution: {integrity: sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==}
+    dev: true
 
   /minimist/1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
-    dev: true
 
   /mkdirp-classic/0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
@@ -2152,8 +2152,8 @@ packages:
     hasBin: true
     dev: true
 
-  /node-abi/3.31.0:
-    resolution: {integrity: sha512-eSKV6s+APenqVh8ubJyiu/YhZgxQpGP66ntzUb3lY1xB9ukSRaGnx0AIxI+IM+1+IVYC1oWobgG5L3Lt9ARykQ==}
+  /node-abi/3.33.0:
+    resolution: {integrity: sha512-7GGVawqyHF4pfd0YFybhv/eM9JwTtPqx0mAanQ146O3FlSh3pA24zf9IRQTOsfTSqXTNzPSP5iagAJ94jjuVog==}
     engines: {node: '>=10'}
     dependencies:
       semver: 7.3.8
@@ -2660,10 +2660,10 @@ packages:
       detect-libc: 2.0.1
       expand-template: 2.0.3
       github-from-package: 0.0.0
-      minimist: 1.2.7
+      minimist: 1.2.8
       mkdirp-classic: 0.5.3
       napi-build-utils: 1.0.2
-      node-abi: 3.31.0
+      node-abi: 3.33.0
       pump: 3.0.0
       rc: 1.2.8
       simple-get: 4.0.1
@@ -2790,7 +2790,7 @@ packages:
     dependencies:
       deep-extend: 0.6.0
       ini: 1.3.8
-      minimist: 1.2.7
+      minimist: 1.2.8
       strip-json-comments: 2.0.1
     dev: false
 
