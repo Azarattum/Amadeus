@@ -1,5 +1,5 @@
+import { assign, boolean, nullable, number, object, string } from "superstruct";
 import { album, artist, track, unique } from "@amadeus-music/protocol";
-import { assign, nullable, number, object, string } from "superstruct";
 import { primary, crr, ordered, index } from "crstore";
 
 const id = number;
@@ -46,6 +46,40 @@ const playlists = object({
 crr(playlists);
 primary(playlists, "id");
 
+const playback = object({
+  id: id(),
+  track: id(),
+  device: string(),
+  progress: number(),
+  order: string(),
+  hidden: boolean(),
+});
+crr(playback);
+primary(playback, "id");
+index(playback, "device");
+index(playback, "order", "id");
+ordered(playback, "order", "device");
+
+const following = object({
+  artist: id(),
+  seen: id(),
+});
+crr(following);
+primary(following, "artist", "seen");
+
+const settings = object({
+  key: string(),
+  value: string(),
+});
+crr(settings);
+primary(settings, "key");
+index(settings, "value");
+
+const history = object({
+  query: string(),
+  date: number(),
+});
+
 export const schema = object({
   tracks,
   albums,
@@ -53,4 +87,8 @@ export const schema = object({
   artists,
   library,
   playlists,
+  playback,
+  following,
+  settings,
+  history,
 });
