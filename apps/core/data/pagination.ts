@@ -1,7 +1,6 @@
+import { identify, uniquify, type Uniqueified } from "./identity";
 import { debounce, lock } from "@amadeus-music/util/throttle";
-import type { Unique } from "@amadeus-music/protocol";
 import { combine } from "@amadeus-music/util/object";
-import { identify } from "./identity";
 
 function page<T extends Record<string, any>>(
   number: number,
@@ -11,6 +10,7 @@ function page<T extends Record<string, any>>(
 ) {
   const progress = groups.map(() => new Set());
   const map = new Map<number, T>();
+  const convert = uniquify as any;
   const size = options.page;
   const items: T[] = [];
 
@@ -58,7 +58,7 @@ function pages<T extends Record<string, any>>(
   const last = () => pages.findIndex((x) => x.progress < 1);
   const refresh = debounce(() => {
     options.update?.(
-      pages[selected].items as Unique<T>[],
+      pages[selected].items as Uniqueified<T>[],
       pages[selected].progress,
       pages[selected].number
     );
@@ -108,12 +108,6 @@ function pages<T extends Record<string, any>>(
   };
 }
 
-function convert<T extends Record<string, any>>(target: T) {
-  const copy = { ...target, id: identify(target) };
-  for (const key in copy) if (Array.isArray(copy[key])) copy[key].sort();
-  return copy;
-}
-
 function merge<T extends Record<string, any>>(target: T, source: T) {
   function caseEntropy(text: string) {
     let small = 0;
@@ -153,7 +147,7 @@ type PaginationOptions<T> = {
   page: number;
   invalidate?: () => void;
   compare: (a: T, b: T) => number;
-  update?: (items: Unique<T>[], progress: number, page: number) => void;
+  update?: (items: Uniqueified<T>[], progress: number, page: number) => void;
 };
 
 export { pages, type PaginationOptions };

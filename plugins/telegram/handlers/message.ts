@@ -19,7 +19,7 @@ message(function* (text) {
   const id = aggregate(search, ["track", text] as const, {
     update(tracks, progress, page) {
       const buttons = tracks.map((x) => ({
-        text: `${x.artists.join(", ")} - ${x.title}`,
+        text: `${x.artists.map((x) => x.title).join(", ")} - ${x.title}`,
         callback: { download: x.id },
       }));
 
