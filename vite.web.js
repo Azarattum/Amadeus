@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [sveltekit()],
+  build: { rollupOptions: { external: ["path"] } },
   test: {
     exclude: ["node_modules", "build", ".svelte-kit"],
     coverage: {

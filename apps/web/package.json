@@ -9,10 +9,10 @@
     "test": "vitest run -c ../../vite.web.js"
   },
   "dependencies": {
-    "@amadeus-music/ui": "workspace:*",
-    "@amadeus-music/crdata": "workspace:*"
+    "@amadeus-music/crdata": "workspace:*",
+    "@amadeus-music/ui": "workspace:*"
   },
   "devDependencies": {
-    "@sveltejs/adapter-static": "1.0.6"
+    "@sveltejs/adapter-static": "2.0.1"
   }
 }
