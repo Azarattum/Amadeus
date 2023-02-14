@@ -1,8 +1,7 @@
 import { assign, boolean, nullable, number, object, string } from "superstruct";
 import { album, artist, track, unique } from "@amadeus-music/protocol";
 import { primary, crr, ordered, index } from "crstore";
-
-const id = number;
+import { id } from "./base";
 
 const tracks = assign(unique(track), object({ album: id() }));
 crr(tracks);

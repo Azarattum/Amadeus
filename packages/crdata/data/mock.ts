@@ -1,6 +1,6 @@
+import type { schema } from "../schema/user";
 import type { Infer } from "superstruct";
 import type { connect } from "./library";
-import type { schema } from "./schema";
 import { APPEND } from "crstore";
 
 function prepare(update: ReturnType<typeof connect>["update"]) {

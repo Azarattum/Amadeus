@@ -1,5 +1,5 @@
 import { database, json, jsonGroup } from "crstore";
-import { schema } from "./schema";
+import { schema } from "../schema/user";
 import { mock } from "./mock";
 
 function connect(name = "library.db") {
