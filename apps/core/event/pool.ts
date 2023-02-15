@@ -1,5 +1,6 @@
 import type { TrackInfo, AlbumInfo, ArtistInfo } from "@amadeus-music/protocol";
 import type { PaginationOptions } from "../data/pagination";
+import type { Database } from "../data/persistence";
 import type { Controls } from "../data/aggregate";
 import type { BaseConfig } from "../data/config";
 import { pools, type Pool } from "libfun";
@@ -43,7 +44,7 @@ const desource = pool<(sources: string[]) => string>("desource");
 //    - follow
 //    - unfollow
 
-const database = pool<(user: string) => any>("database");
+const database = pool<(user?: string) => Database>("database");
 const users = pool<() => number>("users");
 
 export { log, init, stop, search, desource, aggregate, database, users };

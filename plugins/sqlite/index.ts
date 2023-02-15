@@ -1,16 +1,15 @@
 import { existsSync, mkdirSync, readdirSync } from "fs";
+import { close, connect } from "@amadeus-music/crdata";
 import { database, stop, users } from "./plugin";
-import { connect } from "@amadeus-music/crdata";
+import { async } from "@amadeus-music/core";
 
-database(function* (user) {
+database(function* (user = "shared") {
   if (!existsSync("users")) mkdirSync("users");
-  const db = this.connections.get(user) || connect(`users/${user}.db`);
-  this.connections.set(user, db);
-  yield db;
+  yield connect(`users/${user}.db`).playlists;
 });
 
 stop(function* () {
-  this.connections?.forEach((x) => x.close());
+  yield* async(close());
 });
 
 users(() => {

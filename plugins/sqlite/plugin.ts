@@ -4,7 +4,4 @@ import { name, version } from "./package.json";
 export const { database, users, stop } = register({
   name,
   version,
-  context: {
-    connections: new Map<string, { close(): void }>(),
-  },
 });
