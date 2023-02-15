@@ -2,7 +2,13 @@
   "name": "@amadeus-music/protocol",
   "version": "1.0.0",
   "main": "index.ts",
+  "scripts": {
+    "coverage": "vitest run --coverage",
+    "test": "vitest run"
+  },
   "dependencies": {
+    "@amadeus-music/util": "workspace:*",
+    "murmurhash": "^2.0.1",
     "superstruct": "^1.0.3"
   }
 }
