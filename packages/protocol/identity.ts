@@ -68,8 +68,12 @@ function merge<T extends Record<string, any>>(target: T, source: T) {
   }
 
   for (const key in target) {
-    const a = target[key] as any;
-    const b = source[key] as any;
+    const json =
+      ["art", "source"].includes(key) &&
+      typeof target[key] === "string" &&
+      typeof source[key] === "string";
+    const a = json ? JSON.parse(target[key]) : target[key];
+    const b = json ? JSON.parse(source[key]) : source[key];
     let c = a;
 
     if (typeof a !== typeof b) continue;
@@ -79,7 +83,7 @@ function merge<T extends Record<string, any>>(target: T, source: T) {
       const identified = sorted.map(identify);
       c = sorted.filter((x, i) => identified.indexOf(identify(x)) === i);
     } else if (typeof a === "object") c = merge(a, b);
-    target[key] = c;
+    target[key] = json ? JSON.stringify(c) : c;
   }
 
   for (const key in source) {
@@ -89,7 +93,7 @@ function merge<T extends Record<string, any>>(target: T, source: T) {
 }
 
 function uniquify<T>(target: T): Uniqueified<T> {
-  if (typeof target !== "object") return target as any;
+  if (typeof target !== "object" || !target) return target as any;
   if (Array.isArray(target)) return target.slice().sort().map(uniquify) as any;
 
   const copy: Record<string, any> = { ...target, id: identify(target) };
