@@ -1,3 +1,3 @@
 import { connect } from "../data";
 
-export const { playlists } = connect();
+export const { playlists } = connect("library.db");

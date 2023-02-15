@@ -10,7 +10,7 @@ import {
 } from "superstruct";
 import { album, artist, track, unique } from "@amadeus-music/protocol";
 import { primary, crr, ordered, index } from "crstore";
-import { Database } from "crstore/types";
+import type { Database } from "crstore/types";
 
 const id = integer;
 
