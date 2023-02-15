@@ -1,30 +1,27 @@
 import type { TrackDetails } from "@amadeus-music/protocol";
 import type { Context } from "../plugin/types";
 import { database } from "../event/pool";
-import { async, take } from "libfun";
+import { take } from "libfun";
 
 function persistence(this: Context, user?: string) {
-  const all = (x: any[]) => async(Promise.all(x));
-  const shared = async(take(database.bind(this)()));
-  const connections = async(take(database.bind(this)(user)));
+  const shared = take(database.bind(this)());
+  const connections = take(database.bind(this)(user));
 
   return {
-    *add(track: TrackDetails, playlist?: number) {
-      /// dup operation to the shared DB
-      const dbs = yield* connections;
-      const cache = yield* shared;
-      yield* all([
+    async add(track: TrackDetails, playlist?: number) {
+      const [dbs, cache] = await Promise.all([connections, shared]);
+      await Promise.all([
         ...(user ? dbs.map((x) => x.add(track, playlist)) : []),
         ...cache.map((x) => x.add(track)),
       ]);
     },
-    *remove(track: number, playlist?: number) {
-      const dbs = yield* connections;
-      yield* all(dbs.map((x) => x.remove(track, playlist)));
+    async remove(track: number, playlist?: number) {
+      const dbs = await connections;
+      await Promise.all(dbs.map((x) => x.remove(track, playlist)));
     },
-    *create(playlist: string) {
-      const dbs = yield* connections;
-      yield* all(dbs.map((x) => x.create(playlist)));
+    async create(playlist: string) {
+      const dbs = await connections;
+      await Promise.all(dbs.map((x) => x.create(playlist)));
     },
   };
 }

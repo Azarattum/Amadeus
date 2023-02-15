@@ -6,6 +6,7 @@ import {
   voice,
   info,
   post,
+  persistence,
 } from "../plugin";
 import { markdown, pager, escape } from "../api/markup";
 import { match } from "@amadeus-music/core";
@@ -15,9 +16,11 @@ message(function* (text) {
   info(`${this.name} is searching for "${text}"...`);
   const chat = this.chat;
 
+  const cache = persistence();
   const { message_id: message } = yield* this.reply({ text: "⏳" });
   const id = aggregate(search, ["track", text] as const, {
-    update(tracks, progress, page) {
+    async update(tracks, progress, page) {
+      await Promise.all(tracks.map((x) => cache.add(x)));
       const buttons = tracks.map((x) => ({
         text: `${x.artists.map((x) => x.title).join(", ")} - ${x.title}`,
         callback: { download: x.id },

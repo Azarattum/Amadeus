@@ -24,6 +24,7 @@ export const {
   search,
   desource,
   aggregate,
+  persistence,
 } = register({
   name,
   version,

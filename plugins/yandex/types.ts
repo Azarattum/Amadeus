@@ -60,7 +60,7 @@ function convert(track: Infer<typeof Track>) {
     source: JSON.stringify([`yandex/${track.id}`]),
     album: {
       title: track.albums[0]?.title || track.title,
-      year: track.albums[0]?.year || null,
+      year: track.albums[0]?.year || 0,
       art: JSON.stringify(toArt(track.coverUri)),
       source: JSON.stringify([`yandex/${track.albums[0].id}`]),
     },
