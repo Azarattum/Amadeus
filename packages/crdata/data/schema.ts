@@ -16,6 +16,7 @@ const id = integer;
 
 const tracks = assign(unique(track), object({ album: id() }));
 crr(tracks);
+index(tracks, "album");
 primary(tracks, "id");
 
 const albums = unique(album);
@@ -31,6 +32,7 @@ const catalogue = object({
   artist: id(),
 });
 crr(catalogue);
+index(catalogue, "artist");
 primary(catalogue, "album", "artist");
 
 const library = object({
@@ -42,6 +44,7 @@ const library = object({
 });
 crr(library);
 primary(library, "id");
+index(library, "track");
 index(library, "playlist");
 index(library, "order", "id");
 ordered(library, "order", "playlist");
