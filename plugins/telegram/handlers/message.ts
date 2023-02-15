@@ -20,7 +20,7 @@ message(function* (text) {
   const { message_id: message } = yield* this.reply({ text: "⏳" });
   const id = aggregate(search, ["track", text] as const, {
     async update(tracks, progress, page) {
-      await Promise.all(tracks.map((x) => cache.add(x)));
+      await cache.push(tracks);
       const buttons = tracks.map((x) => ({
         text: `${x.artists.map((x) => x.title).join(", ")} - ${x.title}`,
         callback: { download: x.id },

@@ -65,94 +65,100 @@ export const playlists = ({ store }: DB) =>
         ])
         .groupBy("group"),
     {
-      async add(db, track: TrackDetails, playlist?: number) {
-        await db
-          .insertInto("albums")
-          .onConflict((x) => x.doNothing())
-          .values(track.album)
-          .execute();
-        await db
-          .insertInto("artists")
-          .onConflict((x) => x.doNothing())
-          .values(track.artists)
-          .execute();
-        await db
-          .insertInto("tracks")
-          .onConflict((x) => x.doNothing())
-          .values({
-            id: track.id,
-            title: track.title,
-            length: track.length,
-            source: track.source,
-            album: track.album.id,
-          })
-          .execute();
-        await db
-          .insertInto("catalogue")
-          .onConflict((x) => x.doNothing())
-          .values(
-            track.artists.map(({ id }) => ({
-              artist: id,
+      async push(db, tracks: TrackDetails[], playlist?: number) {
+        const promises = tracks.map(async (track) => {
+          await db
+            .insertInto("albums")
+            .onConflict((x) => x.doNothing())
+            .values(track.album)
+            .execute();
+          await db
+            .insertInto("artists")
+            .onConflict((x) => x.doNothing())
+            .values(track.artists)
+            .execute();
+          await db
+            .insertInto("tracks")
+            .onConflict((x) => x.doNothing())
+            .values({
+              id: track.id,
+              title: track.title,
+              length: track.length,
+              source: track.source,
               album: track.album.id,
-            }))
-          )
-          .execute();
-        if (playlist == null) return;
-        await db
-          .insertInto("library")
-          .values({
-            id: uuid(),
-            order: APPEND,
-            date: Date.now(),
-            track: track.id,
-            playlist,
-          })
-          .execute();
-      },
-      async remove(db, entry: number) {
-        const { track } = await db
-          .deleteFrom("library")
-          .where("id", "=", entry)
-          .returning(["track"])
-          .executeTakeFirstOrThrow();
-        {
-          const { count } = await db
-            .selectFrom("library")
-            .where("track", "=", track)
-            .select(db.fn.count("id").as("count"))
-            .executeTakeFirstOrThrow();
-          if (count !== 0) return;
-        }
-        const { album } = await db
-          .deleteFrom("tracks")
-          .where("id", "=", track)
-          .returning("album")
-          .executeTakeFirstOrThrow();
-        /// What should happen to "playback"?
-        {
-          const { count } = await db
-            .selectFrom("tracks")
-            .where("album", "=", album)
-            .select(db.fn.count("id").as("count"))
-            .executeTakeFirstOrThrow();
-          if (count !== 0) return;
-        }
-        await db.deleteFrom("albums").where("id", "=", album).execute();
-        const artists = await db
-          .deleteFrom("catalogue")
-          .where("album", "=", album)
-          .returning("artist")
-          .execute();
-        artists.forEach(async ({ artist }) => {
-          const { count } = await db
-            .selectFrom("catalogue")
-            .where("artist", "=", artist)
-            .select(db.fn.count("id").as("count"))
-            .executeTakeFirstOrThrow();
-          if (count !== 0) return;
-          await db.deleteFrom("artists").where("id", "=", artist).execute();
-          /// What should happen to "following"?
+            })
+            .execute();
+          await db
+            .insertInto("catalogue")
+            .onConflict((x) => x.doNothing())
+            .values(
+              track.artists.map(({ id }) => ({
+                artist: id,
+                album: track.album.id,
+              }))
+            )
+            .execute();
+          if (playlist == null) return;
+          await db
+            .insertInto("library")
+            .values({
+              id: uuid(),
+              order: APPEND,
+              date: Date.now(),
+              track: track.id,
+              playlist,
+            })
+            .execute();
         });
+        await Promise.all(promises);
+      },
+      async purge(db, entries: number[]) {
+        const promises = entries.map(async (entry) => {
+          const { track } = await db
+            .deleteFrom("library")
+            .where("id", "=", entry)
+            .returning(["track"])
+            .executeTakeFirstOrThrow();
+          {
+            const { count } = await db
+              .selectFrom("library")
+              .where("track", "=", track)
+              .select(db.fn.count("id").as("count"))
+              .executeTakeFirstOrThrow();
+            if (count !== 0) return;
+          }
+          const { album } = await db
+            .deleteFrom("tracks")
+            .where("id", "=", track)
+            .returning("album")
+            .executeTakeFirstOrThrow();
+          /// What should happen to "playback"?
+          {
+            const { count } = await db
+              .selectFrom("tracks")
+              .where("album", "=", album)
+              .select(db.fn.count("id").as("count"))
+              .executeTakeFirstOrThrow();
+            if (count !== 0) return;
+          }
+          await db.deleteFrom("albums").where("id", "=", album).execute();
+          const artists = await db
+            .deleteFrom("catalogue")
+            .where("album", "=", album)
+            .returning("artist")
+            .execute();
+          artists.forEach(async ({ artist }) => {
+            const { count } = await db
+              .selectFrom("catalogue")
+              .where("artist", "=", artist)
+              .select(db.fn.count("id").as("count"))
+              .executeTakeFirstOrThrow();
+            if (count !== 0) return;
+            await db.deleteFrom("artists").where("id", "=", artist).execute();
+            /// What should happen to "following"?
+          });
+        });
+        await Promise.all(promises);
       },
       async create(db, playlist: string) {
         await db
