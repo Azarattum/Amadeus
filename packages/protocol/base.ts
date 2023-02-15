@@ -1,4 +1,4 @@
-import { number, object, string } from "superstruct";
+import { integer, number, object, string } from "superstruct";
 import type { Infer } from "superstruct";
 
 const track = object({
@@ -9,7 +9,7 @@ const track = object({
 
 const album = object({
   title: string(),
-  year: number(),
+  year: integer(),
   source: string(),
   art: string(),
 });

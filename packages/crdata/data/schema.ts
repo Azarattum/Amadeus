@@ -2,6 +2,7 @@ import {
   assign,
   boolean,
   Infer,
+  integer,
   nullable,
   number,
   object,
@@ -11,7 +12,7 @@ import { album, artist, track, unique } from "@amadeus-music/protocol";
 import { primary, crr, ordered, index } from "crstore";
 import { Database } from "crstore/types";
 
-const id = number;
+const id = integer;
 
 const tracks = assign(unique(track), object({ album: id() }));
 crr(tracks);
@@ -36,7 +37,7 @@ const library = object({
   id: id(),
   playlist: id(),
   track: id(),
-  date: number(),
+  date: integer(),
   order: string(),
 });
 crr(library);
@@ -86,7 +87,7 @@ index(settings, "value");
 
 const history = object({
   query: string(),
-  date: number(),
+  date: integer(),
 });
 
 export type DB = Database<Infer<typeof schema>>;
