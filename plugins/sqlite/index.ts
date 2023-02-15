@@ -5,7 +5,7 @@ import { async } from "@amadeus-music/core";
 
 database(function* (user = "shared") {
   if (!existsSync("users")) mkdirSync("users");
-  yield connect(`users/${user}.db`).playlists;
+  yield connect(`users/${user}.db`, user === "shared").playlists;
 });
 
 stop(function* () {

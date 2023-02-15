@@ -8,9 +8,21 @@ const stores = (db: DB) => ({
   playlists: playlists(db),
 });
 
-function connect(name = "shared.db") {
+function nocrr<T>(schema: T) {
+  return {
+    ...schema,
+    schema: Object.fromEntries(
+      Object.entries((schema as any).schema).map(([key, value]) => [
+        key,
+        { ...(value as object), crr: false },
+      ])
+    ),
+  } as T;
+}
+
+function connect(name: string, local = false) {
   if (!connections.has(name)) {
-    const db = database(schema, { name });
+    const db = database(local ? nocrr(schema) : schema, { name });
     connections.set(name, { ...db, ...stores(db) });
   }
   return connections.get(name) as Connection;
