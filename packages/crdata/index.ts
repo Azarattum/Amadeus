@@ -1,1 +1,1 @@
-export * from "./data/library";
+export * from "./data";

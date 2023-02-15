@@ -1,7 +1,17 @@
-import { assign, boolean, nullable, number, object, string } from "superstruct";
+import {
+  assign,
+  boolean,
+  Infer,
+  nullable,
+  number,
+  object,
+  string,
+} from "superstruct";
 import { album, artist, track, unique } from "@amadeus-music/protocol";
 import { primary, crr, ordered, index } from "crstore";
-import { id } from "./base";
+import { Database } from "crstore/types";
+
+const id = number;
 
 const tracks = assign(unique(track), object({ album: id() }));
 crr(tracks);
@@ -79,6 +89,7 @@ const history = object({
   date: number(),
 });
 
+export type DB = Database<Infer<typeof schema>>;
 export const schema = object({
   tracks,
   albums,

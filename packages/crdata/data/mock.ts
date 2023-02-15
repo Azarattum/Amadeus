@@ -1,9 +1,8 @@
-import type { schema } from "../schema/user";
+import type { DB, schema } from "./schema";
 import type { Infer } from "superstruct";
-import type { connect } from "./library";
 import { APPEND } from "crstore";
 
-function prepare(update: ReturnType<typeof connect>["update"]) {
+function prepare(update: DB["update"]) {
   return function <T extends keyof Infer<typeof schema>>(
     table: T,
     data: Infer<typeof schema>[T] | Infer<typeof schema>[T][]
@@ -19,7 +18,7 @@ function prepare(update: ReturnType<typeof connect>["update"]) {
 }
 
 /** For development purposes only! Database mocking. */
-async function mock(update: ReturnType<typeof connect>["update"]) {
+async function mock({ update }: DB) {
   const put = prepare(update);
   await put("tracks", {
     id: 12345,
