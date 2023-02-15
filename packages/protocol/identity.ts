@@ -1,6 +1,6 @@
-import type { Unique } from "@amadeus-music/protocol";
 import { clean } from "@amadeus-music/util/string";
 import { has } from "@amadeus-music/util/object";
+import type { Unique } from ".";
 import hash from "murmurhash";
 
 function titled(data: any) {

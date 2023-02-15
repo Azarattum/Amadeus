@@ -1,4 +1,9 @@
-import { identify, merge, uniquify, type Uniqueified } from "./identity";
+import {
+  identify,
+  merge,
+  uniquify,
+  type Uniqueified,
+} from "@amadeus-music/protocol";
 import { debounce, lock } from "@amadeus-music/util/throttle";
 import { combine } from "@amadeus-music/util/object";
 
