@@ -36,14 +36,11 @@ function request(req: IncomingMessage, res: ServerResponse) {
 
 update(function* (body) {
   const data = JSON.parse(body);
-  update.context(yield* verify.bind(this)(data));
+  update.context(yield* verify(data));
   yield* map(handle.bind(this)(data));
 });
 
-function* verify(
-  this: { state: { users: Record<string, number> } },
-  update: unknown
-) {
+function* verify(update: unknown) {
   const sender = Sender.create(update);
   const from =
     sender.callback_query?.from ||
@@ -64,6 +61,7 @@ function* verify(
   }
 
   if (!from) throw "The update does not have a sender!";
+  /// FIX users
   const entry = Object.entries(this.state.users).find((x) => x[1] === from.id);
   if (!entry) throw `Unauthorized access from @${from.username} (${from.id})!`;
 

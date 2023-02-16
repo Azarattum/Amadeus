@@ -21,20 +21,20 @@ function persistence(this: Context, user?: string) {
       const dbs = await connections;
       await Promise.all(dbs.map((x) => x.purge?.(entries)));
     },
-    async store(key: string, value: string) {
+    async store(key: string, value: unknown) {
       const dbs = await connections;
-      await Promise.all(dbs.map((x) => x.store?.(group, key, value)));
+      await Promise.all(dbs.map((x) => x.store?.(key, value, group)));
     },
-    async lookup(value: string) {
+    async lookup(value: unknown) {
       const dbs = await connections;
       return Promise.race(
-        dbs.map((x) => x.lookup?.(group, value)).filter((x) => x)
+        dbs.map((x) => x.lookup?.(value, group)).filter((x) => x)
       );
     },
     async extract(key: string) {
       const dbs = await connections;
       return Promise.race(
-        dbs.map((x) => x.extract?.(group, key)).filter((x) => x)
+        dbs.map((x) => x.extract?.(key, group)).filter((x) => x)
       );
     },
     async create(playlist: string) {
@@ -58,9 +58,9 @@ type Database = Partial<{
   push(tracks: TrackDetails[], playlist?: number): Promise<void>;
   purge(entries: number[]): Promise<void>;
 
-  store(collection: string, key: string, value: string): Promise<void>;
-  lookup(collection: string, value: string): Promise<string>;
-  extract(collection: string, key: string): Promise<string>;
+  store(key: string, value: unknown, collection?: string): Promise<void>;
+  lookup(value: unknown, collection?: string): Promise<string>;
+  extract(key: string, collection?: string): Promise<any>;
 
   create(name: string): Promise<void>;
 }>;

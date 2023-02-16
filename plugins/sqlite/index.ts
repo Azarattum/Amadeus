@@ -8,40 +8,20 @@ database(function* (user = "shared") {
   const db = connect(`users/${user}.db`, user === "shared");
   yield {
     ...db.playlists,
-    async store(collection, key, value) {
-      return db.update(async (db) => {
-        await db.schema
-          .createTable(collection)
-          .ifNotExists()
-          .addColumn("key", "text", (x) => x.primaryKey())
-          .addColumn("value", "text")
-          .execute();
-        await db.schema
-          .createIndex(collection + "_value")
-          .ifNotExists()
-          .on(collection)
-          .column("value")
-          .execute();
-        await db
-          .insertInto(collection as any)
-          .onConflict((x) => x.doUpdateSet({ value }))
-          .values({ key, value })
-          .execute();
-      });
-    },
-    async extract(collection, key) {
+    ...db.settings,
+    async extract(key, collection = "settings") {
       return (await db.connection)
         .selectFrom(collection as any)
         .select("value")
         .where("key", "=", key)
         .executeTakeFirstOrThrow()
-        .then((x) => x.value);
+        .then((x) => JSON.parse(x.value));
     },
-    async lookup(collection, value) {
+    async lookup(value, collection = "settings") {
       return (await db.connection)
         .selectFrom(collection as any)
         .select("key")
-        .where("value", "=", value)
+        .where("value", "=", JSON.stringify(value))
         .executeTakeFirstOrThrow()
         .then((x) => x.key);
     },

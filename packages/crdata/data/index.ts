@@ -1,4 +1,5 @@
 import { playlists } from "../stores/playlists";
+import { settings } from "../stores/settings";
 import { DB, schema } from "./schema";
 import { database } from "crstore";
 
@@ -6,6 +7,7 @@ type Connection = DB & ReturnType<typeof stores>;
 const connections = new Map<string, Connection>();
 const stores = (db: DB) => ({
   playlists: playlists(db),
+  settings: settings(db),
 });
 
 function nocrr<T>(schema: T) {

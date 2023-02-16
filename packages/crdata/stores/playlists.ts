@@ -1,5 +1,5 @@
 import { type TrackDetails, identify } from "@amadeus-music/protocol";
-import { APPEND, json, jsonGroup } from "crstore";
+import { APPEND, json, groupJSON } from "crstore";
 import type { DB } from "../data/schema";
 
 const uuid = () => (Math.random() * 2 ** 32) >>> 0;
@@ -36,7 +36,7 @@ export const playlists = ({ store }: DB) =>
               }).as("album")
             )
             .select((qb) =>
-              jsonGroup(qb, {
+              groupJSON(qb, {
                 id: "artists.id",
                 title: "artists.title",
                 source: "artists.source",
@@ -52,7 +52,7 @@ export const playlists = ({ store }: DB) =>
           "group as id",
           "playlist",
           (qb) =>
-            jsonGroup(qb, {
+            groupJSON(qb, {
               id: "id",
               entry: "entry",
               date: "date",
