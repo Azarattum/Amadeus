@@ -29,8 +29,12 @@ function connect(name: string, local = false) {
 }
 
 async function close(name?: string) {
-  if (name) return connections.get(name)?.close();
-  return Promise.all([...connections.values()].map((x) => x.close()));
+  if (name) {
+    connections.get(name)?.close();
+    return connections.delete(name);
+  }
+  await Promise.all([...connections.values()].map((x) => x.close()));
+  connections.clear();
 }
 
 export { connect, close };
