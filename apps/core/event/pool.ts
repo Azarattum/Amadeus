@@ -30,7 +30,7 @@ const search = pool<
   | ((type: "album", query: string) => AlbumInfo)
   | ((type: "artist", query: string) => ArtistInfo)
 >("search");
-const desource = pool<(sources: string[]) => string>("desource");
+const desource = pool<(source: string) => string>("desource");
 
 // Persistence events
 const database = pool<(user?: string) => Database>("database");

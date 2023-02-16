@@ -9,6 +9,12 @@ function persistence(this: Context, user?: string) {
   const shared = database.bind(this);
   const connections = take(database.bind(this)(user));
 
+  const race = <T>(x: T[]): Promise<NonNullable<T>> =>
+    Promise.race(x.filter((x) => x)).then((x) => {
+      if (!x) throw new Error("No data found!");
+      return x;
+    });
+
   return {
     async push(tracks: TrackDetails[], playlist?: number) {
       const [dbs, cache] = await Promise.all([connections, take(shared())]);
@@ -25,21 +31,21 @@ function persistence(this: Context, user?: string) {
       const dbs = await connections;
       await Promise.all(dbs.map((x) => x.store?.(key, value, group)));
     },
-    async lookup(value: unknown) {
-      const dbs = await connections;
-      return Promise.race(
-        dbs.map((x) => x.lookup?.(value, group)).filter((x) => x)
-      );
-    },
-    async extract(key: string) {
-      const dbs = await connections;
-      return Promise.race(
-        dbs.map((x) => x.extract?.(key, group)).filter((x) => x)
-      );
-    },
     async create(playlist: string) {
       const dbs = await connections;
       await Promise.all(dbs.map((x) => x.create?.(playlist)));
+    },
+    async lookup(value: unknown) {
+      const dbs = await connections;
+      return race(dbs.map((x) => x.lookup?.(value, group)));
+    },
+    async extract(key: string) {
+      const dbs = await connections;
+      return race(dbs.map((x) => x.extract?.(key, group)));
+    },
+    async track(id: number) {
+      const dbs = await connections;
+      return race(dbs.map((x) => x.track?.(id)));
     },
   };
 }
@@ -61,6 +67,8 @@ type Database = Partial<{
   store(key: string, value: unknown, collection?: string): Promise<void>;
   lookup(value: unknown, collection?: string): Promise<string>;
   extract(key: string, collection?: string): Promise<any>;
+
+  track(id: number): Promise<TrackDetails>;
 
   create(name: string): Promise<void>;
 }>;

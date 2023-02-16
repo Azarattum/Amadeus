@@ -30,16 +30,14 @@ search(function* (type, query) {
   }
 });
 
-desource(function* (sources: string[]) {
-  const schema = "amadeus://yandex/";
-  const source = sources.find((x) => x.startsWith(schema));
-  if (!source) return;
-  const id = source.slice(schema.length);
+desource(function* (source) {
+  /// Support other types
+  const id = source?.match(/yandex\/([0-9]+)/)?.[1];
+  if (!id) return;
 
   const { result } = yield* fetch(`tracks/${id}/download-info`).as(Source);
   const url = result[0].downloadInfoUrl + "&format=json";
   const info = yield* fetch(url).as(Download);
-
   const trackUrl = `XGRlBW9FXlekgbPrRHuSiA${info.path.slice(1)}${info.s}`;
   const sign = createHash("md5").update(trackUrl).digest("hex");
   yield `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`;

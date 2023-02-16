@@ -7,31 +7,30 @@ type Reply = ReturnType<typeof replier>;
 type Edit = ReturnType<typeof editor>;
 interface Message {
   text?: string;
-  markup?: string;
-  audio?: string;
   mode?: string;
+  markup?: string;
+  audio?: { url: string; performer?: string; title?: string; thumb?: string };
 }
 
 function paramify(params: Message) {
   return {
     ...(params.text ? { text: params.text } : {}),
-    ...(params.audio ? { audio: params.audio } : {}),
     ...(params.mode ? { parse_mode: params.mode } : {}),
     ...(params.markup ? { reply_markup: params.markup } : {}),
+    ...(params.audio?.url ? { audio: params.audio.url } : {}),
+    ...(params.audio?.title ? { title: params.audio.title } : {}),
+    ...(params.audio?.thumb ? { title: params.audio.thumb } : {}),
+    ...(params.audio?.performer ? { performer: params.audio.performer } : {}),
   };
 }
 
 function* reply(chat: number, params: Message) {
-  if (params.audio) {
-    /// Do audio stuff
-  } else if (params.text) {
-    yield (yield* fetch("sendMessage", {
-      params: {
-        chat_id: chat.toString(),
-        ...paramify(params),
-      },
-    }).as(Sent)).result;
-  }
+  yield (yield* fetch(params.audio ? "sendAudio" : "sendMessage", {
+    params: {
+      chat_id: chat.toString(),
+      ...paramify(params),
+    },
+  }).as(Sent)).result;
 }
 
 function replier(chat: number, group = true) {

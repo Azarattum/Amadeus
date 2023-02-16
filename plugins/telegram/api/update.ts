@@ -65,7 +65,7 @@ function* verify(update: unknown) {
 
   const user = Object.entries(yield* async(users())).find(
     (x) => x[1].telegram === from.id
-  )?.[1];
+  );
   if (!user) throw `Unauthorized access from @${from.username} (${from.id})!`;
 
   if (message) {
@@ -79,7 +79,8 @@ function* verify(update: unknown) {
 
   return {
     chat: chat.id,
-    name: user.name,
+    user: user[0],
+    name: user[1].name,
     edit: editor(chat.id),
     reply: replier(chat.id, chat.type !== "private"),
   };

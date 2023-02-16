@@ -42,6 +42,7 @@ export const {
   context: {
     chat: 0,
     name: "",
+    user: undefined as string | undefined,
     edit: null as any as Edit,
     reply: null as any as Reply,
     state: {

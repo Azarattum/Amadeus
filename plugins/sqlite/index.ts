@@ -1,5 +1,5 @@
+import { close, connect, json, groupJSON } from "@amadeus-music/crdata";
 import { existsSync, mkdirSync, readdirSync } from "fs";
-import { close, connect } from "@amadeus-music/crdata";
 import { database, stop, users } from "./plugin";
 import { async } from "@amadeus-music/core";
 
@@ -24,6 +24,39 @@ database(function* (user = "shared") {
         .where("value", "=", JSON.stringify(value))
         .executeTakeFirstOrThrow()
         .then((x) => x.key);
+    },
+    async track(id) {
+      return (await db.connection)
+        .selectFrom("tracks")
+        .innerJoin("albums", "albums.id", "tracks.album")
+        .innerJoin("catalogue", "catalogue.album", "albums.id")
+        .innerJoin("artists", "artists.id", "catalogue.artist")
+        .where("tracks.id", "=", id)
+        .select([
+          "tracks.id as id",
+          "tracks.title as title",
+          "tracks.length as length",
+          "tracks.source as source",
+        ])
+        .select((qb) =>
+          json(qb, {
+            id: "albums.id",
+            title: "albums.title",
+            year: "albums.year",
+            source: "albums.source",
+            art: "albums.art",
+          }).as("album")
+        )
+        .select((qb) =>
+          groupJSON(qb, {
+            id: "artists.id",
+            title: "artists.title",
+            source: "artists.source",
+            art: "artists.art",
+          }).as("artists")
+        )
+        .groupBy("tracks.id")
+        .executeTakeFirstOrThrow();
     },
   };
 });
