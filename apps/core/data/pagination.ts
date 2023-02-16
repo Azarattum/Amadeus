@@ -114,7 +114,7 @@ function pages<T extends Record<string, any>>(
 }
 
 type PaginationOptions<T> = {
-  id?: string;
+  id?: number;
   page: number;
   invalidate?: () => void;
   compare: (a: T, b: T) => number;

@@ -1,17 +1,21 @@
-import { object, string, union } from "@amadeus-music/core";
+import { integer, object, union } from "@amadeus-music/core";
 
 const Next = object({
-  next: string(),
+  next: integer(),
 });
 
 const Prev = object({
-  prev: string(),
+  prev: integer(),
 });
 
 const Close = object({
-  close: string(),
+  close: integer(),
 });
 
-const Query = union([Next, Prev, Close]);
+const Download = object({
+  download: integer(),
+});
 
-export { Next, Prev, Close, Query };
+const Query = union([Next, Prev, Close, Download]);
+
+export { Next, Prev, Close, Download, Query };

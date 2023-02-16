@@ -45,20 +45,20 @@ aggregate(function* (from, args, options) {
   );
 });
 
-function aggregator(id: string): Controls;
+function aggregator(id: number): Controls;
 function aggregator<T extends Fn, A extends Readonly<Parameters<T>>>(
   this: Context,
   from: Pool<T, any>,
   args: A,
   options: PaginationOptions<ReturnType<Extract<T, (..._: A) => any>>>
-): string;
+): number;
 function aggregator(
   this: Context,
-  source: string | Pool<any, any>,
+  source: number | Pool<any, any>,
   args: any[] = [],
   options: PaginationOptions<any> = { page: 10, compare: () => 0 }
 ) {
-  if (typeof source === "string") {
+  if (typeof source === "number") {
     const controls = [...aggregate.status().executing.values()].find(
       (x: any) => x.controls === source
     ) as (Executor & Partial<Controls>) | undefined;
@@ -71,7 +71,7 @@ function aggregator(
   }
 
   const group = this?.group || context.group;
-  const id = options.id || Math.random().toString(36).slice(2);
+  const id = options.id || (Math.random() * 2 ** 32) >>> 0;
   async function invalidate() {
     try {
       await options.invalidate?.();

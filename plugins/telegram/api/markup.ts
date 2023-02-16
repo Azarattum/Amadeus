@@ -1,7 +1,7 @@
 type Buttons = { text: string; callback: Record<string, any> }[][];
 
 function pager(
-  aggregator: string,
+  aggregator: number,
   page: number,
   options: Buttons[number],
   next = true
