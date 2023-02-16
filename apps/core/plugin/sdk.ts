@@ -1,6 +1,6 @@
 import {
   PluginInfo,
-  type ConfigStruct,
+  type RecordStruct,
   type Configure,
   type Plugin,
 } from "./types";
@@ -26,9 +26,10 @@ const bound = {
 };
 
 function register<
-  T extends ConfigStruct = undefined,
+  T extends RecordStruct = undefined,
+  S extends RecordStruct = undefined,
   C extends Record<string, any> = Record<string, never>
->(plugin: Plugin<T, C>) {
+>(plugin: Plugin<T, S, C>) {
   assert(plugin, PluginInfo, "Tried to register an invalid plugin!");
   plugin.name = format(plugin.name);
 
@@ -49,7 +50,7 @@ function register<
     Object.entries(bound)
       .filter((entry) => "bind" in entry[1])
       .map(([key, fn]) => [key, (fn as any).bind(context)])
-  ) as Configure<typeof bound, T, C & { fetch: FetchOptions }>;
+  ) as Configure<typeof bound, T, S, C & { fetch: FetchOptions }>;
 }
 
 export { register, usage };

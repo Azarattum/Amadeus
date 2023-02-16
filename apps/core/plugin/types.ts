@@ -9,6 +9,7 @@ import {
   type Infer,
 } from "superstruct";
 import type { PoolMaker } from "libfun/pool/pool.types";
+import type { User } from "../data/persistence";
 import type { Config } from "../data/config";
 import type { Pool } from "libfun";
 
@@ -20,29 +21,33 @@ const PluginInfo = object({
   settings: optional(record(string(), instance(Struct<any, null>))),
 });
 
-type ConfigStruct = Record<string, Struct<any>> | undefined;
-type InferMap<T extends Record<string, Struct<any>>> = {
-  [K in keyof T]: Infer<T[K]>;
-};
+type RecordStruct = Record<string, Struct<any>> | undefined;
+type InferMap<T> = T extends Record<string, Struct<any>>
+  ? {
+      [K in keyof T]: Infer<T[K]>;
+    }
+  : Record<string, never>;
 
 type Plugin<
-  T extends ConfigStruct = ConfigStruct,
+  T extends RecordStruct = RecordStruct,
+  S extends RecordStruct = RecordStruct,
   C extends Record<string, any> = Record<string, any>
 > = Infer<typeof PluginInfo> & {
   config?: T;
   context?: C;
+  settings?: S;
 };
-
-type PluginConfig<T extends ConfigStruct> = Config &
-  (T extends object ? InferMap<T> : Record<string, never>);
 
 type Configure<
   T extends Record<string, any>,
-  U extends ConfigStruct,
+  U extends RecordStruct,
+  S extends RecordStruct,
   C extends Record<string, any>
 > = {
   [K in keyof T]: K extends "init"
-    ? Pool<(config: PluginConfig<U>) => void, C>
+    ? Pool<(config: Config & InferMap<U>) => void, C>
+    : K extends "users"
+    ? () => Promise<Record<string, User & InferMap<S>>>
     : K extends "stop"
     ? Pool<() => void, Partial<C>>
     : T[K] extends Pool<infer U, infer R>
@@ -57,4 +62,4 @@ type Configure<
 type Context = void | { group?: string };
 
 export { PluginInfo };
-export type { Plugin, PluginConfig, ConfigStruct, Configure, Context };
+export type { Plugin, RecordStruct, Configure, Context };

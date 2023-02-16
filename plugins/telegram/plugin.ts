@@ -3,10 +3,8 @@ import {
   register,
   number,
   object,
-  record,
   string,
   Infer,
-  type,
 } from "@amadeus-music/core";
 import { name, version } from "./package.json";
 import { Reply, Edit } from "./api/reply";
@@ -21,6 +19,7 @@ export const {
   pool,
   stop,
   fetch,
+  users,
   search,
   desource,
   aggregate,
