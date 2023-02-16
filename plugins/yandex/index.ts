@@ -2,8 +2,7 @@ import { convert, Download, Source, Tracks } from "./types";
 import { init, search, desource, fetch } from "./plugin";
 import { createHash } from "node:crypto";
 
-init(function* (config) {
-  const { token } = config.yandex;
+init(function* ({ yandex: { token } }) {
   if (!token) throw "Plugin disabled! No token found!";
   this.fetch.baseURL = "https://api.music.yandex.net/";
   this.fetch.headers = {

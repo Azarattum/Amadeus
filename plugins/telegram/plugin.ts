@@ -29,12 +29,6 @@ export const {
   name,
   version,
   config: {
-    users: record(
-      string(),
-      type({
-        telegram: defaulted(number(), -1),
-      })
-    ),
     telegram: defaulted(
       object({
         token: defaulted(string(), ""),
@@ -43,13 +37,15 @@ export const {
       {}
     ),
   },
+  settings: {
+    telegram: defaulted(number(), -1),
+  },
   context: {
     chat: 0,
     name: "",
     edit: null as any as Edit,
     reply: null as any as Reply,
     state: {
-      users: {} as Record<string, number>,
       me: {} as Infer<typeof Me>["result"],
     },
   },

@@ -85,8 +85,8 @@ const settings = object({
   value: string(),
 });
 crr(settings);
-primary(settings, "key");
 index(settings, "value");
+primary(settings, "key");
 
 const history = object({
   query: string(),

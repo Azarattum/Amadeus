@@ -9,7 +9,7 @@ import {
   type Infer,
 } from "superstruct";
 import type { PoolMaker } from "libfun/pool/pool.types";
-import type { BaseConfig } from "../data/config";
+import type { Config } from "../data/config";
 import type { Pool } from "libfun";
 
 const PluginInfo = object({
@@ -17,6 +17,7 @@ const PluginInfo = object({
   version: string(),
   config: optional(record(string(), instance(Struct<any>))),
   context: optional(record(string(), any())),
+  settings: optional(record(string(), instance(Struct<any, null>))),
 });
 
 type ConfigStruct = Record<string, Struct<any>> | undefined;
@@ -32,7 +33,7 @@ type Plugin<
   context?: C;
 };
 
-type PluginConfig<T extends ConfigStruct> = BaseConfig &
+type PluginConfig<T extends ConfigStruct> = Config &
   (T extends object ? InferMap<T> : Record<string, never>);
 
 type Configure<
