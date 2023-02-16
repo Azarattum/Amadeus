@@ -8,6 +8,7 @@ import {
 } from "@amadeus-music/util/color";
 import { capitalize, format } from "@amadeus-music/util/string";
 import { format as formatPlugin } from "../plugin/loader";
+import { persistence, users } from "../data/persistence";
 import { pretty } from "@amadeus-music/util/object";
 import { log, pool, pools } from "../event/pool";
 import type { Context } from "../plugin/types";
@@ -22,7 +23,9 @@ const commands = new Map<string, Argument[] | []>();
 const arg = {
   text: Symbol("text"),
   pool: Symbol("pool"),
+  user: Symbol("user"),
   plugin: Symbol("plugin"),
+  setting: Symbol("setting"),
   command: Symbol("command"),
 };
 
@@ -181,11 +184,58 @@ command("exec", [arg.pool])(function* (what, ...args) {
   info(`${name} done executing!`);
 });
 
-command("register")(function* (username) {
+command("register", [arg.text])(function* (username) {
   if (!username) return wrn("Provide a username!");
-  const config = yield* async(register(username).catch((x) => wrn(x.message)));
-  if (!config) return wrn(`Failed to register new user "${username}"!`);
-  info(`Registered user ${bright}${username}${reset}:`, pretty(config));
+  const error = yield* async(register(username).catch((x) => x.message));
+  if (error) return wrn(error);
+  info(
+    `Registered user ${bright}${username}${reset}! ` +
+      `(Use ${bright}user ${username.toLowerCase()}${reset} for configuration).`
+  );
+});
+
+command(
+  "user",
+  arg.user,
+  arg.setting,
+  arg.text
+)(function* (username, setting, value) {
+  const current = yield* async(users());
+  if (!username) {
+    if (!Object.keys(current).length) return wrn("No users registered!");
+    return info(`Registered users: ${Object.keys(current).join(", ")}.`);
+  }
+  if (!current[username]) return wrn(`No such user "${username}"!`);
+  if (!setting) {
+    return info(
+      `${bright}${username}${reset}'s settings:`,
+      pretty(current[username])
+    );
+  }
+  const type = typeof current[username]?.[setting];
+  if (type === "undefined") {
+    return wrn(`No such setting "${setting}" for user "${username}"!`);
+  }
+  if (!value) {
+    return info(
+      `${bright}${username}${reset}.${setting} =`,
+      pretty(current[username][setting])
+    );
+  }
+
+  let coerced = null;
+  try {
+    coerced = type !== "string" ? JSON.parse(value) : value;
+    if (typeof coerced !== type) throw "";
+  } catch {
+    return wrn(`Unable to coerce "${value}" to type "${type}"!`);
+  }
+  yield* async(persistence(username).store(setting, JSON.stringify(coerced)));
+  info(
+    `${bright}${setting}${reset} set to ` +
+      `${bright}${value}${reset} for ` +
+      `${bright}${username}${reset}!`
+  );
 });
 
 command("restart")(() => {

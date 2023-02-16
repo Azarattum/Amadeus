@@ -44,6 +44,8 @@ function persistence(this: Context, user?: string) {
   };
 }
 
+function users(this: Context): Promise<Record<string, User>>;
+function users(this: Context, pool: () => Generator<User>): void;
 async function users(this: Context, pool?: () => Generator<User>) {
   if (pool) return load.bind(this)(pool);
   const results = load.bind(this)();

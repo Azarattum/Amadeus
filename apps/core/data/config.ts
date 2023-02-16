@@ -5,6 +5,7 @@ import {
   create,
   number,
   type Infer,
+  string,
 } from "superstruct";
 import { readFile, writeFile } from "node:fs/promises";
 import { merge } from "@amadeus-music/util/object";
@@ -14,14 +15,17 @@ import { plugins } from "../plugin/loader";
 import { fallback, pipe } from "libfun";
 import { resolve } from "node:path";
 
-type Config = Infer<typeof base>;
-const base = type({
+type Config = Infer<typeof baseConfig>;
+const baseConfig = type({
   port: defaulted(number(), 8080),
+});
+const baseSetting = type({
+  name: defaulted(string(), "Unknown"),
 });
 
 async function configure(plugins: Map<string, Plugin>, overrides = {}) {
   const configs = [...plugins.values()].map((x) => type(x.config || {}));
-  const config = intersection([base, ...configs]);
+  const config = intersection([baseConfig, ...configs]);
   const file = import.meta.env.DEV
     ? "./config.json"
     : resolve(__dirname, "./config.json");
@@ -36,17 +40,21 @@ async function configure(plugins: Map<string, Plugin>, overrides = {}) {
   );
 }
 
-async function setup() {
+function settings() {
   const settings = [...plugins.values()].map((x) => type(x.settings || {}));
-  const setup = intersection(settings as any);
-  const defaults = setup.create({});
+  return intersection([baseSetting, ...settings]);
+}
+
+async function setup(username?: string) {
+  const defaults = settings().create({});
   const promises = [];
 
   for (const [user, settings] of Object.entries(await users())) {
+    if (username != null && user !== username) continue;
     const storage = persistence(user);
     promises.push(
       Object.entries(defaults)
-        .filter(([key]) => key in settings)
+        .filter(([key]) => !(key in settings))
         .map(([key, value]) => storage.store(key, JSON.stringify(value)))
     );
   }
@@ -55,17 +63,10 @@ async function setup() {
 
 async function register(username: string) {
   if (username.includes("shared")) throw new Error("Username is not allowed!");
-  const settings = [...plugins.values()].map((x) => type(x.settings || {}));
-  const setup = intersection(settings as any);
-  const defaults: Record<string, any> = setup.create({ name: username });
-
-  const storage = persistence(username.toLowerCase());
-  const promises = Object.entries(defaults).map(([key, value]) =>
-    storage.store(key, JSON.stringify(value))
-  );
-  await Promise.all(promises);
-  return defaults;
+  const user = username.toLowerCase();
+  await persistence(user).store("name", JSON.stringify(username));
+  await setup(user);
 }
 
-export { configure, register, setup };
+export { configure, register, setup, settings };
 export type { Config };

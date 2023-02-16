@@ -16,7 +16,7 @@ const launch = () =>
     configure,
     init,
     take,
-    setup,
+    () => setup(),
     complete,
     interactive,
     fallback(err)

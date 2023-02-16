@@ -3,9 +3,11 @@ import { log, pool, pools, stop as close } from "../event/pool";
 import { cyan, highlight } from "@amadeus-music/util/color";
 import { prefix, split } from "@amadeus-music/util/string";
 import { stdin, stdout } from "node:process";
+import { users } from "../data/persistence";
 import type { WriteStream } from "node:tty";
 import { plugins } from "../plugin/loader";
 import { arg, commands } from "./commands";
+import { settings } from "../data/config";
 import { stop } from "./manage";
 import { take } from "libfun";
 import { wrn } from "./log";
@@ -46,28 +48,32 @@ async function interactive() {
   cli.prompt();
 }
 
-function options(parts: string[], index: number) {
+async function options(parts: string[], index: number) {
   if (index <= 0) return [...commands.keys()];
 
   let docs = commands.get(parts[0])?.[index - 1] || [];
   if (!Array.isArray(docs)) docs = [docs as any];
-  return docs.flatMap((x) => {
-    if (x === arg.text) return [];
-    if (x === arg.command) return [...commands.keys()];
-    if (x === arg.pool) return pools.status().map((x) => x.id);
-    if (x === arg.plugin) {
-      return [...plugins.values()].map((x) => x.name.toLowerCase());
-    }
-    if (typeof x === "string") return x;
-    return [];
-  });
+  return Promise.all(
+    docs.map(async (x) => {
+      if (x === arg.text) return [];
+      if (x === arg.command) return [...commands.keys()];
+      if (x === arg.pool) return pools.status().map((x) => x.id);
+      if (x === arg.user) return Object.keys(await users());
+      if (x === arg.setting) return Object.keys(settings().create({}));
+      if (x === arg.plugin) {
+        return [...plugins.values()].map((x) => x.name.toLowerCase());
+      }
+      if (typeof x === "string") return x;
+      return [];
+    })
+  ).then((x) => x.flat(2));
 }
 
-function completer(this: Interface, line: string) {
+async function completer(this: Interface, line: string) {
   if (this.cursor !== this.line.length) return [[], line];
   const parts = split(line);
   const index = parts.length - (line.endsWith(" ") ? 0 : 1);
-  const completions = options(parts, index);
+  const completions = await options(parts, index);
   const target = parts[index] || "";
   const hits = completions.filter((x) => x.startsWith(target));
 
