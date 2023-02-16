@@ -185,7 +185,7 @@ export function pretty(target: object) {
   let string = JSON.stringify(target, null, 2);
   if (!string) return bright + black + "undefined" + reset;
   string = highlight(string, /"[^"]*"(?=:)/g, cyan);
-  string = highlight(string, / [0-9]+(?=,|$)/gm, yellow);
+  string = highlight(string, / [-0-9]+\.?[0-9]*(?=,|$)/gm, yellow);
   string = highlight(string, / (true|false)(?=,|$)/gm, magenta);
   return string;
 }
