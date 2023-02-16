@@ -5,26 +5,23 @@ import {
   create,
   number,
   type Infer,
-  string,
-  record,
-  any,
 } from "superstruct";
 import { readFile, writeFile } from "node:fs/promises";
 import { merge } from "@amadeus-music/util/object";
+import { persistence, users } from "./persistence";
 import type { Plugin } from "../plugin/types";
 import { plugins } from "../plugin/loader";
 import { fallback, pipe } from "libfun";
 import { resolve } from "node:path";
 
-const Config = type({
-  users: defaulted(record(string(), type({})), {}),
+type Config = Infer<typeof base>;
+const base = type({
   port: defaulted(number(), 8080),
 });
-type BaseConfig = Infer<typeof Config>;
 
 async function configure(plugins: Map<string, Plugin>, overrides = {}) {
-  const Plugins = [...plugins.values()].map((x) => type(x.config || {}));
-  const Settings = intersection([Config, ...Plugins]);
+  const configs = [...plugins.values()].map((x) => type(x.config || {}));
+  const config = intersection([base, ...configs]);
   const file = import.meta.env.DEV
     ? "./config.json"
     : resolve(__dirname, "./config.json");
@@ -34,31 +31,41 @@ async function configure(plugins: Map<string, Plugin>, overrides = {}) {
     JSON.parse,
     fallback({}),
     (x) => merge(x, overrides),
-    (x) => create(x, Settings, "Invalid configuration!"),
+    (x) => create(x, config, "Invalid configuration!"),
     (x) => writeFile(file, JSON.stringify(x, null, 2)).then(() => x)
   );
 }
 
-async function register(username: string) {
-  const coercers = [...plugins.values()].map((x) => ({
-    config: x.config?.users || any(),
-    plugin: x.name,
-  }));
-  coercers.push({ config: Config.schema.users, plugin: "Core" });
+async function setup() {
+  const settings = [...plugins.values()].map((x) => type(x.settings || {}));
+  const setup = intersection(settings as any);
+  const defaults = setup.create({});
+  const promises = [];
 
-  let users = { [username]: {} };
-  coercers.forEach(({ config, plugin }) => {
-    users = config.create(
-      users,
-      `Sorry, "${plugin}" ` +
-        "doesn't support user registration! " +
-        "Please ask the developer to add default " +
-        "values for users configuration."
+  for (const [user, settings] of Object.entries(await users())) {
+    const storage = persistence(user);
+    promises.push(
+      Object.entries(defaults)
+        .filter(([key]) => key in settings)
+        .map(([key, value]) => storage.store(key, JSON.stringify(value)))
     );
-  });
-
-  return configure(plugins, { users });
+  }
+  await Promise.all(promises);
 }
 
-export { configure, register };
-export type { BaseConfig };
+async function register(username: string) {
+  if (username.includes("shared")) throw new Error("Username is not allowed!");
+  const settings = [...plugins.values()].map((x) => type(x.settings || {}));
+  const setup = intersection(settings as any);
+  const defaults: Record<string, any> = setup.create({ name: username });
+
+  const storage = persistence(username.toLowerCase());
+  const promises = Object.entries(defaults).map(([key, value]) =>
+    storage.store(key, JSON.stringify(value))
+  );
+  await Promise.all(promises);
+  return defaults;
+}
+
+export { configure, register, setup };
+export type { Config };

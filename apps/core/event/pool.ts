@@ -1,8 +1,8 @@
 import type { TrackInfo, AlbumInfo, ArtistInfo } from "@amadeus-music/protocol";
 import type { PaginationOptions } from "../data/pagination";
-import type { Database } from "../data/persistence";
+import type { Database, User } from "../data/persistence";
 import type { Controls } from "../data/aggregate";
-import type { BaseConfig } from "../data/config";
+import type { Config } from "../data/config";
 import { pools, type Pool } from "libfun";
 
 const all = pools({ group: "core" });
@@ -21,7 +21,7 @@ const aggregate = pool<
 });
 
 // Plugin events
-const init = pool<(config: BaseConfig) => void>("init");
+const init = pool<(config: Config) => void>("init");
 const stop = pool("stop");
 
 // Aggregator events
@@ -31,6 +31,11 @@ const search = pool<
   | ((type: "artist", query: string) => ArtistInfo)
 >("search");
 const desource = pool<(sources: string[]) => string>("desource");
+
+// Persistence events
+const database = pool<(user?: string) => Database>("database");
+const users = pool<() => Record<string, User>>("users");
+
 /// TODO:
 //  Provider
 //    - relate
@@ -43,9 +48,6 @@ const desource = pool<(sources: string[]) => string>("desource");
 //  ???
 //    - follow
 //    - unfollow
-
-const database = pool<(user?: string) => Database>("database");
-const users = pool<() => number>("users");
 
 export { log, init, stop, search, desource, aggregate, database, users };
 export { all as pools, pool };

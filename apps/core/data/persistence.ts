@@ -1,16 +1,17 @@
 import type { TrackDetails } from "@amadeus-music/protocol";
+import { database, users as load } from "../event/pool";
+import { merge } from "@amadeus-music/util/object";
 import type { Context } from "../plugin/types";
-import { database } from "../event/pool";
 import { take } from "libfun";
 
 function persistence(this: Context, user?: string) {
-  const group = this?.group || "core";
-  const shared = take(database.bind(this)());
+  const group = this?.group || "settings";
+  const shared = database.bind(this);
   const connections = take(database.bind(this)(user));
 
   return {
     async push(tracks: TrackDetails[], playlist?: number) {
-      const [dbs, cache] = await Promise.all([connections, shared]);
+      const [dbs, cache] = await Promise.all([connections, take(shared())]);
       await Promise.all([
         ...(user ? dbs.map((x) => x.push?.(tracks, playlist)) : []),
         ...cache.map((x) => x.push?.(tracks)),
@@ -43,6 +44,14 @@ function persistence(this: Context, user?: string) {
   };
 }
 
+async function users(this: Context, pool?: () => Generator<User>) {
+  if (pool) return load.bind(this)(pool);
+  const results = load.bind(this)();
+  let merged = (await results.next()).value || {};
+  for await (const result of results) merged = merge(merged, result);
+  return merged;
+}
+
 type Database = Partial<{
   push(tracks: TrackDetails[], playlist?: number): Promise<void>;
   purge(entries: number[]): Promise<void>;
@@ -54,5 +63,10 @@ type Database = Partial<{
   create(name: string): Promise<void>;
 }>;
 
-export type { Database };
-export { persistence };
+type User = {
+  name: string;
+  [key: string]: any;
+};
+
+export type { Database, User };
+export { persistence, users };

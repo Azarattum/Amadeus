@@ -52,7 +52,16 @@ stop(function* () {
   yield* async(close());
 });
 
-users(() => {
-  if (!existsSync("users")) return 0;
-  return readdirSync("users").length;
+users(function* () {
+  if (!existsSync("users")) return yield {};
+  const all = readdirSync("users")
+    .filter((x) => !x.includes("shared") && x.endsWith(".db"))
+    .map(async (filename) => {
+      const { connection } = connect(`users/${filename}`);
+      const db = await connection;
+      const entries = await db.selectFrom("settings").selectAll().execute();
+      const data = entries.map(({ key, value }) => [key, JSON.parse(value)]);
+      return [filename.replace(".db", ""), Object.fromEntries(data)] as const;
+    });
+  yield yield* async(Promise.all(all).then(Object.fromEntries));
 });

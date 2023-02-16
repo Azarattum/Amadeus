@@ -7,7 +7,7 @@ import {
 import { bright, reset } from "@amadeus-music/util/color";
 import type { FetchOptions } from "../network/fetch";
 import { command, usage } from "../status/commands";
-import { persistence } from "../data/persistence";
+import * as persistence from "../data/persistence";
 import { aggregate } from "../data/aggregate";
 import { format, plugins } from "./loader";
 import * as fetch from "../network/fetch";
@@ -16,7 +16,14 @@ import * as log from "../status/log";
 import { info } from "../status/log";
 import { assert } from "superstruct";
 
-const bound = { command, ...log, ...events, ...fetch, aggregate, persistence };
+const bound = {
+  ...events,
+  ...log,
+  ...fetch,
+  ...persistence,
+  aggregate,
+  command,
+};
 
 function register<
   T extends ConfigStruct = undefined,

@@ -185,11 +185,7 @@ command("register")(function* (username) {
   if (!username) return wrn("Provide a username!");
   const config = yield* async(register(username).catch((x) => wrn(x.message)));
   if (!config) return wrn(`Failed to register new user "${username}"!`);
-  info(
-    `Added new user to "config.json". ${bright}${username}${reset}:`,
-    pretty(config.users[username])
-  );
-  info("Restart the application to apply the changes!");
+  info(`Registered user ${bright}${username}${reset}:`, pretty(config));
 });
 
 command("restart")(() => {

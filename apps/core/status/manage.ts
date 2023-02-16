@@ -1,9 +1,9 @@
 import { stop as close, pools, init } from "../event/pool";
 import { divide, err, info, ok, SilentError } from "./log";
+import { configure, setup } from "../data/config";
 import { load, plugins } from "../plugin/loader";
 import { name, version } from "../package.json";
 import { fallback, pipe, take } from "libfun";
-import { configure } from "../data/config";
 import { commands } from "./commands";
 import { interactive } from "./cli";
 
@@ -16,6 +16,7 @@ const launch = () =>
     configure,
     init,
     take,
+    setup,
     complete,
     interactive,
     fallback(err)
