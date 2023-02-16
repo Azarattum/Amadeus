@@ -1,5 +1,6 @@
 import {
   wrn,
+  users,
   message,
   command,
   voice,
@@ -11,8 +12,8 @@ import {
   fetch,
 } from "../plugin";
 import { Text, Audio, Voice, Post, Callback, Invite } from "../types/core";
+import { async, map, take } from "@amadeus-music/core";
 import { IncomingMessage, ServerResponse } from "http";
-import { map, take } from "@amadeus-music/core";
 import { replier, editor } from "./reply";
 import { Sender } from "../types/sender";
 
@@ -61,9 +62,11 @@ function* verify(update: unknown) {
   }
 
   if (!from) throw "The update does not have a sender!";
-  /// FIX users
-  const entry = Object.entries(this.state.users).find((x) => x[1] === from.id);
-  if (!entry) throw `Unauthorized access from @${from.username} (${from.id})!`;
+
+  const user = Object.entries(yield* async(users())).find(
+    (x) => x[1].telegram === from.id
+  )?.[1];
+  if (!user) throw `Unauthorized access from @${from.username} (${from.id})!`;
 
   if (message) {
     fetch("deleteMessage", {
@@ -76,7 +79,7 @@ function* verify(update: unknown) {
 
   return {
     chat: chat.id,
-    name: entry[0],
+    name: user.name,
     edit: editor(chat.id),
     reply: replier(chat.id, chat.type !== "private"),
   };
