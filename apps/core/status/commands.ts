@@ -230,7 +230,7 @@ command(
   } catch {
     return wrn(`Unable to coerce "${value}" to type "${type}"!`);
   }
-  yield* async(persistence(username).store(setting, JSON.stringify(coerced)));
+  yield* async(persistence(username).store(setting, coerced));
   info(
     `${bright}${setting}${reset} set to ` +
       `${bright}${value}${reset} for ` +

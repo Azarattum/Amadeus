@@ -55,7 +55,7 @@ async function setup(username?: string) {
     promises.push(
       Object.entries(defaults)
         .filter(([key]) => !(key in settings))
-        .map(([key, value]) => storage.store(key, JSON.stringify(value)))
+        .map(([key, value]) => storage.store(key, value))
     );
   }
   await Promise.all(promises);
@@ -64,7 +64,7 @@ async function setup(username?: string) {
 async function register(username: string) {
   if (username.includes("shared")) throw new Error("Username is not allowed!");
   const user = username.toLowerCase();
-  await persistence(user).store("name", JSON.stringify(username));
+  await persistence(user).store("name", username);
   await setup(user);
 }
 
