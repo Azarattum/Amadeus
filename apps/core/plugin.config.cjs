@@ -7,7 +7,7 @@ const { defineConfig } = require("vite");
 const name = require(resolve("./package.json")).name;
 const monorepo = existsSync(resolve("../../package.json"));
 
-export default defineConfig({
+module.exports = defineConfig({
   plugins: [
     { ...node({ preferBuiltins: true }), enforce: "pre" },
     replace({
