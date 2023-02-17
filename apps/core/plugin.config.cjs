@@ -1,4 +1,4 @@
-const node = require("@rollup/plugin-node-resolve").default;
+const { externals } = require("rollup-plugin-node-externals");
 const replace = require("@rollup/plugin-replace").default;
 const { existsSync } = require("node:fs");
 const { resolve } = require("node:path");
@@ -9,13 +9,14 @@ const monorepo = existsSync(resolve("../../package.json"));
 
 module.exports = defineConfig({
   plugins: [
-    { ...node({ preferBuiltins: true }), enforce: "pre" },
+    { ...externals({ deps: false }), enforce: "pre" },
     replace({
       "process.env.NODE_ENV": '"production"',
       preventAssignment: true,
     }),
   ],
   resolve: {
+    conditions: ["import", "module", "node", "default"],
     alias: [
       {
         find: "@amadeus-music/core",
