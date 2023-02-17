@@ -13,6 +13,8 @@
     "@amadeus-music/ui": "workspace:*"
   },
   "devDependencies": {
-    "@sveltejs/adapter-static": "2.0.1"
+    "@sveltejs/adapter-static": "2.0.1",
+    "crstore": "^0.8.7",
+    "murmurhash": "^2.0.1"
   }
 }
