@@ -92,24 +92,24 @@ importers:
       '@amadeus-music/crdata': workspace:*
       '@amadeus-music/ui': workspace:*
       '@sveltejs/adapter-static': 2.0.1
-      crstore: ^0.8.7
+      crstore: ^0.8.8
       murmurhash: ^2.0.1
     dependencies:
       '@amadeus-music/crdata': link:../../packages/crdata
       '@amadeus-music/ui': link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static': 2.0.1
-      crstore: 0.8.7
+      crstore: 0.8.8
       murmurhash: 2.0.1
 
   packages/crdata:
     specifiers:
       '@amadeus-music/protocol': workspace:*
-      crstore: ^0.8.7
+      crstore: ^0.8.8
       superstruct: ^1.0.3
     dependencies:
       '@amadeus-music/protocol': link:../protocol
-      crstore: 0.8.7
+      crstore: 0.8.8
       superstruct: 1.0.3
 
   packages/libfun:
@@ -1155,8 +1155,8 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crstore/0.8.7:
-    resolution: {integrity: sha512-B3bWOo+qA+lj6R4Pi/II/5WNN5v2pA5CM9Qwm6r2qFxfrBo/s8ODaWZwkkQR8AikIgD9XY2Wan7D3x/WdfET+w==}
+  /crstore/0.8.8:
+    resolution: {integrity: sha512-owY3kBVWfATwzvTy/v4g9FzmiaZAe06j32qWmbhkRIFQ8GGSIlE8lh30LxI3rGRf9UYUn1yXNFHXgcJVXnQcdA==}
     dependencies:
       '@vlcn.io/crsqlite': 0.7.2
       '@vlcn.io/wa-crsqlite': 0.7.4
