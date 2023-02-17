@@ -1,4 +1,4 @@
-import { assign, integer, object, Struct } from "superstruct";
+import { assign, integer, object, type Struct } from "superstruct";
 
 type Unique<T> = T & { id: number };
 const unique = <T extends Struct<any>>(t: T) =>
