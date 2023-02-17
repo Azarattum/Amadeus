@@ -1,11 +1,15 @@
 import { close, connect, json, groupJSON } from "@amadeus-music/crdata";
 import { existsSync, mkdirSync, readdirSync } from "fs";
+import { async, path } from "@amadeus-music/core";
 import { database, stop, users } from "./plugin";
-import { async } from "@amadeus-music/core";
 
 database(function* (user = "shared") {
-  if (!existsSync("users")) mkdirSync("users");
-  const db = connect(`users/${user}.db`, user === "shared");
+  if (!existsSync(path("users"))) mkdirSync(path("users"));
+  const db = connect({
+    name: path(`users/${user}.db`),
+    local: user === "shared",
+    paths,
+  });
   yield {
     ...db.playlists,
     ...db.settings,
@@ -66,11 +70,14 @@ stop(function* () {
 });
 
 users(function* () {
-  if (!existsSync("users")) return yield {};
-  const all = readdirSync("users")
+  if (!existsSync(path("users"))) return yield {};
+  const all = readdirSync(path("users"))
     .filter((x) => !x.includes("shared") && x.endsWith(".db"))
     .map(async (filename) => {
-      const { connection } = connect(`users/${filename}`);
+      const { connection } = connect({
+        name: path(`users/${filename}`),
+        paths,
+      });
       const db = await connection;
       const entries = await db.selectFrom("settings").selectAll().execute();
       const data = entries.map(({ key, value }) => [key, JSON.parse(value)]);
@@ -78,3 +85,10 @@ users(function* () {
     });
   yield yield* async(Promise.all(all).then(Object.fromEntries));
 });
+
+const paths = {
+  binding: import.meta.env.DEV
+    ? undefined
+    : path("plugins/sqlite/better_sqlite3.node"),
+  extension: import.meta.env.DEV ? undefined : path("plugins/sqlite/crsqlite"),
+};

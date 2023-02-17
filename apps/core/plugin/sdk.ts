@@ -15,6 +15,7 @@ import * as events from "../event/pool";
 import * as log from "../status/log";
 import { info } from "../status/log";
 import { assert } from "superstruct";
+import { resolve } from "node:path";
 
 const bound = {
   ...events,
@@ -52,6 +53,9 @@ function register<
       .map(([key, fn]) => [key, (fn as any).bind(context)])
   ) as Configure<typeof bound, T, S, C & { fetch: FetchOptions }>;
 }
+
+export const path = (to = ".") =>
+  import.meta.env.DEV ? resolve(__dirname, "..", to) : resolve(__dirname, to);
 
 export { register, usage };
 export { http } from "../network/http";

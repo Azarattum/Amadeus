@@ -1,18 +1,29 @@
 const { externals } = require("rollup-plugin-node-externals");
 const replace = require("@rollup/plugin-replace").default;
+const copy = require("rollup-plugin-copy");
 const { existsSync } = require("node:fs");
 const { resolve } = require("node:path");
 const { defineConfig } = require("vite");
 
-const name = require(resolve("./package.json")).name;
+const identifier = require(resolve("./package.json")).name;
+const name = identifier.replace(/(@(\w|-)*\/)|((\w|-)*-)/g, "");
 const monorepo = existsSync(resolve("../../package.json"));
+const build = monorepo ? "../../build/plugins" : "./build";
 
 module.exports = defineConfig({
   plugins: [
     { ...externals({ deps: false }), enforce: "pre" },
     replace({
-      "process.env.NODE_ENV": '"production"',
+      "import.meta.url": '"file://"+__filename',
       preventAssignment: true,
+    }),
+    copy({
+      targets: [
+        {
+          src: "./assets/*",
+          dest: resolve(build, name),
+        },
+      ],
     }),
   ],
   resolve: {
@@ -27,12 +38,14 @@ module.exports = defineConfig({
   },
   build: {
     emptyOutDir: monorepo ? false : true,
-    outDir: monorepo ? "../../build/plugins" : "./build",
+    outDir: build,
     lib: {
       formats: ["cjs"],
       entry: "./index.ts",
-      fileName: (ext) =>
-        `${name.replace(/(@(\w|-)*\/)|((\w|-)*-)/g, "")}.${ext}`,
+      fileName: (ext) => `${name}.${ext}`,
+    },
+    commonjsOptions: {
+      ignoreDynamicRequires: true,
     },
   },
 });

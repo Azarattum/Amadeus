@@ -21,6 +21,9 @@
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.2",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-node-externals": "^5.1.2",
+    "vite": "4.1.1",
     "vite-node": "0.28.5"
   }
 }
