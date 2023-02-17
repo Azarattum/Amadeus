@@ -89,6 +89,8 @@ users(function* () {
 const paths = {
   binding: import.meta.env.DEV
     ? undefined
-    : path("plugins/sqlite/better_sqlite3.node"),
-  extension: import.meta.env.DEV ? undefined : path("plugins/sqlite/crsqlite"),
+    : path(`plugins/sqlite/${process.arch}/sqlite.${process.platform}`),
+  extension: import.meta.env.DEV
+    ? undefined
+    : path(`plugins/sqlite/${process.arch}/crsqlite`),
 };
