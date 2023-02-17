@@ -12,6 +12,7 @@ import { Query } from "./types/action";
 import { Me } from "./types/core";
 
 export const {
+  ok,
   err,
   wrn,
   info,

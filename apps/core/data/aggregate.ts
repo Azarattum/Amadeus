@@ -31,11 +31,7 @@ aggregate(function* (from, args, options) {
     })();
   });
 
-  yield {
-    next: data.next,
-    prev: data.prev,
-  };
-
+  yield data;
   yield* map(parallel(...curated));
   // Don't end until aborted
   yield* async(
@@ -45,7 +41,7 @@ aggregate(function* (from, args, options) {
   );
 });
 
-function aggregator(id: number): Controls;
+function aggregator(id: number): Controls & { close(): void };
 function aggregator<T extends Fn, A extends Readonly<Parameters<T>>>(
   this: Context,
   from: Pool<T, any>,
@@ -61,13 +57,14 @@ function aggregator(
   if (typeof source === "number") {
     const controls = [...aggregate.status().executing.values()].find(
       (x: any) => x.controls === source
-    ) as (Executor & Partial<Controls>) | undefined;
-
+    ) as (Executor & Controls) | undefined;
+    if (!controls) {
+      throw new Error(`Could not find aggregator with id ${source}!`);
+    }
     return {
-      next: () => !!controls?.next?.(),
-      prev: () => !!controls?.prev?.(),
-      close: () => controls?.controller.abort(),
-    } as Controls;
+      ...controls,
+      close: () => controls.controller.abort(),
+    } as Controls & { close(): void };
   }
 
   const group = this?.group || context.group;
@@ -122,6 +119,6 @@ function match(query: string) {
   };
 }
 
-type Controls = { next(): boolean; prev(): boolean; close(): void };
+type Controls = Omit<ReturnType<typeof pages>, "append" | "complete">;
 
 export { aggregator as aggregate, match, type Controls };

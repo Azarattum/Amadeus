@@ -13,6 +13,7 @@ function page<T extends Record<string, any>>(
   completed: Set<number>,
   options: PaginationOptions<T>
 ) {
+  const { wait, resolve } = lock();
   const progress = groups.map(() => new Set());
   const map = new Map<number, T>();
   const convert = uniquify as any;
@@ -30,6 +31,7 @@ function page<T extends Record<string, any>>(
 
       batch.forEach((x) => progress[id].add(identify(x)));
       combine(items, batch, params);
+      if (this.progress >= 1) resolve();
       const overshoot = items.splice(size);
       return progress.map((x) => overshoot.filter((y) => x.has(identify(y))));
     },
@@ -46,6 +48,10 @@ function page<T extends Record<string, any>>(
           acc + (this.satisfied(id) ? part : part * (x.size / size)),
         0
       );
+    },
+    get loaded() {
+      if (this.progress >= 1) return Promise.resolve();
+      return wait();
     },
   };
 }
@@ -106,6 +112,9 @@ function pages<T extends Record<string, any>>(
       const changed = !pages[selected].satisfied(id);
       completed.add(id);
       if (changed) refresh();
+    },
+    get pages() {
+      return pages;
     },
     get current() {
       return pages[selected];

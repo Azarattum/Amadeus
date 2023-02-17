@@ -15,7 +15,7 @@ const aggregate = pool<
     from: Pool<any, any>,
     args: any[],
     options: PaginationOptions<any>
-  ) => Partial<Controls>
+  ) => Controls
 >("aggregate", {
   timeout: 1000 * 60 * 60,
 });

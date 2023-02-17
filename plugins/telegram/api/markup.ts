@@ -8,14 +8,28 @@ function pager(
 ) {
   const controls: Buttons = [[], []];
   controls[0].push({
+    text: "🔽",
+    callback: { page: aggregator },
+  });
+  controls[0].push({
+    text: "🔀",
+    callback: { shuffle: aggregator },
+  });
+  if (page > 0) {
+    controls[0].push({
+      text: "⏬",
+      callback: { all: aggregator },
+    });
+  }
+  controls[1].push({
     text: page > 0 ? "👈" : "🤚",
     callback: page > 0 ? { prev: aggregator } : {},
   });
-  controls[0].push({
+  controls[1].push({
     text: "🗑️",
     callback: { close: aggregator },
   });
-  controls[0].push({
+  controls[1].push({
     text: next ? "👉" : "🤚",
     callback: next ? { next: aggregator } : {},
   });
