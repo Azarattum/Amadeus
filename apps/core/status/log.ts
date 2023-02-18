@@ -43,7 +43,7 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
     `[${bright}${group}${reset}]:`,
     ...data.map((x) => {
       if (typeof x !== "string") x = inspect(x);
-      return paint(x, color || reset);
+      return paint(x.replaceAll(reset, reset + color), color || reset);
     })
   );
   save(

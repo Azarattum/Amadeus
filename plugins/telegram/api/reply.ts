@@ -1,7 +1,7 @@
 import { async, first, map, take } from "@amadeus-music/core";
-import { desource, fetch, info, pool, wrn } from "../plugin";
 import { bright, reset } from "@amadeus-music/util/color";
 import type { TrackInfo } from "@amadeus-music/protocol";
+import { desource, fetch, info, pool } from "../plugin";
 import { Sent } from "../types/core";
 
 type Replier = (message: Message) => number;

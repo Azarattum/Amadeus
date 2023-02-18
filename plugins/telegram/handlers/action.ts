@@ -6,6 +6,7 @@ import {
   mention,
   ok,
   persistence,
+  wrn,
 } from "../plugin";
 import {
   All,
@@ -16,11 +17,20 @@ import {
   Prev,
   Shuffle,
 } from "../types/action";
+import { bright, reset } from "@amadeus-music/util/color";
 import { shuffle } from "@amadeus-music/util/object";
 import { TrackInfo } from "@amadeus-music/protocol";
 import { async, is } from "@amadeus-music/core";
 
 callback(function* (action) {
+  const report = (result: number[], type: string) => {
+    const errors = result.filter((x) => !x).length;
+    const op = `${type} download for ${bright}${this.name}${reset}`;
+    const failures = `${bright}${errors}${reset}/${result.length}`;
+    if (!errors) ok(`${op} has successfully completed!`);
+    else wrn(`${op} failed to send ${failures} items!`);
+  };
+
   if (is(action, Next)) aggregate(action.next).next();
   if (is(action, Prev)) aggregate(action.prev).prev();
   if (is(action, Close)) aggregate(action.close).close();
@@ -31,18 +41,16 @@ callback(function* (action) {
     info(`${this.name} requested a page download...`);
     const page = aggregate<TrackInfo>(action.page).current;
     yield* async(page.loaded);
-    yield* this.reply(page.items);
-    ok(`Page download for ${this.name} has completed!`);
+    report(yield* this.reply(page.items), "Page");
   } else if (is(action, All)) {
     info(`${this.name} requested a mass download...`);
     const all = aggregate<TrackInfo>(action.all).pages;
-    yield* this.reply(all.flatMap((x) => x.items));
-    ok(`Mass download for ${this.name} has completed!`);
+    report(yield* this.reply(all.flatMap((x) => x.items)), "Mass");
   } else if (is(action, Shuffle)) {
     info(`${this.name} requested a random download...`);
     const all = aggregate<TrackInfo>(action.shuffle).pages;
-    yield* this.reply(shuffle(all.flatMap((x) => x.items)).slice(0, 10));
-    ok(`Random download for ${this.name} has completed!`);
+    const shuffled = shuffle(all.flatMap((x) => x.items)).slice(0, 10);
+    report(yield* this.reply(shuffled), "Random");
   }
 });
 
