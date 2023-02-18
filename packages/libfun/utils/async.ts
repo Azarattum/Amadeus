@@ -38,14 +38,19 @@ async function* cleanup<T>(
 function derive(parent?: AbortController | AbortSignal) {
   const signal = parent instanceof AbortSignal ? parent : parent?.signal;
   const derived = new AbortController();
+  if ("process" in globalThis) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require("node:events").setMaxListeners(Infinity, derived.signal);
+  }
+  if (!signal) return derived;
   const abort = () => derived.abort();
   const remove = () => {
     derived.signal.removeEventListener("abort", remove);
-    signal?.removeEventListener("abort", abort);
+    signal.removeEventListener("abort", abort);
   };
 
   derived.signal.addEventListener("abort", remove);
-  signal?.addEventListener("abort", abort);
+  signal.addEventListener("abort", abort);
   return derived;
 }
 

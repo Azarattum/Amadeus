@@ -103,7 +103,7 @@ function pools(options: Partial<Options> = {}): Pools {
 
       return function (...args: any[]) {
         const executor = {
-          controller: new AbortController(),
+          controller: derive(),
           tasks: new Set(),
           group,
         } satisfies Executor;

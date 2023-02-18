@@ -10,7 +10,7 @@
     "isolatedModules": true,
     "module": "esnext",
     "target": "esnext",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "strict": true
   }
 }
