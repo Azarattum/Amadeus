@@ -6,7 +6,7 @@ import {
   reset,
   yellow,
 } from "@amadeus-music/util/color";
-import { capitalize, format } from "@amadeus-music/util/string";
+import { capitalize, dedupe, format } from "@amadeus-music/util/string";
 import { format as formatPlugin } from "../plugin/loader";
 import { persistence, users } from "../data/persistence";
 import { pretty } from "@amadeus-music/util/object";
@@ -106,13 +106,13 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
       message += "]\n";
     });
     x.pending.forEach((executor) => {
-      message += ` ${yellow}${pending}${reset}`;
-      message += `${capitalize(executor.group || "unknown")}...`;
+      message += ` ${yellow}${pending}${reset} `;
+      message += `${capitalize(executor.group || "unknown")}...\n`;
     });
     if (x.executing.size || x.pending.size) message += "\n";
   });
 
-  message = message.trimEnd() + "\n";
+  message = dedupe(message.trimEnd()) + "\n";
   message = message.replace(/\n/g, "\n  ");
   info(message);
 });

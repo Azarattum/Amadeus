@@ -41,7 +41,9 @@ aggregate(function* (from, args, options) {
   );
 });
 
-function aggregator(id: number): Controls & { close(): void };
+function aggregator<T extends Record<string, any> = Record<string, any>>(
+  id: number
+): Controls<T> & { close(): void };
 function aggregator<T extends Fn, A extends Readonly<Parameters<T>>>(
   this: Context,
   from: Pool<T, any>,
@@ -119,6 +121,9 @@ function match(query: string) {
   };
 }
 
-type Controls = Omit<ReturnType<typeof pages>, "append" | "complete">;
+type Controls<T extends Record<string, any> = Record<string, any>> = Omit<
+  ReturnType<typeof pages<T>>,
+  "append" | "complete"
+>;
 
 export { aggregator as aggregate, match, type Controls };

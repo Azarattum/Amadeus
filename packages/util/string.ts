@@ -1,3 +1,5 @@
+import { black, bright, reset } from "./color";
+
 /**
  * Makes the first letter of first/every word uppercase in a string
  * @param string String to capitalize
@@ -95,4 +97,30 @@ export function prefix(words: string[]) {
  */
 export function clean(text: string) {
   return text.normalize().trim().toLowerCase().replace(/\s/g, " ");
+}
+
+/**
+ * Deduplicates identical lines with the specifies format
+ * @param input Input text (multiline)
+ * @param format Format function
+ */
+export function dedupe(
+  input: string,
+  format = (line: string, i: number) =>
+    `${line} ${bright + black}(x${i})${reset}`
+) {
+  const lines = input.split("\n");
+  let count = 1;
+  return (
+    lines.slice(1).reduce((result, line, index) => {
+      if (line === lines[index] && line.trim()) {
+        count++;
+        return result;
+      }
+      const formatted = count > 1 ? format(lines[index], count) : lines[index];
+      count = 1;
+      return `${result}${formatted}\n`;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    }, "") + (count > 1 ? format(lines.pop()!, count) : lines.pop())
+  );
 }
