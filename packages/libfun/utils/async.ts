@@ -76,10 +76,14 @@ function block<
     const ready = condition();
     if (ready === true) return Object.assign(resolve(), meta);
 
-    const blocking = new Promise<void>(function poll(resolve) {
-      const ready = condition();
-      if (ready === true) resolve();
-      else setTimeout(() => poll(resolve), ready);
+    const blocking = new Promise<void>(function poll(resolve, reject) {
+      try {
+        const ready = condition();
+        if (ready === true) resolve();
+        else setTimeout(() => poll(resolve, reject), ready);
+      } catch (error) {
+        reject(error);
+      }
     });
 
     return Object.assign(
