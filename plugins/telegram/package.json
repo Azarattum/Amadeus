@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
+    "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/util": "workspace:*"
   },
   "devDependencies": {

@@ -148,10 +148,12 @@ importers:
   plugins/telegram:
     specifiers:
       '@amadeus-music/core': workspace:*
+      '@amadeus-music/protocol': workspace:*
       '@amadeus-music/util': workspace:*
       vite: 4.1.2
     dependencies:
       '@amadeus-music/core': link:../../apps/core
+      '@amadeus-music/protocol': link:../../packages/protocol
       '@amadeus-music/util': link:../../packages/util
     devDependencies:
       vite: 4.1.2

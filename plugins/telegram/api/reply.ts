@@ -1,8 +1,10 @@
-import { Infer, map } from "@amadeus-music/core";
-import { fetch, pool } from "../plugin";
+import { async, first, map, take } from "@amadeus-music/core";
+import { desource, fetch, info, pool, wrn } from "../plugin";
+import { bright, reset } from "@amadeus-music/util/color";
+import type { TrackInfo } from "@amadeus-music/protocol";
 import { Sent } from "../types/core";
 
-type Replier = (message: Message) => Infer<typeof Sent>["result"];
+type Replier = (message: Message) => number;
 type Reply = ReturnType<typeof replier>;
 type Edit = ReturnType<typeof editor>;
 interface Message {
@@ -30,21 +32,41 @@ function* reply(chat: number, params: Message) {
       chat_id: chat.toString(),
       ...paramify(params),
     },
-  }).as(Sent)).result;
+  }).as(Sent)).result.message_id;
 }
 
-function replier(chat: number, group = true) {
+function replier(name: string, chat: number, group = true) {
   const target = pool<Replier>(`upload/${chat}`, {
     rate: group ? 20 : 60,
     concurrency: 3,
   });
   if (!target.status().listeners.size) target(reply.bind(null, chat));
 
-  return function* (message: Message) {
-    const [result] = yield* map(target(message), function* (x) {
+  return function* (message: Message | TrackInfo[]) {
+    if (Array.isArray(message)) {
+      const promises: Promise<any>[] = [];
+      for (const { album, artists, title, source } of message) {
+        const url = yield* async(first(desource(source)));
+        const performer = artists.map((x: any) => x.title).join(", ");
+        const song = `${performer} - ${title}`;
+        info(`Sending "${song}" to ${bright}${name}${reset}...`);
+        promises.push(
+          take(
+            target({
+              audio: { url, performer, title: title, thumb: album.art },
+            })
+          )
+        );
+      }
+      return yield* async(
+        Promise.allSettled(promises).then((x) =>
+          x.map((x) => (x.status === "rejected" ? 0 : +x.value))
+        )
+      );
+    }
+    return yield* map(target(message), function* (x) {
       return x;
     });
-    return result;
   };
 }
 

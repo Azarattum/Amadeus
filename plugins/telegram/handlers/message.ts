@@ -17,7 +17,7 @@ message(function* (text) {
   const chat = this.chat;
 
   const cache = persistence();
-  const { message_id: message } = yield* this.reply({ text: "⏳" });
+  const [message] = yield* this.reply({ text: "⏳" });
   const id = aggregate(search, ["track", text] as const, {
     async update(tracks, progress, page) {
       await cache.push(tracks);

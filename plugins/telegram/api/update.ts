@@ -82,7 +82,7 @@ function* verify(update: unknown) {
     user: user[0],
     name: user[1].name,
     edit: editor(chat.id),
-    reply: replier(chat.id, chat.type !== "private"),
+    reply: replier(user[1].name, chat.id, chat.type !== "private"),
   };
 }
 
