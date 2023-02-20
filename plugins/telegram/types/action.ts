@@ -28,6 +28,7 @@ export const Artists = object({
 });
 export const Artist = object({
   artist: integer(),
+  track: integer(),
 });
 export const Album = object({
   album: integer(),
@@ -35,8 +36,8 @@ export const Album = object({
 export const Similar = object({
   similar: integer(),
 });
-export const Hide = object({
-  hide: integer(),
+export const Reset = object({
+  reset: integer(),
 });
 
 export const Query = union([
@@ -51,5 +52,5 @@ export const Query = union([
   Artist,
   Album,
   Similar,
-  Hide,
+  Reset,
 ]);

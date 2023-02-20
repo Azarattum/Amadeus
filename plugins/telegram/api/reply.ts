@@ -13,7 +13,6 @@ interface Message {
   text?: string;
   mode?: string;
   markup?: string;
-  photo?: string;
   caption?: string;
   audio?: { url: string; performer?: string; title?: string; thumb?: string };
 }
@@ -22,6 +21,7 @@ function paramify(params: Message) {
   return {
     ...(params.text ? { text: params.text } : {}),
     ...(params.mode ? { parse_mode: params.mode } : {}),
+    ...(params.caption ? { caption: params.caption } : {}),
     ...(params.markup ? { reply_markup: params.markup } : {}),
     ...(params.audio?.url ? { audio: params.audio.url } : {}),
     ...(params.audio?.title ? { title: params.audio.title } : {}),
@@ -81,7 +81,7 @@ function replier(name: string, chat: number, group = true) {
 }
 
 function* edit(chat: number, message: number, params: Message) {
-  yield* fetch("editMessageText", {
+  yield* fetch("editMessageCaption", {
     params: {
       chat_id: chat.toString(),
       message_id: message.toString(),

@@ -1,4 +1,17 @@
 import {
+  Album,
+  All,
+  Artist,
+  Artists,
+  Close,
+  Download,
+  Next,
+  Page,
+  Prev,
+  Reset,
+  Shuffle,
+} from "../types/action";
+import {
   aggregate,
   callback,
   desource,
@@ -10,17 +23,7 @@ import {
   fetch,
   wrn,
 } from "../plugin";
-import {
-  Album,
-  All,
-  Close,
-  Download,
-  Next,
-  Page,
-  Prev,
-  Shuffle,
-} from "../types/action";
-import { markdown, escape, pager, details } from "../api/markup";
+import { markdown, escape, pager, details, keyboard } from "../api/markup";
 import { bright, reset } from "@amadeus-music/util/color";
 import { TrackDetails } from "@amadeus-music/protocol";
 import { shuffle } from "@amadeus-music/util/object";
@@ -39,24 +42,35 @@ callback(function* (action, message, chat) {
   if (is(action, Next)) aggregate(action.next).next();
   if (is(action, Prev)) aggregate(action.prev).prev();
   if (is(action, Close)) aggregate(action.close).close();
-  else if (is(action, Download)) {
+  if (is(action, Reset)) {
+    const track = yield* async(persistence().track(action.reset));
+    yield* this.edit(message, {
+      mode: markdown(),
+      markup: details(track.id),
+    });
+  }
+  if (is(action, Download)) {
     const track = yield* async(persistence().track(action.download));
     yield* this.reply([track]);
-  } else if (is(action, Page)) {
+  }
+  if (is(action, Page)) {
     info(`${this.name} requested a page download...`);
     const page = aggregate<TrackDetails>(action.page).current;
     yield* async(page.loaded);
     report(yield* this.reply(page.items), "Page");
-  } else if (is(action, All)) {
+  }
+  if (is(action, All)) {
     info(`${this.name} requested a mass download...`);
     const all = aggregate<TrackDetails>(action.all).pages;
     report(yield* this.reply(all.flatMap((x) => x.items)), "Mass");
-  } else if (is(action, Shuffle)) {
+  }
+  if (is(action, Shuffle)) {
     info(`${this.name} requested a random download...`);
     const all = aggregate<TrackDetails>(action.shuffle).pages;
     const shuffled = shuffle(all.flatMap((x) => x.items)).slice(0, 10);
     report(yield* this.reply(shuffled), "Random");
-  } else if (is(action, Album)) {
+  }
+  if (is(action, Album)) {
     const track = yield* async(persistence().track(action.album));
     const cache = persistence();
 
@@ -74,7 +88,12 @@ callback(function* (action, message, chat) {
             progress < 1
               ? `${Math.round(progress * 100)}% ⏳ ${escape(track.album.title)}`
               : `💿 *${escape(track.album.title)}*`,
-          markup: pager(id, page, buttons, progress >= 1),
+          markup: pager(
+            id,
+            page,
+            buttons,
+            progress >= 1 && tracks.length >= this.page
+          ),
         };
 
         fetch("editMessageCaption", {
@@ -91,6 +110,69 @@ callback(function* (action, message, chat) {
             chat_id: chat.toString(),
             message_id: message.toString(),
             ...paramify({ mode: markdown(), markup: details(track.id) }),
+          },
+        });
+      },
+      page: 8,
+    });
+  }
+  if (is(action, Artists)) {
+    const track = yield* async(persistence().track(action.artists));
+    if (track.artists.length === 1) {
+      action = { artist: track.artists[0].id, track: track.id };
+    } else {
+      yield* this.edit(message, {
+        mode: markdown(),
+        markup: keyboard([
+          ...track.artists.map((x) => [
+            { text: x.title, callback: { artist: x.id, track: track.id } },
+          ]),
+          [{ text: "👌", callback: { reset: track.id } }],
+        ]),
+      });
+    }
+  }
+  if (is(action, Artist)) {
+    const artist = yield* async(persistence().artist(action.artist));
+    const cache = persistence();
+    const track = action.track;
+
+    const id = aggregate(desource, ["artist", artist.source] as const, {
+      async update(tracks, progress, page) {
+        await cache.push(tracks);
+        const buttons = tracks.map((x) => ({
+          text: `${x.artists.map((x) => x.title).join(", ")} - ${x.title}`,
+          callback: { download: x.id },
+        }));
+
+        const params = {
+          mode: markdown(),
+          caption:
+            progress < 1
+              ? `${Math.round(progress * 100)}% ⏳ ${escape(artist.title)}`
+              : `👤 *${escape(artist.title)}*`,
+          markup: pager(
+            id,
+            page,
+            buttons,
+            progress >= 1 && tracks.length >= this.page
+          ),
+        };
+
+        fetch("editMessageCaption", {
+          params: {
+            chat_id: chat.toString(),
+            message_id: message.toString(),
+            ...paramify(params),
+          },
+        });
+      },
+      invalidate() {
+        fetch("editMessageCaption", {
+          params: {
+            chat_id: chat.toString(),
+            message_id: message.toString(),
+            ...paramify({ mode: markdown(), markup: details(track) }),
           },
         });
       },

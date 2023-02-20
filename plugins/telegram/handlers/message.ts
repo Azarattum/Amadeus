@@ -32,7 +32,12 @@ message(function* (text) {
           progress < 1
             ? `${Math.round(progress * 100)}% ⏳ ${escape(text)}`
             : `🔎 *${escape(text)}*`,
-        markup: pager(id, page, buttons, progress >= 1),
+        markup: pager(
+          id,
+          page,
+          buttons,
+          progress >= 1 && tracks.length >= this.page
+        ),
       };
 
       fetch("editMessageText", {

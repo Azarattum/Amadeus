@@ -62,6 +62,13 @@ database(function* (user = "shared") {
         .groupBy("tracks.id")
         .executeTakeFirstOrThrow();
     },
+    async artist(id) {
+      return (await db.connection)
+        .selectFrom("artists")
+        .where("artists.id", "=", id)
+        .selectAll()
+        .executeTakeFirstOrThrow();
+    },
   };
 });
 
