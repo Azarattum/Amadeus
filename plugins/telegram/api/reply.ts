@@ -1,7 +1,8 @@
+import type { TrackDetails, TrackInfo } from "@amadeus-music/protocol";
 import { async, first, map, take } from "@amadeus-music/core";
 import { bright, reset } from "@amadeus-music/util/color";
-import type { TrackInfo } from "@amadeus-music/protocol";
 import { desource, fetch, info, pool } from "../plugin";
+import { details, markdown } from "./markup";
 import { Sent } from "../types/core";
 
 type Replier = (message: Message) => number;
@@ -11,23 +12,33 @@ interface Message {
   text?: string;
   mode?: string;
   markup?: string;
+  photo?: string;
+  caption?: string;
   audio?: { url: string; performer?: string; title?: string; thumb?: string };
 }
 
 function paramify(params: Message) {
   return {
-    ...(params.text ? { text: params.text } : {}),
+    ...(params.caption ? { caption: params.caption } : {}),
+    ...(params.text && !params.photo ? { text: params.text } : {}),
     ...(params.mode ? { parse_mode: params.mode } : {}),
     ...(params.markup ? { reply_markup: params.markup } : {}),
     ...(params.audio?.url ? { audio: params.audio.url } : {}),
     ...(params.audio?.title ? { title: params.audio.title } : {}),
     ...(params.audio?.thumb ? { title: params.audio.thumb } : {}),
     ...(params.audio?.performer ? { performer: params.audio.performer } : {}),
+    ...(params.text && params.photo ? { caption: params.text } : {}),
+    ...(params.photo ? { photo: params.photo } : {}),
   };
 }
 
 function* reply(chat: number, params: Message) {
-  yield (yield* fetch(params.audio ? "sendAudio" : "sendMessage", {
+  const method = params.audio
+    ? "sendAudio"
+    : params.photo
+    ? "sendPhoto"
+    : "sendMessage";
+  yield (yield* fetch(method, {
     params: {
       chat_id: chat.toString(),
       ...paramify(params),
@@ -42,11 +53,11 @@ function replier(name: string, chat: number, group = true) {
   });
   if (!target.status().listeners.size) target(reply.bind(null, chat));
 
-  return function* (message: Message | TrackInfo[]) {
+  return function* (message: Message | TrackDetails[]) {
     if (Array.isArray(message)) {
       const promises: Promise<any>[] = [];
-      for (const { album, artists, title, source } of message) {
-        const url = yield* async(first(desource(source)));
+      for (const { id, album, artists, title, source } of message) {
+        const url = yield* async(first(desource("track", source)));
         const performer = artists.map((x: any) => x.title).join(", ");
         const song = `${performer} - ${title}`;
         info(`Sending "${song}" to ${bright}${name}${reset}...`);
@@ -54,6 +65,8 @@ function replier(name: string, chat: number, group = true) {
           take(
             target({
               audio: { url, performer, title: title, thumb: album.art },
+              markup: details(id),
+              mode: markdown(),
             })
           )
         );
