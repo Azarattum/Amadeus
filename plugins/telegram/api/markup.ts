@@ -37,6 +37,23 @@ function pager(
   return keyboard([...options.map((x) => [x]), ...controls]);
 }
 
+function details(id: number) {
+  const controls: Buttons = [[]];
+  controls[0].push({
+    text: "👤",
+    callback: { artists: id },
+  });
+  controls[0].push({
+    text: "💿",
+    callback: { album: id },
+  });
+  controls[0].push({
+    text: "📻",
+    callback: { similar: id },
+  });
+  return keyboard(controls);
+}
+
 function keyboard(buttons: Buttons) {
   return JSON.stringify({
     inline_keyboard: buttons.map((x) =>
@@ -74,4 +91,4 @@ function markdown() {
   return "MarkdownV2";
 }
 
-export { keyboard, markdown, escape, pager };
+export { keyboard, markdown, escape, pager, details };
