@@ -103,6 +103,14 @@ function uniquify<T>(target: T): Uniqueified<T> {
   return copy as any;
 }
 
+function format(data: any) {
+  return has(data, "artists") && has(data, "title")
+    ? `${data.artists.map(titled).join(", ")} - ${data.title}`
+    : has(data, "title")
+    ? data.title
+    : String(data);
+}
+
 type Uniqueified<T> = T extends Record<any, any>
   ? Unique<{
       [K in keyof T]: T[K] extends (infer I)[]
@@ -112,4 +120,4 @@ type Uniqueified<T> = T extends Record<any, any>
   : T;
 
 export type { Uniqueified };
-export { identify, stringify, normalize, uniquify, merge };
+export { identify, stringify, normalize, uniquify, merge, format };

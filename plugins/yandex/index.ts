@@ -8,6 +8,7 @@ import {
   similar,
 } from "./types";
 import { init, search, desource, fetch, relate } from "./plugin";
+import { format } from "@amadeus-music/protocol";
 import { createHash } from "node:crypto";
 
 init(function* ({ yandex: { token, page } }) {
@@ -66,8 +67,7 @@ relate(function* (type, to) {
   let id = to.source.match(/yandex\/([0-9]+)/)?.[1];
   if (type === "track") {
     if (!id) {
-      const text = `${to.artists.map((x) => x.title)} - ${to.title}`;
-      const params = { text, type, "page-size": "1", page: "0" };
+      const params = { text: format(to), type, "page-size": "1", page: "0" };
       const { result } = yield* fetch("search", { params }).as(results);
       id = result.tracks?.results[0]?.id.toString();
       if (!id) return;

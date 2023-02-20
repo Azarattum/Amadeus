@@ -1,9 +1,9 @@
-import { async, first, map, take } from "@amadeus-music/core";
-import type { TrackDetails } from "@amadeus-music/protocol";
+import { aggregate, desource, fetch, info, persistence, pool } from "../plugin";
+import { format, TrackDetails, TrackInfo } from "@amadeus-music/protocol";
+import { async, first, map, Pool, take } from "@amadeus-music/core";
+import { menu, markdown, icon, escape, pager } from "./markup";
 import { bright, reset } from "@amadeus-music/util/color";
-import { desource, fetch, info, pool } from "../plugin";
 import { pretty } from "@amadeus-music/util/object";
-import { menu, markdown } from "./markup";
 import { sent } from "../types/core";
 
 type Replier = (message: Message) => number;
@@ -49,16 +49,19 @@ function replier(name: string, chat: number, group = true) {
   return function* (message: Message | TrackDetails[]) {
     if (Array.isArray(message)) {
       const promises: Promise<any>[] = [];
-      for (const { id, album, artists, title, source } of message) {
-        const url = yield* async(first(desource("track", source)));
-        const performer = artists.map((x: any) => x.title).join(", ");
-        const song = `${performer} - ${title}`;
-        info(`Sending "${song}" to ${bright}${name}${reset}...`);
+      for (const track of message) {
+        const url = yield* async(first(desource("track", track.source)));
+        info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
         promises.push(
           take(
             target({
-              audio: { url, performer, title: title, thumb: album.art },
-              markup: menu(id),
+              audio: {
+                url,
+                title: track.title,
+                thumb: track.album.art,
+                performer: track.artists.map((x: any) => x.title).join(", "),
+              },
+              markup: menu(track.id),
               mode: markdown(),
             })
           )
@@ -96,4 +99,63 @@ function editor(chat: number) {
   };
 }
 
-export { replier, editor, paramify, type Reply, type Edit };
+function paginate<T extends (..._: any) => TrackInfo>(
+  from: [Pool<T, any>, Parameters<Extract<T, (..._: any) => TrackInfo>>],
+  options: {
+    icon: string;
+    chat: number;
+    header: string;
+    track?: number;
+    message: number;
+    compare?: (a: TrackInfo, b: TrackInfo) => number;
+  }
+) {
+  const target = {
+    chat_id: options.chat.toString(),
+    message_id: options.message.toString(),
+  };
+
+  const cache = persistence();
+  const id = aggregate(...from, {
+    async update(tracks, progress, page) {
+      await cache.push(tracks);
+      const buttons = tracks.map((x) => ({
+        text: format(x),
+        callback: { download: x.id },
+      }));
+
+      const data = options.track ? "caption" : "text";
+      const loaded = Math.round(progress * 100);
+      const title = escape(options.header);
+      const state = `${loaded}% ${icon.load} *${title}*`;
+      const header = progress < 1 ? state : `${options.icon} *${title}*`;
+      const completed = progress >= 1 && tracks.length >= this.page;
+
+      fetch(options.track ? "editMessageCaption" : "editMessageText", {
+        params: {
+          ...target,
+          ...paramify({
+            mode: markdown(),
+            markup: pager(id, page, buttons, completed),
+            [data]: header,
+          }),
+        },
+      });
+    },
+    invalidate() {
+      fetch(options.track ? "editMessageCaption" : "deleteMessage", {
+        params: {
+          ...target,
+          ...(options.track
+            ? paramify({ mode: markdown(), markup: menu(options.track) })
+            : {}),
+        },
+      }).flush();
+    },
+    compare: options.compare,
+    page: 8,
+  });
+}
+
+export type { Reply, Edit, Message };
+export { replier, editor, paramify, paginate };

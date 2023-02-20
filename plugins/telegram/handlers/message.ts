@@ -1,63 +1,18 @@
-import {
-  aggregate,
-  message,
-  search,
-  fetch,
-  voice,
-  info,
-  post,
-  persistence,
-} from "../plugin";
-import { markdown, pager, escape, icon } from "../api/markup";
+import { message, search, voice, info, post } from "../plugin";
+import { bright, reset } from "@amadeus-music/util/color";
 import { match } from "@amadeus-music/core";
-import { paramify } from "../api/reply";
+import { paginate } from "../api/reply";
+import { icon } from "../api/markup";
 
 message(function* (text) {
-  info(`${this.name} is searching for "${text}"...`);
-  const chat = this.chat;
-
-  const cache = persistence();
+  info(`${bright}${this.name}${reset} is searching for "${text}"...`);
   const [message] = yield* this.reply({ text: icon.load });
-  const id = aggregate(search, ["track", text] as const, {
-    async update(tracks, progress, page) {
-      await cache.push(tracks);
-      const buttons = tracks.map((x) => ({
-        text: `${x.artists.map((x) => x.title).join(", ")} - ${x.title}`,
-        callback: { download: x.id },
-      }));
-
-      const params = {
-        mode: markdown(),
-        text:
-          progress < 1
-            ? `${Math.round(progress * 100)}% ${icon.load} ${escape(text)}`
-            : `${icon.search} *${escape(text)}*`,
-        markup: pager(
-          id,
-          page,
-          buttons,
-          progress >= 1 && tracks.length >= this.page
-        ),
-      };
-
-      fetch("editMessageText", {
-        params: {
-          chat_id: chat.toString(),
-          message_id: message.toString(),
-          ...paramify(params),
-        },
-      });
-    },
-    invalidate() {
-      fetch("deleteMessage", {
-        params: {
-          message_id: message.toString(),
-          chat_id: chat.toString(),
-        },
-      }).flush();
-    },
+  paginate([search, ["track", text]], {
+    header: text,
+    icon: icon.search,
     compare: match(text),
-    page: 8,
+    chat: this.chat,
+    message,
   });
 });
 
