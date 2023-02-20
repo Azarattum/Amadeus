@@ -126,7 +126,7 @@ type PaginationOptions<T> = {
   id?: number;
   page: number;
   invalidate?: () => void;
-  compare: (a: T, b: T) => number;
+  compare?: (a: T, b: T) => number;
   update?: (items: Uniqueified<T>[], progress: number, page: number) => void;
 };
 

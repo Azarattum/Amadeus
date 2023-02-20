@@ -104,13 +104,13 @@ export async function combine<T, U>(
   b: U[],
   {
     identify,
-    compare,
+    compare = () => 0,
     convert,
     merge,
     map,
   }: {
     identify: (item: T | U) => number;
-    compare: (a: T, b: T) => number;
+    compare?: (a: T, b: T) => number;
     merge: (a: T, b: U) => void;
     convert: (item: U) => T;
     map: Map<number, T>;
