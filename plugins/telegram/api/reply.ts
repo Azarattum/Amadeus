@@ -1,11 +1,13 @@
 import { aggregate, desource, fetch, info, persistence, pool } from "../plugin";
-import { format, TrackDetails, TrackInfo } from "@amadeus-music/protocol";
+import type { TrackDetails, TrackInfo } from "@amadeus-music/protocol";
 import { async, first, map, Pool, take } from "@amadeus-music/core";
 import { menu, markdown, icon, escape, pager } from "./markup";
 import { bright, reset } from "@amadeus-music/util/color";
 import { pretty } from "@amadeus-music/util/object";
+import { format } from "@amadeus-music/protocol";
 import { sent } from "../types/core";
 
+type Queue = (tracks: TrackDetails[]) => number;
 type Replier = (message: Message) => number;
 type Reply = ReturnType<typeof replier>;
 type Edit = ReturnType<typeof editor>;
@@ -30,6 +32,37 @@ function paramify(params: Message) {
   };
 }
 
+function* queue(
+  pool: Pool<Replier, any>,
+  name: string,
+  tracks: TrackDetails[]
+) {
+  const promises: Promise<any>[] = [];
+  for (const track of tracks) {
+    const url = yield* async(first(desource("track", track.source)));
+    info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
+    promises.push(
+      take(
+        pool({
+          audio: {
+            url,
+            title: track.title,
+            thumb: track.album.art,
+            performer: track.artists.map((x: any) => x.title).join(", "),
+          },
+          markup: menu(track.id),
+          mode: markdown(),
+        })
+      )
+    );
+  }
+  yield* yield* async(
+    Promise.allSettled(promises).then((x) =>
+      x.map((x) => (x.status === "rejected" ? 0 : +x.value))
+    )
+  );
+}
+
 function* reply(chat: number, params: Message) {
   yield (yield* fetch(params.audio ? "sendAudio" : "sendMessage", {
     params: {
@@ -39,7 +72,7 @@ function* reply(chat: number, params: Message) {
   }).as(sent)).result.message_id;
 }
 
-function replier(name: string, chat: number, group = true) {
+function replier(chat: number, name: string, group = true) {
   const target = pool<Replier>(`upload/${chat}`, {
     rate: group ? 20 : 60,
     concurrency: 3,
@@ -47,33 +80,16 @@ function replier(name: string, chat: number, group = true) {
   if (!target.status().listeners.size) target(reply.bind(null, chat));
 
   return function* (message: Message | TrackDetails[]) {
+    let ids: number[] = [];
     if (Array.isArray(message)) {
-      const promises: Promise<any>[] = [];
-      for (const track of message) {
-        const url = yield* async(first(desource("track", track.source)));
-        info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
-        promises.push(
-          take(
-            target({
-              audio: {
-                url,
-                title: track.title,
-                thumb: track.album.art,
-                performer: track.artists.map((x: any) => x.title).join(", "),
-              },
-              markup: menu(track.id),
-              mode: markdown(),
-            })
-          )
-        );
-      }
-      return yield* async(
-        Promise.allSettled(promises).then((x) =>
-          x.map((x) => (x.status === "rejected" ? 0 : +x.value))
-        )
-      );
+      const send = pool<Queue>(`queue/${chat}`, { concurrency: 1 });
+      if (!send.status().listeners.size) send(queue.bind(null, target, name));
+      return yield* map(send(message), function* (x) {
+        return x;
+      });
     }
-    const ids = yield* map(target(message), function* (x) {
+
+    ids = yield* map(target(message), function* (x) {
       return x;
     });
     if (!ids.length) {

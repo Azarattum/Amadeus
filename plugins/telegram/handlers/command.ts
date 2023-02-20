@@ -1,8 +1,10 @@
-import { command } from "../plugin";
+import { command, pool } from "../plugin";
 
 command(function* (command) {
   if (command === "start") {
     yield* this.reply({ text: "👋" });
-    /// Add to temp messages
+  }
+  if (command === "cancel") {
+    pool(`queue/${this.chat}`).drain();
   }
 });
