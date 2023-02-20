@@ -6,5 +6,6 @@ command(function* (command) {
   }
   if (command === "cancel") {
     pool(`queue/${this.chat}`).drain();
+    pool(`upload/${this.chat}`).drain();
   }
 });

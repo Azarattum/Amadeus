@@ -32,11 +32,28 @@ function paramify(params: Message) {
   };
 }
 
+function notifier(chat: number) {
+  return () =>
+    fetch("sendChatAction", {
+      params: {
+        chat_id: chat.toString(),
+        action: "upload_voice",
+      },
+    })
+      .request.flush()
+      .catch(() => {});
+}
+
 function* queue(
+  this: { signal: AbortSignal },
   pool: Pool<Replier, any>,
+  notifier: () => void,
   name: string,
   tracks: TrackDetails[]
 ) {
+  let done = false;
+  const ping = (notifier(), setInterval(notifier, 3000));
+  this.signal.addEventListener("abort", () => clearInterval(ping));
   const promises: Promise<any>[] = [];
   for (const track of tracks) {
     const url = yield* async(first(desource("track", track.source)));
@@ -47,13 +64,13 @@ function* queue(
           audio: {
             url,
             title: track.title,
-            thumb: track.album.art,
+            thumb: JSON.parse(track.album.art)?.[0],
             performer: track.artists.map((x: any) => x.title).join(", "),
           },
           markup: menu(track.id),
           mode: markdown(),
         })
-      )
+      ).then((x) => (setTimeout(() => done || notifier(), 10), x))
     );
   }
   yield* yield* async(
@@ -61,6 +78,7 @@ function* queue(
       x.map((x) => (x.status === "rejected" ? 0 : +x.value))
     )
   );
+  done = true;
 }
 
 function* reply(chat: number, params: Message) {
@@ -83,7 +101,13 @@ function replier(chat: number, name: string, group = true) {
     let ids: number[] = [];
     if (Array.isArray(message)) {
       const send = pool<Queue>(`queue/${chat}`, { concurrency: 1 });
-      if (!send.status().listeners.size) send(queue.bind(null, target, name));
+      if (!send.status().listeners.size) {
+        send(function (tracks: TrackDetails[]) {
+          return queue.bind(this)(target, notifier(chat), name, tracks);
+        });
+      }
+
+      yield* async(persistence().push(message));
       return yield* map(send(message), function* (x) {
         return x;
       });
