@@ -20,14 +20,14 @@ import {
   Prev,
   Shuffle,
 } from "../types/action";
+import { markdown, escape, pager, details } from "../api/markup";
 import { bright, reset } from "@amadeus-music/util/color";
-import { markdown, escape, pager } from "../api/markup";
 import { TrackDetails } from "@amadeus-music/protocol";
 import { shuffle } from "@amadeus-music/util/object";
 import { async, is } from "@amadeus-music/core";
 import { paramify } from "../api/reply";
 
-callback(function* (action) {
+callback(function* (action, message, chat) {
   const report = (result: number[], type: string) => {
     const errors = result.filter((x) => !x).length;
     const op = `${type} download for ${bright}${this.name}${reset}`;
@@ -58,12 +58,7 @@ callback(function* (action) {
     report(yield* this.reply(shuffled), "Random");
   } else if (is(action, Album)) {
     const track = yield* async(persistence().track(action.album));
-
-    const art = JSON.parse(track.album.art)[0];
-    const [message] = yield* this.reply({ text: "⏳", photo: art });
-    /// Should throw if the message is undefined
     const cache = persistence();
-    const chat = this.chat;
 
     const id = aggregate(desource, ["album", track.album.source] as const, {
       async update(tracks, progress, page) {
@@ -91,12 +86,13 @@ callback(function* (action) {
         });
       },
       invalidate() {
-        fetch("deleteMessage", {
+        fetch("editMessageCaption", {
           params: {
-            message_id: message.toString(),
             chat_id: chat.toString(),
+            message_id: message.toString(),
+            ...paramify({ mode: markdown(), markup: details(track.id) }),
           },
-        }).flush();
+        });
       },
       page: 8,
     });

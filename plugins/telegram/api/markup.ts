@@ -26,7 +26,7 @@ function pager(
     callback: page > 0 ? { prev: aggregator } : {},
   });
   controls[1].push({
-    text: "🗑️",
+    text: "👌",
     callback: { close: aggregator },
   });
   controls[1].push({
@@ -34,6 +34,7 @@ function pager(
     callback: next ? { next: aggregator } : {},
   });
 
+  if (options.length <= 1) controls.shift();
   return keyboard([...options.map((x) => [x]), ...controls]);
 }
 

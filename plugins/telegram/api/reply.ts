@@ -1,7 +1,8 @@
-import type { TrackDetails, TrackInfo } from "@amadeus-music/protocol";
 import { async, first, map, take } from "@amadeus-music/core";
+import type { TrackDetails } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
 import { desource, fetch, info, pool } from "../plugin";
+import { pretty } from "@amadeus-music/util/object";
 import { details, markdown } from "./markup";
 import { Sent } from "../types/core";
 
@@ -19,26 +20,18 @@ interface Message {
 
 function paramify(params: Message) {
   return {
-    ...(params.caption ? { caption: params.caption } : {}),
-    ...(params.text && !params.photo ? { text: params.text } : {}),
+    ...(params.text ? { text: params.text } : {}),
     ...(params.mode ? { parse_mode: params.mode } : {}),
     ...(params.markup ? { reply_markup: params.markup } : {}),
     ...(params.audio?.url ? { audio: params.audio.url } : {}),
     ...(params.audio?.title ? { title: params.audio.title } : {}),
     ...(params.audio?.thumb ? { title: params.audio.thumb } : {}),
     ...(params.audio?.performer ? { performer: params.audio.performer } : {}),
-    ...(params.text && params.photo ? { caption: params.text } : {}),
-    ...(params.photo ? { photo: params.photo } : {}),
   };
 }
 
 function* reply(chat: number, params: Message) {
-  const method = params.audio
-    ? "sendAudio"
-    : params.photo
-    ? "sendPhoto"
-    : "sendMessage";
-  yield (yield* fetch(method, {
+  yield (yield* fetch(params.audio ? "sendAudio" : "sendMessage", {
     params: {
       chat_id: chat.toString(),
       ...paramify(params),
@@ -77,9 +70,13 @@ function replier(name: string, chat: number, group = true) {
         )
       );
     }
-    return yield* map(target(message), function* (x) {
+    const ids = yield* map(target(message), function* (x) {
       return x;
     });
+    if (!ids.length) {
+      throw new Error(`Failed to send message: ${pretty(message)}`);
+    }
+    return ids;
   };
 }
 
