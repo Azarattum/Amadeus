@@ -1,5 +1,20 @@
 type Buttons = { text: string; callback: Record<string, any> }[][];
 
+const icon = {
+  all: "⏬",
+  page: "🔽",
+  shuffle: "🔀",
+  stop: "🤚",
+  prev: "👈",
+  next: "👉",
+  close: "👌",
+  search: "🔎",
+  artist: "👤",
+  album: "💿",
+  similar: "📻",
+  load: "⏳",
+};
+
 function pager(
   aggregator: number,
   page: number,
@@ -7,30 +22,22 @@ function pager(
   next = true
 ) {
   const controls: Buttons = [[], []];
-  controls[0].push({
-    text: "🔽",
-    callback: { page: aggregator },
-  });
-  controls[0].push({
-    text: "🔀",
-    callback: { shuffle: aggregator },
-  });
-  if (page > 0) {
-    controls[0].push({
-      text: "⏬",
-      callback: { all: aggregator },
-    });
-  }
+  controls[0].push(
+    ...(["page", "shuffle", "all"] as const).map((x) => ({
+      text: icon[x],
+      callback: { [x]: aggregator },
+    }))
+  );
   controls[1].push({
-    text: page > 0 ? "👈" : "🤚",
+    text: page > 0 ? icon.prev : icon.stop,
     callback: page > 0 ? { prev: aggregator } : {},
   });
   controls[1].push({
-    text: "👌",
+    text: icon.close,
     callback: { close: aggregator },
   });
   controls[1].push({
-    text: next ? "👉" : "🤚",
+    text: next ? icon.next : icon.stop,
     callback: next ? { next: aggregator } : {},
   });
 
@@ -38,18 +45,18 @@ function pager(
   return keyboard([...options.map((x) => [x]), ...controls]);
 }
 
-function details(id: number) {
+function menu(id: number) {
   const controls: Buttons = [[]];
   controls[0].push({
-    text: "👤",
+    text: icon.artist,
     callback: { artists: id },
   });
   controls[0].push({
-    text: "💿",
+    text: icon.album,
     callback: { album: id },
   });
   controls[0].push({
-    text: "📻",
+    text: icon.similar,
     callback: { similar: id },
   });
   return keyboard(controls);
@@ -92,4 +99,4 @@ function markdown() {
   return "MarkdownV2";
 }
 
-export { keyboard, markdown, escape, pager, details };
+export { keyboard, markdown, escape, pager, menu, icon };

@@ -3,7 +3,7 @@ import type { TrackDetails } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
 import { desource, fetch, info, pool } from "../plugin";
 import { pretty } from "@amadeus-music/util/object";
-import { details, markdown } from "./markup";
+import { menu, markdown } from "./markup";
 import { sent } from "../types/core";
 
 type Replier = (message: Message) => number;
@@ -58,7 +58,7 @@ function replier(name: string, chat: number, group = true) {
           take(
             target({
               audio: { url, performer, title: title, thumb: album.art },
-              markup: details(id),
+              markup: menu(id),
               mode: markdown(),
             })
           )

@@ -8,7 +8,7 @@ import {
   post,
   persistence,
 } from "../plugin";
-import { markdown, pager, escape } from "../api/markup";
+import { markdown, pager, escape, icon } from "../api/markup";
 import { match } from "@amadeus-music/core";
 import { paramify } from "../api/reply";
 
@@ -17,7 +17,7 @@ message(function* (text) {
   const chat = this.chat;
 
   const cache = persistence();
-  const [message] = yield* this.reply({ text: "⏳" });
+  const [message] = yield* this.reply({ text: icon.load });
   const id = aggregate(search, ["track", text] as const, {
     async update(tracks, progress, page) {
       await cache.push(tracks);
@@ -30,8 +30,8 @@ message(function* (text) {
         mode: markdown(),
         text:
           progress < 1
-            ? `${Math.round(progress * 100)}% ⏳ ${escape(text)}`
-            : `🔎 *${escape(text)}*`,
+            ? `${Math.round(progress * 100)}% ${icon.load} ${escape(text)}`
+            : `${icon.search} *${escape(text)}*`,
         markup: pager(
           id,
           page,

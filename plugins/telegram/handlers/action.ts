@@ -11,7 +11,7 @@ import {
   wrn,
   relate,
 } from "../plugin";
-import { markdown, escape, pager, details, keyboard } from "../api/markup";
+import { markdown, escape, pager, menu, keyboard, icon } from "../api/markup";
 import { bright, reset } from "@amadeus-music/util/color";
 import { artist, action as type } from "../types/action";
 import { TrackDetails } from "@amadeus-music/protocol";
@@ -35,7 +35,7 @@ callback(function* (action, message, chat) {
     const track = yield* async(persistence().track(action.reset));
     yield* this.edit(message, {
       mode: markdown(),
-      markup: details(track.id),
+      markup: menu(track.id),
     });
   }
   if (type("download").is(action)) {
@@ -75,8 +75,10 @@ callback(function* (action, message, chat) {
           mode: markdown(),
           caption:
             progress < 1
-              ? `${Math.round(progress * 100)}% ⏳ ${escape(track.album.title)}`
-              : `💿 *${escape(track.album.title)}*`,
+              ? `${Math.round(progress * 100)}% ${icon.load} ${escape(
+                  track.album.title
+                )}`
+              : `${icon.album} *${escape(track.album.title)}*`,
           markup: pager(
             id,
             page,
@@ -98,7 +100,7 @@ callback(function* (action, message, chat) {
           params: {
             chat_id: chat.toString(),
             message_id: message.toString(),
-            ...paramify({ mode: markdown(), markup: details(track.id) }),
+            ...paramify({ mode: markdown(), markup: menu(track.id) }),
           },
         });
       },
@@ -121,8 +123,8 @@ callback(function* (action, message, chat) {
           mode: markdown(),
           caption:
             progress < 1
-              ? `${Math.round(progress * 100)}% ⏳ *Similar*`
-              : `📻 *Similar*`,
+              ? `${Math.round(progress * 100)}% ${icon.load} *Similar*`
+              : `${icon.similar} *Similar*`,
           markup: pager(
             id,
             page,
@@ -144,7 +146,7 @@ callback(function* (action, message, chat) {
           params: {
             chat_id: chat.toString(),
             message_id: message.toString(),
-            ...paramify({ mode: markdown(), markup: details(track.id) }),
+            ...paramify({ mode: markdown(), markup: menu(track.id) }),
           },
         });
       },
@@ -162,7 +164,7 @@ callback(function* (action, message, chat) {
           ...track.artists.map((x) => [
             { text: x.title, callback: { artist: x.id, track: track.id } },
           ]),
-          [{ text: "👌", callback: { reset: track.id } }],
+          [{ text: icon.close, callback: { reset: track.id } }],
         ]),
       });
     }
@@ -184,8 +186,10 @@ callback(function* (action, message, chat) {
           mode: markdown(),
           caption:
             progress < 1
-              ? `${Math.round(progress * 100)}% ⏳ ${escape(artist.title)}`
-              : `👤 *${escape(artist.title)}*`,
+              ? `${Math.round(progress * 100)}% ${icon.load} ${escape(
+                  artist.title
+                )}`
+              : `${icon.artist} *${escape(artist.title)}*`,
           markup: pager(
             id,
             page,
@@ -207,7 +211,7 @@ callback(function* (action, message, chat) {
           params: {
             chat_id: chat.toString(),
             message_id: message.toString(),
-            ...paramify({ mode: markdown(), markup: details(track) }),
+            ...paramify({ mode: markdown(), markup: menu(track) }),
           },
         });
       },
