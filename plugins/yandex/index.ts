@@ -1,5 +1,13 @@
-import { Volumes, convert, Download, Source, Search, Tracks } from "./types";
-import { init, search, desource, fetch } from "./plugin";
+import {
+  Volumes,
+  convert,
+  Download,
+  Source,
+  Search,
+  Tracks,
+  Similar,
+} from "./types";
+import { init, search, desource, fetch, relate } from "./plugin";
 import { createHash } from "node:crypto";
 
 init(function* ({ yandex: { token, page } }) {
@@ -52,4 +60,20 @@ desource(function* (type, source) {
       yield* result.tracks.map(convert);
     }
   }
+});
+
+relate(function* (type, to) {
+  let id = to.source.match(/yandex\/([0-9]+)/)?.[1];
+  if (type === "track") {
+    if (!id) {
+      const text = `${to.artists.map((x) => x.title)} - ${to.title}`;
+      const params = { text, type, "page-size": "1", page: "0" };
+      const { result } = yield* fetch("search", { params }).as(Search);
+      id = result.tracks?.results[0]?.id.toString();
+      if (!id) return;
+    }
+    const { result } = yield* fetch(`tracks/${id}/similar`).as(Similar);
+    yield* result.similarTracks.map(convert);
+  }
+  /// Properly support other `type`s!
 });
