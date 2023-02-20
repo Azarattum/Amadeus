@@ -29,13 +29,23 @@ const Track = type({
   ),
 });
 
-const Tracks = type({
+const Search = type({
   result: type({
     tracks: optional(
       type({
         results: array(Track),
       })
     ),
+  }),
+});
+
+const Volumes = type({
+  result: type({ volumes: array(array(Track)) }),
+});
+
+const Tracks = type({
+  result: type({
+    tracks: optional(array(Track)),
   }),
 });
 
@@ -72,4 +82,4 @@ function convert(track: Infer<typeof Track>) {
   };
 }
 
-export { Tracks, Source, Download, convert };
+export { Search, Source, Download, Volumes, Tracks, convert };
