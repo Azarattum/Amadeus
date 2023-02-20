@@ -1,18 +1,4 @@
 import {
-  Album,
-  All,
-  Artist,
-  Artists,
-  Close,
-  Download,
-  Next,
-  Page,
-  Prev,
-  Reset,
-  Shuffle,
-  Similar,
-} from "../types/action";
-import {
   aggregate,
   callback,
   desource,
@@ -27,9 +13,10 @@ import {
 } from "../plugin";
 import { markdown, escape, pager, details, keyboard } from "../api/markup";
 import { bright, reset } from "@amadeus-music/util/color";
+import { artist, action as type } from "../types/action";
 import { TrackDetails } from "@amadeus-music/protocol";
 import { shuffle } from "@amadeus-music/util/object";
-import { async, is } from "@amadeus-music/core";
+import { async } from "@amadeus-music/core";
 import { paramify } from "../api/reply";
 
 callback(function* (action, message, chat) {
@@ -41,38 +28,38 @@ callback(function* (action, message, chat) {
     else wrn(`${op} failed to send ${failures} items!`);
   };
 
-  if (is(action, Next)) aggregate(action.next).next();
-  if (is(action, Prev)) aggregate(action.prev).prev();
-  if (is(action, Close)) aggregate(action.close).close();
-  if (is(action, Reset)) {
+  if (type("next").is(action)) aggregate(action.next).next();
+  if (type("prev").is(action)) aggregate(action.prev).prev();
+  if (type("close").is(action)) aggregate(action.close).close();
+  if (type("reset").is(action)) {
     const track = yield* async(persistence().track(action.reset));
     yield* this.edit(message, {
       mode: markdown(),
       markup: details(track.id),
     });
   }
-  if (is(action, Download)) {
+  if (type("download").is(action)) {
     const track = yield* async(persistence().track(action.download));
     yield* this.reply([track]);
   }
-  if (is(action, Page)) {
+  if (type("page").is(action)) {
     info(`${this.name} requested a page download...`);
     const page = aggregate<TrackDetails>(action.page).current;
     yield* async(page.loaded);
     report(yield* this.reply(page.items), "Page");
   }
-  if (is(action, All)) {
+  if (type("all").is(action)) {
     info(`${this.name} requested a mass download...`);
     const all = aggregate<TrackDetails>(action.all).pages;
     report(yield* this.reply(all.flatMap((x) => x.items)), "Mass");
   }
-  if (is(action, Shuffle)) {
+  if (type("shuffle").is(action)) {
     info(`${this.name} requested a random download...`);
     const all = aggregate<TrackDetails>(action.shuffle).pages;
     const shuffled = shuffle(all.flatMap((x) => x.items)).slice(0, 10);
     report(yield* this.reply(shuffled), "Random");
   }
-  if (is(action, Album)) {
+  if (type("album").is(action)) {
     const track = yield* async(persistence().track(action.album));
     const cache = persistence();
 
@@ -118,7 +105,53 @@ callback(function* (action, message, chat) {
       page: 8,
     });
   }
-  if (is(action, Artists)) {
+  if (type("similar").is(action)) {
+    const track = yield* async(persistence().track(action.similar));
+    const cache = persistence();
+
+    const id = aggregate(relate, ["track", track] as const, {
+      async update(tracks, progress, page) {
+        await cache.push(tracks);
+        const buttons = tracks.map((x) => ({
+          text: `${x.artists.map((x) => x.title).join(", ")} - ${x.title}`,
+          callback: { download: x.id },
+        }));
+
+        const params = {
+          mode: markdown(),
+          caption:
+            progress < 1
+              ? `${Math.round(progress * 100)}% ⏳ *Similar*`
+              : `📻 *Similar*`,
+          markup: pager(
+            id,
+            page,
+            buttons,
+            progress >= 1 && tracks.length >= this.page
+          ),
+        };
+
+        fetch("editMessageCaption", {
+          params: {
+            chat_id: chat.toString(),
+            message_id: message.toString(),
+            ...paramify(params),
+          },
+        });
+      },
+      invalidate() {
+        fetch("editMessageCaption", {
+          params: {
+            chat_id: chat.toString(),
+            message_id: message.toString(),
+            ...paramify({ mode: markdown(), markup: details(track.id) }),
+          },
+        });
+      },
+      page: 8,
+    });
+  }
+  if (type("artists").is(action)) {
     const track = yield* async(persistence().track(action.artists));
     if (track.artists.length === 1) {
       action = { artist: track.artists[0].id, track: track.id };
@@ -134,7 +167,7 @@ callback(function* (action, message, chat) {
       });
     }
   }
-  if (is(action, Artist)) {
+  if (artist.is(action)) {
     const artist = yield* async(persistence().artist(action.artist));
     const cache = persistence();
     const track = action.track;
@@ -175,52 +208,6 @@ callback(function* (action, message, chat) {
             chat_id: chat.toString(),
             message_id: message.toString(),
             ...paramify({ mode: markdown(), markup: details(track) }),
-          },
-        });
-      },
-      page: 8,
-    });
-  }
-  if (is(action, Similar)) {
-    const track = yield* async(persistence().track(action.similar));
-    const cache = persistence();
-
-    const id = aggregate(relate, ["track", track] as const, {
-      async update(tracks, progress, page) {
-        await cache.push(tracks);
-        const buttons = tracks.map((x) => ({
-          text: `${x.artists.map((x) => x.title).join(", ")} - ${x.title}`,
-          callback: { download: x.id },
-        }));
-
-        const params = {
-          mode: markdown(),
-          caption:
-            progress < 1
-              ? `${Math.round(progress * 100)}% ⏳ *Similar*`
-              : `📻 *Similar*`,
-          markup: pager(
-            id,
-            page,
-            buttons,
-            progress >= 1 && tracks.length >= this.page
-          ),
-        };
-
-        fetch("editMessageCaption", {
-          params: {
-            chat_id: chat.toString(),
-            message_id: message.toString(),
-            ...paramify(params),
-          },
-        });
-      },
-      invalidate() {
-        fetch("editMessageCaption", {
-          params: {
-            chat_id: chat.toString(),
-            message_id: message.toString(),
-            ...paramify({ mode: markdown(), markup: details(track.id) }),
           },
         });
       },

@@ -8,7 +8,7 @@ import {
 } from "@amadeus-music/core";
 import { name, version } from "./package.json";
 import { Reply, Edit } from "./api/reply";
-import { Query } from "./types/action";
+import { query } from "./types/action";
 import { Me } from "./types/core";
 
 export const {
@@ -61,7 +61,7 @@ const voice = pool<(file: string) => void>("voice");
 const post = pool<(file: string, chat: number) => void>("post");
 const invite = pool<(chat: number, title: string) => void>("invite");
 const callback =
-  pool<(request: Infer<typeof Query>, message: number, chat: number) => void>(
+  pool<(request: Infer<typeof query>, message: number, chat: number) => void>(
     "callback"
   );
 
