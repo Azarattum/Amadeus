@@ -1,33 +1,55 @@
 import { integer, object, union } from "@amadeus-music/core";
 
-const Next = object({
+export const Next = object({
   next: integer(),
 });
-
-const Prev = object({
+export const Prev = object({
   prev: integer(),
 });
-
-const Close = object({
+export const Close = object({
   close: integer(),
 });
-
-const Download = object({
+export const Download = object({
   download: integer(),
 });
 
-const Page = object({
+export const Page = object({
   page: integer(),
 });
-
-const All = object({
+export const All = object({
   all: integer(),
 });
-
-const Shuffle = object({
+export const Shuffle = object({
   shuffle: integer(),
 });
 
-const Query = union([Next, Prev, Close, Download, Page, All, Shuffle]);
+export const Artists = object({
+  artists: integer(),
+});
+export const Artist = object({
+  artist: integer(),
+});
+export const Album = object({
+  album: integer(),
+});
+export const Similar = object({
+  similar: integer(),
+});
+export const Hide = object({
+  hide: integer(),
+});
 
-export { Next, Prev, Close, Download, Query, Page, All, Shuffle };
+export const Query = union([
+  Next,
+  Prev,
+  Close,
+  Download,
+  Page,
+  All,
+  Shuffle,
+  Artists,
+  Artist,
+  Album,
+  Similar,
+  Hide,
+]);
