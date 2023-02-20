@@ -11,11 +11,11 @@ import {
   update,
   fetch,
 } from "../plugin";
-import { Text, Audio, Voice, Post, Callback, Invite } from "../types/core";
 import { async, map, take } from "@amadeus-music/core";
 import { IncomingMessage, ServerResponse } from "http";
 import { replier, editor } from "./reply";
-import { Sender } from "../types/sender";
+import { sender } from "../types/sender";
+import * as type from "../types/core";
 
 const secret = crypto.randomUUID();
 
@@ -42,20 +42,20 @@ update(function* (body) {
 });
 
 function* verify(update: unknown) {
-  const sender = Sender.create(update);
+  const data = sender.create(update);
   const from =
-    sender.callback_query?.from ||
-    sender.my_chat_member?.from ||
-    sender.message?.from;
+    data.callback_query?.from ||
+    data.my_chat_member?.from ||
+    data.message?.from;
   const chat =
-    sender.callback_query?.message.chat ||
-    sender.channel_post?.chat ||
-    sender.message?.chat ||
-    sender.my_chat_member?.chat;
-  const message = sender.message?.message_id || sender.channel_post?.message_id;
+    data.callback_query?.message.chat ||
+    data.channel_post?.chat ||
+    data.message?.chat ||
+    data.my_chat_member?.chat;
+  const message = data.message?.message_id || data.channel_post?.message_id;
   if (!chat) throw "Failed to get a chat from update!";
 
-  if (Post.is(update)) {
+  if (type.post.is(update)) {
     /// TODO: Verify channel posts
     //    Look for channel id in user's playlists
     return { chat: chat.id };
@@ -90,28 +90,28 @@ async function* handle(
   this: { state: { me: { username: string } } },
   update: unknown
 ) {
-  if (Voice.is(update)) yield* voice(update.message.voice.file_id);
-  if (Text.is(update)) {
+  if (type.voice.is(update)) yield* voice(update.message.voice.file_id);
+  if (type.text.is(update)) {
     const { text, reply_to_message } = update.message;
     if (!text.startsWith("/")) yield* message(text);
     else yield* command(text.slice(1), reply_to_message?.message_id);
   }
-  if (Audio.is(update)) {
+  if (type.audio.is(update)) {
     const { performer, title } = update.message.audio;
     const text = [performer, title].filter((x) => x).join(" - ");
     if (text) yield* message(text);
   }
-  if (Post.is(update)) {
+  if (type.post.is(update)) {
     const { chat, audio, text } = update.channel_post;
     if (text?.includes(`@${this.state.me.username}`)) yield* mention(chat.id);
     if (audio) yield* post(audio.file_id, chat.id);
   }
-  if (Callback.is(update)) {
+  if (type.callback.is(update)) {
     const { data, from, message } = update.callback_query;
     const action = JSON.parse(data);
     yield* callback(action, message.message_id, from.id);
   }
-  if (Invite.is(update)) {
+  if (type.invite.is(update)) {
     const { chat } = update.my_chat_member;
     yield* invite(chat.id, chat.title);
   }

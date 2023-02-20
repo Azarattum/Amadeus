@@ -13,7 +13,7 @@ import type { User } from "../data/persistence";
 import type { Config } from "../data/config";
 import type { Pool } from "libfun";
 
-const PluginInfo = object({
+const pluginInfo = object({
   name: string(),
   version: string(),
   config: optional(record(string(), instance(Struct<any>))),
@@ -32,7 +32,7 @@ type Plugin<
   T extends RecordStruct = RecordStruct,
   S extends RecordStruct = RecordStruct,
   C extends Record<string, any> = Record<string, any>
-> = Infer<typeof PluginInfo> & {
+> = Infer<typeof pluginInfo> & {
   config?: T;
   context?: C;
   settings?: S;
@@ -61,5 +61,5 @@ type Configure<
 
 type Context = void | { group?: string };
 
-export { PluginInfo };
+export { pluginInfo };
 export type { Plugin, RecordStruct, Configure, Context };

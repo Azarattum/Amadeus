@@ -4,7 +4,7 @@ import { bright, reset } from "@amadeus-music/util/color";
 import { desource, fetch, info, pool } from "../plugin";
 import { pretty } from "@amadeus-music/util/object";
 import { details, markdown } from "./markup";
-import { Sent } from "../types/core";
+import { sent } from "../types/core";
 
 type Replier = (message: Message) => number;
 type Reply = ReturnType<typeof replier>;
@@ -36,7 +36,7 @@ function* reply(chat: number, params: Message) {
       chat_id: chat.toString(),
       ...paramify(params),
     },
-  }).as(Sent)).result.message_id;
+  }).as(sent)).result.message_id;
 }
 
 function replier(name: string, chat: number, group = true) {

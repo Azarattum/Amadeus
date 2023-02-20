@@ -2,7 +2,7 @@ import { bright, reset } from "@amadeus-music/util/color";
 import { init, stop, info, fetch } from "./plugin";
 import { secret, request } from "./api/update";
 import { http } from "@amadeus-music/core";
-import { Me } from "./types/core";
+import { me } from "./types/core";
 
 init(function* ({ telegram: { token, webhook } }) {
   if (!token) throw "Please set a bot token!";
@@ -14,7 +14,7 @@ init(function* ({ telegram: { token, webhook } }) {
     params: { url: url.toString(), secret_token: secret },
   }).json();
 
-  this.state.me = (yield* fetch("getMe").as(Me)).result;
+  this.state.me = (yield* fetch("getMe").as(me)).result;
   info(`Logged in as ${bright}@${this.state.me.username}${reset}!`);
 
   http().on("request", request);

@@ -1,5 +1,5 @@
 import {
-  PluginInfo,
+  pluginInfo,
   type RecordStruct,
   type Configure,
   type Plugin,
@@ -31,7 +31,7 @@ function register<
   S extends RecordStruct = undefined,
   C extends Record<string, any> = Record<string, never>
 >(plugin: Plugin<T, S, C>) {
-  assert(plugin, PluginInfo, "Tried to register an invalid plugin!");
+  assert(plugin, pluginInfo, "Tried to register an invalid plugin!");
   plugin.name = format(plugin.name);
 
   const id = plugin.name.toLowerCase();

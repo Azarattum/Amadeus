@@ -8,7 +8,7 @@ import {
   union,
 } from "@amadeus-music/core";
 
-const Track = type({
+const track = type({
   id: union([number(), string()]),
   coverUri: optional(string()),
   durationMs: number(),
@@ -29,56 +29,56 @@ const Track = type({
   ),
 });
 
-const Search = type({
+const results = type({
   result: type({
     tracks: optional(
       type({
-        results: array(Track),
+        results: array(track),
       })
     ),
   }),
 });
 
-const Volumes = type({
-  result: type({ volumes: array(array(Track)) }),
+const volumes = type({
+  result: type({ volumes: array(array(track)) }),
 });
 
-const Similar = type({
-  result: type({ similarTracks: array(Track) }),
+const similar = type({
+  result: type({ similarTracks: array(track) }),
 });
 
-const Tracks = type({
+const tracks = type({
   result: type({
-    tracks: optional(array(Track)),
+    tracks: optional(array(track)),
   }),
 });
 
-const Source = type({
+const link = type({
   result: array(type({ downloadInfoUrl: string() })),
 });
 
-const Download = type({
+const download = type({
   path: string(),
   host: string(),
   s: string(),
   ts: string(),
 });
 
-function convert(track: Infer<typeof Track>) {
+function convert(data: Infer<typeof track>) {
   const toArt = (cover?: string) =>
     cover ? ["https://" + cover.slice(0, -2) + "800x800"] : [];
 
   return {
-    title: track.title,
-    length: track.durationMs / 1000,
-    source: JSON.stringify([`yandex/${track.id}`]),
+    title: data.title,
+    length: data.durationMs / 1000,
+    source: JSON.stringify([`yandex/${data.id}`]),
     album: {
-      title: track.albums[0]?.title || track.title,
-      year: track.albums[0]?.year || 0,
-      art: JSON.stringify(toArt(track.coverUri)),
-      source: JSON.stringify([`yandex/${track.albums[0].id}`]),
+      title: data.albums[0]?.title || data.title,
+      year: data.albums[0]?.year || 0,
+      art: JSON.stringify(toArt(data.coverUri)),
+      source: JSON.stringify([`yandex/${data.albums[0].id}`]),
     },
-    artists: track.artists.map((x) => ({
+    artists: data.artists.map((x) => ({
       title: x.name,
       art: JSON.stringify(toArt(x.cover?.uri)),
       source: JSON.stringify([`yandex/${x.id}`]),
@@ -86,4 +86,4 @@ function convert(track: Infer<typeof Track>) {
   };
 }
 
-export { Search, Source, Download, Volumes, Tracks, Similar, convert };
+export { results, link, download, volumes, tracks, similar, convert };

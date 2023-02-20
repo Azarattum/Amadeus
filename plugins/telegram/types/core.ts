@@ -1,6 +1,6 @@
 import { optional, literal, number, string, type } from "@amadeus-music/core";
 
-const Text = type({
+const text = type({
   message: type({
     text: string(),
     reply_to_message: optional(
@@ -11,7 +11,7 @@ const Text = type({
   }),
 });
 
-const Audio = type({
+const audio = type({
   message: type({
     audio: type({
       title: optional(string()),
@@ -20,7 +20,7 @@ const Audio = type({
   }),
 });
 
-const Voice = type({
+const voice = type({
   message: type({
     voice: type({
       file_id: string(),
@@ -28,7 +28,7 @@ const Voice = type({
   }),
 });
 
-const Post = type({
+const post = type({
   channel_post: type({
     text: optional(string()),
     chat: type({
@@ -42,7 +42,7 @@ const Post = type({
   }),
 });
 
-const Callback = type({
+const callback = type({
   callback_query: type({
     data: string(),
     message: type({
@@ -54,7 +54,7 @@ const Callback = type({
   }),
 });
 
-const Invite = type({
+const invite = type({
   my_chat_member: type({
     new_chat_member: type({
       status: literal("administrator"),
@@ -66,18 +66,18 @@ const Invite = type({
   }),
 });
 
-const Me = type({
+const me = type({
   result: type({
     id: number(),
     username: string(),
   }),
 });
 
-const Sent = type({
+const sent = type({
   ok: literal(true),
   result: type({
     message_id: number(),
   }),
 });
 
-export { Callback, Invite, Audio, Voice, Text, Sent, Post, Me };
+export { callback, invite, audio, voice, text, sent, post, me };

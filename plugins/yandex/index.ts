@@ -1,11 +1,11 @@
 import {
-  Volumes,
+  volumes,
   convert,
-  Download,
-  Source,
-  Search,
-  Tracks,
-  Similar,
+  download,
+  link,
+  results,
+  tracks,
+  similar,
 } from "./types";
 import { init, search, desource, fetch, relate } from "./plugin";
 import { createHash } from "node:crypto";
@@ -30,7 +30,7 @@ search(function* (type, query) {
       page: (page++).toString(),
     };
 
-    const { result } = yield* fetch("search", { params }).as(Search);
+    const { result } = yield* fetch("search", { params }).as(results);
     if (!result.tracks) break;
     /// Properly support other `type`s!
     yield* result.tracks.results.map(convert);
@@ -41,21 +41,21 @@ desource(function* (type, source) {
   const id = source?.match(/yandex\/([0-9]+)/)?.[1];
   if (!id) return;
   if (type === "track") {
-    const { result } = yield* fetch(`tracks/${id}/download-info`).as(Source);
+    const { result } = yield* fetch(`tracks/${id}/download-info`).as(link);
     const url = result[0].downloadInfoUrl + "&format=json";
-    const info = yield* fetch(url).as(Download);
+    const info = yield* fetch(url).as(download);
     const trackUrl = `XGRlBW9FXlekgbPrRHuSiA${info.path.slice(1)}${info.s}`;
     const sign = createHash("md5").update(trackUrl).digest("hex");
     yield `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`;
   } else if (type === "album") {
-    const { result } = yield* fetch(`albums/${id}/with-tracks`).as(Volumes);
+    const { result } = yield* fetch(`albums/${id}/with-tracks`).as(volumes);
     yield* result.volumes.flat().map(convert);
   } else if (type === "artist") {
     let page = 0;
     for (;;) {
       const url = `artists/${id}/tracks`;
       const params = { page: (page++).toString() };
-      const { result } = yield* fetch(url, { params }).as(Tracks);
+      const { result } = yield* fetch(url, { params }).as(tracks);
       if (!result.tracks) break;
       yield* result.tracks.map(convert);
     }
@@ -68,11 +68,11 @@ relate(function* (type, to) {
     if (!id) {
       const text = `${to.artists.map((x) => x.title)} - ${to.title}`;
       const params = { text, type, "page-size": "1", page: "0" };
-      const { result } = yield* fetch("search", { params }).as(Search);
+      const { result } = yield* fetch("search", { params }).as(results);
       id = result.tracks?.results[0]?.id.toString();
       if (!id) return;
     }
-    const { result } = yield* fetch(`tracks/${id}/similar`).as(Similar);
+    const { result } = yield* fetch(`tracks/${id}/similar`).as(similar);
     yield* result.similarTracks.map(convert);
   }
   /// Properly support other `type`s!

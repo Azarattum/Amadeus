@@ -9,7 +9,7 @@ import {
 import { name, version } from "./package.json";
 import { Reply, Edit } from "./api/reply";
 import { query } from "./types/action";
-import { Me } from "./types/core";
+import { me } from "./types/core";
 
 export const {
   ok,
@@ -48,7 +48,7 @@ export const {
     edit: null as any as Edit,
     reply: null as any as Reply,
     state: {
-      me: {} as Infer<typeof Me>["result"],
+      me: {} as Infer<typeof me>["result"],
     },
   },
 });
