@@ -66,6 +66,7 @@ export const playlists = ({ store }: DB) =>
         .groupBy("group"),
     {
       async push(db, tracks: TrackDetails[], playlist?: number) {
+        /// Do updates on conflict
         const promises = tracks.map(async (track) => {
           await db
             .insertInto("albums")

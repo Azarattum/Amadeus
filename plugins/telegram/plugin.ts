@@ -22,6 +22,7 @@ export const {
   fetch,
   users,
   search,
+  relate,
   desource,
   aggregate,
   persistence,

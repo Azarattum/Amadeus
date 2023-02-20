@@ -35,6 +35,11 @@ const desource = pool<
   | ((type: "album", source: string) => TrackInfo)
   | ((type: "artist", source: string) => TrackInfo)
 >("desource");
+const relate = pool<
+  | ((type: "track", to: TrackInfo) => TrackInfo)
+  | ((type: "album", to: AlbumInfo) => AlbumInfo)
+  | ((type: "artist", to: ArtistInfo) => ArtistInfo)
+>("relate");
 
 // Persistence events
 const database = pool<(user?: string) => Database>("database");
@@ -42,7 +47,6 @@ const users = pool<() => Record<string, User>>("users");
 
 /// TODO:
 //  Provider
-//    - relate
 //    - recognize
 //  Preserver
 //    - retrieve
@@ -53,5 +57,15 @@ const users = pool<() => Record<string, User>>("users");
 //    - follow
 //    - unfollow
 
-export { log, init, stop, search, desource, aggregate, database, users };
+export {
+  log,
+  init,
+  stop,
+  search,
+  desource,
+  relate,
+  aggregate,
+  database,
+  users,
+};
 export { all as pools, pool };

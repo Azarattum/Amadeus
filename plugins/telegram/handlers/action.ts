@@ -10,6 +10,7 @@ import {
   Prev,
   Reset,
   Shuffle,
+  Similar,
 } from "../types/action";
 import {
   aggregate,
@@ -22,6 +23,7 @@ import {
   persistence,
   fetch,
   wrn,
+  relate,
 } from "../plugin";
 import { markdown, escape, pager, details, keyboard } from "../api/markup";
 import { bright, reset } from "@amadeus-music/util/color";
@@ -173,6 +175,52 @@ callback(function* (action, message, chat) {
             chat_id: chat.toString(),
             message_id: message.toString(),
             ...paramify({ mode: markdown(), markup: details(track) }),
+          },
+        });
+      },
+      page: 8,
+    });
+  }
+  if (is(action, Similar)) {
+    const track = yield* async(persistence().track(action.similar));
+    const cache = persistence();
+
+    const id = aggregate(relate, ["track", track] as const, {
+      async update(tracks, progress, page) {
+        await cache.push(tracks);
+        const buttons = tracks.map((x) => ({
+          text: `${x.artists.map((x) => x.title).join(", ")} - ${x.title}`,
+          callback: { download: x.id },
+        }));
+
+        const params = {
+          mode: markdown(),
+          caption:
+            progress < 1
+              ? `${Math.round(progress * 100)}% ⏳ *Similar*`
+              : `📻 *Similar*`,
+          markup: pager(
+            id,
+            page,
+            buttons,
+            progress >= 1 && tracks.length >= this.page
+          ),
+        };
+
+        fetch("editMessageCaption", {
+          params: {
+            chat_id: chat.toString(),
+            message_id: message.toString(),
+            ...paramify(params),
+          },
+        });
+      },
+      invalidate() {
+        fetch("editMessageCaption", {
+          params: {
+            chat_id: chat.toString(),
+            message_id: message.toString(),
+            ...paramify({ mode: markdown(), markup: details(track.id) }),
           },
         });
       },

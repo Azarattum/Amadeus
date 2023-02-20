@@ -43,6 +43,10 @@ const Volumes = type({
   result: type({ volumes: array(array(Track)) }),
 });
 
+const Similar = type({
+  result: type({ similarTracks: array(Track) }),
+});
+
 const Tracks = type({
   result: type({
     tracks: optional(array(Track)),
@@ -82,4 +86,4 @@ function convert(track: Infer<typeof Track>) {
   };
 }
 
-export { Search, Source, Download, Volumes, Tracks, convert };
+export { Search, Source, Download, Volumes, Tracks, Similar, convert };
