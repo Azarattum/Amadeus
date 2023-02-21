@@ -12,6 +12,7 @@ const icon = {
   artist: "👤",
   album: "💿",
   similar: "📻",
+  lyrics: "📃",
   load: "⏳",
 };
 
@@ -58,6 +59,10 @@ function menu(id: number) {
   controls[0].push({
     text: icon.similar,
     callback: { similar: id },
+  });
+  controls[0].push({
+    text: icon.lyrics,
+    callback: { lyrics: id },
   });
   return keyboard(controls);
 }

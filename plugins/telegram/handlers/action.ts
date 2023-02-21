@@ -9,13 +9,14 @@ import {
   persistence,
   wrn,
   relate,
+  transcribe,
 } from "../plugin";
+import { markdown, menu, keyboard, icon, escape } from "../api/markup";
 import { format, TrackDetails } from "@amadeus-music/protocol";
-import { markdown, menu, keyboard, icon } from "../api/markup";
 import { bright, reset } from "@amadeus-music/util/color";
 import { artist, action as type } from "../types/action";
 import { shuffle } from "@amadeus-music/util/object";
-import { async } from "@amadeus-music/core";
+import { async, first } from "@amadeus-music/core";
 import { paginate } from "../api/reply";
 
 callback(function* (action, message, chat) {
@@ -58,6 +59,29 @@ callback(function* (action, message, chat) {
     const all = aggregate<TrackDetails>(action.shuffle).pages;
     const shuffled = shuffle(all.flatMap((x) => x.items)).slice(0, 10);
     report(yield* this.reply(shuffled), "Random");
+  }
+  if (type("lyrics").is(action)) {
+    const track = yield* async(persistence().track(action.lyrics));
+    const fallback =
+      `No lyrics found\\. [Try searching the web\\.](https://www.google.com/` +
+      `search?q=lyrics+${format(track).replace(/\s+/g, "+")})`;
+    const lyrics = yield* async(first(transcribe(track)).catch(() => fallback));
+    const header = `${icon.lyrics} *${escape(format(track))}*\n\n`;
+    const limit = 1024 - header.length;
+    if (lyrics.length > limit) {
+      yield* this.reply({
+        text: lyrics,
+        to: message.toString(),
+      });
+      return;
+    }
+    yield* this.edit(message, {
+      mode: markdown(),
+      caption:
+        `${icon.lyrics} *${escape(format(track))}*\n\n` +
+        (lyrics === fallback ? fallback : escape(lyrics)),
+      markup: keyboard([[{ text: icon.close, callback: { reset: track.id } }]]),
+    });
   }
   if (type("album").is(action)) {
     const track = yield* async(persistence().track(action.album));
