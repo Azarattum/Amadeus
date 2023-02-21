@@ -14,6 +14,8 @@ const icon = {
   similar: "📻",
   lyrics: "📃",
   load: "⏳",
+  history: "📜",
+  cancel: "🚫",
 };
 
 function pager(
@@ -78,6 +80,13 @@ function keyboard(buttons: Buttons) {
   });
 }
 
+function replies(options: string[]) {
+  return JSON.stringify({
+    keyboard: options.map((x) => [{ text: x }]),
+    one_time_keyboard: true,
+  });
+}
+
 function escape(text: string) {
   return text
     .replace(/_/g, "\\_")
@@ -104,4 +113,4 @@ function markdown() {
   return "MarkdownV2";
 }
 
-export { keyboard, markdown, escape, pager, menu, icon };
+export { keyboard, markdown, escape, pager, menu, replies, icon };

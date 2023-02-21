@@ -2,6 +2,7 @@ import { bright, reset } from "@amadeus-music/util/color";
 import { init, stop, info, fetch } from "./plugin";
 import { secret, request } from "./api/update";
 import { http } from "@amadeus-music/core";
+import { icon } from "./api/markup";
 import { me } from "./types/core";
 
 init(function* ({ telegram: { token, webhook } }) {
@@ -31,11 +32,11 @@ stop(() => {
 const commands = [
   {
     command: "cancel",
-    description: "🚫 Stop pending uploads",
+    description: `${icon.cancel} Stop pending uploads`,
   },
   {
     command: "history",
-    description: "📜 Show search history",
+    description: `${icon.history} Show search history`,
   },
 ];
 
