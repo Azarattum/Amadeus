@@ -91,7 +91,8 @@ const history = object({
   query: string(),
   date: integer(),
 });
-primary(history, "date");
+index(history, "date");
+primary(history, "query");
 
 export type DB = Database<Infer<typeof schema>>;
 export const schema = object({

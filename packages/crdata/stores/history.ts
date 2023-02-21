@@ -5,7 +5,7 @@ export const history = ({ store }: DB) =>
     async log(db, query: string) {
       await db
         .insertInto("history")
-        .onConflict((x) => x.doUpdateSet({ query }))
+        .onConflict((x) => x.doUpdateSet({ date: Date.now() }))
         .values({ query, date: Date.now() })
         .execute();
     },
