@@ -47,6 +47,10 @@ const similar = type({
   result: type({ similarTracks: array(track) }),
 });
 
+const lyrics = type({
+  result: type({ lyrics: optional(type({ fullLyrics: string() })) }),
+});
+
 const tracks = type({
   result: type({
     tracks: optional(array(track)),
@@ -86,4 +90,4 @@ function convert(data: Infer<typeof track>) {
   };
 }
 
-export { results, link, download, volumes, tracks, similar, convert };
+export { results, link, download, volumes, tracks, lyrics, similar, convert };

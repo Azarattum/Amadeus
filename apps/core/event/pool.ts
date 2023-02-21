@@ -40,6 +40,7 @@ const relate = pool<
   | ((type: "album", to: AlbumInfo) => AlbumInfo)
   | ((type: "artist", to: ArtistInfo) => ArtistInfo)
 >("relate");
+const transcribe = pool<(track: TrackInfo) => string>("transcribe");
 
 // Persistence events
 const database = pool<(user?: string) => Database>("database");
@@ -61,11 +62,12 @@ export {
   log,
   init,
   stop,
-  search,
-  desource,
-  relate,
-  aggregate,
-  database,
   users,
+  search,
+  relate,
+  desource,
+  database,
+  aggregate,
+  transcribe,
 };
 export { all as pools, pool };

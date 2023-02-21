@@ -6,15 +6,16 @@ import {
   results,
   tracks,
   similar,
+  lyrics,
 } from "./types";
-import { init, search, desource, fetch, relate } from "./plugin";
+import { init, search, desource, fetch, relate, transcribe } from "./plugin";
 import { format } from "@amadeus-music/protocol";
 import { createHash } from "node:crypto";
 
 init(function* ({ yandex: { token, page } }) {
   if (!token) throw "Plugin disabled! No token found!";
   this.fetch.baseURL = "https://api.music.yandex.net/";
-  this.fetch.params = { "page-size": page.toString() };
+  this.fetch.params = { "page-size": page.toString(), page: "0" };
   this.fetch.headers = {
     "User-Agent": "Yandex-Music-API",
     Authorization: `OAuth ${token}`,
@@ -67,7 +68,7 @@ relate(function* (type, to) {
   let id = to.source.match(/yandex\/([0-9]+)/)?.[1];
   if (type === "track") {
     if (!id) {
-      const params = { text: format(to), type, "page-size": "1", page: "0" };
+      const params = { text: format(to), type, "page-size": "1" };
       const { result } = yield* fetch("search", { params }).as(results);
       id = result.tracks?.results[0]?.id.toString();
       if (!id) return;
@@ -76,4 +77,16 @@ relate(function* (type, to) {
     yield* result.similarTracks.map(convert);
   }
   /// Properly support other `type`s!
+});
+
+transcribe(function* (track) {
+  let id = track.source.match(/yandex\/([0-9]+)/)?.[1];
+  if (!id) {
+    const params = { text: format(track), type: "track", "page-size": "1" };
+    const { result } = yield* fetch("search", { params }).as(results);
+    id = result.tracks?.results[0]?.id.toString();
+    if (!id) return;
+  }
+  const { result } = yield* fetch(`tracks/${id}/supplement`).as(lyrics);
+  if (result.lyrics) yield result.lyrics.fullLyrics;
 });

@@ -25,6 +25,7 @@ export const {
   relate,
   desource,
   aggregate,
+  transcribe,
   persistence,
 } = register({
   name,
