@@ -12,6 +12,7 @@ type Replier = (message: Message) => number;
 type Reply = ReturnType<typeof replier>;
 type Edit = ReturnType<typeof editor>;
 interface Message {
+  to?: string;
   text?: string;
   mode?: string;
   markup?: string;
@@ -24,6 +25,7 @@ function paramify(params: Message) {
     ...(params.text ? { text: params.text } : {}),
     ...(params.mode ? { parse_mode: params.mode } : {}),
     ...(params.caption ? { caption: params.caption } : {}),
+    ...(params.to ? { reply_to_message_id: params.to } : {}),
     ...(params.markup ? { reply_markup: params.markup } : {}),
     ...(params.audio?.url ? { audio: params.audio.url } : {}),
     ...(params.audio?.title ? { title: params.audio.title } : {}),
@@ -40,7 +42,7 @@ function notifier(chat: number) {
         action: "upload_voice",
       },
     })
-      .request.flush()
+      .request.text()
       .catch(() => {});
 }
 
@@ -130,7 +132,7 @@ function* edit(chat: number, message: number, params: Message) {
       message_id: message.toString(),
       ...paramify(params),
     },
-  }).flush();
+  }).text();
 }
 
 function editor(chat: number) {

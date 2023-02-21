@@ -74,7 +74,9 @@ function* verify(update: unknown) {
         chat_id: chat?.id.toString(),
         message_id: message.toString(),
       },
-    }).flush();
+    })
+      .request.text()
+      .catch(() => {});
   }
 
   return {
