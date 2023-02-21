@@ -13,6 +13,7 @@ database(function* (user = "shared") {
   yield {
     ...db.playlists,
     ...db.settings,
+    ...db.history,
     async extract(key, collection = "settings") {
       return (await db.connection)
         .selectFrom(collection as any)
@@ -68,6 +69,13 @@ database(function* (user = "shared") {
         .where("artists.id", "=", id)
         .selectAll()
         .executeTakeFirstOrThrow();
+    },
+    async history() {
+      return (await db.connection)
+        .selectFrom("history")
+        .selectAll()
+        .orderBy("date", "desc")
+        .execute();
     },
   };
 });

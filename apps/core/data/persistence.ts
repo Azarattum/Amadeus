@@ -53,6 +53,17 @@ function persistence(this: Context, user?: string) {
       /// Consider merge
       return race(dbs.map((x) => x.artist?.(id)));
     },
+    async log(query: string) {
+      const dbs = await connections;
+      await Promise.all(dbs.map((x) => x.log?.(query)));
+    },
+    async history() {
+      const dbs = await connections;
+      /// Consider distinct
+      return (await Promise.all(dbs.map((x) => x.history?.() || [])))
+        .flat()
+        .sort((a, b) => b.date - a.date);
+    },
   };
 }
 
@@ -76,6 +87,9 @@ type Database = Partial<{
 
   track(id: number): Promise<TrackDetails>;
   artist(id: number): Promise<ArtistDetails>;
+
+  log(query: string): Promise<void>;
+  history(): Promise<{ query: string; date: number }[]>;
 
   create(name: string): Promise<void>;
 }>;

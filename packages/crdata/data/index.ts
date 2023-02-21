@@ -1,5 +1,6 @@
 import { playlists } from "../stores/playlists";
 import { settings } from "../stores/settings";
+import { history } from "../stores/history";
 import { DB, schema } from "./schema";
 import { database } from "crstore";
 
@@ -7,6 +8,7 @@ const connections = new Map<string, Connection>();
 const stores = (db: DB) => ({
   playlists: playlists(db),
   settings: settings(db),
+  history: history(db),
 });
 
 function connect(options: Options) {
