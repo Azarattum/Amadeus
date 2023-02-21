@@ -10,6 +10,7 @@ import {
   invite,
   update,
   fetch,
+  temp,
 } from "../plugin";
 import { async, map, take } from "@amadeus-music/core";
 import { IncomingMessage, ServerResponse } from "http";
@@ -68,16 +69,19 @@ function* verify(update: unknown) {
   );
   if (!user) throw `Unauthorized access from @${from.username} (${from.id})!`;
 
-  if (message) {
+  if (!temp.has(chat.id)) temp.set(chat.id, new Set());
+  if (message) temp.get(chat.id)?.add(message);
+  temp.get(chat.id)?.forEach((x) =>
     fetch("deleteMessage", {
       params: {
         chat_id: chat?.id.toString(),
-        message_id: message.toString(),
+        message_id: x.toString(),
       },
     })
       .request.text()
-      .catch(() => {});
-  }
+      .catch(() => {})
+  );
+  temp.get(chat.id)?.clear();
 
   return {
     chat: chat.id,

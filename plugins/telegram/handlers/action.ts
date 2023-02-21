@@ -10,6 +10,7 @@ import {
   wrn,
   relate,
   transcribe,
+  temp,
 } from "../plugin";
 import { markdown, menu, keyboard, icon, escape } from "../api/markup";
 import { format, TrackDetails } from "@amadeus-music/protocol";
@@ -69,10 +70,11 @@ callback(function* (action, message, chat) {
     const header = `${icon.lyrics} *${escape(format(track))}*\n\n`;
     const limit = 1024 - header.length;
     if (lyrics.length > limit) {
-      yield* this.reply({
+      const [id] = yield* this.reply({
         text: lyrics,
         to: message.toString(),
       });
+      temp.get(this.chat)?.add(id);
       return;
     }
     yield* this.edit(message, {

@@ -45,15 +45,16 @@ export const {
   context: {
     chat: 0,
     name: "",
-    user: undefined as string | undefined,
     edit: null as any as Edit,
     reply: null as any as Reply,
+    user: undefined as string | undefined,
     state: {
       me: {} as Infer<typeof me>["result"],
     },
   },
 });
 
+const temp = new Map<number, Set<number>>();
 const update = pool<(data: string) => void>("update");
 const message = pool<(text: string) => void>("message");
 const command = pool<(command: string, replied?: number) => void>("command");
@@ -70,4 +71,14 @@ update.catch((error: any) =>
   wrn(error.cause?.message || error.cause || error.message)
 );
 
-export { callback, message, command, mention, invite, update, voice, post };
+export {
+  callback,
+  message,
+  command,
+  mention,
+  invite,
+  update,
+  voice,
+  post,
+  temp,
+};

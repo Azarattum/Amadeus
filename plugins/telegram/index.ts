@@ -1,7 +1,7 @@
 import { bright, reset } from "@amadeus-music/util/color";
-import { init, stop, info, fetch } from "./plugin";
+import { init, stop, info, fetch, temp } from "./plugin";
+import { async, http } from "@amadeus-music/core";
 import { secret, request } from "./api/update";
-import { http } from "@amadeus-music/core";
 import { icon } from "./api/markup";
 import { me } from "./types/core";
 
@@ -25,7 +25,17 @@ init(function* ({ telegram: { token, webhook } }) {
   http().on("request", request);
 });
 
-stop(() => {
+stop(function* () {
+  const promises = [...temp.entries()]
+    .flatMap(([chat, set]) =>
+      [...set].map((x) => ({
+        chat_id: chat.toString(),
+        message_id: x.toString(),
+      }))
+    )
+    .map((params) => fetch("deleteMessage", { params }).request.text());
+  yield* async(Promise.allSettled(promises));
+  temp.clear();
   http(false).off("request", request);
 });
 
