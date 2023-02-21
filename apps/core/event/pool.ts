@@ -40,7 +40,9 @@ const relate = pool<
   | ((type: "album", to: AlbumInfo) => AlbumInfo)
   | ((type: "artist", to: ArtistInfo) => ArtistInfo)
 >("relate");
-const transcribe = pool<(track: TrackInfo) => string>("transcribe");
+const transcribe = pool<(track: TrackInfo) => string>("transcribe", {
+  cache: 5,
+});
 
 // Persistence events
 const database = pool<(user?: string) => Database>("database");
