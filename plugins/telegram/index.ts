@@ -12,7 +12,11 @@ init(function* ({ telegram: { token, webhook } }) {
   info("Setting up a webhook...");
   yield* fetch("setWebhook", {
     params: { url: url.toString(), secret_token: secret },
-  }).json();
+  }).flush();
+  info("Adjusting bot settings...");
+  yield* fetch("setMyCommands", {
+    params: { commands: JSON.stringify(commands) },
+  }).flush();
 
   this.state.me = (yield* fetch("getMe").as(me)).result;
   info(`Logged in as ${bright}@${this.state.me.username}${reset}!`);
@@ -23,5 +27,16 @@ init(function* ({ telegram: { token, webhook } }) {
 stop(() => {
   http(false).off("request", request);
 });
+
+const commands = [
+  {
+    command: "cancel",
+    description: "🚫 Stop pending uploads",
+  },
+  {
+    command: "history",
+    description: "📜 Show search history",
+  },
+];
 
 import.meta.glob("./handlers/*", { eager: true });
