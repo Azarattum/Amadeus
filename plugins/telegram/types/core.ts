@@ -44,6 +44,7 @@ const post = type({
 
 const callback = type({
   callback_query: type({
+    id: string(),
     data: string(),
     message: type({
       message_id: number(),

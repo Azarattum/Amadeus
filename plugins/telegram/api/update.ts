@@ -113,9 +113,14 @@ async function* handle(
     if (audio) yield* post(audio.file_id, chat.id);
   }
   if (type.callback.is(update)) {
-    const { data, from, message } = update.callback_query;
+    const { id, data, from, message } = update.callback_query;
     const action = JSON.parse(data);
     yield* callback(action, message.message_id, from.id);
+    fetch("answerCallbackQuery", {
+      params: { callback_query_id: id },
+    })
+      .request.text()
+      .catch(wrn);
   }
   if (type.invite.is(update)) {
     const { chat } = update.my_chat_member;
