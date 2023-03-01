@@ -376,7 +376,7 @@ function pool<T extends Fn = () => void, R = never>(
                   const done = generators.every(
                     ({ task }) => task.controller.signal.aborted
                   );
-                  if (done) executor.controller.abort();
+                  if (done && transform === merge) executor.controller.abort();
                 });
               })();
             } catch (error) {
