@@ -48,7 +48,7 @@ function notifier(chat: number) {
 
 function* queue(
   this: { signal: AbortSignal },
-  pool: Pool<Replier, any>,
+  pool: Pool<Replier, never, any>,
   notifier: () => void,
   name: string,
   tracks: TrackDetails[]

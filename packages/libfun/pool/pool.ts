@@ -50,7 +50,7 @@ function pools(options: Partial<Options> = {}): Pools {
     };
   }
 
-  type ProtoPool = Pool<Fn<unknown[], unknown>, Record<string, any>>;
+  type ProtoPool = Pool<Fn<unknown[], unknown>, unknown, Record<string, any>>;
   const prototype: Pick<ProtoPool, keyof ProtoPool> = {
     abort(filter) {
       this[state].executing.forEach((executor) => {
@@ -257,10 +257,10 @@ function pools(options: Partial<Options> = {}): Pools {
   };
 }
 
-function pool<T extends Fn = () => void>(
+function pool<T extends Fn = () => void, R = never>(
   this: Override & { scope?: string },
   global: {
-    options: Options;
+    options: Options<ReturnType<T>, R>;
     prototype: object;
     all: Map<string, Pool>;
     catchers: Set<Catcher>;
@@ -268,10 +268,10 @@ function pool<T extends Fn = () => void>(
   },
   id: string,
   options: Partial<Options> = {}
-): Pool<T> {
+): Pool<T, R> {
   if (this?.scope) id = `${this.scope}/${id}`;
   const existing = global.all.get(id);
-  if (existing) return existing as Pool<T>;
+  if (existing) return existing as Pool<T, R>;
 
   options.group = options.group || this?.group || global.options.group;
   const data: Pick<Pool, symbol> = {

@@ -1,7 +1,8 @@
-import type { Fn, Intersected } from "../utils/types";
+import type { Fn, Intersected, IsNever } from "../utils/types";
 import type { Passthrough } from "./iterator";
 
-interface Options {
+interface Options<T = any, R = T> {
+  transform?: (x: T) => R;
   concurrency: number;
   timeout: number;
   group?: string;
@@ -69,14 +70,17 @@ type Handler<T extends Fn, C = unknown> = ((
   group?: string;
 };
 
-type Caller<T, Split = false> = Intersected<
-  T extends (..._: infer A) => infer R
+type Caller<T, R = never, Split = false> = Intersected<
+  T extends (..._: infer A) => infer U
     ? (
         this: Override,
         ...args: A
       ) => Split extends false
-        ? AsyncGenerator<R, void> & { executor: Executor }
-        : Map<string, AsyncGenerator<R, void> & { executor: Executor }>
+        ? AsyncGenerator<IsNever<R, U, R>, void> & { executor: Executor }
+        : Map<
+            string,
+            AsyncGenerator<IsNever<R, U, R>, void> & { executor: Executor }
+          >
     : unknown
 >;
 
@@ -85,30 +89,34 @@ type Filter =
   | { group?: never; caller: string; handler?: string }
   | { group?: never; caller?: string; handler: string };
 
-type Pool<T extends Fn = (..._: any) => any, C extends Ctx = unknown> = {
+type Pool<
+  T extends Fn = (..._: any) => any,
+  R = never,
+  C extends Ctx = unknown
+> = {
   (this: Override, handler: Handler<T, C>): () => void;
 
-  bind: <C extends Ctx>(context: Override<C>) => Pool<T, C>;
-  schedule: (when: Schedule) => Caller<T>;
-  where: (group: string) => Caller<T>;
+  bind: <C extends Ctx>(context: Override<C>) => Pool<T, R, C>;
+  schedule: (when: Schedule) => Caller<T, R>;
+  where: (group: string) => Caller<T, R>;
   catch: (handler?: Catcher) => void;
   abort: (filter?: Filter) => void;
   drain: (filter?: Filter) => void;
   close: (filter?: Filter) => void;
   status: () => State<T, C>;
-  split(): Caller<T, true>;
+  split(): Caller<T, R, true>;
 
   [state: symbol]: State<T, C>;
-} & Caller<T> &
+} & Caller<T, R> &
   (C extends Record<string, any>
     ? { context: (context: Partial<C>) => void }
     : unknown);
 
 type PoolMaker<C extends Ctx = unknown> = {
-  <T extends Fn = () => void>(id: string, options?: Partial<Options>): Pool<
-    T,
-    C
-  >;
+  <T extends Fn = () => void, R = never>(
+    id: string,
+    options?: Partial<Options<ReturnType<T>, R>>
+  ): Pool<T, R, C>;
   bind<T>(context: Override<T> & { scope?: string }): PoolMaker<T>;
 };
 

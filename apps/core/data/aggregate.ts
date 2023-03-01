@@ -46,13 +46,13 @@ function aggregator<T extends Record<string, any> = Record<string, any>>(
 ): Controls<T> & { close(): void };
 function aggregator<T extends Fn, A extends Readonly<Parameters<T>>>(
   this: Context,
-  from: Pool<T, any>,
+  from: Pool<T, any, any>,
   args: A,
   options: PaginationOptions<ReturnType<Extract<T, (..._: A) => any>>>
 ): number;
 function aggregator(
   this: Context,
-  source: number | Pool<any, any>,
+  source: number | Pool<any, any, any>,
   args: any[] = [],
   options: PaginationOptions<any> = { page: 10, compare: () => 0 }
 ) {

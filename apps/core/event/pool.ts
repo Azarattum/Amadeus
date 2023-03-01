@@ -12,7 +12,7 @@ const { pool } = all;
 const log = pool<(text: string) => void>("log");
 const aggregate = pool<
   (
-    from: Pool<any, any>,
+    from: Pool<any, any, any>,
     args: any[],
     options: PaginationOptions<any>
   ) => Controls
