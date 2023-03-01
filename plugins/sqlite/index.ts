@@ -35,8 +35,8 @@ database(function* (user = "shared") {
       return (await db.connection)
         .selectFrom("tracks")
         .innerJoin("albums", "albums.id", "tracks.album")
-        .innerJoin("catalogue", "catalogue.album", "albums.id")
-        .innerJoin("artists", "artists.id", "catalogue.artist")
+        .innerJoin("attribution", "attribution.track", "tracks.id")
+        .innerJoin("artists", "artists.id", "attribution.artist")
         .where("tracks.id", "=", id)
         .select([
           "tracks.id as id",

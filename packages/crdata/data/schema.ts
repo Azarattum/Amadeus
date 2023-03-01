@@ -31,13 +31,13 @@ const artists = unique(artist);
 crr(artists);
 primary(artists, "id");
 
-const catalogue = object({
-  album: id(),
+const attribution = object({
+  track: id(),
   artist: id(),
 });
-crr(catalogue);
-index(catalogue, "artist");
-primary(catalogue, "album", "artist");
+crr(attribution);
+index(attribution, "artist");
+primary(attribution, "track", "artist");
 
 const playlists = unique(playlist);
 crr(playlists);
@@ -97,7 +97,7 @@ export type DB = Database<Infer<typeof schema>>;
 export const schema = object({
   tracks,
   albums,
-  catalogue,
+  attribution,
   artists,
   library,
   playlists,

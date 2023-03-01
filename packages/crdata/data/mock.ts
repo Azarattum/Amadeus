@@ -34,8 +34,8 @@ async function mock({ update }: DB) {
     source: '["http://123"]',
     art: '["http://1234"]',
   });
-  await put("catalogue", {
-    album: 4321,
+  await put("attribution", {
+    track: 12345,
     artist: 2345,
   });
   await put("artists", {

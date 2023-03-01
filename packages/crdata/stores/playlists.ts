@@ -14,8 +14,8 @@ export const playlists = ({ store }: DB) =>
             .innerJoin("library", "library.playlist", "playlists.id")
             .innerJoin("tracks", "tracks.id", "library.track")
             .innerJoin("albums", "albums.id", "tracks.album")
-            .innerJoin("catalogue", "catalogue.album", "albums.id")
-            .innerJoin("artists", "artists.id", "catalogue.artist")
+            .innerJoin("attribution", "attribution.track", "tracks.id")
+            .innerJoin("artists", "artists.id", "attribution.artist")
             .select([
               "tracks.id as id",
               "library.id as entry",
@@ -90,12 +90,12 @@ export const playlists = ({ store }: DB) =>
             })
             .execute();
           await db
-            .insertInto("catalogue")
+            .insertInto("attribution")
             .onConflict((x) => x.doNothing())
             .values(
               track.artists.map(({ id }) => ({
+                track: track.id,
                 artist: id,
-                album: track.album.id,
               }))
             )
             .execute();
@@ -144,13 +144,13 @@ export const playlists = ({ store }: DB) =>
           }
           await db.deleteFrom("albums").where("id", "=", album).execute();
           const artists = await db
-            .deleteFrom("catalogue")
-            .where("album", "=", album)
+            .deleteFrom("attribution")
+            .where("track", "=", track)
             .returning("artist")
             .execute();
           artists.forEach(async ({ artist }) => {
             const { count } = await db
-              .selectFrom("catalogue")
+              .selectFrom("attribution")
               .where("artist", "=", artist)
               .select(db.fn.count("id").as("count"))
               .executeTakeFirstOrThrow();
