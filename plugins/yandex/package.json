@@ -11,6 +11,6 @@
     "@amadeus-music/protocol": "workspace:*"
   },
   "devDependencies": {
-    "vite": "4.1.2"
+    "vite": "4.1.4"
   }
 }
