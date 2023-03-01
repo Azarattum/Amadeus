@@ -437,3 +437,26 @@ for await (const item of map.get("b")) {
 }
 ```
 </details>
+
+<details><summary>🧬 <b>Override pool transformer</b></summary>
+
+```ts
+// This pool will transform all its output to `string`
+const mapped = pool<() => number, string>("mapped", {
+  async *transform(generators, groups, args) {
+    for await (const x of merge(generators)) {
+      yield x.toString();
+    }
+  },
+});
+
+mapped(function* () {
+  yield 1;
+  yield 2;
+});
+
+for await (const item of mapped()) {
+  // "1", "2"
+}
+```
+</details>

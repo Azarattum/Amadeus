@@ -125,7 +125,7 @@ function reuse<T>(
   })();
 }
 
-async function* merge<T, U>(...iterators: SomeIterator<T>[]) {
+async function* merge<T, U>(iterators: SomeIterator<T>[]) {
   const never = new Promise<any>(() => {});
 
   function next(iterator: SomeIterator<T>, index: number) {

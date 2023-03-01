@@ -1,8 +1,12 @@
 import type { Fn, Intersected, IsNever } from "../utils/types";
 import type { Passthrough } from "./iterator";
 
-interface Options<T = any, R = T> {
-  transform?: (x: T) => R;
+interface Options<T extends Fn, R = ReturnType<T>> {
+  transform: (
+    generators: AsyncGenerator<ReturnType<T>>[],
+    groups: (string | undefined)[],
+    args: Parameters<T>
+  ) => AsyncGenerator<R>;
   concurrency: number;
   timeout: number;
   group?: string;
@@ -48,7 +52,7 @@ interface PoolError {
   pool: string;
 }
 
-interface State<T extends Fn, C> extends Options {
+interface State<T extends Fn, C> extends Options<T> {
   cached: Map<string, ReturnType<T>[]>;
   listeners: Set<Handler<T, C>>;
   executing: Set<Executor>;
@@ -115,7 +119,7 @@ type Pool<
 type PoolMaker<C extends Ctx = unknown> = {
   <T extends Fn = () => void, R = never>(
     id: string,
-    options?: Partial<Options<ReturnType<T>, R>>
+    options?: Partial<Options<T, R>>
   ): Pool<T, R, C>;
   bind<T>(context: Override<T> & { scope?: string }): PoolMaker<T>;
 };

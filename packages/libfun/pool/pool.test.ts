@@ -1,4 +1,4 @@
-import { take, async, context, map, first } from "./iterator";
+import { take, async, context, map, first, merge } from "./iterator";
 import { PoolError, pools } from "./pool";
 import type { Fn } from "../utils/types";
 import { expect, it, vi } from "vitest";
@@ -761,4 +761,24 @@ it("stops after async abort", async () => {
   take(event());
   await delay(1);
   expect(event.status().executing.size).toBe(0);
+  event.close();
+});
+
+it("transforms items", async () => {
+  const mapped = pool<(_: number) => number, string>("event", {
+    async *transform(generators, groups, args) {
+      expect(groups).toEqual(["test"]);
+      expect(args).toEqual([4]);
+      for await (const x of merge(generators)) {
+        yield x.toString();
+      }
+    },
+  });
+  mapped(function* (x) {
+    yield x * 2;
+  });
+
+  const items = await take(mapped(4));
+  expect(items).toEqual(["8"]);
+  mapped.close();
 });

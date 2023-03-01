@@ -21,16 +21,17 @@ import { derive, block, delay, cancel, cleanup } from "../utils/async";
 import type { Fn } from "../utils/types";
 import { handle } from "../utils/error";
 
-const defaults: Options = {
+const defaults: Options<any> = {
   concurrency: Infinity,
   timeout: Infinity,
+  transform: merge,
   rate: Infinity,
   cache: 0,
 };
 
 const state = Symbol();
 
-function pools(options: Partial<Options> = {}): Pools {
+function pools(options: Partial<Options<any>> = {}): Pools {
   const globals = { ...defaults, ...options };
   const contexts = new Map<string, Ctx>();
   const all = new Map<string, Pool>();
@@ -244,7 +245,7 @@ function pools(options: Partial<Options> = {}): Pools {
     pool(
       this: Override & { scope?: string },
       id: string,
-      options: Partial<Options> = {}
+      options: Partial<Options<any>> = {}
     ) {
       return pool.bind(this, {
         all,
@@ -260,19 +261,20 @@ function pools(options: Partial<Options> = {}): Pools {
 function pool<T extends Fn = () => void, R = never>(
   this: Override & { scope?: string },
   global: {
-    options: Options<ReturnType<T>, R>;
+    options: Options<T, R>;
     prototype: object;
     all: Map<string, Pool>;
     catchers: Set<Catcher>;
     contexts: Map<string, Ctx>;
   },
   id: string,
-  options: Partial<Options> = {}
+  options: Partial<Options<any>> = {}
 ): Pool<T, R> {
   if (this?.scope) id = `${this.scope}/${id}`;
   const existing = global.all.get(id);
   if (existing) return existing as Pool<T, R>;
 
+  const transform = options.transform || global.options.transform;
   options.group = options.group || this?.group || global.options.group;
   const data: Pick<Pool, symbol> = {
     [state]: {
@@ -359,7 +361,7 @@ function pool<T extends Fn = () => void, R = never>(
         const iterables = () =>
           generators.map(({ handler, task }) => {
             try {
-              const generator = wrap<unknown, void>(
+              const generator = wrap<ReturnType<T>, void>(
                 generate(handler(...params)),
                 task.controller.signal,
                 task.group,
@@ -387,7 +389,8 @@ function pool<T extends Fn = () => void, R = never>(
             }
           });
 
-        const iterable = () => merge(...iterables());
+        const groups = generators.map(({ task }) => task.group);
+        const iterable = () => transform(iterables(), groups, params as any);
         const key = self.cache ? JSON.stringify(params) : "";
         const cached = reuse(iterable, self.cached, key, self.cache);
 

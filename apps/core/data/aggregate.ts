@@ -32,7 +32,7 @@ aggregate(function* (from, args, options) {
   });
 
   yield data;
-  yield* map(parallel(...curated));
+  yield* map(parallel(curated));
   // Don't end until aborted
   yield* async(
     new Promise((resolve) =>
