@@ -3,12 +3,17 @@ import {
   boolean,
   Infer,
   integer,
-  nullable,
   number,
   object,
   string,
 } from "superstruct";
-import { album, artist, track, unique } from "@amadeus-music/protocol";
+import {
+  album,
+  artist,
+  playlist,
+  track,
+  unique,
+} from "@amadeus-music/protocol";
 import { primary, crr, ordered, index, type Database } from "crstore";
 
 const id = integer;
@@ -34,6 +39,10 @@ crr(catalogue);
 index(catalogue, "artist");
 primary(catalogue, "album", "artist");
 
+const playlists = unique(playlist);
+crr(playlists);
+primary(playlists, "id");
+
 const library = object({
   id: id(),
   playlist: id(),
@@ -47,16 +56,6 @@ index(library, "track");
 index(library, "playlist");
 index(library, "order", "id");
 ordered(library, "order", "playlist");
-
-const playlists = object({
-  id: id(),
-  title: string(),
-  relevancy: number(),
-  shared: nullable(string()),
-  remote: nullable(string()),
-});
-crr(playlists);
-primary(playlists, "id");
 
 const playback = object({
   id: id(),

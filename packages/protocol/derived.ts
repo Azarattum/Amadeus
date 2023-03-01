@@ -1,5 +1,5 @@
+import { album, artist, playlist, track } from "./base";
 import { array, assign, object } from "superstruct";
-import { album, artist, track } from "./base";
 import type { Infer } from "superstruct";
 import { unique } from "./modifiers";
 
@@ -18,12 +18,17 @@ const artistDetails = unique(artist);
 const albumInfo = album;
 const albumDetails = unique(album);
 
+const playlistInfo = playlist;
+const playlistDetails = unique(playlist);
+
 type TrackInfo = Infer<typeof trackInfo>;
 type TrackDetails = Infer<typeof trackDetails>;
 type ArtistInfo = Infer<typeof artistInfo>;
 type ArtistDetails = Infer<typeof artistDetails>;
 type AlbumInfo = Infer<typeof albumInfo>;
 type AlbumDetails = Infer<typeof albumDetails>;
+type PlaylistInfo = Infer<typeof playlistInfo>;
+type PlaylistDetails = Infer<typeof playlistDetails>;
 
 export type {
   TrackInfo,
@@ -32,6 +37,8 @@ export type {
   ArtistDetails,
   AlbumInfo,
   AlbumDetails,
+  PlaylistInfo,
+  PlaylistDetails,
 };
 export {
   trackInfo,
@@ -40,4 +47,6 @@ export {
   artistDetails,
   albumInfo,
   albumDetails,
+  playlistInfo,
+  playlistDetails,
 };

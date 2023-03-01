@@ -1,6 +1,6 @@
 import { close, connect, json, groupJSON } from "@amadeus-music/crdata";
+import { async, identify, path } from "@amadeus-music/core";
 import { existsSync, mkdirSync, readdirSync } from "fs";
-import { async, path } from "@amadeus-music/core";
 import { database, stop, users } from "./plugin";
 
 database(function* (user = "shared") {
@@ -14,6 +14,7 @@ database(function* (user = "shared") {
     ...db.playlists,
     ...db.settings,
     ...db.history,
+    then: undefined,
     async extract(key, collection = "settings") {
       return (await db.connection)
         .selectFrom(collection as any)
@@ -76,6 +77,13 @@ database(function* (user = "shared") {
         .selectAll()
         .orderBy("date", "desc")
         .execute();
+    },
+    async playlist(title) {
+      return (await db.connection)
+        .selectFrom("playlists")
+        .where("id", "=", identify(title))
+        .selectAll()
+        .executeTakeFirstOrThrow();
     },
   };
 });

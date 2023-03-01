@@ -1,4 +1,8 @@
-import type { ArtistDetails, TrackDetails } from "@amadeus-music/protocol";
+import type {
+  ArtistDetails,
+  PlaylistDetails,
+  TrackDetails,
+} from "@amadeus-music/protocol";
 import { database, users as load } from "../event/pool";
 import { merge } from "@amadeus-music/util/object";
 import type { Context } from "../plugin/types";
@@ -64,6 +68,11 @@ function persistence(this: Context, user?: string) {
         .flat()
         .sort((a, b) => b.date - a.date);
     },
+    async playlist(title: string) {
+      const dbs = await connections;
+      /// Consider merge
+      return race(dbs.map((x) => x.playlist?.(title)));
+    },
   };
 }
 
@@ -87,6 +96,7 @@ type Database = Partial<{
 
   track(id: number): Promise<TrackDetails>;
   artist(id: number): Promise<ArtistDetails>;
+  playlist(title: string): Promise<PlaylistDetails>;
 
   log(query: string): Promise<void>;
   history(): Promise<{ query: string; date: number }[]>;

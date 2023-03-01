@@ -66,3 +66,5 @@ export * from "superstruct";
 export { map as dict } from "superstruct";
 export * from "libfun";
 export { map } from "libfun";
+
+export { identify } from "@amadeus-music/protocol";

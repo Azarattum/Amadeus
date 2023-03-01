@@ -1,4 +1,4 @@
-import { integer, number, object, string } from "superstruct";
+import { integer, nullable, number, object, string } from "superstruct";
 import type { Infer } from "superstruct";
 
 const track = object({
@@ -20,9 +20,17 @@ const artist = object({
   art: string(),
 });
 
+const playlist = object({
+  title: string(),
+  relevancy: number(),
+  shared: nullable(string()),
+  remote: nullable(string()),
+});
+
 type Track = Infer<typeof track>;
 type Album = Infer<typeof album>;
 type Artist = Infer<typeof artist>;
+type Playlist = Infer<typeof playlist>;
 
-export type { Track, Album, Artist };
-export { track, album, artist };
+export type { Track, Album, Artist, Playlist };
+export { track, album, artist, playlist };
