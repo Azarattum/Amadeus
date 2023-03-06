@@ -4,8 +4,8 @@ import type { Passthrough } from "./iterator";
 interface Options<T extends Fn, R = ReturnType<T>> {
   transform: (
     generators: AsyncGenerator<ReturnType<T>>[],
-    groups: (string | undefined)[],
-    args: Parameters<T>
+    args: Parameters<T>,
+    task: { groups: (string | undefined)[]; controller: AbortController }
   ) => AsyncGenerator<R>;
   concurrency: number;
   timeout: number;

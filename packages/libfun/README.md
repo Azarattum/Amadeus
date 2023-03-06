@@ -443,7 +443,7 @@ for await (const item of map.get("b")) {
 ```ts
 // This pool will transform all its output to `string`
 const mapped = pool<() => number, string>("mapped", {
-  async *transform(generators, groups, args) {
+  async *transform(generators, args, task) {
     for await (const x of merge(generators)) {
       yield x.toString();
     }

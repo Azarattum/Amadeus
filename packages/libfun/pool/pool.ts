@@ -389,8 +389,11 @@ function pool<T extends Fn = () => void, R = never>(
             }
           });
 
-        const groups = generators.map(({ task }) => task.group);
-        const iterable = () => transform(iterables(), groups, params as any);
+        const iterable = () =>
+          transform(iterables(), params as any, {
+            groups: generators.map(({ task }) => task.group),
+            controller: executor.controller,
+          });
         const key = self.cache ? JSON.stringify(params) : "";
         const cached = reuse(iterable, self.cached, key, self.cache);
 
