@@ -1,9 +1,9 @@
+import { deleteMessage, getMe, setMyCommands, setWebhook } from "./api/methods";
 import { bright, reset } from "@amadeus-music/util/color";
-import { init, stop, info, fetch, temp } from "./plugin";
 import { async, http } from "@amadeus-music/core";
+import { init, stop, info, temp } from "./plugin";
 import { secret, request } from "./api/update";
 import { icon } from "./api/markup";
-import { me } from "./types/core";
 
 init(function* ({ telegram: { token, webhook } }) {
   if (!token) throw "Please set a bot token!";
@@ -11,15 +11,11 @@ init(function* ({ telegram: { token, webhook } }) {
   if (!webhook) throw "Please set a webhook URL!";
   const url = new URL("/telegram", webhook);
   info("Setting up a webhook...");
-  yield* fetch("setWebhook", {
-    params: { url: url.toString(), secret_token: secret },
-  }).text();
+  yield* setWebhook(url, secret);
   info("Adjusting bot settings...");
-  yield* fetch("setMyCommands", {
-    params: { commands: JSON.stringify(commands) },
-  }).text();
+  yield* setMyCommands(commands);
 
-  this.state.me = (yield* fetch("getMe").as(me)).result;
+  this.state.me = (yield* getMe()).result;
   info(`Logged in as ${bright}@${this.state.me.username}${reset}!`);
 
   http().on("request", request);
@@ -27,13 +23,8 @@ init(function* ({ telegram: { token, webhook } }) {
 
 stop(function* () {
   const promises = [...temp.entries()]
-    .flatMap(([chat, set]) =>
-      [...set].map((x) => ({
-        chat_id: chat.toString(),
-        message_id: x.toString(),
-      }))
-    )
-    .map((params) => fetch("deleteMessage", { params }).request.text());
+    .flatMap(([chat, set]) => [...set].map((x) => [chat, x]))
+    .map(([chat, message]) => deleteMessage(chat, message));
   yield* async(Promise.allSettled(promises));
   temp.clear();
   http(false).off("request", request);

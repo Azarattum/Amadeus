@@ -1,54 +1,41 @@
-import { aggregate, desource, fetch, info, persistence, pool } from "../plugin";
-import type { TrackDetails, TrackInfo } from "@amadeus-music/protocol";
+import {
+  editMessageCaption,
+  sendChatAction,
+  sendMessage,
+  sendAudio,
+} from "./methods";
 import { async, first, map, Pool, take } from "@amadeus-music/core";
-import { menu, markdown, icon, escape, pager } from "./markup";
+import { desource, info, persistence, pool } from "../plugin";
+import type { TrackDetails } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
+import { Message, Queue, Replier } from "../types/reply";
 import { pretty } from "@amadeus-music/util/object";
 import { format } from "@amadeus-music/protocol";
-import { sent } from "../types/core";
-
-type Queue = (tracks: TrackDetails[]) => number;
-type Replier = (message: Message) => number;
-type Reply = ReturnType<typeof replier>;
-type Edit = ReturnType<typeof editor>;
-interface Message {
-  to?: string;
-  text?: string;
-  mode?: string;
-  markup?: string;
-  caption?: string;
-  audio?: { url: string; performer?: string; title?: string; thumb?: string };
-}
-
-function paramify(params: Message) {
-  return {
-    ...(params.text ? { text: params.text } : {}),
-    ...(params.mode ? { parse_mode: params.mode } : {}),
-    ...(params.caption ? { caption: params.caption } : {}),
-    ...(params.to ? { reply_to_message_id: params.to } : {}),
-    ...(params.markup ? { reply_markup: params.markup } : {}),
-    ...(params.audio?.url ? { audio: params.audio.url } : {}),
-    ...(params.audio?.title ? { title: params.audio.title } : {}),
-    ...(params.audio?.thumb ? { title: params.audio.thumb } : {}),
-    ...(params.audio?.performer ? { performer: params.audio.performer } : {}),
-  };
-}
+import { menu, markdown } from "./markup";
+import { sendPage } from "./pages";
 
 function notifier(chat: number) {
-  return () =>
-    fetch("sendChatAction", {
-      params: {
-        chat_id: chat.toString(),
-        action: "upload_voice",
-      },
-    })
-      .request.text()
-      .catch(() => {});
+  return () => sendChatAction(chat, "upload_voice").catch(() => {});
+}
+
+function paramify(params: Record<string, any>) {
+  const map: Record<string, string> = {
+    mode: "parse_mode",
+    to: "reply_to_message_id",
+    markup: "reply_markup",
+  };
+  const mapped: Record<string, any> = {};
+  for (const key in params) {
+    if (key in params && params[key] !== undefined) {
+      mapped[map[key] || key] = params[key];
+    }
+  }
+  return mapped;
 }
 
 function* queue(
   this: { signal: AbortSignal },
-  pool: Pool<Replier, never, any>,
+  pool: Pool<Replier, any>,
   notifier: () => void,
   name: string,
   tracks: TrackDetails[]
@@ -58,17 +45,15 @@ function* queue(
   this.signal.addEventListener("abort", () => clearInterval(ping));
   const promises: Promise<any>[] = [];
   for (const track of tracks) {
-    const url = yield* async(first(desource("track", track.source)));
+    const url = yield* async(first(desource(track.source)));
     info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
     promises.push(
       take(
         pool({
-          audio: {
-            url,
-            title: track.title,
-            thumb: JSON.parse(track.album.art)?.[0],
-            performer: track.artists.map((x: any) => x.title).join(", "),
-          },
+          audio: url,
+          title: track.title,
+          thumb: JSON.parse(track.album.art)?.[0],
+          performer: track.artists.map((x: any) => x.title).join(", "),
           markup: menu(track.id),
           mode: markdown(),
         })
@@ -84,12 +69,13 @@ function* queue(
 }
 
 function* reply(chat: number, params: Message) {
-  yield (yield* fetch(params.audio ? "sendAudio" : "sendMessage", {
-    params: {
-      chat_id: chat.toString(),
-      ...paramify(params),
-    },
-  }).as(sent)).result.message_id;
+  const { result } = yield* "audio" in params
+    ? sendAudio(chat, params)
+    : "page" in params
+    ? sendPage(chat, params)
+    : sendMessage(chat, params);
+
+  yield result.message_id;
 }
 
 function replier(chat: number, name: string, group = true) {
@@ -125,79 +111,10 @@ function replier(chat: number, name: string, group = true) {
   };
 }
 
-function* edit(chat: number, message: number, params: Message) {
-  yield* fetch("editMessageCaption", {
-    params: {
-      chat_id: chat.toString(),
-      message_id: message.toString(),
-      ...paramify(params),
-    },
-  }).text();
-}
-
 function editor(chat: number) {
   return function* (message: number, params: Message) {
-    yield* edit(chat, message, params);
+    yield* editMessageCaption(chat, message, params);
   };
 }
 
-function paginate<T extends (..._: any) => TrackInfo>(
-  from: [Pool<T, any>, Parameters<Extract<T, (..._: any) => TrackInfo>>],
-  options: {
-    icon: string;
-    chat: number;
-    header: string;
-    track?: number;
-    message: number;
-    compare?: (a: TrackInfo, b: TrackInfo) => number;
-  }
-) {
-  const target = {
-    chat_id: options.chat.toString(),
-    message_id: options.message.toString(),
-  };
-
-  const cache = persistence();
-  const id = aggregate(...from, {
-    async update(tracks, progress, page) {
-      await cache.push(tracks);
-      const buttons = tracks.map((x) => ({
-        text: format(x),
-        callback: { download: x.id },
-      }));
-
-      const data = options.track ? "caption" : "text";
-      const loaded = Math.round(progress * 100);
-      const title = escape(options.header);
-      const state = `${loaded}% ${icon.load} *${title}*`;
-      const header = progress < 1 ? state : `${options.icon} *${title}*`;
-      const completed = progress >= 1 && tracks.length >= this.page;
-
-      fetch(options.track ? "editMessageCaption" : "editMessageText", {
-        params: {
-          ...target,
-          ...paramify({
-            mode: markdown(),
-            markup: pager(id, page, buttons, completed),
-            [data]: header,
-          }),
-        },
-      });
-    },
-    invalidate() {
-      fetch(options.track ? "editMessageCaption" : "deleteMessage", {
-        params: {
-          ...target,
-          ...(options.track
-            ? paramify({ mode: markdown(), markup: menu(options.track) })
-            : {}),
-        },
-      }).flush();
-    },
-    compare: options.compare,
-    page: 8,
-  });
-}
-
-export type { Reply, Edit, Message };
-export { replier, editor, paramify, paginate };
+export { replier, editor, paramify };

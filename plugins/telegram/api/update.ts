@@ -9,9 +9,9 @@ import {
   callback,
   invite,
   update,
-  fetch,
   temp,
 } from "../plugin";
+import { answerCallbackQuery, deleteMessage } from "./methods";
 import { async, map, take } from "@amadeus-music/core";
 import { IncomingMessage, ServerResponse } from "http";
 import { replier, editor } from "./reply";
@@ -71,16 +71,7 @@ function* verify(update: unknown) {
 
   if (!temp.has(chat.id)) temp.set(chat.id, new Set());
   if (message) temp.get(chat.id)?.add(message);
-  temp.get(chat.id)?.forEach((x) =>
-    fetch("deleteMessage", {
-      params: {
-        chat_id: chat?.id.toString(),
-        message_id: x.toString(),
-      },
-    })
-      .request.text()
-      .catch(() => {})
-  );
+  temp.get(chat.id)?.forEach((x) => deleteMessage(chat?.id, x).catch(() => {}));
   temp.get(chat.id)?.clear();
 
   return {
@@ -116,11 +107,7 @@ async function* handle(
     const { id, data, from, message } = update.callback_query;
     const action = JSON.parse(data);
     yield* callback(action, message.message_id, from.id);
-    fetch("answerCallbackQuery", {
-      params: { callback_query_id: id },
-    })
-      .request.text()
-      .catch(wrn);
+    answerCallbackQuery(id);
   }
   if (type.invite.is(update)) {
     const { chat } = update.my_chat_member;
