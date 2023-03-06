@@ -103,7 +103,7 @@ function uniquify<T>(target: T): Uniqueified<T> {
   return copy as any;
 }
 
-function format(data: any) {
+function format(data: any): string {
   return has(data, "artists") && has(data, "title")
     ? `${data.artists.map(titled).join(", ")} - ${data.title}`
     : has(data, "title")

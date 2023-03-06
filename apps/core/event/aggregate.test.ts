@@ -1,6 +1,6 @@
+import { async, first, pools, type Mapped } from "libfun";
 import { delay } from "@amadeus-music/util/throttle";
 import type { Page } from "../data/pagination";
-import { async, first, pools } from "libfun";
 import { aggregate } from "./aggregate";
 import { expect, it } from "vitest";
 
@@ -8,12 +8,11 @@ const { pool } = pools();
 
 it("aggregates pool", async () => {
   type Data = { title: string };
-  const event = pool<(a: string, b: string, c: number) => Data, Page<Data>>(
-    "event",
-    {
-      transform: aggregate,
-    }
-  );
+  const event = pool<
+    (a: string, b: string, c: number) => Mapped<Data, Page<Data>>
+  >("search", {
+    transform: aggregate,
+  });
   event.bind({ group: "a" })(function* (a) {
     yield { title: (+a + 1).toString() };
     yield { title: (+a + 2).toString() };

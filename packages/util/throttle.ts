@@ -1,4 +1,7 @@
 type Func = (..._: any) => any;
+const raf =
+  (globalThis as any).requestAnimationFrame ||
+  ((x: () => void) => setTimeout(x, 16.66));
 
 /**
  * Returns a throttled function with respect to animation frames or a specified delay.
@@ -31,7 +34,7 @@ export function throttle<T extends Func>(func: T, delay?: number) {
       parameters = args;
 
       if (id) return;
-      id = requestAnimationFrame(callId);
+      id = raf(callId);
     } as T;
   } else {
     return function (this: any, ...args: any) {
@@ -76,8 +79,16 @@ export function delay(duration: number) {
  * from multiple places and resolved at any moment.
  */
 export function lock() {
+  let resolved = false;
   const resolves = new Set<() => void>();
-  const wait = () => new Promise<void>((r) => resolves.add(r));
-  const resolve = () => (resolves.forEach((x) => x()), resolves.clear());
+  const wait = () =>
+    new Promise<void>((r) =>
+      resolved ? (r(), (resolved = false)) : resolves.add(r)
+    );
+  const resolve = () => {
+    if (!resolves.size) return (resolved = true);
+    resolves.forEach((x) => x());
+    resolves.clear();
+  };
   return { wait, resolve };
 }
