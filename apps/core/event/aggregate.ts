@@ -30,6 +30,7 @@ async function* aggregate(
     controller,
     compare,
   });
+  controller.signal.addEventListener("abort", page.close, { once: true });
   const curated = generators.map((generator, id) => {
     return (async function* () {
       let empty = true;

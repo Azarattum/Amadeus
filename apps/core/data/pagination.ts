@@ -105,6 +105,7 @@ function pages<T extends Record<string, any>>(
       return true;
     },
     close() {
+      if (!active) return;
       active = false;
       refresh();
       options.controller?.abort();
