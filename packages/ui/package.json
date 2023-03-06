@@ -8,6 +8,7 @@
     "./internal/*": "./internal/*.ts"
   },
   "scripts": {
+    "build": "svelte-kit sync",
     "dev": "vite dev -c ../../vite.web.js --port 5174"
   },
   "dependencies": {

@@ -5,7 +5,7 @@
   "main": "app.ts",
   "types": "app.ts",
   "scripts": {
-    "build": "vite build --emptyOutDir=false",
+    "build": "svelte-kit sync && vite build --emptyOutDir=false",
     "coverage": "vitest run --coverage",
     "dev": "vite-node -w app.ts",
     "preview": "(cd ../../build && node app.cjs)",

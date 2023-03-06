@@ -27,6 +27,7 @@ module.exports = defineConfig({
     }),
   ],
   resolve: {
+    conditions: ["import", "module", "node", "default"],
     alias: [
       {
         find: "@amadeus-music/core",
