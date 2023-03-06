@@ -1,13 +1,10 @@
 import { createInterface, type Interface } from "node:readline/promises";
-import { log, pool, pools, stop as close } from "../event/pool";
 import { cyan, highlight } from "@amadeus-music/util/color";
 import { prefix, split } from "@amadeus-music/util/string";
+import { log, pool, stop as close } from "../event/pool";
 import { stdin, stdout } from "node:process";
-import { users } from "../data/persistence";
 import type { WriteStream } from "node:tty";
-import { plugins } from "../plugin/loader";
-import { arg, commands } from "./commands";
-import { settings } from "../data/config";
+import { commands } from "./commands";
 import { stop } from "./manage";
 import { take } from "libfun";
 import { wrn } from "./log";
@@ -55,14 +52,7 @@ async function options(parts: string[], index: number) {
   if (!Array.isArray(docs)) docs = [docs as any];
   return Promise.all(
     docs.map(async (x) => {
-      if (x === arg.text) return [];
-      if (x === arg.command) return [...commands.keys()];
-      if (x === arg.pool) return pools.status().map((x) => x.id);
-      if (x === arg.user) return Object.keys(await users());
-      if (x === arg.setting) return Object.keys(settings().create({}));
-      if (x === arg.plugin) {
-        return [...plugins.values()].map((x) => x.name.toLowerCase());
-      }
+      if (typeof x === "function") return await x();
       if (typeof x === "string") return x;
       return [];
     })

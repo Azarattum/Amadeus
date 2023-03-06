@@ -7,26 +7,27 @@ import {
   yellow,
 } from "@amadeus-music/util/color";
 import { capitalize, dedupe, format } from "@amadeus-music/util/string";
-import { format as formatPlugin } from "../plugin/loader";
+import { format as formatPlugin, plugins } from "../plugin/loader";
 import { persistence, users } from "../data/persistence";
 import { pretty } from "@amadeus-music/util/object";
+import { register, settings } from "../data/config";
 import { log, pool, pools } from "../event/pool";
 import type { Context } from "../plugin/types";
-import { register } from "../data/config";
 import { async, map, take } from "libfun";
 import { launch, stop } from "./manage";
 import { info, ok, wrn } from "./log";
 
-type Argument = readonly (string | symbol)[] | string | symbol;
+type Completer = () => Promise<string[]> | string[];
+type Argument = readonly (string | Completer)[] | string | Completer;
 const commands = new Map<string, Argument[] | []>();
 
 const arg = {
-  text: Symbol("text"),
-  pool: Symbol("pool"),
-  user: Symbol("user"),
-  plugin: Symbol("plugin"),
-  setting: Symbol("setting"),
-  command: Symbol("command"),
+  text: () => [],
+  pool: () => pools.status().map((x) => x.id),
+  user: () => users().then(Object.keys),
+  plugin: () => [...plugins.values()].map((x) => x.name.toLowerCase()),
+  setting: () => Object.keys(settings().create({})),
+  command: () => [...commands.keys()],
 };
 
 function command(this: Context, what: string, ...args: readonly Argument[]) {
