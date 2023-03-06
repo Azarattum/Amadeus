@@ -62,7 +62,6 @@ export {
   expand,
   desource,
   database,
-  aggregate,
   transcribe,
 };
 export { all as pools, pool };
