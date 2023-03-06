@@ -1,12 +1,16 @@
-import type { Fn, Intersected, IsNever } from "../utils/types";
+import type { Fn, Intersected } from "../utils/types";
 import type { Passthrough } from "./iterator";
 
-interface Options<T extends Fn, R = ReturnType<T>> {
+interface Options<T extends Fn> {
   transform: (
-    generators: AsyncGenerator<ReturnType<T>>[],
+    generators: AsyncGenerator<Result<ReturnType<T>>>[],
     args: Parameters<T>,
-    task: { groups: (string | undefined)[]; controller: AbortController }
-  ) => AsyncGenerator<R>;
+    task: {
+      groups: (string | undefined)[];
+      controller: AbortController;
+      id: string;
+    }
+  ) => AsyncGenerator<Result<ReturnType<T>, true>>;
   concurrency: number;
   timeout: number;
   group?: string;
@@ -53,7 +57,7 @@ interface PoolError {
 }
 
 interface State<T extends Fn, C> extends Options<T> {
-  cached: Map<string, ReturnType<T>[]>;
+  cached: Map<string, Result<ReturnType<T>>[]>;
   listeners: Set<Handler<T, C>>;
   executing: Set<Executor>;
   pending: Set<Executor>;
@@ -62,28 +66,45 @@ interface State<T extends Fn, C> extends Options<T> {
   id: string;
 }
 
+declare const mapped: unique symbol;
+type Mapped<T, U> = {
+  [mapped]: true;
+  from: T;
+  to: U;
+};
+
+type Result<T, Map = false> = T extends Mapped<infer A, infer B>
+  ? Map extends true
+    ? B
+    : A
+  : T;
+
 type Handler<T extends Fn, C = unknown> = ((
   this: Context<C>,
   ...args: Parameters<T>
 ) =>
   | Generator<
-      ReturnType<T> | Promise<ReturnType<T>> | Passthrough<unknown>,
+      | Result<ReturnType<T>>
+      | Promise<Result<ReturnType<T>>>
+      | Passthrough<unknown>,
       void
     >
-  | (ReturnType<T> extends Promise<any> ? never : ReturnType<T>)) & {
+  | (Result<ReturnType<T>> extends Promise<any>
+      ? never
+      : Result<ReturnType<T>>)) & {
   group?: string;
 };
 
-type Caller<T, R = never, Split = false> = Intersected<
+type Caller<T, Split = false> = Intersected<
   T extends (..._: infer A) => infer U
     ? (
         this: Override,
         ...args: A
       ) => Split extends false
-        ? AsyncGenerator<IsNever<R, U, R>, void> & { executor: Executor }
+        ? AsyncGenerator<Result<U, true>, void> & { executor: Executor }
         : Map<
             string,
-            AsyncGenerator<IsNever<R, U, R>, void> & { executor: Executor }
+            AsyncGenerator<Result<U, true>, void> & { executor: Executor }
           >
     : unknown
 >;
@@ -93,34 +114,30 @@ type Filter =
   | { group?: never; caller: string; handler?: string }
   | { group?: never; caller?: string; handler: string };
 
-type Pool<
-  T extends Fn = (..._: any) => any,
-  R = never,
-  C extends Ctx = unknown
-> = {
+type Pool<T extends Fn = (..._: any) => any, C extends Ctx = unknown> = {
   (this: Override, handler: Handler<T, C>): () => void;
 
-  bind: <C extends Ctx>(context: Override<C>) => Pool<T, R, C>;
-  schedule: (when: Schedule) => Caller<T, R>;
-  where: (group: string) => Caller<T, R>;
+  bind: <C extends Ctx>(context: Override<C>) => Pool<T, C>;
+  schedule: (when: Schedule) => Caller<T>;
+  where: (group: string) => Caller<T>;
   catch: (handler?: Catcher) => void;
   abort: (filter?: Filter) => void;
   drain: (filter?: Filter) => void;
   close: (filter?: Filter) => void;
   status: () => State<T, C>;
-  split(): Caller<T, R, true>;
+  split(): Caller<T, true>;
 
   [state: symbol]: State<T, C>;
-} & Caller<T, R> &
+} & Caller<T> &
   (C extends Record<string, any>
     ? { context: (context: Partial<C>) => void }
     : unknown);
 
 type PoolMaker<C extends Ctx = unknown> = {
-  <T extends Fn = () => void, R = never>(
-    id: string,
-    options?: Partial<Options<T, R>>
-  ): Pool<T, R, C>;
+  <T extends Fn = () => void>(id: string, options?: Partial<Options<T>>): Pool<
+    T,
+    C
+  >;
   bind<T>(context: Override<T> & { scope?: string }): PoolMaker<T>;
 };
 
@@ -149,6 +166,8 @@ export type {
   Options,
   Handler,
   Catcher,
+  Result,
+  Mapped,
   Filter,
   Pools,
   Pool,

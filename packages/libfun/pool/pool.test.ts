@@ -1,4 +1,5 @@
 import { take, async, context, map, first, merge } from "./iterator";
+import type { Mapped } from "./pool.types";
 import { PoolError, pools } from "./pool";
 import type { Fn } from "../utils/types";
 import { expect, it, vi } from "vitest";
@@ -765,11 +766,12 @@ it("stops after async abort", async () => {
 });
 
 it("transforms items", async () => {
-  const mapped = pool<(_: number) => number, string>("event", {
-    async *transform(generators, args, { groups, controller }) {
+  const mapped = pool<(_: number) => Mapped<number, string>>("event", {
+    async *transform(generators, args, { groups, controller, id }) {
       expect(controller).toBeInstanceOf(AbortController);
       expect(groups).toEqual(["test"]);
       expect(args).toEqual([4]);
+      expect(id).toBe("event");
       for await (const x of merge(generators)) {
         yield x.toString();
       }

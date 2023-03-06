@@ -1,13 +1,14 @@
 import type {
   PoolError as Details,
   Override,
+  Executor,
   Catcher,
   Handler,
   Options,
+  Result,
+  Filter,
   Pools,
   Pool,
-  Executor,
-  Filter,
   Ctx,
 } from "./pool.types";
 import {
@@ -51,7 +52,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
     };
   }
 
-  type ProtoPool = Pool<Fn<unknown[], unknown>, unknown, Record<string, any>>;
+  type ProtoPool = Pool<Fn<unknown[], unknown>, Record<string, any>>;
   const prototype: Pick<ProtoPool, keyof ProtoPool> = {
     abort(filter) {
       this[state].executing.forEach((executor) => {
@@ -261,7 +262,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
 function pool<T extends Fn = () => void, R = never>(
   this: Override & { scope?: string },
   global: {
-    options: Options<T, R>;
+    options: Options<T>;
     prototype: object;
     all: Map<string, Pool>;
     catchers: Set<Catcher>;
@@ -361,7 +362,7 @@ function pool<T extends Fn = () => void, R = never>(
         const iterables = () =>
           generators.map(({ handler, task }) => {
             try {
-              const generator = wrap<ReturnType<T>, void>(
+              const generator = wrap<Result<ReturnType<T>>, void>(
                 generate(handler(...params)),
                 task.controller.signal,
                 task.group,
@@ -393,6 +394,7 @@ function pool<T extends Fn = () => void, R = never>(
           transform(iterables(), params as any, {
             groups: generators.map(({ task }) => task.group),
             controller: executor.controller,
+            id,
           });
         const key = self.cache ? JSON.stringify(params) : "";
         const cached = reuse(iterable, self.cached, key, self.cache);
