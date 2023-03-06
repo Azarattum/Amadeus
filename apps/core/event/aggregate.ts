@@ -1,34 +1,45 @@
-import { normalize } from "@amadeus-music/protocol";
+import { normalize, trackDetails } from "@amadeus-music/protocol";
 import stringSimilarity from "string-similarity-js";
 import { batch } from "@amadeus-music/util/object";
 import { clean } from "@amadeus-music/util/string";
+import { persistence } from "../data/persistence";
+import { cancel } from "libfun/utils/async";
 import { pages } from "../data/pagination";
 import { inferTrack } from "../data/infer";
 import { merge, take } from "libfun/pool";
+import { array, is } from "superstruct";
 import { wrn } from "../status/log";
 
 async function* aggregate(
   generators: AsyncGenerator<any>[],
-  args: [string, string | { title: string }, number?],
+  args: [string, any, number?],
   {
+    id,
     groups,
     controller,
-  }: { groups: (string | undefined)[]; controller: AbortController }
+  }: { id: string; groups: (string | undefined)[]; controller: AbortController }
 ) {
   generators = generators.map(batch);
 
-  /// type properly?
+  const compare =
+    id === "search"
+      ? match(typeof args[1] === "string" ? args[1] : args[1].title)
+      : undefined;
   const page = pages<any>(groups as string[], {
-    compare: match(typeof args[1] === "string" ? args[1] : args[1].title),
     page: args[2] || 8,
     controller,
+    compare,
   });
   const curated = generators.map((generator, id) => {
     return (async function* () {
       let empty = true;
       for await (const batch of generator) {
         if (batch.length) empty = false;
-        await page.append(id, batch);
+        try {
+          await cancel(page.append(id, batch), controller.signal);
+        } catch {
+          return page.close();
+        }
       }
       page.complete(id);
       if (empty) wrn.bind({ group: groups[id] })("No results aggregated!");
@@ -36,8 +47,12 @@ async function* aggregate(
   });
 
   take(merge(curated));
-  /// add cache
-  yield* page.values();
+  const cache = persistence();
+  for await (const state of page.values()) {
+    if (is(state.items, array(trackDetails))) cache.push(state.items);
+    /// TODO: cache other media types
+    yield state;
+  }
 }
 
 function match(query: string) {

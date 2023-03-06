@@ -92,7 +92,7 @@ function pages<T extends Record<string, any>>(
       }
       selected++;
       if (!pages[selected]) pages[selected] = create(selected);
-      refresh();
+      else refresh();
       if (pages[selected].progress < 1) resolve();
       return true;
     },
@@ -141,10 +141,12 @@ type PaginationOptions<T> = {
 };
 
 type Page<T> = {
+  pages: ReturnType<typeof page>[];
   items: Uniqueified<T>[];
-  number: number;
-  progress: number;
   loaded: Promise<void>;
+  progress: number;
+  number: number;
+
   next(): boolean;
   prev(): boolean;
   close(): void;

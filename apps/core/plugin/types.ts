@@ -45,20 +45,17 @@ type Configure<
   C extends Record<string, any>
 > = {
   [K in keyof T]: K extends "init"
-    ? Pool<(config: Config & InferMap<U>) => void, never, C>
+    ? Pool<(config: Config & InferMap<U>) => void, C>
     : K extends "users"
     ? (_?: () => Generator<User>) => Promise<Record<string, User & InferMap<S>>>
     : K extends "stop"
-    ? Pool<() => void, never, Partial<C>>
-    : T[K] extends Pool<infer U, infer R, infer O>
-    ? Pool<U, R, O & C>
+    ? Pool<() => void, Partial<C>>
+    : T[K] extends Pool<infer U, infer O>
+    ? Pool<U, O & C>
     : T[K] extends PoolMaker<infer R>
     ? PoolMaker<R & C>
-    : T[K] extends (
-        this: infer H,
-        ..._: infer A
-      ) => Pool<infer U, infer R, infer O>
-    ? (this: H, ..._: A) => Pool<U, R, O & C>
+    : T[K] extends (this: infer H, ..._: infer A) => Pool<infer U, infer O>
+    ? (this: H, ..._: A) => Pool<U, O & C>
     : T[K];
 };
 
