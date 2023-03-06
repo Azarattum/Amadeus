@@ -1,7 +1,5 @@
 import {
-  aggregate,
   callback,
-  desource,
   info,
   invite,
   mention,
@@ -11,16 +9,17 @@ import {
   relate,
   transcribe,
   temp,
+  expand,
 } from "../plugin";
 import { markdown, menu, keyboard, icon, escape } from "../api/markup";
-import { format, TrackDetails } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
 import { artist, action as type } from "../types/action";
+import { async, first, map } from "@amadeus-music/core";
 import { shuffle } from "@amadeus-music/util/object";
-import { async, first } from "@amadeus-music/core";
-import { paginate } from "../api/reply";
+import { format } from "@amadeus-music/protocol";
+import { pages } from "../api/pages";
 
-callback(function* (action, message, chat) {
+callback(function* (action, message) {
   const name = `${bright}${this.name}${reset}`;
   const report = (result: number[], type: string) => {
     const errors = result.filter((x) => !x).length;
@@ -30,9 +29,9 @@ callback(function* (action, message, chat) {
     else wrn(`${op} failed to send ${failures} items!`);
   };
 
-  if (type("next").is(action)) aggregate(action.next).next();
-  if (type("prev").is(action)) aggregate(action.prev).prev();
-  if (type("close").is(action)) aggregate(action.close).close();
+  if (type("next").is(action)) pages.get(action.next)?.next();
+  if (type("prev").is(action)) pages.get(action.prev)?.prev();
+  if (type("close").is(action)) pages.get(action.close)?.close();
   if (type("reset").is(action)) {
     const track = yield* async(persistence().track(action.reset));
     yield* this.edit(message, {
@@ -46,23 +45,25 @@ callback(function* (action, message, chat) {
   }
   if (type("page").is(action)) {
     info(`${name} requested a page download...`);
-    const page = aggregate<TrackDetails>(action.page).current;
-    yield* async(page.loaded);
+    const page = pages.get(action.page);
+    const loaded = page?.loaded;
+    if (!loaded) return;
+
+    yield* async(loaded);
     report(yield* this.reply(page.items), "Page");
   }
   if (type("all").is(action)) {
     info(`${name} requested a mass download...`);
-    const all = aggregate<TrackDetails>(action.all).pages;
-    report(yield* this.reply(all.flatMap((x) => x.items)), "Mass");
+    report(yield* this.reply(pages.get(action.all)?.all || []), "Mass");
   }
   if (type("shuffle").is(action)) {
     info(`${name} requested a random download...`);
-    const all = aggregate<TrackDetails>(action.shuffle).pages;
-    const shuffled = shuffle(all.flatMap((x) => x.items)).slice(0, 10);
+    const shuffled = shuffle(pages.get(action.shuffle)?.all || []).slice(0, 10);
     report(yield* this.reply(shuffled), "Random");
   }
   if (type("lyrics").is(action)) {
     const track = yield* async(persistence().track(action.lyrics));
+    info(`${name} requested lyrics for "${format(track)}".`);
     const fallback =
       `No lyrics found\\. [Try searching the web\\.](https://www.google.com/` +
       `search?q=lyrics+${format(track).replace(/\s+/g, "+")})`;
@@ -88,23 +89,35 @@ callback(function* (action, message, chat) {
   if (type("album").is(action)) {
     const track = yield* async(persistence().track(action.album));
     info(`${name} requested an album of "${format(track)}".`);
-    paginate([desource, ["album", track.album.source]], {
-      header: track.album.title,
+    const [id] = yield* this.reply({
+      page: track.album.title,
       icon: icon.album,
-      track: track.id,
+      reset: track.id,
       message,
-      chat,
+    });
+    const page = pages.get(id);
+    if (!page) return;
+
+    this.signal.addEventListener("abort", page.close, { once: true });
+    yield* map(expand("album", track.album.source, 8), function* (state) {
+      yield* page.update(state);
     });
   }
   if (type("similar").is(action)) {
     const track = yield* async(persistence().track(action.similar));
     info(`${name} requested similar to "${format(track)}".`);
-    paginate([relate, ["track", track]], {
-      header: "Similar",
+    const [id] = yield* this.reply({
+      page: "Similar",
       icon: icon.similar,
-      track: track.id,
+      reset: track.id,
       message,
-      chat,
+    });
+    const page = pages.get(id);
+    if (!page) return;
+
+    this.signal.addEventListener("abort", page.close, { once: true });
+    yield* map(relate("track", track), function* (state) {
+      yield* page.update(state);
     });
   }
   if (type("artists").is(action)) {
@@ -126,12 +139,18 @@ callback(function* (action, message, chat) {
   if (artist.is(action)) {
     const artist = yield* async(persistence().artist(action.artist));
     info(`${name} requested tracks of artist "${artist.title}".`);
-    paginate([desource, ["artist", artist.source]], {
-      header: artist.title,
+    const [id] = yield* this.reply({
+      page: artist.title,
       icon: icon.artist,
-      track: action.track,
+      reset: action.track,
       message,
-      chat,
+    });
+    const page = pages.get(id);
+    if (!page) return;
+
+    this.signal.addEventListener("abort", page.close, { once: true });
+    yield* map(expand("artist", artist.source, 8), function* (state) {
+      yield* page.update(state);
     });
   }
 });

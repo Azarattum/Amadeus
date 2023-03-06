@@ -7,7 +7,7 @@ import {
   Infer,
 } from "@amadeus-music/core";
 import { name, version } from "./package.json";
-import { Reply, Edit } from "./api/reply";
+import { Reply, Edit } from "./types/reply";
 import { query } from "./types/action";
 import { me } from "./types/core";
 
@@ -23,6 +23,7 @@ export const {
   users,
   search,
   relate,
+  expand,
   desource,
   aggregate,
   transcribe,

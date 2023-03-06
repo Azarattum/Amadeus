@@ -1,20 +1,20 @@
 import { message, search, voice, info, post, persistence } from "../plugin";
 import { bright, reset } from "@amadeus-music/util/color";
-import { async, match } from "@amadeus-music/core";
-import { paginate } from "../api/reply";
+import { async, map } from "@amadeus-music/core";
 import { icon } from "../api/markup";
+import { pages } from "../api/pages";
 
 message(function* (text) {
   info(`${bright}${this.name}${reset} is searching for "${text}"...`);
   yield* async(persistence(this.user).log(text));
 
-  const [message] = yield* this.reply({ text: icon.load });
-  paginate([search, ["track", text]], {
-    header: text,
-    icon: icon.search,
-    compare: match(text),
-    chat: this.chat,
-    message,
+  const [id] = yield* this.reply({ page: text, icon: icon.search });
+  const page = pages.get(id);
+  if (!page) return;
+
+  this.signal.addEventListener("abort", page.close, { once: true });
+  yield* map(search("track", text, 8), function* (state) {
+    yield* page.update(state);
   });
 });
 
