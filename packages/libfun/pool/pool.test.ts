@@ -766,7 +766,8 @@ it("stops after async abort", async () => {
 
 it("transforms items", async () => {
   const mapped = pool<(_: number) => number, string>("event", {
-    async *transform(generators, groups, args) {
+    async *transform(generators, args, { groups, controller }) {
+      expect(controller).toBeInstanceOf(AbortController);
       expect(groups).toEqual(["test"]);
       expect(args).toEqual([4]);
       for await (const x of merge(generators)) {
