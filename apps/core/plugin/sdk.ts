@@ -8,7 +8,6 @@ import { bright, reset } from "@amadeus-music/util/color";
 import type { FetchOptions } from "../network/fetch";
 import { command, usage } from "../status/commands";
 import * as persistence from "../data/persistence";
-import { aggregate } from "../data/aggregate";
 import { format, plugins } from "./loader";
 import * as fetch from "../network/fetch";
 import * as events from "../event/pool";
@@ -22,7 +21,6 @@ const bound = {
   ...log,
   ...fetch,
   ...persistence,
-  aggregate,
   command,
 };
 
@@ -59,7 +57,6 @@ export const path = (to = ".") =>
 
 export { register, usage };
 export { http } from "../network/http";
-export { match } from "../data/aggregate";
 export { inferTrack, inferArtists } from "../data/infer";
 
 export * from "superstruct";
@@ -68,3 +65,5 @@ export * from "libfun";
 export { map } from "libfun";
 
 export { identify } from "@amadeus-music/protocol";
+
+export type { Page } from "../data/pagination";

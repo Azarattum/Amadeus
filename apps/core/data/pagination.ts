@@ -39,7 +39,7 @@ function page<T extends Record<string, any>>(
       return progress[id].size >= size || completed.has(id);
     },
     get items() {
-      return items;
+      return items as Uniqueified<T>[];
     },
     get progress() {
       const part = 1 / progress.length;
@@ -67,13 +67,9 @@ function pages<T extends Record<string, any>>(
   const { resolve, wait } = lock();
   const create = (number: number) => page(number, groups, completed, options);
   const last = () => pages.findIndex((x) => x.progress < 1);
-  const refresh = debounce(() => {
-    options.update?.(
-      pages[selected].items as Uniqueified<T>[],
-      pages[selected].progress,
-      pages[selected].number
-    );
-  }, 1);
+  const updater = lock();
+  const refresh = debounce(updater.resolve, 1);
+  let active = true;
 
   return {
     async append(id: number, batch: T[], number = last()) {
@@ -108,6 +104,11 @@ function pages<T extends Record<string, any>>(
       if (pages[selected].progress < 1) resolve();
       return true;
     },
+    close() {
+      active = false;
+      refresh();
+      options.controller?.abort();
+    },
     complete(id: number) {
       const changed = !pages[selected].satisfied(id);
       completed.add(id);
@@ -119,15 +120,34 @@ function pages<T extends Record<string, any>>(
     get current() {
       return pages[selected];
     },
+    async *values() {
+      while (active) {
+        if (selected || pages[selected].progress) {
+          yield {
+            ...pages[selected],
+            ...this,
+          } as Page<T>;
+        }
+        await updater.wait();
+      }
+    },
   };
 }
 
 type PaginationOptions<T> = {
-  id?: number;
-  page: number;
-  invalidate?: () => void;
   compare?: (a: T, b: T) => number;
-  update?: (items: Uniqueified<T>[], progress: number, page: number) => void;
+  controller?: AbortController;
+  page: number;
 };
 
-export { pages, type PaginationOptions };
+type Page<T> = {
+  items: Uniqueified<T>[];
+  number: number;
+  progress: number;
+  loaded: Promise<void>;
+  next(): boolean;
+  prev(): boolean;
+  close(): void;
+};
+
+export { pages, type Page };
