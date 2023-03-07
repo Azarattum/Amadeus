@@ -2,8 +2,8 @@ import { normalize, trackDetails } from "@amadeus-music/protocol";
 import stringSimilarity from "string-similarity-js";
 import { batch } from "@amadeus-music/util/object";
 import { clean } from "@amadeus-music/util/string";
-import { persistence } from "../data/persistence";
 import { cancel } from "libfun/utils/async";
+import { persistence } from "./persistence";
 import { pages } from "../data/pagination";
 import { inferTrack } from "../data/infer";
 import { merge, take } from "libfun/pool";
@@ -43,7 +43,9 @@ async function* aggregate(
   take(merge(curated));
   const cache = persistence();
   for await (const state of page.values()) {
-    if (is(state.items, array(trackDetails))) cache.push(state.items);
+    if (is(state.items, array(trackDetails))) {
+      await cache.playlists.push(state.items);
+    }
     /// TODO: cache other media types
     yield state;
   }

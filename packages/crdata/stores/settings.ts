@@ -29,5 +29,21 @@ export const settings = ({ store }: DB) =>
           .values({ key, value: JSON.stringify(value) })
           .execute();
       },
+      async extract(db, key: string, collection = "settings") {
+        return db
+          .selectFrom(collection as any)
+          .select("value")
+          .where("key", "=", key)
+          .executeTakeFirstOrThrow()
+          .then((x) => JSON.parse(x.value));
+      },
+      async lookup(db, value: unknown, collection = "settings") {
+        return db
+          .selectFrom(collection as any)
+          .select("key")
+          .where("value", "=", JSON.stringify(value))
+          .executeTakeFirstOrThrow()
+          .then((x) => x.key);
+      },
     }
   );

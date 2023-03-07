@@ -1,6 +1,5 @@
 import { command, persistence, pool, temp } from "../plugin";
 import { icon, replies } from "../api/markup";
-import { async } from "@amadeus-music/core";
 
 command(function* (command) {
   if (command === "start") {
@@ -12,7 +11,7 @@ command(function* (command) {
     pool(`upload/${this.chat}`).drain();
   }
   if (command === "history") {
-    const entries = yield* async(persistence(this.user).history());
+    const entries = yield* persistence(this.user).history.get();
     const last = entries.map((x) => x.query).slice(0, 5);
     const [message] = yield* this.reply({
       text: icon.history,

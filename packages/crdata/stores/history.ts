@@ -9,4 +9,11 @@ export const history = ({ store }: DB) =>
         .values({ query, date: Date.now() })
         .execute();
     },
+    async get(db) {
+      return db
+        .selectFrom("history")
+        .selectAll()
+        .orderBy("date", "desc")
+        .execute();
+    },
   });

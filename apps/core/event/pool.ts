@@ -4,7 +4,7 @@ import type {
   ArtistInfo,
   Uniqueified,
 } from "@amadeus-music/protocol";
-import type { Database, User } from "../data/persistence";
+import type { Database, User } from "./persistence";
 import type { Page } from "../data/pagination";
 import type { Config } from "../data/config";
 import { pools, type Mapped } from "libfun";

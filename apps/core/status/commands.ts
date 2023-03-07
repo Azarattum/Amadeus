@@ -8,7 +8,7 @@ import {
 } from "@amadeus-music/util/color";
 import { capitalize, dedupe, format } from "@amadeus-music/util/string";
 import { format as formatPlugin, plugins } from "../plugin/loader";
-import { persistence, users } from "../data/persistence";
+import { persistence, users } from "../event/persistence";
 import { pretty } from "@amadeus-music/util/object";
 import { register, settings } from "../data/config";
 import { log, pool, pools } from "../event/pool";
@@ -231,7 +231,7 @@ command(
   } catch {
     return wrn(`Unable to coerce "${value}" to type "${type}"!`);
   }
-  yield* async(persistence(username).store(setting, coerced));
+  yield* persistence(username).settings.store(setting, coerced);
   info(
     `${bright}${setting}${reset} set to ` +
       `${bright}${value}${reset} for ` +

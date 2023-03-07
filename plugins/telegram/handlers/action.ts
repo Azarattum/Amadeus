@@ -20,6 +20,7 @@ import { format } from "@amadeus-music/protocol";
 import { pages } from "../api/pages";
 
 callback(function* (action, message) {
+  const { tracks, artists } = persistence();
   const name = `${bright}${this.name}${reset}`;
   const report = (result: number[], type: string) => {
     const errors = result.filter((x) => !x).length;
@@ -33,14 +34,14 @@ callback(function* (action, message) {
   if (type("prev").is(action)) pages.get(action.prev)?.prev();
   if (type("close").is(action)) pages.get(action.close)?.close();
   if (type("reset").is(action)) {
-    const track = yield* async(persistence().track(action.reset));
+    const track = yield* tracks.get(action.reset);
     yield* this.edit(message, {
       mode: markdown(),
       markup: menu(track.id),
     });
   }
   if (type("download").is(action)) {
-    const track = yield* async(persistence().track(action.download));
+    const track = yield* tracks.get(action.download);
     yield* this.reply([track]);
   }
   if (type("page").is(action)) {
@@ -62,7 +63,7 @@ callback(function* (action, message) {
     report(yield* this.reply(shuffled), "Random");
   }
   if (type("lyrics").is(action)) {
-    const track = yield* async(persistence().track(action.lyrics));
+    const track = yield* tracks.get(action.lyrics);
     info(`${name} requested lyrics for "${format(track)}".`);
     const fallback =
       `No lyrics found\\. [Try searching the web\\.](https://www.google.com/` +
@@ -87,7 +88,7 @@ callback(function* (action, message) {
     });
   }
   if (type("album").is(action)) {
-    const track = yield* async(persistence().track(action.album));
+    const track = yield* tracks.get(action.album);
     info(`${name} requested an album of "${format(track)}".`);
     const [id] = yield* this.reply({
       page: track.album.title,
@@ -104,7 +105,7 @@ callback(function* (action, message) {
     });
   }
   if (type("similar").is(action)) {
-    const track = yield* async(persistence().track(action.similar));
+    const track = yield* tracks.get(action.similar);
     info(`${name} requested similar to "${format(track)}".`);
     const [id] = yield* this.reply({
       page: "Similar",
@@ -121,7 +122,7 @@ callback(function* (action, message) {
     });
   }
   if (type("artists").is(action)) {
-    const track = yield* async(persistence().track(action.artists));
+    const track = yield* tracks.get(action.artists);
     if (track.artists.length === 1) {
       action = { artist: track.artists[0].id, track: track.id };
     } else {
@@ -137,7 +138,7 @@ callback(function* (action, message) {
     }
   }
   if (artist.is(action)) {
-    const artist = yield* async(persistence().artist(action.artist));
+    const artist = yield* artists.get(action.artist);
     info(`${name} requested tracks of artist "${artist.title}".`);
     const [id] = yield* this.reply({
       page: artist.title,

@@ -1,12 +1,12 @@
 import { message, search, voice, info, post, persistence } from "../plugin";
 import { bright, reset } from "@amadeus-music/util/color";
-import { async, map } from "@amadeus-music/core";
+import { map } from "@amadeus-music/core";
 import { icon } from "../api/markup";
 import { pages } from "../api/pages";
 
 message(function* (text) {
   info(`${bright}${this.name}${reset} is searching for "${text}"...`);
-  yield* async(persistence(this.user).log(text));
+  yield* persistence(this.user).history.log(text);
 
   const [id] = yield* this.reply({ page: text, icon: icon.search });
   const page = pages.get(id);

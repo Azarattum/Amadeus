@@ -12,8 +12,8 @@ import {
   temp,
 } from "../plugin";
 import { answerCallbackQuery, deleteMessage } from "./methods";
-import { async, map, take } from "@amadeus-music/core";
 import { IncomingMessage, ServerResponse } from "http";
+import { async, map } from "@amadeus-music/core";
 import { replier, editor } from "./reply";
 import { sender } from "../types/sender";
 import * as type from "../types/core";

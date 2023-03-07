@@ -6,8 +6,8 @@ import {
 } from "./types";
 import { bright, reset } from "@amadeus-music/util/color";
 import type { FetchOptions } from "../network/fetch";
+import * as persistence from "../event/persistence";
 import { command, usage } from "../status/commands";
-import * as persistence from "../data/persistence";
 import { format, plugins } from "./loader";
 import * as fetch from "../network/fetch";
 import * as events from "../event/pool";

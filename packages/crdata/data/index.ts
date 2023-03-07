@@ -1,6 +1,8 @@
 import { playlists } from "../stores/playlists";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
+import { artists } from "../stores/artists";
+import { tracks } from "../stores/tracks";
 import { DB, schema } from "./schema";
 import { database } from "crstore";
 
@@ -9,6 +11,8 @@ const stores = (db: DB) => ({
   playlists: playlists(db),
   settings: settings(db),
   history: history(db),
+  artists: artists(db),
+  tracks: tracks(db),
 });
 
 function connect(options: Options) {

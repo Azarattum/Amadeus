@@ -4,12 +4,12 @@ import {
   sendMessage,
   sendAudio,
 } from "./methods";
-import { async, first, map, Pool, take } from "@amadeus-music/core";
-import { desource, info, persistence, pool } from "../plugin";
+import { async, first, map, Pool } from "@amadeus-music/core";
 import type { TrackDetails } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
 import { Message, Queue, Replier } from "../types/reply";
 import { pretty } from "@amadeus-music/util/object";
+import { desource, info, pool } from "../plugin";
 import { format } from "@amadeus-music/protocol";
 import { menu, markdown } from "./markup";
 import { sendPage } from "./pages";
@@ -93,7 +93,6 @@ function replier(chat: number, name: string, group = true) {
         });
       }
 
-      yield* async(persistence().push(message));
       return yield* map(send(message), function* (x) {
         return x;
       });

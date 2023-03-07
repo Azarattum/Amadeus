@@ -171,5 +171,12 @@ export const playlists = ({ store }: DB) =>
           })
           .execute();
       },
+      async get(db, title: string) {
+        return db
+          .selectFrom("playlists")
+          .selectAll()
+          .where("id", "=", identify(title))
+          .executeTakeFirstOrThrow();
+      },
     }
   );
