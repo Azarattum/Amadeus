@@ -1,15 +1,17 @@
 import type { Fn, Intersected } from "../utils/types";
 import type { Passthrough } from "./iterator";
 
+type Task<T extends any[] = any[]> = {
+  tasks: { group: string | undefined; controller: AbortController }[];
+  controller: AbortController;
+  id: string;
+  args: T;
+};
+
 interface Options<T extends Fn> {
   transform: (
     generators: AsyncGenerator<Result<ReturnType<T>>>[],
-    args: Parameters<T>,
-    task: {
-      groups: (string | undefined)[];
-      controller: AbortController;
-      id: string;
-    }
+    task: Task<Parameters<T>>
   ) => AsyncGenerator<Result<ReturnType<T>, true>>;
   concurrency: number;
   timeout: number;
@@ -170,6 +172,7 @@ export type {
   Mapped,
   Filter,
   Pools,
+  Task,
   Pool,
   Ctx,
 };

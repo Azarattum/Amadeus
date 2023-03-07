@@ -1,4 +1,5 @@
 import { cancel, thenable } from "../utils/async";
+import type { Task } from "./pool.types";
 import { handle } from "../utils/error";
 
 const passthrough = Symbol();
@@ -125,7 +126,10 @@ function reuse<T>(
   })();
 }
 
-async function* merge<T, U>(iterators: SomeIterator<T>[]) {
+async function* merge<T, U>(
+  iterators: SomeIterator<T>[],
+  task: Partial<Task> = {}
+) {
   const never = new Promise<any>(() => {});
 
   function next(iterator: SomeIterator<T>, index: number) {
@@ -134,6 +138,18 @@ async function* merge<T, U>(iterators: SomeIterator<T>[]) {
       result,
     }));
   }
+
+  let completed = 0;
+  function complete() {
+    completed += 1;
+    if (completed >= iterators.length) {
+      iterators.forEach((x) => x.return?.());
+      task.controller?.abort();
+    }
+  }
+  task.tasks?.forEach(({ controller }) =>
+    controller.signal.addEventListener("abort", complete, { once: true })
+  );
 
   const results: U[] = [];
   const promises = iterators.map(next);

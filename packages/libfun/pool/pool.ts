@@ -372,13 +372,9 @@ function pool<T extends Fn = () => void, R = never>(
 
               return (async function* () {
                 executor.tasks.add(task);
-                yield* cleanup(generator, task.controller, () => {
-                  executor.tasks.delete(task);
-                  const done = generators.every(
-                    ({ task }) => task.controller.signal.aborted
-                  );
-                  if (done && transform === merge) executor.controller.abort();
-                });
+                yield* cleanup(generator, task.controller, () =>
+                  executor.tasks.delete(task)
+                );
               })();
             } catch (error) {
               task.controller.abort();
@@ -391,9 +387,10 @@ function pool<T extends Fn = () => void, R = never>(
           });
 
         const iterable = () =>
-          transform(iterables(), params as any, {
-            groups: generators.map(({ task }) => task.group),
+          transform(iterables(), {
+            tasks: generators.map(({ task }) => task),
             controller: executor.controller,
+            args: params as Parameters<T>,
             id,
           });
         const key = self.cache ? JSON.stringify(params) : "";
