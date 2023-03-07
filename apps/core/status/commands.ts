@@ -133,7 +133,7 @@ command("help", [arg.command])((command) => {
 
 command("clear")(() => {
   console.clear();
-  take(log(""));
+  log("").then();
 });
 
 command("abort", ["all", arg.plugin, arg.pool])(function* (filter) {

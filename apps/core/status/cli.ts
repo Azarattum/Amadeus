@@ -6,7 +6,6 @@ import { stdin, stdout } from "node:process";
 import type { WriteStream } from "node:tty";
 import { commands } from "./commands";
 import { stop } from "./manage";
-import { take } from "libfun";
 import { wrn } from "./log";
 import "./commands";
 
@@ -15,7 +14,7 @@ function handle(command: string) {
   const main = parts.shift()?.toLowerCase();
   if (!main) return;
   if (!commands.has(main)) return wrn(`No such command "${main}"!`);
-  take(pool(`command/${main}`)(...(parts as [])));
+  pool(`command/${main}`)(...(parts as [])).then();
 }
 
 async function interactive() {
@@ -39,7 +38,7 @@ async function interactive() {
     return stop();
   });
   cli.on("line", (input) => {
-    take(log(cli.getPrompt() + input));
+    log(cli.getPrompt() + input).then();
     handle(input);
   });
   cli.prompt();

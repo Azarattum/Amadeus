@@ -43,21 +43,19 @@ function* queue(
   let done = false;
   const ping = (notifier(), setInterval(notifier, 3000));
   this.signal.addEventListener("abort", () => clearInterval(ping));
-  const promises: Promise<any>[] = [];
+  const promises: PromiseLike<any>[] = [];
   for (const track of tracks) {
     const url = yield* async(first(desource(track.source)));
     info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
     promises.push(
-      take(
-        pool({
-          audio: url,
-          title: track.title,
-          thumb: JSON.parse(track.album.art)?.[0],
-          performer: track.artists.map((x: any) => x.title).join(", "),
-          markup: menu(track.id),
-          mode: markdown(),
-        })
-      ).then((x) => (setTimeout(() => done || notifier(), 10), x))
+      pool({
+        audio: url,
+        title: track.title,
+        thumb: JSON.parse(track.album.art)?.[0],
+        performer: track.artists.map((x: any) => x.title).join(", "),
+        markup: menu(track.id),
+        mode: markdown(),
+      }).then((x) => (setTimeout(() => done || notifier(), 10), x))
     );
   }
   yield* yield* async(

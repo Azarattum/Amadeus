@@ -3,7 +3,7 @@ import { divide, err, info, ok, SilentError } from "./log";
 import { configure, setup } from "../data/config";
 import { load, plugins } from "../plugin/loader";
 import { name, version } from "../package.json";
-import { fallback, pipe, take } from "libfun";
+import { fallback, pipe } from "libfun";
 import { commands } from "./commands";
 import { interactive } from "./cli";
 
@@ -15,7 +15,6 @@ const launch = () =>
     load,
     configure,
     init,
-    take,
     () => setup(),
     complete,
     interactive,
@@ -52,7 +51,7 @@ async function stop(restart = false) {
   divide();
   info("Stopping all the plugins...");
   pools.drain();
-  await take(close());
+  await close();
   info("Cleaning up all the event handlers...");
   process.removeAllListeners();
   if (!restart) {

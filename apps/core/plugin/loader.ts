@@ -5,8 +5,8 @@ import { commands } from "../status/commands";
 import { ok, wrn, err } from "../status/log";
 import { readdir } from "node:fs/promises";
 import { parse, resolve } from "node:path";
-import { pipeline, take } from "libfun";
 import type { Plugin } from "./types";
+import { pipeline } from "libfun";
 
 const format = pipeline(unprefix, capitalize);
 const plugins = new Map<string, Plugin>();
@@ -71,7 +71,7 @@ async function unload(plugin: string) {
   }
 
   pools.drain("*", { group: plugin });
-  await take(stop.where(plugin)());
+  await stop.where(plugin)();
   pools.close("*", { group: plugin });
   plugins.delete(plugin);
 }

@@ -49,7 +49,7 @@ const transcribe = pool<(track: TrackInfo) => string>("transcribe", {
 /// TODO: recognize
 
 // Persistence events
-const database = pool<(user?: string) => Database>("database"); /// TODO: add transform
+const database = pool<(user?: string) => Database>("database");
 const users = pool<() => Record<string, User>>("users");
 
 export {

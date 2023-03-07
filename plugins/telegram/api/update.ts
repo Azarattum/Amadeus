@@ -31,7 +31,7 @@ function request(req: IncomingMessage, res: ServerResponse) {
   let body = "";
   req.on("readable", () => (body += req.read() || ""));
   req.on("end", () => {
-    take(update(body));
+    update(body).then();
     res.writeHead(200).end();
   });
 }
