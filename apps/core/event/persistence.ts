@@ -11,7 +11,7 @@ import { async } from "libfun";
 
 function persistence(this: Context, user?: string) {
   const group = this?.group || "settings";
-  const connect = () => async(database.bind(this)(user));
+  const connect = () => async(database.bind(this)(user).then());
   const strategies = {
     race: new Set<Method>([
       "settings.extract",
@@ -35,7 +35,7 @@ function persistence(this: Context, user?: string) {
           const dbs = yield* connect();
           const fns = dbs.map((x: any) => x[scope]?.[method]).filter((x) => x);
           if (strategies.group.has(target)) args.push(group);
-          const promises = fns.map((x) => x(args));
+          const promises = fns.map((x) => x(...args));
           if (strategies.race.has(target)) {
             const result = yield* async(Promise.race(promises));
             if (!result) throw new Error(`${target} returned nothing!`);
