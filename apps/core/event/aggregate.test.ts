@@ -26,24 +26,26 @@ it("aggregates pool", async () => {
   });
 
   const generator = event("123", "123", 4);
-  const page = await first(generator, false);
-  expect(page).toMatchObject({
-    items: [{ title: "124" }, { title: "125" }],
-    progress: 0.5,
-  });
-  expect(await first(generator, false)).toMatchObject({
-    items: [{ title: "123" }, { title: "124" }, { title: "125" }],
-    progress: 0.625,
-  });
-  expect(await first(generator, false)).toMatchObject({
-    items: [
-      { title: "123" },
-      { title: "124" },
-      { title: "125" },
-      { title: "246" },
-    ],
-    progress: 1,
-  });
+  let page = await first(generator, false);
+  expect(page.progress).toBe(0.5);
+  expect(page.items).toMatchObject([{ title: "124" }, { title: "125" }]);
+
+  page = await first(generator, false);
+  expect(page.progress).toBe(0.625);
+  expect(page.items).toMatchObject([
+    { title: "123" },
+    { title: "124" },
+    { title: "125" },
+  ]);
+
+  page = await first(generator, false);
+  expect(page.progress).toBe(1);
+  expect(page.items).toMatchObject([
+    { title: "123" },
+    { title: "124" },
+    { title: "125" },
+    { title: "246" },
+  ]);
 
   page.next();
   expect(await first(generator, false)).toMatchObject({

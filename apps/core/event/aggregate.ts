@@ -9,27 +9,20 @@ import { inferTrack } from "../data/infer";
 import { merge, take } from "libfun/pool";
 import { array, is } from "superstruct";
 import { wrn } from "../status/log";
+import type { Task } from "libfun";
 
 async function* aggregate(
   generators: AsyncGenerator<any>[],
-  args: [string, any, number?],
-  {
-    id,
-    groups,
-    controller,
-  }: { id: string; groups: (string | undefined)[]; controller: AbortController }
+  { args, id, tasks, controller }: Task<[string, any, number?]>
 ) {
   generators = generators.map(batch);
-
+  const groups = tasks.map((x) => x.group as string).filter((x) => x);
   const compare =
     id === "search"
       ? match(typeof args[1] === "string" ? args[1] : args[1].title)
       : undefined;
-  const page = pages<any>(groups as string[], {
-    page: args[2] || 8,
-    controller,
-    compare,
-  });
+
+  const page = pages<any>(groups, { page: args[2] || 8, controller, compare });
   controller.signal.addEventListener("abort", page.close, { once: true });
   const curated = generators.map((generator, id) => {
     return (async function* () {
