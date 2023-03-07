@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "2.0.1",
-    "crstore": "^0.10.1",
+    "crstore": "^0.10.3",
     "murmurhash": "^2.0.1"
   }
 }
