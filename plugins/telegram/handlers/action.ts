@@ -116,7 +116,7 @@ callback(function* (action, message) {
     if (!page) return;
 
     this.signal.addEventListener("abort", page.close, { once: true });
-    yield* map(relate("track", track), function* (state) {
+    yield* map(relate("track", track, 8), function* (state) {
       yield* page.update(state);
     });
   }

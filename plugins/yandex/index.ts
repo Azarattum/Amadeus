@@ -30,7 +30,7 @@ init(function* ({ yandex: { token } }) {
   };
 });
 
-search(function* (type, query, page = 10) {
+search(function* (type, query, page) {
   for (let i = 0; ; ) {
     const params = {
       type,
@@ -47,7 +47,7 @@ search(function* (type, query, page = 10) {
   }
 });
 
-expand(function* (type, source, page = 10) {
+expand(function* (type, source, page) {
   const id = source?.match(/yandex\/([0-9]+)/)?.[1];
   if (!id) return;
   if (type === "album") {
@@ -78,7 +78,7 @@ desource(function* (source) {
   yield `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`;
 });
 
-relate(function* (type, to, _ = undefined) {
+relate(function* (type, to, _) {
   let id = to.source.match(/yandex\/([0-9]+)/)?.[1];
   if (type === "track") {
     if (!id) {

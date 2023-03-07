@@ -25,20 +25,20 @@ const stop = pool("stop");
 type Aggregated<T> = Mapped<T, Page<Uniqueified<T>>>;
 
 const search = pool<
-  | ((type: "track", query: string, page?: number) => Aggregated<TrackInfo>)
-  | ((type: "album", query: string, page?: number) => Aggregated<AlbumInfo>)
-  | ((type: "artist", query: string, page?: number) => Aggregated<ArtistInfo>)
+  | ((type: "track", query: string, page: number) => Aggregated<TrackInfo>)
+  | ((type: "album", query: string, page: number) => Aggregated<AlbumInfo>)
+  | ((type: "artist", query: string, page: number) => Aggregated<ArtistInfo>)
 >("search", { transform: aggregate, timeout });
 
 const expand = pool<
-  | ((type: "album", source: string, page?: number) => Aggregated<TrackInfo>)
-  | ((type: "artist", source: string, page?: number) => Aggregated<TrackInfo>)
+  | ((type: "album", source: string, page: number) => Aggregated<TrackInfo>)
+  | ((type: "artist", source: string, page: number) => Aggregated<TrackInfo>)
 >("expand", { transform: aggregate, timeout });
 
 const relate = pool<
-  | ((type: "track", to: TrackInfo, page?: number) => Aggregated<TrackInfo>)
-  | ((type: "album", to: AlbumInfo, page?: number) => Aggregated<AlbumInfo>)
-  | ((type: "artist", to: ArtistInfo, page?: number) => Aggregated<ArtistInfo>)
+  | ((type: "track", to: TrackInfo, page: number) => Aggregated<TrackInfo>)
+  | ((type: "album", to: AlbumInfo, page: number) => Aggregated<AlbumInfo>)
+  | ((type: "artist", to: ArtistInfo, page: number) => Aggregated<ArtistInfo>)
 >("relate", { transform: aggregate, timeout });
 
 const desource = pool<(source: string) => string>("desource");
