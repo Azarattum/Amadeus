@@ -3,8 +3,7 @@ import { icon, replies } from "../api/markup";
 
 command(function* (command) {
   if (command === "start") {
-    const [message] = yield* this.reply({ text: "👋" });
-    temp.get(this.chat)?.add(message);
+    yield* this.reply({ text: "👋" });
   }
   if (command === "cancel") {
     pool(`queue/${this.chat}`).drain();
