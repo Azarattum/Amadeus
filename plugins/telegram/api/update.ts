@@ -20,6 +20,12 @@ import * as type from "../types/core";
 
 const secret = crypto.randomUUID();
 
+update(function* (body) {
+  const data = JSON.parse(body);
+  update.context(yield* verify(data));
+  yield* map(handle.bind(this)(data));
+});
+
 function request(req: IncomingMessage, res: ServerResponse) {
   if (req.url !== "/telegram") return;
   const token = req.headers["x-telegram-bot-api-secret-token"];
@@ -35,12 +41,6 @@ function request(req: IncomingMessage, res: ServerResponse) {
     res.writeHead(200).end();
   });
 }
-
-update(function* (body) {
-  const data = JSON.parse(body);
-  update.context(yield* verify(data));
-  yield* map(handle.bind(this)(data));
-});
 
 function* verify(update: unknown) {
   const data = sender.create(update);
