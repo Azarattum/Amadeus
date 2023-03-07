@@ -166,6 +166,8 @@ event(() => 42);
 // Useful generator helpers
 await first(event()); // 1
 await take(event()); // [1, 42, *number*, 2]
+// Can be resolved as a promise
+await event(); // [1, 42, *number*, 2]
 
 event.abort(); // Abort execution at ANY TIME!
 
@@ -201,8 +203,8 @@ stuff(function *() {
   yield awaited;
 });
 
-take(stuff()).then(x => /* [] */)
-// Result will be empty,   ↑
+stuff().then(x => /*    []    */)
+// Result will be empty, ↑
 //   since we have aborted immediately:
 stuff.abort();
 ```
@@ -216,8 +218,8 @@ api(function *() {
   yield* async(/* expensive api call */);
 });
 
-take(api()).then(/* do stuff */);
-take(api()).then(/* this will not resolve until the first call finishes */);
+api().then(/* do stuff */);
+api().then(/* this will not resolve until the first call finishes */);
 ```
 </details>
 
@@ -291,7 +293,7 @@ const bad = pool("bad");
 bad(() => { throw new Error("oops"); });
 bad.catch((e) => console.error(e));
 
-await take(bad()); // Does NOT throw, resolves with: []
+await bad(); // Does NOT throw, resolves with: []
 ```
 </details>
 

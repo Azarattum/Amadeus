@@ -16,9 +16,11 @@ import {
   generate,
   merge,
   reuse,
+  take,
   wrap,
 } from "./iterator";
 import { derive, block, delay, cancel, cleanup } from "../utils/async";
+import type { Reject, Resolve } from "../monad/monad.types";
 import type { Fn } from "../utils/types";
 import { handle } from "../utils/error";
 
@@ -28,6 +30,14 @@ const defaults: Options<any> = {
   transform: merge,
   rate: Infinity,
   cache: 0,
+};
+
+const then = function (
+  this: AsyncGenerator<any>,
+  resolve?: Resolve<any[]>,
+  reject?: Reject
+) {
+  return take(this).then(resolve, reject);
 };
 
 const state = Symbol();
@@ -148,7 +158,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
           }
         })();
 
-        return Object.assign(generator, { executor });
+        return Object.assign(generator, { executor, then });
       };
     },
     where(filter) {
@@ -408,7 +418,7 @@ function pool<T extends Fn = () => void, R = never>(
         })();
       },
       catcher(),
-      { executor }
+      { executor, then }
     );
   }
 

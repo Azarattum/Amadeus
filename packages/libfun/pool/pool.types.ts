@@ -97,17 +97,19 @@ type Handler<T extends Fn, C = unknown> = ((
   group?: string;
 };
 
+type PoolGenerator<T> = AsyncGenerator<Result<T, true>, void> &
+  PromiseLike<Result<T, true>[]> & {
+    executor: Executor;
+  };
+
 type Caller<T, Split = false> = Intersected<
   T extends (..._: infer A) => infer U
     ? (
         this: Override,
         ...args: A
       ) => Split extends false
-        ? AsyncGenerator<Result<U, true>, void> & { executor: Executor }
-        : Map<
-            string,
-            AsyncGenerator<Result<U, true>, void> & { executor: Executor }
-          >
+        ? PoolGenerator<U>
+        : Map<string, PoolGenerator<U>>
     : unknown
 >;
 

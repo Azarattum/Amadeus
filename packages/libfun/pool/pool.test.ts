@@ -785,3 +785,14 @@ it("transforms items", async () => {
   expect(items).toEqual(["8"]);
   mapped.close();
 });
+
+it("acts as a promise", async () => {
+  const multiply = pool<(_: number) => number>("event");
+  multiply(function* (x) {
+    yield x * 2;
+    yield x * 4;
+  });
+
+  expect(await multiply(4)).toEqual([8, 16]);
+  multiply.close();
+});

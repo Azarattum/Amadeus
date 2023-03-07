@@ -63,10 +63,7 @@ function thenable<T = unknown>(value: any): value is PromiseLike<T> {
   );
 }
 
-function block<
-  T extends AsyncGenerator,
-  U extends Record<string, any> = Record<string, never>
->(
+function block<T extends AsyncGenerator, U extends object>(
   condition: () => true | number,
   resolve: () => T,
   catcher?: (error: Error) => void,
