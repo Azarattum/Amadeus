@@ -4,7 +4,7 @@ import {
   uniquify,
   type Uniqueified,
 } from "@amadeus-music/protocol";
-import { debounce, lock } from "@amadeus-music/util/throttle";
+import { debounce, lock } from "@amadeus-music/util/async";
 import { combine } from "@amadeus-music/util/object";
 
 function page<T extends Record<string, any>>(

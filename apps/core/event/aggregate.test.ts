@@ -1,5 +1,5 @@
 import { async, first, pools, type Mapped } from "libfun";
-import { delay } from "@amadeus-music/util/throttle";
+import { delay } from "@amadeus-music/util/async";
 import type { Page } from "../data/pagination";
 import { aggregate } from "./aggregate";
 import { expect, it } from "vitest";

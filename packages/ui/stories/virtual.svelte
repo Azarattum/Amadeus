@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { delay } from "@amadeus-music/util/throttle";
+  import { delay } from "@amadeus-music/util/async";
   import { Virtual } from "@amadeus-music/ui";
   import { onMount } from "svelte";
 

@@ -1,5 +1,5 @@
 import { plural, capitalize, unprefix } from "@amadeus-music/util/string";
-import { delay } from "@amadeus-music/util/throttle";
+import { delay } from "@amadeus-music/util/async";
 import { init, pools, stop } from "../event/pool";
 import { commands } from "../status/commands";
 import { ok, wrn, err } from "../status/log";

@@ -92,3 +92,30 @@ export function lock() {
   };
   return { wait, resolve };
 }
+
+/**
+ * Similar to `Promise.all`, but ignores all the rejected promises.
+ * @param promises Promises to process
+ */
+export function all<T>(promises: Promise<T>[]) {
+  return Promise.allSettled(promises).then((x) =>
+    x.filter((y) => y.status === "fulfilled").map((y: any) => y.value as T)
+  );
+}
+
+/**
+ * Similar to `Promise.race`, but ignores all the rejected promises.
+ * Rejects only when all the promises have rejected.
+ * @param promises Promises to process
+ */
+export function race<T>(promises: Promise<T>[]) {
+  return new Promise<T>((resolve, reject) => {
+    function pass() {
+      if (++rejected >= promises.length) {
+        reject(new Error("All the promises rejected!"));
+      }
+    }
+    let rejected = 0;
+    promises.forEach((x) => Promise.resolve(x).then(resolve, pass));
+  });
+}

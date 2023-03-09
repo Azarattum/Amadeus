@@ -7,7 +7,7 @@ import {
   reset,
   yellow,
 } from "./color";
-import { delay } from "./throttle";
+import { delay } from "./async";
 
 const derivatives = new WeakMap<object, object>();
 const picked = new WeakMap<object, number>();
@@ -105,14 +105,14 @@ export async function combine<T, U>(
   {
     identify,
     compare = () => 0,
-    convert,
+    convert = (x) => x as any,
     merge,
     map,
   }: {
     identify: (item: T | U) => number;
     compare?: (a: T, b: T) => number;
     merge: (a: T, b: U) => void;
-    convert: (item: U) => T;
+    convert?: (item: U) => T;
     map: Map<number, T>;
   }
 ) {
