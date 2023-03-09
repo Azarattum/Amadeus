@@ -15,7 +15,7 @@
     "test": "turbo run test --parallel --no-daemon"
   },
   "devDependencies": {
-    "@sveltejs/kit": "1.10.0",
+    "@sveltejs/kit": "1.11.0",
     "@types/node": "18.14.6",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
     "@typescript-eslint/parser": "^5.54.1",
@@ -32,7 +32,7 @@
     "prettier-plugin-sort-imports": "^1.7.1",
     "prettier-plugin-svelte": "^2.9.0",
     "prettier-plugin-tailwindcss": "^0.2.4",
-    "rimraf": "^4.3.1",
+    "rimraf": "^4.4.0",
     "rollup": "^3.18.0",
     "rollup-plugin-node-externals": "^5.1.2",
     "svelte": "^3.55.1",

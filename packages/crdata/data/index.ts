@@ -2,9 +2,10 @@ import { playlists } from "../stores/playlists";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
 import { artists } from "../stores/artists";
+import triggers from "./triggers.sql?raw";
 import { tracks } from "../stores/tracks";
+import { database, sql } from "crstore";
 import { DB, schema } from "./schema";
-import { database } from "crstore";
 
 const connections = new Map<string, Connection>();
 const stores = (db: DB) => ({
@@ -19,6 +20,7 @@ function connect(options: Options) {
   if (!connections.has(options.name)) {
     const db = database(options.local ? nocrr(schema) : schema, options);
     connections.set(options.name, { ...db, ...stores(db) });
+    db.update((db) => sql.raw(triggers).execute(db));
   }
   return connections.get(options.name) as Connection;
 }

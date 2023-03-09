@@ -4,7 +4,7 @@ importers:
 
   .:
     specifiers:
-      '@sveltejs/kit': 1.10.0
+      '@sveltejs/kit': 1.11.0
       '@types/node': 18.14.6
       '@typescript-eslint/eslint-plugin': ^5.54.1
       '@typescript-eslint/parser': ^5.54.1
@@ -21,7 +21,7 @@ importers:
       prettier-plugin-sort-imports: ^1.7.1
       prettier-plugin-svelte: ^2.9.0
       prettier-plugin-tailwindcss: ^0.2.4
-      rimraf: ^4.3.1
+      rimraf: ^4.4.0
       rollup: ^3.18.0
       rollup-plugin-node-externals: ^5.1.2
       svelte: ^3.55.1
@@ -32,7 +32,7 @@ importers:
       vite: 4.1.4
       vitest: 0.29.2
     devDependencies:
-      '@sveltejs/kit': 1.10.0_svelte@3.55.1+vite@4.1.4
+      '@sveltejs/kit': 1.11.0_svelte@3.55.1+vite@4.1.4
       '@types/node': 18.14.6
       '@typescript-eslint/eslint-plugin': 5.54.1_mlk7dnz565t663n4razh6a6v6i
       '@typescript-eslint/parser': 5.54.1_ycpbpc6yetojsgtrx3mwntkhsu
@@ -49,7 +49,7 @@ importers:
       prettier-plugin-sort-imports: 1.7.1_typescript@4.9.5
       prettier-plugin-svelte: 2.9.0_jrsxveqmsx2uadbqiuq74wlc4u
       prettier-plugin-tailwindcss: 0.2.4_yjdjpc7im5hvpskij45owfsns4
-      rimraf: 4.3.1
+      rimraf: 4.4.0
       rollup: 3.18.0
       rollup-plugin-node-externals: 5.1.2_rollup@3.18.0
       svelte: 3.55.1
@@ -92,24 +92,24 @@ importers:
       '@amadeus-music/crdata': workspace:*
       '@amadeus-music/ui': workspace:*
       '@sveltejs/adapter-static': 2.0.1
-      crstore: ^0.10.3
+      crstore: ^0.11.0
       murmurhash: ^2.0.1
     dependencies:
       '@amadeus-music/crdata': link:../../packages/crdata
       '@amadeus-music/ui': link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static': 2.0.1
-      crstore: 0.10.3
+      crstore: 0.11.0
       murmurhash: 2.0.1
 
   packages/crdata:
     specifiers:
       '@amadeus-music/protocol': workspace:*
-      crstore: ^0.10.3
+      crstore: ^0.11.0
       superstruct: ^1.0.3
     dependencies:
       '@amadeus-music/protocol': link:../protocol
-      crstore: 0.10.3
+      crstore: 0.11.0
       superstruct: 1.0.3
 
   packages/libfun:
@@ -494,8 +494,8 @@ packages:
       '@sveltejs/kit': ^1.5.0
     dev: true
 
-  /@sveltejs/kit/1.10.0_svelte@3.55.1+vite@4.1.4:
-    resolution: {integrity: sha512-0P35zHrByfbF3Ym3RdQL+RvzgsCDSyO3imSwuZ67XAD5HoCQFF3a8Mhh0V3sObz3rc5aJd4Qn82UpAihJqZ6gQ==}
+  /@sveltejs/kit/1.11.0_svelte@3.55.1+vite@4.1.4:
+    resolution: {integrity: sha512-PwViZcMoLgEU/jhLoSyjf5hSrHS67wvSm0ifBo4prP9irpGa5HuPOZeVDTL5tPDSBoKxtdYi1zlGdoiJfO86jA==}
     engines: {node: ^16.14 || >=18}
     hasBin: true
     requiresBuild: true
@@ -1157,8 +1157,8 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crstore/0.10.3:
-    resolution: {integrity: sha512-VOAs5aNf5F1eZ5o9MsPtKJ/2gSGPA0vEeAUICfdunRCazsIK2LmojfIcJU0mSENdSljUq6AT9chGS3p+h++MUg==}
+  /crstore/0.11.0:
+    resolution: {integrity: sha512-JxQOYuBov7BTaswn9hSDneXtvYfdF3bR3eFCRfckP4Z6Z0jQsHQ/6EwSQyAfyZ/A2ELFlfSSawKrjRT6k9uLLQ==}
     dependencies:
       '@vlcn.io/crsqlite': 0.8.0
       '@vlcn.io/wa-crsqlite': 0.8.0
@@ -2881,8 +2881,8 @@ packages:
       glob: 7.2.3
     dev: true
 
-  /rimraf/4.3.1:
-    resolution: {integrity: sha512-GfHJHBzFQra23IxDzIdBqhOWfbtdgS1/dCHrDy+yvhpoJY5TdwdT28oWaHWfRpKFDLd3GZnGTx6Mlt4+anbsxQ==}
+  /rimraf/4.4.0:
+    resolution: {integrity: sha512-X36S+qpCUR0HjXlkDe4NAOhS//aHH0Z+h8Ckf2auGJk3PTnx5rLmrHkwNdbVQuCSUhOyFrlRvFEllZOYE+yZGQ==}
     engines: {node: '>=14'}
     hasBin: true
     dependencies:
@@ -2914,14 +2914,6 @@ packages:
       rollup: ^2.60.0 || ^3.0.0
     dependencies:
       rollup: 3.18.0
-    dev: true
-
-  /rollup/3.17.3:
-    resolution: {integrity: sha512-p5LaCXiiOL/wrOkj8djsIDFmyU9ysUxcyW+EKRLHb6TKldJzXpImjcRSR+vgo09DBdofGcOoLOsRyxxG2n5/qQ==}
-    engines: {node: '>=14.18.0', npm: '>=8.0.0'}
-    hasBin: true
-    optionalDependencies:
-      fsevents: 2.3.2
     dev: true
 
   /rollup/3.18.0:
@@ -3486,7 +3478,7 @@ packages:
       esbuild: 0.16.17
       postcss: 8.4.21
       resolve: 1.22.1
-      rollup: 3.17.3
+      rollup: 3.18.0
     optionalDependencies:
       fsevents: 2.3.2
     dev: true

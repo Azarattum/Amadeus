@@ -1,6 +1,7 @@
 import type {
   ArtistDetails,
   PlaylistDetails,
+  PlaylistInfo,
   TrackDetails,
 } from "@amadeus-music/protocol";
 import type { IsNever } from "libfun/utils/types";
@@ -8,7 +9,7 @@ import type { async } from "libfun";
 
 type Database = Partial<{
   playlists: Partial<{
-    create(name: string): Promise<void>;
+    create(playlist: Partial<PlaylistInfo> & { title: string }): Promise<void>;
     get(title: string): Promise<PlaylistDetails>;
 
     push(tracks: TrackDetails[], playlist?: number): Promise<void>;

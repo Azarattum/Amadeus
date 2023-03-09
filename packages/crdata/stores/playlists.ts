@@ -1,5 +1,9 @@
-import { type TrackDetails, identify } from "@amadeus-music/protocol";
-import { APPEND, json, groupJSON } from "crstore";
+import {
+  type TrackDetails,
+  identify,
+  PlaylistInfo,
+} from "@amadeus-music/protocol";
+import { APPEND, json, groupJSON, sql } from "crstore";
 import type { DB } from "../data/schema";
 
 const uuid = () => (Math.random() * 2 ** 32) >>> 0;
@@ -11,16 +15,19 @@ export const playlists = ({ store }: DB) =>
         .selectFrom((db) =>
           db
             .selectFrom("playlists")
-            .innerJoin("library", "library.playlist", "playlists.id")
-            .innerJoin("tracks", "tracks.id", "library.track")
-            .innerJoin("albums", "albums.id", "tracks.album")
-            .innerJoin("attribution", "attribution.track", "tracks.id")
-            .innerJoin("artists", "artists.id", "attribution.artist")
+            .leftJoin("library", "library.playlist", "playlists.id")
+            .leftJoin("tracks", "tracks.id", "library.track")
+            .leftJoin("albums", "albums.id", "tracks.album")
+            .leftJoin("attribution", "attribution.track", "tracks.id")
+            .leftJoin("artists", "artists.id", "attribution.artist")
             .select([
               "tracks.id as id",
-              "library.id as entry",
+              sql<number>`IFNULL(library.id,RANDOM())`.as("entry"),
               "playlists.id as group",
               "playlists.title as playlist",
+              "playlists.relevancy as relevancy",
+              "playlists.shared as shared",
+              "playlists.remote as remote",
               "library.date as date",
               "tracks.title as title",
               "tracks.length as length",
@@ -43,7 +50,7 @@ export const playlists = ({ store }: DB) =>
                 art: "artists.art",
               }).as("artists")
             )
-            .groupBy("library.id")
+            .groupBy("entry")
             .orderBy("library.order")
             .orderBy("library.id")
             .as("data")
@@ -51,6 +58,9 @@ export const playlists = ({ store }: DB) =>
         .select([
           "group as id",
           "playlist",
+          "relevancy",
+          "shared",
+          "remote",
           (qb) =>
             groupJSON(qb, {
               id: "id",
@@ -114,62 +124,23 @@ export const playlists = ({ store }: DB) =>
         await Promise.all(promises);
       },
       async purge(db, entries: number[]) {
-        const promises = entries.map(async (entry) => {
-          const { track } = await db
-            .deleteFrom("library")
-            .where("id", "=", entry)
-            .returning(["track"])
-            .executeTakeFirstOrThrow();
-          {
-            const { count } = await db
-              .selectFrom("library")
-              .where("track", "=", track)
-              .select(db.fn.count("id").as("count"))
-              .executeTakeFirstOrThrow();
-            if (count !== 0) return;
-          }
-          const { album } = await db
-            .deleteFrom("tracks")
-            .where("id", "=", track)
-            .returning("album")
-            .executeTakeFirstOrThrow();
-          /// What should happen to "playback"?
-          {
-            const { count } = await db
-              .selectFrom("tracks")
-              .where("album", "=", album)
-              .select(db.fn.count("id").as("count"))
-              .executeTakeFirstOrThrow();
-            if (count !== 0) return;
-          }
-          await db.deleteFrom("albums").where("id", "=", album).execute();
-          const artists = await db
-            .deleteFrom("attribution")
-            .where("track", "=", track)
-            .returning("artist")
-            .execute();
-          artists.forEach(async ({ artist }) => {
-            const { count } = await db
-              .selectFrom("attribution")
-              .where("artist", "=", artist)
-              .select(db.fn.count("id").as("count"))
-              .executeTakeFirstOrThrow();
-            if (count !== 0) return;
-            await db.deleteFrom("artists").where("id", "=", artist).execute();
-            /// What should happen to "following"?
-          });
-        });
+        const promises = entries.map((entry) =>
+          db.deleteFrom("library").where("id", "=", entry).execute()
+        );
         await Promise.all(promises);
       },
-      async create(db, playlist: string) {
+      async create(db, playlist: Partial<PlaylistInfo> & { title: string }) {
+        const id = identify(playlist);
         await db
           .insertInto("playlists")
+          .onConflict((x) => x.doNothing())
           .values({
-            id: identify(playlist),
-            title: playlist,
+            id,
             relevancy: 1,
+            ...playlist,
           })
           .execute();
+        return id;
       },
       async get(db, title: string) {
         return db
