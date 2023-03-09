@@ -1,3 +1,10 @@
+CREATE TRIGGER IF NOT EXISTS cascade_playlists_library
+AFTER DELETE ON playlists
+FOR EACH ROW
+BEGIN
+  DELETE FROM library WHERE playlist = OLD.id;
+END;
+
 CREATE TRIGGER IF NOT EXISTS cascade_library_tracks
 AFTER DELETE ON library
 FOR EACH ROW
