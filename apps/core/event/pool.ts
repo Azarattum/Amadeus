@@ -4,7 +4,7 @@ import type {
   ArtistInfo,
   Uniqueified,
 } from "@amadeus-music/protocol";
-import type { Database, User } from "./persistence";
+import type { Database, User } from "./persistence.types";
 import type { Page } from "../data/pagination";
 import type { Config } from "../data/config";
 import { pools, type Mapped } from "libfun";
@@ -49,7 +49,7 @@ const transcribe = pool<(track: TrackInfo) => string>("transcribe", {
 /// TODO: recognize
 
 // Persistence events
-const database = pool<(user?: string) => Database>("database");
+const persistence = pool<(user?: string) => Database>("persistence");
 const users = pool<() => Record<string, User>>("users");
 
 export {
@@ -61,7 +61,7 @@ export {
   relate,
   expand,
   desource,
-  database,
   transcribe,
+  persistence,
 };
 export { all as pools, pool };

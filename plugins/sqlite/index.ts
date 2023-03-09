@@ -1,9 +1,9 @@
 import { existsSync, mkdirSync, readdirSync } from "fs";
 import { close, connect } from "@amadeus-music/crdata";
+import { persistence, stop, users } from "./plugin";
 import { async, path } from "@amadeus-music/core";
-import { database, stop, users } from "./plugin";
 
-database(function* (user = "shared") {
+persistence(function* (user = "shared") {
   if (!existsSync(path("users"))) mkdirSync(path("users"));
   yield connect({
     name: path(`users/${user}.db`),
