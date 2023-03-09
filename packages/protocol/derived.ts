@@ -30,6 +30,10 @@ type AlbumDetails = Infer<typeof albumDetails>;
 type PlaylistInfo = Infer<typeof playlistInfo>;
 type PlaylistDetails = Infer<typeof playlistDetails>;
 
+type PlaybackDirection = "forward" | "backward" | "shuffled";
+type PlaybackPosition = "next" | "last" | "hidden" | number;
+type PlaybackRepeat = "none" | "all" | "single";
+
 export type {
   TrackInfo,
   TrackDetails,
@@ -39,6 +43,9 @@ export type {
   AlbumDetails,
   PlaylistInfo,
   PlaylistDetails,
+  PlaybackDirection,
+  PlaybackPosition,
+  PlaybackRepeat,
 };
 export {
   trackInfo,

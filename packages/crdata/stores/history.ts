@@ -9,7 +9,10 @@ export const history = ({ store }: DB) =>
         .values({ query, date: Date.now() })
         .execute();
     },
-    async get(db) {
+    async clear(db) {
+      await db.deleteFrom("history").execute();
+    },
+    get(db) {
       return db
         .selectFrom("history")
         .selectAll()

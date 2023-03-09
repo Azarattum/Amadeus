@@ -1,7 +1,9 @@
 import { playlists } from "../stores/playlists";
+import { playback } from "../stores/playback";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
 import { artists } from "../stores/artists";
+import { library } from "../stores/library";
 import triggers from "./triggers.sql?raw";
 import { tracks } from "../stores/tracks";
 import { database, sql } from "crstore";
@@ -10,9 +12,11 @@ import { DB, schema } from "./schema";
 const connections = new Map<string, Connection>();
 const stores = (db: DB) => ({
   playlists: playlists(db),
+  playback: playback(db),
   settings: settings(db),
   history: history(db),
   artists: artists(db),
+  library: library(db),
   tracks: tracks(db),
 });
 

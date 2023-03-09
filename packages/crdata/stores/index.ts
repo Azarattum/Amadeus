@@ -1,6 +1,14 @@
 import { connect } from "../data";
 
-export const { playlists, history, artists, tracks, settings, update } =
-  connect({
-    name: "library.db",
-  });
+export const {
+  playlists,
+  playback,
+  settings,
+  history,
+  artists,
+  library,
+  tracks,
+  update,
+} = connect({
+  name: "library.db",
+});

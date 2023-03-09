@@ -1,12 +1,6 @@
-import {
-  type TrackDetails,
-  identify,
-  PlaylistInfo,
-} from "@amadeus-music/protocol";
-import { APPEND, json, groupJSON, sql } from "crstore";
+import { identify, Playlist } from "@amadeus-music/protocol";
+import { json, groupJSON, sql } from "crstore";
 import type { DB } from "../data/schema";
-
-const uuid = () => (Math.random() * 2 ** 32) >>> 0;
 
 export const playlists = ({ store }: DB) =>
   store(
@@ -75,78 +69,39 @@ export const playlists = ({ store }: DB) =>
         ])
         .groupBy("group"),
     {
-      async push(db, tracks: TrackDetails[], playlist?: number) {
-        /// Do updates on conflict
-        const promises = tracks.map(async (track) => {
-          await db
-            .insertInto("albums")
-            .onConflict((x) => x.doNothing())
-            .values(track.album)
-            .execute();
-          await db
-            .insertInto("artists")
-            .onConflict((x) => x.doNothing())
-            .values(track.artists)
-            .execute();
-          await db
-            .insertInto("tracks")
-            .onConflict((x) => x.doNothing())
-            .values({
-              id: track.id,
-              title: track.title,
-              length: track.length,
-              source: track.source,
-              album: track.album.id,
-            })
-            .execute();
-          await db
-            .insertInto("attribution")
-            .onConflict((x) => x.doNothing())
-            .values(
-              track.artists.map(({ id }) => ({
-                track: track.id,
-                artist: id,
-              }))
-            )
-            .execute();
-          if (playlist == null) return;
-          await db
-            .insertInto("library")
-            .values({
-              id: uuid(),
-              order: APPEND,
-              date: Date.now(),
-              track: track.id,
-              playlist,
-            })
-            .execute();
-        });
-        await Promise.all(promises);
-      },
-      async purge(db, entries: number[]) {
-        const promises = entries.map((entry) =>
-          db.deleteFrom("library").where("id", "=", entry).execute()
-        );
-        await Promise.all(promises);
-      },
-      async create(db, playlist: Partial<PlaylistInfo> & { title: string }) {
-        const id = identify(playlist);
+      async create(db, playlist: Partial<Playlist> & { title: string }) {
         await db
           .insertInto("playlists")
           .onConflict((x) => x.doNothing())
           .values({
-            id,
+            id: identify(playlist),
             relevancy: 1,
             ...playlist,
           })
           .execute();
-        return id;
       },
-      async get(db, title: string) {
+      async edit(db, id: number, playlist: Partial<Playlist>) {
+        await db
+          .updateTable("playlists")
+          .where("id", "=", id)
+          .set(playlist)
+          .execute();
+      },
+      async rearrange(db, id: number, after?: number) {
+        await db
+          .updateTable("playlists_fractindex" as any)
+          .set({ after_id: after || null })
+          .where("id", "=", id)
+          .execute();
+      },
+      async delete(db, id: number) {
+        await db.deleteFrom("playlists").where("id", "=", id).execute();
+      },
+      get(db, id: number) {
         return db
           .selectFrom("playlists")
           .selectAll()
-          .where("id", "=", identify(title))
+          .where("id", "=", id)
           .executeTakeFirstOrThrow();
       },
     }

@@ -1,9 +1,25 @@
+import { Album, Track } from "@amadeus-music/protocol";
 import { groupJSON, json } from "crstore";
 import { DB } from "../data/schema";
 
 export const tracks = ({ store }: DB) =>
   store((db) => db.selectFrom("tracks").selectAll(), {
-    async get(db, id: number) {
+    async edit(db, id: number, track: Partial<Track & { album: Album }>) {
+      const result = await db
+        .updateTable("tracks")
+        .where("id", "=", id)
+        .set({ ...track, album: undefined })
+        .returning("album")
+        .executeTakeFirst();
+      if (result?.album && track.album) {
+        await db
+          .updateTable("albums")
+          .where("id", "=", result.album)
+          .set(track.album)
+          .execute();
+      }
+    },
+    get(db, id: number) {
       return db
         .selectFrom("tracks")
         .innerJoin("albums", "albums.id", "tracks.album")
