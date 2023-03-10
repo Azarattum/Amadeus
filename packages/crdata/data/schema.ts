@@ -1,9 +1,9 @@
 import {
-  assign,
-  boolean,
-  Infer,
-  integer,
+  type Infer,
+  instance,
   nullable,
+  integer,
+  assign,
   number,
   object,
   string,
@@ -71,17 +71,26 @@ index(feed, "type");
 
 const playback = object({
   id: id(),
+  device: instance(Uint8Array),
   track: id(),
-  device: string(),
   progress: number(),
   order: string(),
-  hidden: boolean(),
+  inverted: number(),
 });
 crr(playback);
 primary(playback, "id");
 index(playback, "device");
 index(playback, "order", "id");
 ordered(playback, "order", "device");
+
+const devices = object({
+  id: instance(Uint8Array),
+  direction: number(),
+  infinite: number(),
+  repeat: number(),
+});
+crr(devices);
+primary(devices, "id");
 
 const following = object({
   artist: id(),
@@ -115,6 +124,7 @@ export const schema = object({
   feed,
   playlists,
   playback,
+  devices,
   following,
   settings,
   history,

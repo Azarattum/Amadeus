@@ -31,7 +31,7 @@ type PlaylistInfo = Infer<typeof playlistInfo>;
 type PlaylistDetails = Infer<typeof playlistDetails>;
 
 type PlaybackDirection = "forward" | "backward" | "shuffled";
-type PlaybackPosition = "next" | "last" | "hidden" | number;
+type PlaybackPosition = "next" | "last" | "awaiting" | number;
 type PlaybackRepeat = "none" | "all" | "single";
 type FeedType = "listened" | "recommended" | "following";
 

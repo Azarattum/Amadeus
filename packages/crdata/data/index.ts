@@ -26,7 +26,8 @@ function connect(options: Options) {
   if (!connections.has(options.name)) {
     const db = database(options.local ? nocrr(schema) : schema, options);
     connections.set(options.name, { ...db, ...stores(db) });
-    db.update((db) => sql.raw(triggers).execute(db));
+    const statements = triggers.split(/\r?\n\r?\n/).map((x) => sql.raw(x));
+    db.update((db) => Promise.all(statements.map((x) => x.execute(db))));
   }
   return connections.get(options.name) as Connection;
 }

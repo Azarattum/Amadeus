@@ -89,3 +89,5 @@ BEGIN
       EXISTS (SELECT 1 FROM following WHERE following.artist = attribution.artist)
       AND track = NEW.track;
 END;
+
+INSERT OR IGNORE INTO devices VALUES (crsql_siteid(), 0, 0, 0);

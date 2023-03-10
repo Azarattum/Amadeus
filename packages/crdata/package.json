@@ -2,6 +2,9 @@
   "name": "@amadeus-music/crdata",
   "version": "1.0.0",
   "main": "index.ts",
+  "scripts": {
+    "test": "vitest run"
+  },
   "dependencies": {
     "@amadeus-music/protocol": "workspace:*",
     "crstore": "^0.11.0",
