@@ -23,7 +23,7 @@ persistence(() => ({
 }));
 
 it("processes voided", async () => {
-  const result = await persistence().playlists.create("name");
+  const result = await persistence().playlists.create({ title: "name" });
   expect(result).toBeUndefined();
 });
 
