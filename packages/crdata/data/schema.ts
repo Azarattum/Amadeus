@@ -39,9 +39,11 @@ crr(attribution);
 index(attribution, "artist");
 primary(attribution, "track", "artist");
 
-const playlists = unique(playlist);
+const playlists = assign(unique(playlist), object({ order: string() }));
 crr(playlists);
 primary(playlists, "id");
+ordered(playlists, "order");
+index(playlists, "order", "id");
 
 const library = object({
   id: id(),

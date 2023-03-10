@@ -1,5 +1,5 @@
 import { identify, Playlist } from "@amadeus-music/protocol";
-import { json, groupJSON, sql } from "crstore";
+import { json, groupJSON, sql, APPEND } from "crstore";
 import type { DB } from "../data/schema";
 
 export const playlists = ({ store }: DB) =>
@@ -18,6 +18,7 @@ export const playlists = ({ store }: DB) =>
               "tracks.id as id",
               sql<number>`IFNULL(library.id,RANDOM())`.as("entry"),
               "playlists.id as group",
+              "playlists.order as order",
               "playlists.title as playlist",
               "playlists.relevancy as relevancy",
               "playlists.shared as shared",
@@ -67,7 +68,9 @@ export const playlists = ({ store }: DB) =>
               artists: "artists",
             }).as("tracks"),
         ])
-        .groupBy("group"),
+        .groupBy("group")
+        .orderBy("order")
+        .orderBy("group"),
     {
       async create(db, playlist: Partial<Playlist> & { title: string }) {
         await db
@@ -75,6 +78,7 @@ export const playlists = ({ store }: DB) =>
           .onConflict((x) => x.doNothing())
           .values({
             id: identify(playlist),
+            order: APPEND,
             relevancy: 1,
             ...playlist,
           })
