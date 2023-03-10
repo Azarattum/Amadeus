@@ -77,3 +77,15 @@ WHEN NOT EXISTS (
 BEGIN
   DELETE FROM artists WHERE id = OLD.artist;
 END;
+
+CREATE TRIGGER IF NOT EXISTS log_playback
+AFTER UPDATE OF progress ON playback
+FOR EACH ROW
+WHEN NEW.progress >= 1
+BEGIN
+  INSERT INTO feed VALUES (ABS(RANDOM() % POWER(2, 32)), 0, NEW.track);
+  INSERT INTO following SELECT artist, track as seen FROM attribution
+    WHERE
+      EXISTS (SELECT 1 FROM following WHERE following.artist = attribution.artist)
+      AND track = NEW.track;
+END;

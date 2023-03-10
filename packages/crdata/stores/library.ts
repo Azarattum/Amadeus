@@ -1,52 +1,13 @@
 import { type TrackDetails } from "@amadeus-music/protocol";
+import { push, uuid } from "../data/operations";
 import type { DB } from "../data/schema";
 import { APPEND } from "crstore";
-
-const uuid = () => (Math.random() * 2 ** 32) >>> 0;
 
 export const library = ({ store }: DB) =>
   store((db) => db.selectFrom("library").selectAll(), {
     async push(db, tracks: TrackDetails[], playlist?: number) {
       const promises = tracks.map(async (track) => {
-        await db
-          .insertInto("albums")
-          .onConflict((x) => x.doUpdateSet(track.album))
-          .values(track.album)
-          .execute();
-        for (const artist of track.artists) {
-          await db
-            .insertInto("artists")
-            .onConflict((x) => x.doUpdateSet(artist))
-            .values(artist)
-            .execute();
-        }
-        await db
-          .insertInto("tracks")
-          .onConflict((x) =>
-            x.doUpdateSet({
-              title: track.title,
-              length: track.length,
-              source: track.source,
-            })
-          )
-          .values({
-            id: track.id,
-            title: track.title,
-            length: track.length,
-            source: track.source,
-            album: track.album.id,
-          })
-          .execute();
-        await db
-          .insertInto("attribution")
-          .onConflict((x) => x.doNothing())
-          .values(
-            track.artists.map(({ id }) => ({
-              track: track.id,
-              artist: id,
-            }))
-          )
-          .execute();
+        await push(db, track);
         if (playlist == null) return;
         await db
           .insertInto("library")

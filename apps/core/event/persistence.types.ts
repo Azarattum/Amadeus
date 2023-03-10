@@ -9,6 +9,7 @@ import type {
   PlaylistDetails,
   ArtistDetails,
   TrackDetails,
+  FeedType,
 } from "@amadeus-music/protocol";
 import type { IsNever } from "libfun/utils/types";
 import type { async } from "libfun";
@@ -20,6 +21,10 @@ type Database = DeepPartial<{
     rearrange(id: number, after?: number): Promise<void>;
     get(id: number): Promise<PlaylistDetails>;
     delete(id: number): Promise<void>;
+  };
+  feed: {
+    push(tracks: TrackDetails[], type: FeedType): Promise<void>;
+    clear(type: FeedType): Promise<void>;
   };
   library: {
     push(tracks: TrackDetails[], playlist?: number): Promise<void>;

@@ -3,6 +3,7 @@ import {
   boolean,
   Infer,
   integer,
+  nullable,
   number,
   object,
   string,
@@ -59,6 +60,15 @@ index(library, "playlist");
 index(library, "order", "id");
 ordered(library, "order", "playlist");
 
+const feed = object({
+  id: id(),
+  type: number(),
+  track: id(),
+});
+crr(feed);
+primary(feed, "id");
+index(feed, "type");
+
 const playback = object({
   id: id(),
   track: id(),
@@ -75,7 +85,7 @@ ordered(playback, "order", "device");
 
 const following = object({
   artist: id(),
-  seen: id(),
+  seen: nullable(id()),
 });
 crr(following);
 primary(following, "artist", "seen");
@@ -102,6 +112,7 @@ export const schema = object({
   attribution,
   artists,
   library,
+  feed,
   playlists,
   playback,
   following,

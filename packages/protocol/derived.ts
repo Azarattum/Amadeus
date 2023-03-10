@@ -33,6 +33,7 @@ type PlaylistDetails = Infer<typeof playlistDetails>;
 type PlaybackDirection = "forward" | "backward" | "shuffled";
 type PlaybackPosition = "next" | "last" | "hidden" | number;
 type PlaybackRepeat = "none" | "all" | "single";
+type FeedType = "listened" | "recommended" | "following";
 
 export type {
   TrackInfo,
@@ -46,6 +47,7 @@ export type {
   PlaybackDirection,
   PlaybackPosition,
   PlaybackRepeat,
+  FeedType,
 };
 export {
   trackInfo,
