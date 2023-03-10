@@ -13,14 +13,22 @@ export const library = ({ store }: DB) =>
           .onConflict((x) => x.doUpdateSet(track.album))
           .values(track.album)
           .execute();
-        await db
-          .insertInto("artists")
-          .onConflict((x) => x.doNothing()) /// Do updates on conflict
-          .values(track.artists)
-          .execute();
+        for (const artist of track.artists) {
+          await db
+            .insertInto("artists")
+            .onConflict((x) => x.doUpdateSet(artist))
+            .values(artist)
+            .execute();
+        }
         await db
           .insertInto("tracks")
-          .onConflict((x) => x.doUpdateSet({ ...track, album: undefined }))
+          .onConflict((x) =>
+            x.doUpdateSet({
+              title: track.title,
+              length: track.length,
+              source: track.source,
+            })
+          )
           .values({
             id: track.id,
             title: track.title,
