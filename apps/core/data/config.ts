@@ -53,7 +53,7 @@ async function setup(username?: string) {
     if (username != null && user !== username) continue;
     const storage = persistence(user);
     promises.push(
-      Object.entries(defaults)
+      ...Object.entries(defaults)
         .filter(([key]) => !(key in settings))
         .map(([key, value]) => storage.settings.store(key, value))
     );
