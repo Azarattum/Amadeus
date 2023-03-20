@@ -7,15 +7,15 @@ import type {
 } from "./persistence.types";
 import type { Reject, Resolve } from "libfun/monad/monad.types";
 import { persistence as database, users as load } from "./pool";
-import { all, race } from "@amadeus-music/util/async";
 import type { Handler } from "libfun/pool/pool.types";
+import { all } from "@amadeus-music/util/async";
 import { merge } from "@amadeus-music/protocol";
 import type { Context } from "../plugin/types";
 import { wrap } from "libfun/pool";
 import { async } from "libfun";
 
 const voided: Strategy = (x) => all(x).then(() => undefined);
-const raced: Strategy = (x) => race(x);
+const raced: Strategy = (x) => Promise.any(x);
 const merged: Strategy = (x) =>
   all(x).then((x) => x.reduce((a, b) => merge(a, b)));
 const dated: Strategy = (x) =>

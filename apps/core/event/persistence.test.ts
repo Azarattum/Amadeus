@@ -61,7 +61,7 @@ it("throws unimplemented", () => {
 it("handles exceptions", async () => {
   expect(await persistence().artists.get(42)).toEqual({ title: "Test" });
   expect(persistence().settings.extract("")).rejects.toThrowError(
-    "All the promises rejected!"
+    "All promises were rejected"
   );
 });
 
