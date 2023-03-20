@@ -48,8 +48,12 @@ function usage(command: string) {
     if (!Array.isArray(x)) x = [x as any];
     return x
       .map((type) =>
-        type.description
-          ? `${bright + magenta}${type.description}${reset}`
+        typeof type === "function"
+          ? `${bright + magenta}${
+              (Object.entries(arg).find((x) => x[1] === type) || [
+                "argument",
+              ])[0]
+            }${reset}`
           : type
       )
       .join(`${bright + black}/${reset}`);
