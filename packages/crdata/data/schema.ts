@@ -7,6 +7,7 @@ import {
   number,
   object,
   string,
+  any,
 } from "superstruct";
 import {
   album,
@@ -73,9 +74,9 @@ const playback = object({
   id: id(),
   device: instance(Uint8Array),
   track: id(),
-  progress: number(),
+  state: number(),
   order: string(),
-  inverted: number(),
+  temp: any(),
 });
 crr(playback);
 primary(playback, "id");

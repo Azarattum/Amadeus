@@ -19,7 +19,7 @@
     "@types/node": "18.15.3",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
-    "@vitest/coverage-c8": "^0.29.3",
+    "@vitest/coverage-c8": "^0.29.5",
     "autoprefixer": "^10.4.14",
     "cssnano": "^5.1.15",
     "eslint": "^8.36.0",
@@ -40,7 +40,7 @@
     "tslib": "^2.5.0",
     "turbo": "^1.8.3",
     "typescript": "^5.0.2",
-    "vite": "4.2.0",
-    "vitest": "0.29.3"
+    "vite": "4.2.1",
+    "vitest": "0.29.5"
   }
 }

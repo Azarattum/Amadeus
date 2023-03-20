@@ -1,6 +1,6 @@
+import { upcoming, preceding, playing, playback } from "../stores/playback";
 import { playlists } from "../stores/playlists";
 import triggers from "../sql/triggers.sql?raw";
-import { playback } from "../stores/playback";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
 import { artists } from "../stores/artists";
@@ -14,8 +14,11 @@ import { feed } from "../stores/feed";
 const connections = new Map<string, Connection>();
 const stores = (db: DB) => ({
   playlists: playlists(db),
+  preceding: preceding(db),
   playback: playback(db),
+  upcoming: upcoming(db),
   settings: settings(db),
+  playing: playing(db),
   history: history(db),
   artists: artists(db),
   library: library(db),

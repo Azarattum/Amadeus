@@ -8,7 +8,7 @@ importers:
       '@types/node': 18.15.3
       '@typescript-eslint/eslint-plugin': ^5.55.0
       '@typescript-eslint/parser': ^5.55.0
-      '@vitest/coverage-c8': ^0.29.3
+      '@vitest/coverage-c8': ^0.29.5
       autoprefixer: ^10.4.14
       cssnano: ^5.1.15
       eslint: ^8.36.0
@@ -29,14 +29,14 @@ importers:
       tslib: ^2.5.0
       turbo: ^1.8.3
       typescript: ^5.0.2
-      vite: 4.2.0
-      vitest: 0.29.3
+      vite: 4.2.1
+      vitest: 0.29.5
     devDependencies:
-      '@sveltejs/kit': 1.12.0_svelte@3.57.0+vite@4.2.0
+      '@sveltejs/kit': 1.12.0_svelte@3.57.0+vite@4.2.1
       '@types/node': 18.15.3
       '@typescript-eslint/eslint-plugin': 5.55.0_qsnvknysi52qtaxqdyqyohkcku
       '@typescript-eslint/parser': 5.55.0_j4766f7ecgqbon3u7zlxn5zszu
-      '@vitest/coverage-c8': 0.29.3_vitest@0.29.3
+      '@vitest/coverage-c8': 0.29.5_vitest@0.29.5
       autoprefixer: 10.4.14_postcss@8.4.21
       cssnano: 5.1.15_postcss@8.4.21
       eslint: 8.36.0
@@ -57,8 +57,8 @@ importers:
       tslib: 2.5.0
       turbo: 1.8.3
       typescript: 5.0.2
-      vite: 4.2.0_@types+node@18.15.3
-      vitest: 0.29.3
+      vite: 4.2.1_@types+node@18.15.3
+      vitest: 0.29.5
 
   apps/core:
     specifiers:
@@ -71,8 +71,8 @@ importers:
       rollup-plugin-node-externals: ^5.1.2
       string-similarity-js: ^2.1.4
       superstruct: ^1.0.3
-      vite: 4.2.0
-      vite-node: 0.29.3
+      vite: 4.2.1
+      vite-node: 0.29.5
     dependencies:
       '@amadeus-music/protocol': link:../../packages/protocol
       '@amadeus-music/util': link:../../packages/util
@@ -84,32 +84,32 @@ importers:
       '@rollup/plugin-replace': 5.0.2
       rollup-plugin-copy: 3.4.0
       rollup-plugin-node-externals: 5.1.2
-      vite: 4.2.0
-      vite-node: 0.29.3
+      vite: 4.2.1
+      vite-node: 0.29.5
 
   apps/web:
     specifiers:
       '@amadeus-music/crdata': workspace:*
       '@amadeus-music/ui': workspace:*
       '@sveltejs/adapter-static': 2.0.1
-      crstore: ^0.11.5
+      crstore: ^0.12.1
       murmurhash: ^2.0.1
     dependencies:
       '@amadeus-music/crdata': link:../../packages/crdata
       '@amadeus-music/ui': link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static': 2.0.1
-      crstore: 0.11.5
+      crstore: 0.12.1
       murmurhash: 2.0.1
 
   packages/crdata:
     specifiers:
       '@amadeus-music/protocol': workspace:*
-      crstore: ^0.11.5
+      crstore: ^0.12.1
       superstruct: ^1.0.3
     dependencies:
       '@amadeus-music/protocol': link:../protocol
-      crstore: 0.11.5
+      crstore: 0.12.1
       superstruct: 1.0.3
 
   packages/libfun:
@@ -138,36 +138,36 @@ importers:
     specifiers:
       '@amadeus-music/core': workspace:*
       '@amadeus-music/crdata': workspace:*
-      vite: 4.2.0
+      vite: 4.2.1
     dependencies:
       '@amadeus-music/core': link:../../apps/core
       '@amadeus-music/crdata': link:../../packages/crdata
     devDependencies:
-      vite: 4.2.0
+      vite: 4.2.1
 
   plugins/telegram:
     specifiers:
       '@amadeus-music/core': workspace:*
       '@amadeus-music/protocol': workspace:*
       '@amadeus-music/util': workspace:*
-      vite: 4.2.0
+      vite: 4.2.1
     dependencies:
       '@amadeus-music/core': link:../../apps/core
       '@amadeus-music/protocol': link:../../packages/protocol
       '@amadeus-music/util': link:../../packages/util
     devDependencies:
-      vite: 4.2.0
+      vite: 4.2.1
 
   plugins/yandex:
     specifiers:
       '@amadeus-music/core': workspace:*
       '@amadeus-music/protocol': workspace:*
-      vite: 4.2.0
+      vite: 4.2.1
     dependencies:
       '@amadeus-music/core': link:../../apps/core
       '@amadeus-music/protocol': link:../../packages/protocol
     devDependencies:
-      vite: 4.2.0
+      vite: 4.2.1
 
 packages:
 
@@ -509,7 +509,7 @@ packages:
       '@sveltejs/kit': ^1.5.0
     dev: true
 
-  /@sveltejs/kit/1.12.0_svelte@3.57.0+vite@4.2.0:
+  /@sveltejs/kit/1.12.0_svelte@3.57.0+vite@4.2.1:
     resolution: {integrity: sha512-hhOtaL3jS7p4A3O34m8RlM+K5OSyrEyFUIh4iqsv6e8BDvupzNSxGa7J9+Gfjb+Z1yZCxjvxJ8Flb2Cj0g8cLg==}
     engines: {node: ^16.14 || >=18}
     hasBin: true
@@ -518,7 +518,7 @@ packages:
       svelte: ^3.54.0
       vite: ^4.0.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 2.0.3_svelte@3.57.0+vite@4.2.0
+      '@sveltejs/vite-plugin-svelte': 2.0.3_svelte@3.57.0+vite@4.2.1
       '@types/cookie': 0.5.1
       cookie: 0.5.0
       devalue: 4.3.0
@@ -532,12 +532,12 @@ packages:
       svelte: 3.57.0
       tiny-glob: 0.2.9
       undici: 5.21.0
-      vite: 4.2.0_@types+node@18.15.3
+      vite: 4.2.1_@types+node@18.15.3
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@sveltejs/vite-plugin-svelte/2.0.3_svelte@3.57.0+vite@4.2.0:
+  /@sveltejs/vite-plugin-svelte/2.0.3_svelte@3.57.0+vite@4.2.1:
     resolution: {integrity: sha512-o+cguBFdwIGtRbNkYOyqTM7KvRUffxh5bfK4oJsWKG2obu+v/cbpT03tJrGl58C7tRXo/aEC0/axN5FVHBj0nA==}
     engines: {node: ^14.18.0 || >= 16}
     peerDependencies:
@@ -550,8 +550,8 @@ packages:
       magic-string: 0.29.0
       svelte: 3.57.0
       svelte-hmr: 0.15.1_svelte@3.57.0
-      vite: 4.2.0_@types+node@18.15.3
-      vitefu: 0.2.4_vite@4.2.0
+      vite: 4.2.1_@types+node@18.15.3
+      vitefu: 0.2.4_vite@4.2.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -742,41 +742,41 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@vitest/coverage-c8/0.29.3_vitest@0.29.3:
-    resolution: {integrity: sha512-VMhCCkkd9E2J1U3OVQop2fT7PRutqNA+kjaiXkYKz6+ap5TcH+m5+61oE6bJNGn/pN6i5cL6nDqzrbl9wixFng==}
+  /@vitest/coverage-c8/0.29.5_vitest@0.29.5:
+    resolution: {integrity: sha512-KMK9mROXEOIFyh9b8OIm36UGlFg4JMLyrE+Hwe4eYQu4BgSr3IS/gWy1yG1LU8ioew9vTTr/dxXKFtBhMo/M2A==}
     peerDependencies:
       vitest: '>=0.29.0 <1'
     dependencies:
       c8: 7.13.0
       picocolors: 1.0.0
       std-env: 3.3.2
-      vitest: 0.29.3
+      vitest: 0.29.5
     dev: true
 
-  /@vitest/expect/0.29.3:
-    resolution: {integrity: sha512-z/0JqBqqrdtrT/wzxNrWC76EpkOHdl+SvuNGxWulLaoluygntYyG5wJul5u/rQs5875zfFz/F+JaDf90SkLUIg==}
+  /@vitest/expect/0.29.5:
+    resolution: {integrity: sha512-gDIafqKvpXlhbbaZWmL/CrJycBo6wT3/67BzsD6OFVTzOgeIOIhg27ysy8bJ3NWlaDqAxvnm+71wfzztIBFU9g==}
     dependencies:
-      '@vitest/spy': 0.29.3
-      '@vitest/utils': 0.29.3
+      '@vitest/spy': 0.29.5
+      '@vitest/utils': 0.29.5
       chai: 4.3.7
     dev: true
 
-  /@vitest/runner/0.29.3:
-    resolution: {integrity: sha512-XLi8ctbvOWhUWmuvBUSIBf8POEDH4zCh6bOuVxm/KGfARpgmVF1ku+vVNvyq85va+7qXxtl+MFmzyXQ2xzhAvw==}
+  /@vitest/runner/0.29.5:
+    resolution: {integrity: sha512-qYRf1KTI4Js1dg2vWr8bsOEngogoVL32DsN3vuH0aWIricBgGw4hzu6IyhtH9YPmsHGeAaf8YPipe8bURzRQ8Q==}
     dependencies:
-      '@vitest/utils': 0.29.3
+      '@vitest/utils': 0.29.5
       p-limit: 4.0.0
       pathe: 1.1.0
     dev: true
 
-  /@vitest/spy/0.29.3:
-    resolution: {integrity: sha512-LLpCb1oOCOZcBm0/Oxbr1DQTuKLRBsSIHyLYof7z4QVE8/v8NcZKdORjMUq645fcfX55+nLXwU/1AQ+c2rND+w==}
+  /@vitest/spy/0.29.5:
+    resolution: {integrity: sha512-Qei5fNbRq4gsqxJEsjpKrgGMzzpIo0b10OoLM1bYJvsYb7e35xcge4A+VFtFXk/x182iAPsx8tK7ViMQ/mlflQ==}
     dependencies:
       tinyspy: 1.1.1
     dev: true
 
-  /@vitest/utils/0.29.3:
-    resolution: {integrity: sha512-hg4Ff8AM1GtUnLpUJlNMxrf9f4lZr/xRJjh3uJ0QFP+vjaW82HAxKrmeBmLnhc8Os2eRf+f+VBu4ts7TafPPkA==}
+  /@vitest/utils/0.29.5:
+    resolution: {integrity: sha512-WL+uUZKRh3pIHv1W4RBCIxzQKIwBKhjX85qfxTjOMGJTALRacSsGfrVUPDKwfLlAYIKSZ9jZuU4WJaACkeStDg==}
     dependencies:
       cli-truncate: 3.1.0
       diff: 5.1.0
@@ -1161,8 +1161,8 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crstore/0.11.5:
-    resolution: {integrity: sha512-ccW7lUZriVBqr0w0tm5fl116hY122FMsc0jifiZ0G8Ddrtw1cmavd0OPDs/6rYikZPGmE+EMwRkkQg3V7ViDVQ==}
+  /crstore/0.12.1:
+    resolution: {integrity: sha512-3bfYNm9u/5MRRb0G0mOzFEKkR5J8xzsLrnxtK+p8av4BYSLe4IxRaSsxoYHH8jI/68ZxcGCr6+YAB8a9OgzFpg==}
     dependencies:
       '@vlcn.io/crsqlite': 0.9.0
       '@vlcn.io/crsqlite-wasm': 0.9.0
@@ -3199,8 +3199,8 @@ packages:
     resolution: {integrity: sha512-iyziEiyFxX4kyxSp+MtY1oCH/lvjH3PxFN8PGCDeqcZWAJ/i+9y+nL85w99PxVzrIvew/GSkSbDYtiGVa85Afg==}
     dev: true
 
-  /tinypool/0.3.1:
-    resolution: {integrity: sha512-zLA1ZXlstbU2rlpA4CIeVaqvWq41MTWqLY3FfsAXgC8+f7Pk7zroaJQxDgxn1xNudKW6Kmj4808rPFShUlIRmQ==}
+  /tinypool/0.4.0:
+    resolution: {integrity: sha512-2ksntHOKf893wSAH4z/+JbPpi92esw8Gn9N2deXX+B0EO92hexAVI9GIZZPx7P5aYo5KULfeOSt3kMOmSOy6uA==}
     engines: {node: '>=14.0.0'}
     dev: true
 
@@ -3372,8 +3372,8 @@ packages:
       convert-source-map: 1.9.0
     dev: true
 
-  /vite-node/0.29.3:
-    resolution: {integrity: sha512-QYzYSA4Yt2IiduEjYbccfZQfxKp+T1Do8/HEpSX/G5WIECTFKJADwLs9c94aQH4o0A+UtCKU61lj1m5KvbxxQA==}
+  /vite-node/0.29.5:
+    resolution: {integrity: sha512-Hz8Rso+PhZ2y1YMceqIp5q/yYrPVn+omWHcH0/4ZEAkjEP13uEpYb0gCSKYVIwEIIac/IdBGTKF56PLr3WVZjQ==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     dependencies:
@@ -3382,7 +3382,7 @@ packages:
       mlly: 1.2.0
       pathe: 1.1.0
       picocolors: 1.0.0
-      vite: 4.2.0
+      vite: 4.2.1
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -3393,8 +3393,8 @@ packages:
       - terser
     dev: true
 
-  /vite-node/0.29.3_@types+node@18.15.3:
-    resolution: {integrity: sha512-QYzYSA4Yt2IiduEjYbccfZQfxKp+T1Do8/HEpSX/G5WIECTFKJADwLs9c94aQH4o0A+UtCKU61lj1m5KvbxxQA==}
+  /vite-node/0.29.5_@types+node@18.15.3:
+    resolution: {integrity: sha512-Hz8Rso+PhZ2y1YMceqIp5q/yYrPVn+omWHcH0/4ZEAkjEP13uEpYb0gCSKYVIwEIIac/IdBGTKF56PLr3WVZjQ==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     dependencies:
@@ -3403,7 +3403,7 @@ packages:
       mlly: 1.2.0
       pathe: 1.1.0
       picocolors: 1.0.0
-      vite: 4.2.0_@types+node@18.15.3
+      vite: 4.2.1_@types+node@18.15.3
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -3414,8 +3414,8 @@ packages:
       - terser
     dev: true
 
-  /vite/4.2.0:
-    resolution: {integrity: sha512-AbDTyzzwuKoRtMIRLGNxhLRuv1FpRgdIw+1y6AQG73Q5+vtecmvzKo/yk8X/vrHDpETRTx01ABijqUHIzBXi0g==}
+  /vite/4.2.1:
+    resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -3447,8 +3447,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vite/4.2.0_@types+node@18.15.3:
-    resolution: {integrity: sha512-AbDTyzzwuKoRtMIRLGNxhLRuv1FpRgdIw+1y6AQG73Q5+vtecmvzKo/yk8X/vrHDpETRTx01ABijqUHIzBXi0g==}
+  /vite/4.2.1_@types+node@18.15.3:
+    resolution: {integrity: sha512-7MKhqdy0ISo4wnvwtqZkjke6XN4taqQ2TBaTccLIpOKv7Vp2h4Y+NpmWCnGDeSvvn45KxvWgGyb0MkHvY1vgbg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -3481,7 +3481,7 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitefu/0.2.4_vite@4.2.0:
+  /vitefu/0.2.4_vite@4.2.1:
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0
@@ -3489,11 +3489,11 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.2.0_@types+node@18.15.3
+      vite: 4.2.1_@types+node@18.15.3
     dev: true
 
-  /vitest/0.29.3:
-    resolution: {integrity: sha512-muMsbXnZsrzDGiyqf/09BKQsGeUxxlyLeLK/sFFM4EXdURPQRv8y7dco32DXaRORYP0bvyN19C835dT23mL0ow==}
+  /vitest/0.29.5:
+    resolution: {integrity: sha512-Pe0hT1Ml/23GWyNYu56sEH2PYfu5YKDrv5YREhAJl6ybX5ukuwzuT+WrnRm7enPSVmL44hP9anWiAk68sQAHzg==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
@@ -3502,6 +3502,8 @@ packages:
       '@vitest/ui': '*'
       happy-dom: '*'
       jsdom: '*'
+      safaridriver: '*'
+      webdriverio: '*'
     peerDependenciesMeta:
       '@edge-runtime/vm':
         optional: true
@@ -3513,14 +3515,18 @@ packages:
         optional: true
       jsdom:
         optional: true
+      safaridriver:
+        optional: true
+      webdriverio:
+        optional: true
     dependencies:
       '@types/chai': 4.3.4
       '@types/chai-subset': 1.3.3
       '@types/node': 18.15.3
-      '@vitest/expect': 0.29.3
-      '@vitest/runner': 0.29.3
-      '@vitest/spy': 0.29.3
-      '@vitest/utils': 0.29.3
+      '@vitest/expect': 0.29.5
+      '@vitest/runner': 0.29.5
+      '@vitest/spy': 0.29.5
+      '@vitest/utils': 0.29.5
       acorn: 8.8.2
       acorn-walk: 8.2.0
       cac: 6.7.14
@@ -3533,10 +3539,10 @@ packages:
       std-env: 3.3.2
       strip-literal: 1.0.1
       tinybench: 2.4.0
-      tinypool: 0.3.1
+      tinypool: 0.4.0
       tinyspy: 1.1.1
-      vite: 4.2.0_@types+node@18.15.3
-      vite-node: 0.29.3_@types+node@18.15.3
+      vite: 4.2.1_@types+node@18.15.3
+      vite-node: 0.29.5_@types+node@18.15.3
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
