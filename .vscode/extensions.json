@@ -6,6 +6,7 @@
     "bradlc.vscode-tailwindcss",
     "dbaeumer.vscode-eslint",
     "ZixuanChen.vitest-explorer",
-    "ryanluker.vscode-coverage-gutters"
+    "ryanluker.vscode-coverage-gutters",
+    "streetsidesoftware.code-spell-checker"
   ]
 }
