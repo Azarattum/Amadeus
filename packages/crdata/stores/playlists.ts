@@ -1,4 +1,4 @@
-import { identify, Playlist } from "@amadeus-music/protocol";
+import { identify, type Playlist } from "@amadeus-music/protocol";
 import { json, groupJSON, sql, APPEND } from "crstore";
 import type { DB } from "../data/schema";
 

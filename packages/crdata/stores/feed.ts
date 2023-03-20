@@ -1,4 +1,4 @@
-import { FeedType, TrackDetails } from "@amadeus-music/protocol";
+import type { FeedType, TrackDetails } from "@amadeus-music/protocol";
 import { push, uuid } from "../data/operations";
 import { json, groupJSON } from "crstore";
 import type { DB } from "../data/schema";

@@ -4,11 +4,11 @@ import { settings } from "../stores/settings";
 import { history } from "../stores/history";
 import { artists } from "../stores/artists";
 import { library } from "../stores/library";
+import { type DB, schema } from "./schema";
 import triggers from "./triggers.sql?raw";
 import { tracks } from "../stores/tracks";
 import { database, sql } from "crstore";
 import { feed } from "../stores/feed";
-import { DB, schema } from "./schema";
 
 const connections = new Map<string, Connection>();
 const stores = (db: DB) => ({

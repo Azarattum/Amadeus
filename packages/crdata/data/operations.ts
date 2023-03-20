@@ -1,7 +1,7 @@
-import { TrackDetails } from "@amadeus-music/protocol";
+import type { TrackDetails } from "@amadeus-music/protocol";
+import type { Infer } from "superstruct";
+import type { schema } from "./schema";
 import type { Kysely } from "crstore";
-import { Infer } from "superstruct";
-import { schema } from "./schema";
 
 const uuid = () => (Math.random() * 2 ** 32) >>> 0;
 

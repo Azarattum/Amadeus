@@ -1,4 +1,4 @@
-import { DB } from "../data/schema";
+import type { DB } from "../data/schema";
 import { sql } from "crstore";
 
 export const settings = ({ store }: DB) =>

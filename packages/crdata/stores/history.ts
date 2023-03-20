@@ -1,4 +1,4 @@
-import { DB } from "../data/schema";
+import type { DB } from "../data/schema";
 
 export const history = ({ store }: DB) =>
   store((db) => db.selectFrom("history").selectAll(), {

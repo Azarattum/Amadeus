@@ -1,6 +1,6 @@
-import { Album, Track } from "@amadeus-music/protocol";
+import type { Album, Track } from "@amadeus-music/protocol";
 import { groupJSON, json } from "crstore";
-import { DB } from "../data/schema";
+import type { DB } from "../data/schema";
 
 export const tracks = ({ store }: DB) =>
   store((db) => db.selectFrom("tracks").selectAll(), {

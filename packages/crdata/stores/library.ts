@@ -1,4 +1,4 @@
-import { type TrackDetails } from "@amadeus-music/protocol";
+import type { TrackDetails } from "@amadeus-music/protocol";
 import { push, uuid } from "../data/operations";
 import type { DB } from "../data/schema";
 import { APPEND } from "crstore";

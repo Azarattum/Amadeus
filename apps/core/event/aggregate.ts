@@ -44,7 +44,7 @@ async function* aggregate(
   const cache = persistence();
   for await (const state of page.values()) {
     if (is(state.items, array(trackDetails))) {
-      await cache.playlists.push(state.items);
+      await cache.library.push(state.items);
     }
     /// TODO: cache other media types
     yield state;

@@ -1,10 +1,10 @@
-import {
+import type {
   TrackDetails,
   PlaybackRepeat,
   PlaybackDirection,
   PlaybackPosition,
 } from "@amadeus-music/protocol";
-import { DB } from "../data/schema";
+import type { DB } from "../data/schema";
 
 export const playback = ({ store }: DB) =>
   store((db) => db.selectFrom("playback").selectAll(), {

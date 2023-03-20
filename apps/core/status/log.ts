@@ -27,7 +27,7 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
   color ??= reset;
 
   const group = this?.group?.toUpperCase() || "CORE";
-  const save = pipeline(clean, logged, take);
+  const save = pipeline(clean, logged, () => {});
   const log = console[level];
 
   stdout.write(clear);

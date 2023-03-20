@@ -9,7 +9,7 @@ import {
   type Infer,
 } from "superstruct";
 import type { PoolMaker } from "libfun/pool/pool.types";
-import type { User } from "../event/persistence";
+import type { User } from "../event/persistence.types";
 import type { Config } from "../data/config";
 import type { Pool } from "libfun";
 

@@ -1,5 +1,5 @@
-import { Artist } from "@amadeus-music/protocol";
-import { DB } from "../data/schema";
+import type { Artist } from "@amadeus-music/protocol";
+import type { DB } from "../data/schema";
 
 export const artists = ({ store }: DB) =>
   store((db) => db.selectFrom("artists").selectAll(), {
