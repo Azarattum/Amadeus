@@ -1,12 +1,13 @@
 import { playlists } from "../stores/playlists";
+import triggers from "../sql/triggers.sql?raw";
 import { playback } from "../stores/playback";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
 import { artists } from "../stores/artists";
 import { library } from "../stores/library";
 import { type DB, schema } from "./schema";
-import triggers from "./triggers.sql?raw";
 import { tracks } from "../stores/tracks";
+import setup from "../sql/setup.sql?raw";
 import { database, sql } from "crstore";
 import { feed } from "../stores/feed";
 
@@ -26,7 +27,9 @@ function connect(options: Options) {
   if (!connections.has(options.name)) {
     const db = database(options.local ? nocrr(schema) : schema, options);
     connections.set(options.name, { ...db, ...stores(db) });
-    const statements = triggers.split(/\r?\n\r?\n/).map((x) => sql.raw(x));
+    const statements = [triggers, setup]
+      .flatMap((x) => x.split(/\r?\n\r?\n/))
+      .map((x) => sql.raw(x));
     db.update((db) => Promise.all(statements.map((x) => x.execute(db))));
   }
   return connections.get(options.name) as Connection;

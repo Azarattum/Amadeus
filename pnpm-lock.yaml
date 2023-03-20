@@ -17,7 +17,7 @@ importers:
       postcss: ^8.4.21
       postcss-import: ^15.1.0
       postcss-nested: ^6.0.1
-      prettier: ^2.8.4
+      prettier: ^2.8.5
       prettier-plugin-sort-imports: ^1.7.1
       prettier-plugin-svelte: ^2.9.0
       prettier-plugin-tailwindcss: ^0.2.5
@@ -45,10 +45,10 @@ importers:
       postcss: 8.4.21
       postcss-import: 15.1.0_postcss@8.4.21
       postcss-nested: 6.0.1_postcss@8.4.21
-      prettier: 2.8.4
+      prettier: 2.8.5
       prettier-plugin-sort-imports: 1.7.1_typescript@5.0.2
-      prettier-plugin-svelte: 2.9.0_k23gl6auqwrxgr3e6o2bajswou
-      prettier-plugin-tailwindcss: 0.2.5_yjdjpc7im5hvpskij45owfsns4
+      prettier-plugin-svelte: 2.9.0_olnlr4336c4vkm7c26l3r45yii
+      prettier-plugin-tailwindcss: 0.2.5_4t4kr7ese5dum3z35trke3ztzq
       rimraf: 4.4.0
       rollup: 3.20.0
       rollup-plugin-node-externals: 5.1.2_rollup@3.20.0
@@ -92,24 +92,24 @@ importers:
       '@amadeus-music/crdata': workspace:*
       '@amadeus-music/ui': workspace:*
       '@sveltejs/adapter-static': 2.0.1
-      crstore: ^0.11.0
+      crstore: ^0.11.5
       murmurhash: ^2.0.1
     dependencies:
       '@amadeus-music/crdata': link:../../packages/crdata
       '@amadeus-music/ui': link:../../packages/ui
     devDependencies:
       '@sveltejs/adapter-static': 2.0.1
-      crstore: 0.11.0
+      crstore: 0.11.5
       murmurhash: 2.0.1
 
   packages/crdata:
     specifiers:
       '@amadeus-music/protocol': workspace:*
-      crstore: ^0.11.0
+      crstore: ^0.11.5
       superstruct: ^1.0.3
     dependencies:
       '@amadeus-music/protocol': link:../protocol
-      crstore: 0.11.0
+      crstore: 0.11.5
       superstruct: 1.0.3
 
   packages/libfun:
@@ -784,22 +784,22 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@vlcn.io/crsqlite/0.8.0:
-    resolution: {integrity: sha512-5VACWCCtW/nBhncr8FsZxMhq6/Wb93+Wv/4Ml6Sm9bEyxGErYvP4cMitubVnPJxPczNfmdhYbYyR9zuxcBTGBA==}
-    requiresBuild: true
-
-  /@vlcn.io/wa-crsqlite/0.8.0:
-    resolution: {integrity: sha512-fwm51W8/sPG/7EfmwD5CKAR+F3HbuFiwCUTpcwtxR/MaqGf5PzSES4W5jCgSd0FjQK81hXT8kOQQwTCOzLWncA==}
+  /@vlcn.io/crsqlite-wasm/0.9.0:
+    resolution: {integrity: sha512-/G3KT+hqI1hRu0st8fPiJKiycgolZB+ineziVJz1Zxrmy0aOjN8Q9t8RGoqrCmKfknyUKQCvkJz7iDoee15Fvg==}
     dependencies:
       '@vlcn.io/wa-sqlite': 0.15.0
-      '@vlcn.io/xplat-api': 0.7.0
-      comlink: 4.4.1
+      '@vlcn.io/xplat-api': 0.8.0
+      async-mutex: 0.4.0
+
+  /@vlcn.io/crsqlite/0.9.0:
+    resolution: {integrity: sha512-RfZhvnk2TwTwSFWb4CV+lTwxjWWCKelH21a/Bt/Tn1unqjcD7d4M4tQP7Uxnt03w+nolELK2wgM8vBc0uwH1wA==}
+    requiresBuild: true
 
   /@vlcn.io/wa-sqlite/0.15.0:
     resolution: {integrity: sha512-OjALG9fxFU+TCy397ZjxExVfmA0or5max7IIlWB5F3gjntyokEcruP77pttBaATRsuhtunyt9rKevi4bLvC9Gw==}
 
-  /@vlcn.io/xplat-api/0.7.0:
-    resolution: {integrity: sha512-X2C61+h1D/44/+7oC5oDyNpNWxBcTsCqiY91ng2wfZGIVji4lOmyNZtT1S1hqKx6aW2qHv9yXuxZfSl++V94ew==}
+  /@vlcn.io/xplat-api/0.8.0:
+    resolution: {integrity: sha512-7zCuKe5ZrAzqBvSXcnIMA9uu6NYZA7WMJLslCms4y25dv6kD2lfr1jiXNlcYj2RlwMLwJyCO5mHKCos4HEcTCA==}
     dependencies:
       comlink: 4.4.1
 
@@ -902,6 +902,11 @@ packages:
     resolution: {integrity: sha512-jgsaNduz+ndvGyFt3uSuWqvy4lCnIJiovtouQN5JZHOKCS2QuhEdbcQHFhVksz2N2U9hXJo8odG7ETyWlEeuDw==}
     dev: true
 
+  /async-mutex/0.4.0:
+    resolution: {integrity: sha512-eJFZ1YhRR8UN8eBLoNzcDPcy/jqjsg6I1AP+KvWQX80BqOSW1oJPJXDylPUEeMr2ZQvHgnQ//Lp6f3RQ1zI7HA==}
+    dependencies:
+      tslib: 2.5.0
+
   /autoprefixer/10.4.14_postcss@8.4.21:
     resolution: {integrity: sha512-FQzyfOsTlwVzjHxKEqRIAdJx9niO6VCBCoEwax/VLSoQF29ggECcPuBqUMZ+u8jCZOPSy8b8/8KnuFbp0SaFZQ==}
     engines: {node: ^10 || ^12 || >=14}
@@ -925,8 +930,8 @@ packages:
   /base64-js/1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
-  /better-sqlite3/8.1.0:
-    resolution: {integrity: sha512-p1m09H+Oi8R9TPj810pdNswMFuVgRNgCJEWypp6jlkOgSwMIrNyuj3hW78xEuBRGok5RzeaUW8aBtTWF3l/TQA==}
+  /better-sqlite3/8.2.0:
+    resolution: {integrity: sha512-8eTzxGk9535SB3oSNu0tQ6I4ZffjVCBUjKHN9QeeIFtphBX0sEd0NxAuglBNR9TO5ThnxBB7GqzfcYo9kjadJQ==}
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
@@ -947,7 +952,7 @@ packages:
     dependencies:
       buffer: 5.7.1
       inherits: 2.0.4
-      readable-stream: 3.6.1
+      readable-stream: 3.6.2
 
   /boolbase/1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
@@ -1156,15 +1161,15 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crstore/0.11.0:
-    resolution: {integrity: sha512-JxQOYuBov7BTaswn9hSDneXtvYfdF3bR3eFCRfckP4Z6Z0jQsHQ/6EwSQyAfyZ/A2ELFlfSSawKrjRT6k9uLLQ==}
+  /crstore/0.11.5:
+    resolution: {integrity: sha512-ccW7lUZriVBqr0w0tm5fl116hY122FMsc0jifiZ0G8Ddrtw1cmavd0OPDs/6rYikZPGmE+EMwRkkQg3V7ViDVQ==}
     dependencies:
-      '@vlcn.io/crsqlite': 0.8.0
-      '@vlcn.io/wa-crsqlite': 0.8.0
-      better-sqlite3: 8.1.0
+      '@vlcn.io/crsqlite': 0.9.0
+      '@vlcn.io/crsqlite-wasm': 0.9.0
+      better-sqlite3: 8.2.0
       kysely: 0.23.5
       navigator.locks: 0.8.6
-      svelte: 3.55.1
+      svelte: 3.57.0
 
   /css-declaration-sorter/6.3.1_postcss@8.4.21:
     resolution: {integrity: sha512-fBffmak0bPAnyqc/HO8C3n2sHrp9wcqQz6ES9koRF2/mLOVAx9zIQ3Y7R29sYCteTPqMCwns4WYQoCX91Xl3+w==}
@@ -2682,21 +2687,21 @@ packages:
     peerDependencies:
       typescript: ^4.0.3
     dependencies:
-      prettier: 2.8.4
+      prettier: 2.8.5
       typescript: 5.0.2
     dev: true
 
-  /prettier-plugin-svelte/2.9.0_k23gl6auqwrxgr3e6o2bajswou:
+  /prettier-plugin-svelte/2.9.0_olnlr4336c4vkm7c26l3r45yii:
     resolution: {integrity: sha512-3doBi5NO4IVgaNPtwewvrgPpqAcvNv0NwJNflr76PIGgi9nf1oguQV1Hpdm9TI2ALIQVn/9iIwLpBO5UcD2Jiw==}
     peerDependencies:
       prettier: ^1.16.4 || ^2.0.0
       svelte: ^3.2.0
     dependencies:
-      prettier: 2.8.4
+      prettier: 2.8.5
       svelte: 3.57.0
     dev: true
 
-  /prettier-plugin-tailwindcss/0.2.5_yjdjpc7im5hvpskij45owfsns4:
+  /prettier-plugin-tailwindcss/0.2.5_4t4kr7ese5dum3z35trke3ztzq:
     resolution: {integrity: sha512-vZ/iKieyCx0WTxHbkf5E1rBlv/ybFk8WTT4hL5W2jlVxum2Zbe0jMUpuQdDrpa4z2vnPiJ5KIWCqL/kd16fKYg==}
     engines: {node: '>=12.17.0'}
     peerDependencies:
@@ -2748,12 +2753,12 @@ packages:
       prettier-plugin-twig-melody:
         optional: true
     dependencies:
-      prettier: 2.8.4
-      prettier-plugin-svelte: 2.9.0_k23gl6auqwrxgr3e6o2bajswou
+      prettier: 2.8.5
+      prettier-plugin-svelte: 2.9.0_olnlr4336c4vkm7c26l3r45yii
     dev: true
 
-  /prettier/2.8.4:
-    resolution: {integrity: sha512-vIS4Rlc2FNh0BySk3Wkd6xmwxB0FpOndW5fisM5H8hsZSxU2VWVB5CWIkIjWvrHjIhxk2g3bfMKM87zNTrZddw==}
+  /prettier/2.8.5:
+    resolution: {integrity: sha512-3gzuxrHbKUePRBB4ZeU08VNkUcqEHaUaouNt0m7LGP4Hti/NuB07C7PPTM/LkWqXoJYJn2McEo5+kxPNrtQkLQ==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
@@ -2806,8 +2811,8 @@ packages:
       pify: 2.3.0
     dev: true
 
-  /readable-stream/3.6.1:
-    resolution: {integrity: sha512-+rQmrWMYGA90yenhTYsLWAsLsqVC8osOw6PKE1HDYiO0gdPeKe/xDHNzIAIn4C91YQ6oenEhfYqqc1883qHbjQ==}
+  /readable-stream/3.6.2:
+    resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==}
     engines: {node: '>= 6'}
     dependencies:
       inherits: 2.0.4
@@ -3100,14 +3105,9 @@ packages:
       svelte: 3.57.0
     dev: true
 
-  /svelte/3.55.1:
-    resolution: {integrity: sha512-S+87/P0Ve67HxKkEV23iCdAh/SX1xiSfjF1HOglno/YTbSTW7RniICMCofWGdJJbdjw3S+0PfFb1JtGfTXE0oQ==}
-    engines: {node: '>= 8'}
-
   /svelte/3.57.0:
     resolution: {integrity: sha512-WMXEvF+RtAaclw0t3bPDTUe19pplMlfyKDsixbHQYgCWi9+O9VN0kXU1OppzrB9gPAvz4NALuoca2LfW2bOjTQ==}
     engines: {node: '>= 8'}
-    dev: true
 
   /svgo/2.8.0:
     resolution: {integrity: sha512-+N/Q9kV1+F+UeWYoSiULYo4xYSDQlTgb+ayMobAXPwMnLvop7oxKMo9OzIrX5x3eS4L4f2UHhc9axXwY8DpChg==}
@@ -3173,7 +3173,7 @@ packages:
       end-of-stream: 1.4.4
       fs-constants: 1.0.0
       inherits: 2.0.4
-      readable-stream: 3.6.1
+      readable-stream: 3.6.2
 
   /test-exclude/6.0.0:
     resolution: {integrity: sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==}
@@ -3227,7 +3227,6 @@ packages:
 
   /tslib/2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
-    dev: true
 
   /tsutils/3.21.0_typescript@5.0.2:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
