@@ -1,1 +1,0 @@
-INSERT OR IGNORE INTO devices VALUES (crsql_siteid(), 0, 0, 0);
