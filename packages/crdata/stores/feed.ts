@@ -1,6 +1,6 @@
 import type { FeedType, TrackDetails } from "@amadeus-music/protocol";
-import { push, uuid } from "../data/operations";
-import { json, groupJSON } from "crstore";
+import { metadata, metafields, push, uuid } from "../data/operations";
+import { groupJSON, APPEND } from "crstore";
 import type { DB } from "../data/schema";
 
 const typeId = {
@@ -13,41 +13,15 @@ export const feed = ({ store }: DB) =>
   store(
     (db) =>
       db
+        .with("metadata", metadata)
         .selectFrom((db) =>
           db
             .selectFrom("feed")
-            .leftJoin("tracks", "tracks.id", "feed.track")
-            .leftJoin("albums", "albums.id", "tracks.album")
-            .leftJoin("attribution", "attribution.track", "tracks.id")
-            .leftJoin("artists", "artists.id", "attribution.artist")
-            .select([
-              "tracks.id as id",
-              "feed.id as entry",
-              "feed.type as type",
-              "tracks.title as title",
-              "tracks.length as length",
-              "tracks.source as source",
-            ])
-            .select((qb) =>
-              json(qb, {
-                id: "albums.id",
-                title: "albums.title",
-                year: "albums.year",
-                source: "albums.source",
-                art: "albums.art",
-              }).as("album")
-            )
-            .select((qb) =>
-              groupJSON(qb, {
-                id: "artists.id",
-                title: "artists.title",
-                source: "artists.source",
-                art: "artists.art",
-              }).as("artists")
-            )
-            .groupBy("entry")
-            .orderBy("library.order")
-            .orderBy("library.id")
+            .innerJoin("metadata", "metadata.id", "feed.track")
+            .select(["feed.id as entry", "feed.type as type"])
+            .select(metafields)
+            .orderBy("order", "desc")
+            .orderBy("feed.id", "desc")
             .as("data")
         )
         .select([
@@ -78,6 +52,7 @@ export const feed = ({ store }: DB) =>
               id: uuid(),
               track: track.id,
               type: typeId[type],
+              order: APPEND,
             })
             .execute();
         });
