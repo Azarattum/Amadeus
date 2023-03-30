@@ -79,6 +79,26 @@ const position = {
       .orderBy("order", "desc")
       .orderBy("id", "desc")
       .limit(1),
+  random: (ids: number[]) => (qb: ExpressionBuilder<Schema, "playback">) =>
+    qb
+      .selectFrom((qb) =>
+        qb
+          .selectFrom("queue")
+          .select(["id", "position"])
+          .$if(!!ids.length, (qb) =>
+            qb.unionAll(
+              sql`VALUES ${sql.raw(ids.map((x) => `(${x}, 1)`).join(","))}`
+            )
+          )
+          .unionAll(
+            sql`SELECT null,1 WHERE NOT EXISTS (SELECT 1 FROM queue WHERE position >= 0)`
+          )
+          .as("data")
+      )
+      .select("id")
+      .where("position", ">=", 0)
+      .orderBy(sql`random()`)
+      .limit(1),
 };
 
 async function push(db: Kysely<Schema>, track: TrackDetails) {

@@ -77,6 +77,22 @@ it("pushes with direction", async () => {
   expect(await preceding).toMatchObject([t5, t4, t5, t0, t3, t2]);
   expect(await playback).toMatchObject([t0]);
   expect(await upcoming).toMatchObject([t4, t1, t2, t3, t1, t0]);
+
+  await playback.clear();
+  await playback.push([t1, t2], "last");
+  await playback.push([t0], "first");
+  await playback.push([t3, t4, t5], "random");
+  expect(await preceding).toMatchObject([t0]);
+  expect(await playback).toMatchObject([t1]);
+  const expected = [t2, t3, t4, t5].map((t) => expect.objectContaining(t));
+  const notExpected = [t0, t1].map((t) => expect.objectContaining(t));
+  expect(await upcoming).toEqual(expect.arrayContaining(expected));
+  expect(await upcoming).not.toEqual(expect.arrayContaining(notExpected));
+
+  do {
+    await playback.clear();
+    await playback.push([t2, t3, t4, t5], "random");
+  } while ((await playback)[0].id === 2);
 });
 
 it("pushes after index", async () => {

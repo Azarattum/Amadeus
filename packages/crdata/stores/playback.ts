@@ -55,10 +55,10 @@ export const playback = ({ store }: DB) =>
         at: "first" | "next" | "last" | "random" | number = "next"
       ) {
         await Promise.all(tracks.map((x) => push(db, x)));
-        const { direction } = await db
+        const { direction, playback } = await db
           .selectFrom("devices")
           .where("id", "=", localDevice)
-          .select("direction")
+          .select(["direction", "playback"])
           .executeTakeFirstOrThrow();
 
         const ids = tracks.map(uuid);
@@ -79,7 +79,6 @@ export const playback = ({ store }: DB) =>
             ? position.before
             : position.first;
 
-        /// TODO: support random
         await db
           .insertInto("playback_fractindex" as any)
           .values(
@@ -87,10 +86,31 @@ export const playback = ({ store }: DB) =>
               id: ids[i],
               track: track.id,
               device: localDevice,
-              after_id: i > 0 && direction != 1 ? ids[i - 1] : order,
+              after_id:
+                at === "random"
+                  ? position.random(ids.slice(0, i))
+                  : i > 0 && direction != 1
+                  ? ids[i - 1]
+                  : order,
             }))
           )
           .execute();
+        if (!playback && at === "random") {
+          await db
+            .updateTable("devices")
+            .set({
+              playback: (qb) =>
+                qb
+                  .selectFrom("queue")
+                  .select("id")
+                  .$castTo<{ id: number }>()
+                  .limit(1),
+            })
+            .execute();
+        }
+        if (direction === 2) {
+          /// TODO: update temps (+generate for at="random")
+        }
       },
       async purge(db, entries: number[]) {
         await db.deleteFrom("playback").where("id", "in", entries).execute();
