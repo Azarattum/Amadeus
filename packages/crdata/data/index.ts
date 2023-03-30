@@ -1,24 +1,22 @@
-import { upcoming, preceding, playing, playback } from "../stores/playback";
+import { upcoming, preceding, playback } from "../stores/playback";
 import { playlists } from "../stores/playlists";
-import triggers from "../sql/triggers.sql?raw";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
 import { artists } from "../stores/artists";
 import { library } from "../stores/library";
 import { type DB, schema } from "./schema";
 import { tracks } from "../stores/tracks";
-import setup from "../sql/setup.sql?raw";
 import { database, sql } from "crstore";
 import { feed } from "../stores/feed";
 
 const connections = new Map<string, Connection>();
+
 const stores = (db: DB) => ({
   playlists: playlists(db),
   preceding: preceding(db),
   playback: playback(db),
   upcoming: upcoming(db),
   settings: settings(db),
-  playing: playing(db),
   history: history(db),
   artists: artists(db),
   library: library(db),
@@ -30,7 +28,9 @@ function connect(options: Options) {
   if (!connections.has(options.name)) {
     const db = database(options.local ? nocrr(schema) : schema, options);
     connections.set(options.name, { ...db, ...stores(db) });
-    const statements = [triggers, setup]
+    const statements = Object.values(
+      import.meta.glob("../sql/*", { eager: true, as: "raw" })
+    )
       .flatMap((x) => x.split(/\r?\n\r?\n/))
       .map((x) => sql.raw(x));
     db.update((db) => Promise.all(statements.map((x) => x.execute(db))));
