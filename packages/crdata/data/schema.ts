@@ -56,6 +56,7 @@ const library = object({
 });
 crr(library);
 primary(library, "id");
+index(library, "date");
 index(library, "track");
 index(library, "playlist");
 index(library, "order", "id");
@@ -65,16 +66,18 @@ const feed = object({
   id: id(),
   type: number(),
   track: id(),
+  order: string(),
 });
 crr(feed);
 primary(feed, "id");
 index(feed, "type");
+index(feed, "order", "id");
+ordered(feed, "order", "type");
 
 const playback = object({
   id: id(),
   device: instance(Uint8Array),
   track: id(),
-  state: number(),
   order: string(),
   temp: any(),
 });
@@ -86,8 +89,10 @@ ordered(playback, "order", "device");
 
 const devices = object({
   id: instance(Uint8Array),
+  playback: nullable(id()),
   direction: number(),
   infinite: number(),
+  progress: number(),
   repeat: number(),
 });
 crr(devices);
@@ -115,7 +120,12 @@ const history = object({
 index(history, "date");
 primary(history, "query");
 
-export type DB = Database<Infer<typeof schema>>;
+type Views = {
+  queue: { id: number; device: Uint8Array; track: number; position: number };
+};
+
+export type Schema = Infer<typeof schema> & Views;
+export type DB = Database<Schema>;
 export const schema = object({
   tracks,
   albums,

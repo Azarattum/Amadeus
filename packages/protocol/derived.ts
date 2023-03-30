@@ -31,7 +31,6 @@ type PlaylistInfo = Infer<typeof playlistInfo>;
 type PlaylistDetails = Infer<typeof playlistDetails>;
 
 type PlaybackDirection = "forward" | "backward" | "shuffled";
-type PlaybackPosition = "next" | "last" | "awaiting" | number;
 type PlaybackRepeat = "none" | "single" | "all";
 type FeedType = "listened" | "recommended" | "following";
 
@@ -45,7 +44,6 @@ export type {
   PlaylistInfo,
   PlaylistDetails,
   PlaybackDirection,
-  PlaybackPosition,
   PlaybackRepeat,
   FeedType,
 };

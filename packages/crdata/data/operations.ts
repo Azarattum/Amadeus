@@ -1,10 +1,7 @@
+import type { ExpressionBuilder, Kysely, QueryCreator } from "crstore";
 import type { TrackDetails } from "@amadeus-music/protocol";
-import type { Kysely, QueryCreator } from "crstore";
 import { groupJSON, json, sql } from "crstore";
-import type { Infer } from "superstruct";
-import type { schema } from "./schema";
-
-type Schema = Infer<typeof schema>;
+import type { Schema } from "./schema";
 
 const uuid = () => (Math.random() * 2 ** 32) >>> 0;
 const localDevice = sql<Uint8Array>`crsql_siteid()`;
@@ -50,16 +47,39 @@ const metafields = [
   "metadata.artists",
 ] as const;
 
-const current = (qc: QueryCreator<Schema>) =>
-  qc
-    .selectFrom("playback")
-    .where("device", "=", localDevice)
-    .where("state", "<", 1)
-    .orderBy("state", "desc")
-    .orderBy("order")
-    .orderBy("id")
-    .selectAll()
-    .limit(1);
+const position = {
+  first: null,
+  before: (qb: ExpressionBuilder<Schema, "playback">) =>
+    qb.selectFrom("queue").select("id").where("position", "=", 1).limit(1),
+  shift: (id: number) => (qb: ExpressionBuilder<Schema, "playback">) =>
+    qb
+      .selectFrom("queue")
+      .select("id")
+      .whereRef(
+        (qb) =>
+          qb
+            .selectFrom("queue")
+            .select(sql`position + 1`.as("position"))
+            .where("id", "=", id),
+        "=",
+        "position"
+      )
+      .limit(1),
+  next: (qb: ExpressionBuilder<Schema, "playback">) =>
+    qb
+      .selectFrom("devices")
+      .select("playback")
+      .where("id", "=", localDevice)
+      .limit(1),
+  last: (qb: ExpressionBuilder<Schema, "playback">) =>
+    qb
+      .selectFrom("playback")
+      .select("id")
+      .where("device", "=", localDevice)
+      .orderBy("order", "desc")
+      .orderBy("id", "desc")
+      .limit(1),
+};
 
 async function push(db: Kysely<Schema>, track: TrackDetails) {
   await db
@@ -103,4 +123,4 @@ async function push(db: Kysely<Schema>, track: TrackDetails) {
     .execute();
 }
 
-export { uuid, push, current, metadata, metafields, localDevice };
+export { uuid, push, metadata, position, metafields, localDevice };
