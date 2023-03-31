@@ -223,6 +223,61 @@ it("clears tracks", async () => {
   expect(await playback).toHaveLength(0);
 });
 
+it("rearranges tracks", async () => {
+  await playback.push([t0, t1, t2, t3, t4, t5]);
+  const tracks = [...(await playback), ...(await upcoming)];
+
+  expect(tracks).toMatchObject([t0, t1, t2, t3, t4, t5]);
+  await playback.rearrange(tracks[5].entry, tracks[1].entry);
+  expect(await upcoming).toMatchObject([t1, t5, t2, t3, t4]);
+  await playback.rearrange(tracks[3].entry);
+  expect(await upcoming).toMatchObject([t1, t5, t2, t4]);
+  expect(await preceding).toMatchObject([t3]);
+  for (let i = 0; i < 4; i++) await playback.sync(1);
+  expect(await upcoming).toMatchObject([]);
+  expect(await preceding).toMatchObject([t3, t0, t1, t5, t2]);
+
+  await playback.redirect("backward");
+  expect(await upcoming).toMatchObject([t2, t5, t1, t0, t3]);
+  await playback.rearrange(tracks[1].entry, tracks[2].entry);
+  expect(await upcoming).toMatchObject([t2, t1, t5, t0, t3]);
+  await playback.rearrange(tracks[5].entry);
+  expect(await upcoming).toMatchObject([t2, t1, t0, t3]);
+  expect(await preceding).toMatchObject([t5]);
+  await playback.rearrange(tracks[1].entry, tracks[5].entry);
+  expect(await upcoming).toMatchObject([t2, t0, t3]);
+  expect(await preceding).toMatchObject([t5, t1]);
+
+  await playback.redirect("shuffled");
+  /// TODO: add shuffled tests
+});
+
+it("inserts when shuffled", async () => {
+  await playback.push([t0, t1, t2, t3]);
+  await playback.redirect("shuffled");
+  const expected = [t1, t2, t3].map((t) => expect.objectContaining(t));
+  const all = [t0, t1, t2, t3, t4, t5].map((t) => expect.objectContaining(t));
+  expect(await upcoming).toEqual(expect.arrayContaining(expected));
+  expect(await upcoming).not.toEqual(expect.arrayContaining(all));
+
+  await playback.push([t0, t4], "last");
+  await playback.push([t5, t4], "next");
+  await playback.push([t1, t2], "first");
+  expect((await upcoming).slice(0, 2)).toMatchObject([t5, t4]);
+  expect(await upcoming).toEqual(expect.arrayContaining(expected));
+  expect((await upcoming).slice(-2)).toMatchObject([t0, t4]);
+  expect(await preceding).toMatchObject([t1, t2]);
+  const [{ entry }] = await upcoming;
+  await playback.push([t1, t2], entry);
+  expect((await upcoming).slice(0, 4)).toMatchObject([t5, t1, t2, t4]);
+
+  await playback.redirect("forward");
+  expect(await upcoming).toMatchObject([t5, t4, t1, t2, t3, t0, t4, t1, t2]);
+  expect(await preceding).toMatchObject([t1, t2]);
+  await playback.redirect("shuffled");
+  expect(await upcoming).toEqual(expect.arrayContaining(all));
+});
+
 afterAll(async () => {
   close();
   await rm("./test.db");
