@@ -131,9 +131,23 @@ export const playback = ({ store }: DB) =>
           .execute();
       },
       async rearrange(db, track: number, after?: number) {
+        const { direction } = await db
+          .selectFrom("devices")
+          .where("id", "=", localDevice)
+          .select(["direction"])
+          .executeTakeFirstOrThrow();
+
+        /// TODO: support shuffled direction
+        const target =
+          direction != 1
+            ? after
+            : after != null
+            ? position.shift(after)
+            : position.last;
+
         await db
           .updateTable("playback_fractindex" as any)
-          .set({ after_id: after }) /// TODO: support other directions
+          .set({ after_id: target })
           .where("id", "=", track)
           .execute();
       },
