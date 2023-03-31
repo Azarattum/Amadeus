@@ -1,6 +1,5 @@
 import type {
   PlaybackDirection,
-  PlaybackPosition,
   PlaybackRepeat,
   Playlist,
   Artist,
@@ -52,18 +51,18 @@ type Database = DeepPartial<{
     follow(id: number): Promise<void>;
   };
   playback: {
-    push(tracks: TrackDetails[], position?: PlaybackPosition): Promise<void>;
+    push(
+      tracks: TrackDetails[],
+      at?: "first" | "next" | "last" | "random" | number
+    ): Promise<void>;
     purge(entries: number[]): Promise<void>;
-    clear(onlyHistory?: boolean): Promise<void>;
-
-    synchronize(progress: number): Promise<void>;
-    play(track: TrackDetails): Promise<void>;
-    previous(): Promise<void>;
-    next(): Promise<void>;
-
+    clear(device?: Uint8Array): Promise<void>;
+    sync(progress: number): Promise<void>;
     rearrange(track: number, after?: number): Promise<void>;
     redirect(direction: PlaybackDirection): Promise<void>;
     repeat(type: PlaybackRepeat): Promise<void>;
+    infinite(toggle?: boolean): Promise<void>;
+    replicate(device: Uint8Array): Promise<void>;
   };
   merge(changes: any[]): Promise<void>;
   subscribe(
