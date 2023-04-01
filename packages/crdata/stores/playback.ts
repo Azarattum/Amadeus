@@ -130,7 +130,7 @@ export const playback = ({ store }: DB) =>
           .set({ progress })
           .execute();
       },
-      async rearrange(db, track: number, after?: number) {
+      async rearrange(db, track: number, after: number | null = null) {
         const { direction } = await db
           .selectFrom("devices")
           .where("id", "=", localDevice)
