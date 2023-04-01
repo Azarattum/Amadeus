@@ -1,3 +1,106 @@
 @import "tailwindcss/base.css";
 @import "tailwindcss/components.css";
 @import "tailwindcss/utilities.css";
+@layer base {
+  html,
+  body {
+    @apply surface-400;
+    color: hsl(var(--color-content));
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+      sans-serif;
+  }
+
+  :root {
+    /* Palette playground: https://t.ly/AS7G  */
+    --color-primary-100: 350 100% 95%;
+    --color-primary-200: 350 100% 91%;
+    --color-primary-300: 349 100% 83%;
+    --color-primary-400: 345 99% 72%;
+    --color-primary-500: 342 88% 61%;
+    --color-primary-600: 336 84% 48%;
+    --color-primary-700: 338 79% 42%;
+    --color-primary-800: 338 76% 35%;
+    --color-primary-900: 340 70% 30%;
+
+    --color-content: 240 3% 12%;
+    --color-content-100: 0 0% 35%;
+    --color-content-200: 240 2% 55%;
+    --color-content-300: 0 0% 75%;
+    --color-content-400: 0 0% 93%;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-primary-100: 350 100% 95%;
+      --color-primary-200: 350 92% 91%;
+      --color-primary-300: 349 84% 83%;
+      --color-primary-400: 346 79% 71%;
+      --color-primary-500: 344 75% 62%;
+      --color-primary-600: 341 68% 53%;
+      --color-primary-700: 342 57% 45%;
+      --color-primary-800: 342 57% 37%;
+      --color-primary-900: 342 58% 27%;
+
+      --color-content: 240 11% 96%;
+      --color-content-100: 0 0% 58%;
+      --color-content-200: 0 0% 38%;
+      --color-content-300: 0 0% 23%;
+      --color-content-400: 0 0% 9%;
+    }
+  }
+}
+
+@layer utilities {
+  .surface-200 {
+    @apply bg-black/[6.5%] shadow-inner;
+  }
+  .surface-300 {
+    @apply bg-black/[6.5%];
+  }
+  .surface-400 {
+    @apply bg-white;
+  }
+  .surface-500 {
+    @apply bg-white shadow;
+  }
+  .surface-600 {
+    @apply bg-white shadow-md;
+  }
+  .surface-700 {
+    @apply bg-white shadow-lg;
+  }
+  .surface-800 {
+    @apply bg-white shadow-xl;
+  }
+  .surface-900 {
+    @apply bg-white shadow-2xl;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .surface-200 {
+      @apply bg-white/[17%];
+    }
+    .surface-300 {
+      @apply bg-white/[1%];
+    }
+    .surface-400 {
+      @apply bg-black;
+    }
+    .surface-500 {
+      @apply bg-[#101010] shadow-none;
+    }
+    .surface-600 {
+      @apply bg-[#161616] shadow-none;
+    }
+    .surface-700 {
+      @apply bg-[#1c1c1e] shadow-none;
+    }
+    .surface-800 {
+      @apply bg-[#202020] shadow-none;
+    }
+    .surface-900 {
+      @apply bg-[#242424] shadow-none;
+    }
+  }
+}

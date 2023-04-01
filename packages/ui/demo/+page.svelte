@@ -11,12 +11,12 @@
   $: if ("location" in globalThis) location.hash = current;
 </script>
 
-<main class="min-w-screen flex">
-  <ul class="flex min-h-screen min-w-max flex-col gap-2 p-8 shadow-lg">
+<main class="min-w-screen surface-400 flex">
+  <ul class="surface-500 flex min-h-screen flex-col gap-2 p-8">
     {#each data.stories as story}
       <li
         id={story}
-        class="text-center text-slate-600 underline-offset-4 target:underline hover:text-slate-900"
+        class="text-content-200 hover:text-content-100 text-center underline-offset-4 target:text-primary-600 target:underline"
       >
         <a href="#{story}" on:click={() => (current = story)}>
           {capitalize(story)}
@@ -26,7 +26,7 @@
   </ul>
 
   <iframe
-    class="m-10 w-full resize rounded-md border-2 border-solid border-slate-200"
+    class="border-content-400 m-10 w-full resize rounded-md border-2 border-solid"
     title="Story"
     bind:this={preview}
   />
