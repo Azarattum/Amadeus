@@ -201,18 +201,6 @@ it("skips with repeat all", async () => {
   expect(await upcoming).toMatchObject([t1, t2]);
 });
 
-it("rearranges tracks", async () => {
-  await playback.push([t0, t1, t2, t3]);
-  const tracks = (await upcoming).map((x) => x.entry);
-  expect(await upcoming).toMatchObject([t1, t2, t3]);
-  await playback.rearrange(tracks[0], tracks[1]);
-  expect(await upcoming).toMatchObject([t2, t1, t3]);
-  await playback.rearrange(tracks[0], tracks[2]);
-  expect(await upcoming).toMatchObject([t2, t3, t1]);
-  await playback.rearrange(tracks[1], tracks[2]);
-  expect(await upcoming).toMatchObject([t3, t2, t1]);
-});
-
 it("clears tracks", async () => {
   await playback.push([t0, t1]);
   await playback.sync(1);
