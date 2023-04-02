@@ -1,15 +1,18 @@
 <script>
   import Icon from "./Icon.svelte";
 
+  export let input = "";
   export let checked = false;
   export let iconLeft = "";
   export let iconRight = "";
 
-  const id = Math.random().toString();
+  let id = input || Math.random().toString();
 </script>
 
 <div class="flex w-max items-center gap-2 text-content-300">
-  <input type="checkbox" class="peer hidden" {id} bind:checked />
+  {#if !input}
+    <input type="checkbox" class="peer hidden" {id} bind:checked />
+  {/if}
   {#if iconLeft}
     <Icon name={iconLeft} />
   {/if}

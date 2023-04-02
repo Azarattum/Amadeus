@@ -26,9 +26,10 @@
         </li>
       {/each}
     </ul>
-    <div class="h-8 w-8 bg-yellow-400 dark:bg-blue-400" />
 
     <LightSwitch />
+    <!-- /// TEMP TEST -->
+    <div class="h-8 w-8 bg-yellow-400 dark:bg-blue-400" />
   </nav>
 
   <iframe
