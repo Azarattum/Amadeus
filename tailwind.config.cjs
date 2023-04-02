@@ -1,3 +1,4 @@
+const plugin = require("tailwindcss/plugin");
 const resolve = (path) => require("path").resolve(__dirname, path);
 
 /** @type {import('tailwindcss').Config} */
@@ -9,6 +10,24 @@ module.exports = {
     "./packages/ui/stories/**/*.{html,js,svelte,ts}",
   ].map(resolve),
   theme: require("./packages/ui/lib/theme.cjs"),
-  darkMode: "class",
-  plugins: [],
+  darkMode: "custom",
+  plugins: [
+    plugin(({ addVariant }) => {
+      addVariant("dark", [
+        ({ modifySelectors }) => (
+          modifySelectors(
+            ({ className }) =>
+              `#light-switch:not(:checked) + * .dark\\:${className}`
+          ),
+          "@media (prefers-color-scheme: dark)"
+        ),
+        ({ modifySelectors }) => (
+          modifySelectors(
+            ({ className }) => `#light-switch:checked + * .dark\\:${className}`
+          ),
+          "@media not (prefers-color-scheme: dark)"
+        ),
+      ]);
+    }),
+  ],
 };
