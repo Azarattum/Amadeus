@@ -9,5 +9,6 @@ module.exports = {
     "./packages/ui/stories/**/*.{html,js,svelte,ts}",
   ].map(resolve),
   theme: require("./packages/ui/lib/theme.cjs"),
+  darkMode: "class",
   plugins: [],
 };

@@ -1,6 +1,5 @@
-/** @type {import('tailwindcss').Config} */
-const config = {
-  theme: {
+/** @type {import('tailwindcss').Config["theme"]} */
+const theme = {
     fontSize: {
       "2xs": ["0.625rem", { letterSpacing: "0.03em", lineHeight: "1rem" }],
       xs: ["0.8125rem", { lineHeight: "1rem" }],
@@ -35,7 +34,6 @@ const config = {
         },
       },
     },
-  },
 };
 
-module.exports = config.theme;
+module.exports = theme;
