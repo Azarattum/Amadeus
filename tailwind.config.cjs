@@ -12,18 +12,19 @@ module.exports = {
   theme: require("./packages/ui/lib/theme.cjs"),
   darkMode: "custom",
   plugins: [
-    plugin(({ addVariant }) => {
+    plugin(({ addVariant, e }) => {
       addVariant("dark", [
         ({ modifySelectors }) => (
           modifySelectors(
             ({ className }) =>
-              `#light-switch:not(:checked) + * .dark\\:${className}`
+              `:where(#light-switch:not(:checked)+*) .dark\\:${e(className)}`
           ),
           "@media (prefers-color-scheme: dark)"
         ),
         ({ modifySelectors }) => (
           modifySelectors(
-            ({ className }) => `#light-switch:checked + * .dark\\:${className}`
+            ({ className }) =>
+              `:where(#light-switch:checked+*) .dark\\:${e(className)}`
           ),
           "@media not (prefers-color-scheme: dark)"
         ),
