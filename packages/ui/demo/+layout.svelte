@@ -1,12 +1,8 @@
 <script lang="ts">
+  import Gateway from "$lib/layout/Gateway.svelte";
   import "$lib/tailwind.pcss";
 </script>
 
-<slot />
-
-<style>
-  :global(html, body) {
-    height: 100%;
-    width: 100%;
-  }
-</style>
+<Gateway>
+  <slot />
+</Gateway>
