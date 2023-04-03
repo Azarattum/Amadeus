@@ -1,45 +1,30 @@
-<script context="module" lang="ts">
-  if (!import.meta.env.SSR) {
-    if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }
-</script>
-
 <script lang="ts">
-  import Checkbox from "../primitive/Checkbox.svelte";
-  import Portal from "$lib/layout/Portal.svelte";
-  import { onMount } from "svelte";
+  import { Checkbox, Portal } from "@amadeus-music/ui";
 
-  let dark = false;
-  onMount(() => (dark = matchMedia("(prefers-color-scheme: dark)")?.matches));
-  $: if (!import.meta.env.SSR) {
-    localStorage.theme = dark ? "dark" : "light";
-    if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+  const isStored = () => "localStorage" in globalThis && "dark" in localStorage;
+  const media = globalThis.matchMedia?.("(prefers-color-scheme: dark)");
+
+  export let preference = media?.matches;
+  let checked = isStored() && (localStorage.dark === "true") !== preference;
+  $: dark = !!(+preference ^ +checked);
+  $: if ("localStorage" in globalThis && (flipped || isStored())) {
+    localStorage.dark = dark;
   }
+
+  export let flipped = checked;
+  $: flipped = checked;
+  export let theme = dark ? "dark" : "light";
+  $: theme = dark ? "dark" : "light";
+
+  media?.addEventListener("change", (e) => {
+    if (e.matches !== preference) {
+      if (isStored()) checked = !checked;
+      preference = e.matches;
+    }
+  });
 </script>
 
-<Portal prepend>
-  <input type="checkbox" class="hidden" id="light-switch" />
+<Checkbox target="light-switch" iconLeft="moon" iconRight="sun" />
+<Portal before unique="light-switch">
+  <input class="hidden" type="checkbox" id="light-switch" bind:checked />
 </Portal>
-
-<Checkbox
-  input="light-switch"
-  iconLeft="sun"
-  iconRight="moon"
-  bind:checked={dark}
-/>
