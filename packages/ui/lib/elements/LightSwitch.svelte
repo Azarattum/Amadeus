@@ -24,7 +24,7 @@
   });
 </script>
 
-<Checkbox target="light-switch" iconLeft="moon" iconRight="sun" />
+<Checkbox target="light-switch" iconLeft="sun" iconRight="moon" />
 <Portal before unique="light-switch">
   <input class="hidden" type="checkbox" id="light-switch" bind:checked />
 </Portal>
