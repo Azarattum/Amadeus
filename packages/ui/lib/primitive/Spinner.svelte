@@ -2,7 +2,7 @@
   export let size = 64;
   export let cutoff = 0.3;
   export let wiggle = 0.15;
-  export let color = "rgb(226 232 240)";
+  export let color = "hsl(var(--color-highlight))";
   export let duration = 2000;
   export let thickness = Math.sqrt(size);
 
