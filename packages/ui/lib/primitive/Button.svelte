@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { getContext, onDestroy } from "svelte";
   import type { Writable } from "svelte/store";
-  import { getContext } from "svelte";
 
   type Group = {
     id: string;
@@ -18,9 +18,15 @@
   export let target = true;
   export let air = !!group;
   export let href = "";
+  export let active = href && globalThis.location?.hash === href;
 
   const tag = group ? "label" : href ? "a" : "button";
   const id = href && target ? href.split("#").pop() : undefined;
+
+  const updateActive = () =>
+    (active = href && globalThis.location?.hash === href);
+  globalThis.addEventListener?.("hashchange", updateActive);
+  onDestroy(() => globalThis.removeEventListener?.("hashchange", updateActive));
 </script>
 
 {#if group}
@@ -56,6 +62,9 @@
   class:target:text-primary-600={air}
   class:target:after:opacity-100={air}
   class:target:hover:text-primary-700={air}
+  class:text-primary-600={active && air}
+  class:after:opacity-100={active && air}
+  class:hover:text-primary-700={active && air}
   class:px-[0.625rem]={!air || group}
 >
   <slot />
