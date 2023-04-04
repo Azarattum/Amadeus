@@ -13,6 +13,7 @@ export { default as Sortable } from "./lib/layout/Sortable.svelte";
 export { default as Logo } from "./lib/primitive/Logo.svelte";
 export { default as Icon } from "./lib/primitive/Icon.svelte";
 export { default as Input } from "./lib/primitive/Input.svelte";
+export { default as Group } from "./lib/primitive/Group.svelte";
 export { default as Button } from "./lib/primitive/Button.svelte";
 export { default as Header } from "./lib/primitive/Header.svelte";
 export { default as Spinner } from "./lib/primitive/Spinner.svelte";

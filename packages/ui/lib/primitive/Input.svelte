@@ -1,11 +1,12 @@
 <script lang="ts">
+  import { uuid } from "../../internal/util";
   import Icon from "./Icon.svelte";
 
   export let label = "";
   export let value = "";
   export let icon = "";
 
-  const id = Math.random().toString();
+  const id = uuid();
 </script>
 
 <div class="relative text-content-200">
@@ -16,7 +17,7 @@
   </div>
   <input
     type="text"
-    class="bg-highlight focus:bg-highlight-100 text-md h-11 w-full rounded-xl p-3 text-content outline-none placeholder:text-content-200"
+    class="h-11 w-full rounded-xl bg-highlight p-3 text-md text-content outline-none placeholder:text-content-200 focus:bg-highlight-100"
     class:indent-8={icon}
     {id}
     bind:value
