@@ -27,19 +27,19 @@
   </HStack>
   <HStack gap>
     <Group size={2}>
-      <Button><Icon name="moon" /></Button>
-      <Button><Icon name="sun" /></Button>
-    </Group>
-    <Group size={4} value={1}>
-      <Button><Icon name="artists" /></Button>
-      <Button><Icon name="sun" /></Button>
-      <Button><Icon name="search" /></Button>
+      <Button><Icon name="queue" /></Button>
       <Button><Icon name="book" /></Button>
     </Group>
+    <Group size={4} value={1}>
+      <Button><Icon name="last" /></Button>
+      <Button><Icon name="history" /></Button>
+      <Button><Icon name="stars" /></Button>
+      <Button><Icon name="artists" /></Button>
+    </Group>
     <Group size={3} value={2}>
+      <Button><Icon name="note" />Tracks</Button>
       <Button><Icon name="artists" />Artists</Button>
-      <Button><Icon name="sun" />Sun</Button>
-      <Button><Icon name="search" />Search</Button>
+      <Button><Icon name="album" />Albums</Button>
     </Group>
   </HStack>
 </VStack>
