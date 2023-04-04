@@ -12,7 +12,7 @@
   const value = group?.value;
   const index = group ? group.i++ % group.size : undefined;
 
-  export let vertical = false;
+  export let compact = false;
   export let primary = false;
   export let stretch = false;
   export let round = false;
@@ -47,7 +47,7 @@
   {href}
   {id}
   on:click
-  class="relative flex h-11 min-w-max cursor-pointer select-none items-center gap-[0.625rem] text-content-100 outline-2 outline-offset-2 outline-primary-600 transition-composite after:absolute after:right-2 after:h-6 after:w-0.5 after:rounded-full after:bg-primary-600 after:opacity-0 after:transition-opacity focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {round
+  class="relative flex h-11 min-w-max cursor-pointer select-none items-center gap-[0.625rem] text-content-100 outline-2 outline-offset-2 outline-primary-600 transition-composite after:absolute after:right-0 after:h-6 after:w-0.5 after:rounded-full after:bg-primary-600 after:opacity-0 after:transition-opacity focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {round
     ? 'rounded-full'
     : 'rounded-lg'}"
   class:w-full={stretch}
@@ -64,13 +64,15 @@
   class:target:after:opacity-100={air}
   class:target:hover:text-primary-700={air}
   class:text-primary-600={active && air}
-  class:after:opacity-100={active && air}
+  class:after:opacity-100={active && air && !compact}
   class:hover:text-primary-700={active && air}
-  class:px-[0.625rem]={!air || group}
-  class:justify-end={vertical}
-  class:flex-col={vertical}
-  class:text-2xs={vertical}
-  class:gap-0={vertical}
+  class:pl-[0.625rem]={!air || group}
+  class:pr-[0.625rem]={!compact}
+  class:min-w-[2.75rem]={compact}
+  class:justify-end={compact}
+  class:flex-col={compact}
+  class:text-2xs={compact}
+  class:gap-0={compact}
 >
   <slot />
 </svelte:element>
