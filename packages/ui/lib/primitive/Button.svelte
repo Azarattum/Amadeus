@@ -47,7 +47,7 @@
   {href}
   {id}
   on:click
-  class="relative flex h-11 min-w-max cursor-pointer select-none items-center gap-[0.625rem] text-content-100 outline-2 outline-offset-2 outline-primary-600 transition-composite after:absolute after:right-0 after:h-6 after:w-0.5 after:rounded-full after:bg-primary-600 after:opacity-0 after:transition-opacity focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {round
+  class="relative flex h-11 min-w-max cursor-pointer select-none items-center text-content-100 outline-2 outline-offset-2 outline-primary-600 transition-composite after:absolute after:right-0 after:h-6 after:w-0.5 after:rounded-full after:bg-primary-600 after:opacity-0 after:transition-opacity focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {round
     ? 'rounded-full'
     : 'rounded-lg'}"
   class:w-full={stretch}
@@ -68,11 +68,9 @@
   class:hover:text-primary-700={active && air}
   class:pl-[0.625rem]={!air || group}
   class:pr-[0.625rem]={!compact}
+  class:gap-[0.625rem]={!compact}
   class:min-w-[2.75rem]={compact}
   class:justify-end={compact}
   class:flex-col={compact}
-  class:text-2xs={compact}
-  class:gap-0={compact}
+  class:text-2xs={compact}><slot /></svelte:element
 >
-  <slot />
-</svelte:element>

@@ -13,14 +13,22 @@
   let pane = $$slots.default;
 </script>
 
-<nav class="h-screen {pane ? 'hidden sm:flex' : 'flex'}">
-  <VStack center>
-    <Logo sm={pane ? "auto" : false} />
-    <Separator />
+<nav
+  class="h-screen flex-shrink-0 overflow-y-auto overflow-x-hidden {pane
+    ? 'hidden sm:flex'
+    : 'flex'}"
+>
+  <VStack>
+    <div class="tall:flex hidden w-full flex-col items-center">
+      <Logo sm={pane ? "auto" : false} />
+      <Separator />
+    </div>
     <HStack grow>
       {#if pane}
         <VStack gap="xl" p>
           <slot />
+          <Spacer />
+          <slot name="bottom" />
         </VStack>
       {/if}
       <div class="min-w-[15rem] {pane ? 'hidden xl:flex' : 'flex'}">
@@ -30,7 +38,7 @@
           <slot name="section" />
           <Spacer />
           <VStack center>
-            <slot name="bottom" />
+            <slot name="bottom-section" />
           </VStack>
         </VStack>
       </div>

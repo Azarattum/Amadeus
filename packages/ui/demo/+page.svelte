@@ -35,7 +35,7 @@
         </Button>
       {/each}
     </svelte:fragment>
-    <LightSwitch bind:flipped slot="bottom" />
+    <LightSwitch bind:flipped slot="bottom-section" />
   </Nav>
   <iframe
     title="Story"

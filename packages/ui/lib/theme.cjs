@@ -13,6 +13,9 @@ const theme = {
     ],
   },
   extend: {
+    screens: {
+      tall: { raw: "(min-height: 30rem)" },
+    },
     transitionProperty: {
       composite: "transform, opacity, color",
     },

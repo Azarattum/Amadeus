@@ -47,5 +47,8 @@
         </Button>
       {/each}
     </svelte:fragment>
+    <Button air compact stretch slot="bottom">
+      <Icon md name="settings" />Settings
+    </Button>
   </Nav>
 </HStack>
