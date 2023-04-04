@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LightSwitch, HStack, Nav, Button } from "@amadeus-music/ui";
+  import { LightSwitch, HStack, Nav, Button, Icon } from "@amadeus-music/ui";
   import { capitalize } from "@amadeus-music/util/string";
   import type { PageData } from "./$types";
   import { onMount } from "svelte";
@@ -30,14 +30,14 @@
   <Nav section="Stories">
     {#each data.stories as story}
       <Button href="#{story}" air on:click={() => (current = story)}>
-        {capitalize(story)}
+        <Icon name="book" />{capitalize(story)}
       </Button>
     {/each}
     <LightSwitch bind:flipped slot="bottom" />
   </Nav>
   <iframe
     title="Story"
-    class="outline-highlight-100 m-8 w-full resize rounded-md p-4 outline outline-1"
+    class="m-8 w-full resize rounded-md p-4 outline outline-1 outline-highlight-100"
     bind:this={preview}
   />
 </HStack>
