@@ -1,21 +1,50 @@
 <script lang="ts">
-  import { Header, Logo, VStack } from "@amadeus-music/ui";
+  import {
+    Separator,
+    Header,
+    VStack,
+    HStack,
+    Spacer,
+    Logo,
+  } from "@amadeus-music/ui";
 
   export let section: string;
+
+  let pane = $$slots.default;
 </script>
 
-<div
-  class="outline-highlight-100 flex min-h-screen w-max flex-col outline outline-1"
+<nav class="h-screen {pane ? 'hidden sm:flex' : 'flex'}">
+  <VStack center>
+    <Logo sm={pane ? "auto" : false} />
+    <Separator />
+    <HStack grow>
+      {#if pane}
+        <VStack gap="xl" p>
+          <slot />
+        </VStack>
+      {/if}
+      <div class="min-w-[15rem] {pane ? 'hidden xl:flex' : 'flex'}">
+        <Separator />
+        <VStack gap="sm" p grow>
+          <Header>{section}</Header>
+          <slot name="section" />
+          <Spacer />
+          <VStack center>
+            <slot name="bottom" />
+          </VStack>
+        </VStack>
+      </div>
+    </HStack>
+  </VStack>
+  <Separator vertical />
+</nav>
+<nav
+  class="fixed bottom-0 h-12 w-screen flex-col justify-between {pane
+    ? 'flex sm:hidden'
+    : 'hidden'}"
 >
-  <Logo />
-  <nav
-    class="border-highlight-100 flex h-full flex-col items-center justify-between border-t p-4"
-  >
-    <VStack gap="sm">
-      <Header>{section}</Header>
-      <slot />
-    </VStack>
-
-    <slot name="bottom" />
-  </nav>
-</div>
+  <Separator vertical={false} />
+  <HStack>
+    <slot />
+  </HStack>
+</nav>

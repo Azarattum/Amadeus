@@ -7,6 +7,7 @@
 
 <svelte:element
   this={tag}
+  class:h-11={xl}
   class:text-xl={xl}
   class:text-lg={lg}
   class:py-2={!xl && !lg}

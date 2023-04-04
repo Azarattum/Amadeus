@@ -28,11 +28,13 @@
 
 <HStack>
   <Nav section="Stories">
-    {#each data.stories as story}
-      <Button href="#{story}" air on:click={() => (current = story)}>
-        <Icon name="book" />{capitalize(story)}
-      </Button>
-    {/each}
+    <svelte:fragment slot="section">
+      {#each data.stories as story}
+        <Button href="#{story}" stretch air on:click={() => (current = story)}>
+          <Icon name="book" />{capitalize(story)}
+        </Button>
+      {/each}
+    </svelte:fragment>
     <LightSwitch bind:flipped slot="bottom" />
   </Nav>
   <iframe
