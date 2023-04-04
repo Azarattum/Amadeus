@@ -16,7 +16,7 @@
   export let stretch = false;
   export let round = false;
   export let target = true;
-  export let air = !!group;
+  export let air = false;
   export let href = "";
   export let active = href && globalThis.location?.hash === href;
 
@@ -52,11 +52,11 @@
   class:w-full={stretch}
   class:hover:text-content={!primary}
   class:bg-highlight={!primary}
-  class:hover:bg-highlight-100={!primary}
+  class:hover:bg-highlight-100={!primary && !group}
   class:bg-primary-600={primary}
   class:hover:bg-primary-700={primary}
   class:text-white={primary}
-  class:bg-transparent={air}
+  class:bg-transparent={air || group}
   class:text-content-200={air}
   class:hover:bg-transparent={air}
   class:target:text-primary-600={air}
