@@ -26,5 +26,10 @@
 
 <Checkbox target="light-switch" iconLeft="sun" iconRight="moon" />
 <Portal before unique="light-switch">
-  <input class="hidden" type="checkbox" id="light-switch" bind:checked />
+  <input
+    class="absolute appearance-none"
+    id="light-switch"
+    type="checkbox"
+    bind:checked
+  />
 </Portal>

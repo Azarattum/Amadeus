@@ -13,18 +13,19 @@ module.exports = {
   darkMode: "custom",
   plugins: [
     plugin(({ addVariant, e }) => {
+      addVariant("dark-focus", ":where(#light-switch:focus-visible~*) &");
       addVariant("dark", [
         ({ modifySelectors }) => (
           modifySelectors(
             ({ className }) =>
-              `:where(#light-switch:not(:checked)+*) .dark\\:${e(className)}`
+              `:where(#light-switch:not(:checked)~*) .dark\\:${e(className)}`
           ),
           "@media (prefers-color-scheme: dark)"
         ),
         ({ modifySelectors }) => (
           modifySelectors(
             ({ className }) =>
-              `:where(#light-switch:checked+*) .dark\\:${e(className)}`
+              `:where(#light-switch:checked~*) .dark\\:${e(className)}`
           ),
           "@media not (prefers-color-scheme: dark)"
         ),
