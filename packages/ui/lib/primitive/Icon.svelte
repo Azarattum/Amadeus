@@ -4,11 +4,12 @@
 
 <script lang="ts">
   export let name: string;
+  export let md = false;
   export let xl = false;
   export let lg = false;
   export let sm = false;
 
-  $: size = xl ? 44 : lg ? 32 : sm ? 16 : 24;
+  $: size = xl ? 44 : lg ? 32 : sm ? 16 : md ? 28 : 24;
   $: source = icons[`../icons/${name}.svg`];
 </script>
 

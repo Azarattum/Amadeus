@@ -22,6 +22,8 @@
     <Button primary>Primary Button</Button>
     <Button><Icon name="sun" />Button With Icon</Button>
     <Button air><Icon name="artists" />Air Button</Button>
+    <Button vertical air stretch><Icon md name="moon" />Moon</Button>
+    <Button vertical air stretch><Icon md name="sun" />Sun</Button>
   </HStack>
   <HStack gap>
     <Group size={2}>
