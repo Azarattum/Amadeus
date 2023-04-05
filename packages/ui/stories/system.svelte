@@ -20,6 +20,30 @@
       </Stack>
     </Stack>
     <Stack gap>
+      <Header lg>Surface</Header>
+      <Stack z center>
+        <Stack x>
+          <Stack>
+            <div class="h-16 w-32 rounded-tl-md bg-primary-400" />
+            <div class="h-16 w-32 rounded-bl-md bg-primary-600" />
+          </Stack>
+          <Stack>
+            <div class="h-16 w-32 rounded-tr-md bg-primary-300" />
+            <div class="h-16 w-32 rounded-br-md bg-primary-900" />
+          </Stack>
+        </Stack>
+        <Stack x gap>
+          <div class="h-16 w-16 rounded-md bg-surface" />
+          <div
+            class="h-16 w-16 rounded-md bg-surface-100 shadow-lg dark:shadow-none"
+          />
+          <div
+            class="bg-surface-200 z-50 h-16 w-16 rounded-md backdrop-blur-lg"
+          />
+        </Stack>
+      </Stack>
+    </Stack>
+    <Stack gap>
       <Header lg>Content</Header>
       <Stack x gap>
         <div class="h-16 w-16 rounded-md bg-content" />
@@ -33,27 +57,6 @@
         <div class="h-16 w-16 rounded-md bg-highlight" />
         <div class="h-16 w-16 rounded-md bg-highlight-100" />
         <div class="h-16 w-16 rounded-md bg-highlight-200" />
-      </Stack>
-    </Stack>
-    <Stack gap>
-      <Header lg>Surface</Header>
-      <Stack x gap>
-        <div class="h-16 w-16 rounded-md bg-surface shadow" />
-        <div class="h-16 w-16 rounded-md bg-surface-100 shadow" />
-      </Stack>
-    </Stack>
-    <Header lg>Glass</Header>
-    <Stack z center>
-      <div class="bg-surface-200 z-50 h-20 w-20 rounded-md backdrop-blur-lg" />
-      <Stack x>
-        <Stack>
-          <div class="h-16 w-16 rounded-tl-md bg-content" />
-          <div class="h-16 w-16 rounded-bl-md bg-primary-600" />
-        </Stack>
-        <Stack>
-          <div class="h-16 w-16 rounded-tr-md bg-primary-300" />
-          <div class="h-16 w-16 rounded-br-md bg-primary-900" />
-        </Stack>
       </Stack>
     </Stack>
   </Stack>
