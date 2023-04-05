@@ -2,19 +2,19 @@
   import { LightSwitch, Stack, Nav, Button, Icon } from "@amadeus-music/ui";
   import { capitalize } from "@amadeus-music/util/string";
   import type { PageData } from "./$types";
+  import { hash } from "../internal/page";
   import { onMount } from "svelte";
 
   export let data: PageData;
 
-  let current = globalThis.location?.hash.slice(1) || data.stories[0];
-  let preview: HTMLIFrameElement | undefined;
   let innerSwitch: HTMLInputElement | undefined;
+  let preview: HTMLIFrameElement | undefined;
   let flipped = false;
 
+  $: current = $hash || data.stories[0];
   $: if (preview) preview.src = `/${current}`;
-  $: if ("location" in globalThis) location.hash = current;
-
   $: if (innerSwitch) innerSwitch.checked = flipped;
+
   onMount(() => {
     preview?.addEventListener(
       "load",
@@ -30,7 +30,7 @@
   <Nav section="Stories">
     <svelte:fragment slot="section">
       {#each data.stories as story}
-        <Button href="#{story}" stretch air on:click={() => (current = story)}>
+        <Button href="#{story}" air>
           <Icon name="book" />{capitalize(story)}
         </Button>
       {/each}
