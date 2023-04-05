@@ -33,7 +33,7 @@
       air
       compact
       stretch
-      active={x === section}
+      primary={x === section}
       on:click={() => (section = x)}
     >
       <Icon md name={icons[x]} />{x}
@@ -41,7 +41,7 @@
   {/each}
   <svelte:fragment slot="section">
     {#each sections[section] as x}
-      <Button air active={x === subsection} on:click={() => (subsection = x)}>
+      <Button air primary={x === subsection} on:click={() => (subsection = x)}>
         <Icon name={icons[x]} />{x}
       </Button>
     {/each}

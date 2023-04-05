@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { getContext, onDestroy } from "svelte";
   import type { Writable } from "svelte/store";
+  import { getContext } from "svelte";
 
   type Group = {
     id: string;
@@ -9,25 +9,35 @@
     size: number;
   } | null;
   const group = getContext<Group>("group");
-  const value = group?.value;
   const index = group ? group.i++ % group.size : undefined;
+  const value = group?.value;
 
-  export let compact = false;
+  export let href: string | undefined = undefined;
   export let primary = false;
+  export let compact = false;
   export let stretch = false;
   export let round = false;
-  export let target = true;
   export let air = false;
-  export let href = "";
-  export let active = href && globalThis.location?.hash === href;
 
   const tag = group ? "label" : href ? "a" : "button";
-  const id = href && target ? href.split("#").pop() : undefined;
+  const id = href ? href.split("#").pop() : undefined;
 
-  const updateActive = () =>
-    (active = href && globalThis.location?.hash === href);
-  globalThis.addEventListener?.("hashchange", updateActive);
-  onDestroy(() => globalThis.removeEventListener?.("hashchange", updateActive));
+  $: background =
+    air || group
+      ? ""
+      : primary
+      ? "bg-primary-600 hover:bg-primary-700"
+      : "bg-highlight hover:bg-highlight-100";
+  $: text = air
+    ? primary
+      ? "text-primary-600 hover:text-primary-700"
+      : "text-content-200 hover:text-content"
+    : primary
+    ? "text-white"
+    : "text-content-100 hover:text-content";
+  $: targeted = air
+    ? "target:text-primary-600 target:hover:text-primary-700"
+    : "target:text-white target:hover:text-white target:bg-primary-600 target:hover:bg-primary-700";
 </script>
 
 {#if group}
@@ -47,30 +57,11 @@
   {href}
   {id}
   on:click
-  class="relative flex h-11 min-w-max cursor-pointer select-none items-center text-content-100 outline-2 outline-offset-2 outline-primary-600 transition-composite after:absolute after:right-0 after:h-6 after:w-0.5 after:rounded-full after:bg-primary-600 after:opacity-0 after:transition-opacity focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {round
-    ? 'rounded-full'
-    : 'rounded-lg'}"
+  class="relative flex h-11 min-w-max cursor-pointer select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-composite focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {text} {background} {targeted}
+  {compact ? 'flex-col justify-center text-2xs' : 'gap-[0.625rem]'}
+  {round ? 'rounded-full' : 'rounded-lg'}"
+  class:px-[0.625rem]={!air || group}
   class:w-full={stretch}
-  class:hover:text-content={!primary}
-  class:bg-highlight={!primary}
-  class:hover:bg-highlight-100={!primary && !group}
-  class:bg-primary-600={primary}
-  class:hover:bg-primary-700={primary}
-  class:text-white={primary}
-  class:bg-transparent={air || group}
-  class:text-content-200={air}
-  class:hover:bg-transparent={air}
-  class:target:text-primary-600={air}
-  class:target:after:opacity-100={air}
-  class:target:hover:text-primary-700={air}
-  class:text-primary-600={active && air}
-  class:after:opacity-100={active && air && !compact}
-  class:hover:text-primary-700={active && air}
-  class:pl-[0.625rem]={!air || group}
-  class:pr-[0.625rem]={!compact}
-  class:gap-[0.625rem]={!compact}
-  class:min-w-[2.75rem]={compact}
-  class:justify-end={compact}
-  class:flex-col={compact}
-  class:text-2xs={compact}><slot /></svelte:element
 >
+  <slot />
+</svelte:element>
