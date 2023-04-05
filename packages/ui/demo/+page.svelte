@@ -26,7 +26,7 @@
   });
 </script>
 
-<Stack x>
+<Stack x grow>
   <Nav section="Stories">
     <svelte:fragment slot="section">
       {#each data.stories as story}

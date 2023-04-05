@@ -21,10 +21,14 @@
 </script>
 
 <div
-  class="flex"
+  class="{z ? 'grid [&>*]:col-start-1 [&>*]:row-start-1' : 'flex'} {center
+    ? 'place-items-center'
+    : baseline
+    ? 'place-items-baseline'
+    : !grow
+    ? 'place-items-start'
+    : ''}"
   class:flex-col={!x && !z}
-  class:items-baseline={baseline}
-  class:items-center={center}
   class:gap-1={gap === "sm"}
   class:gap-2={gap === true}
   class:gap-4={gap === "lg"}
