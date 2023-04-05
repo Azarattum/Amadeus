@@ -24,14 +24,16 @@
         <Stack gap="xl" p>
           <slot />
           <Spacer />
-          <slot name="bottom" />
+          <div class="contents"><slot name="bottom" /></div>
         </Stack>
       {/if}
       <section class="min-w-[15rem] {pane ? 'hidden xl:flex' : 'flex'}">
-        <Separator />
+        {#if pane}
+          <Separator />
+        {/if}
         <Stack gap="sm" p grow>
           <Header>{section}</Header>
-          <slot name="section" />
+          <div class="contents"><slot name="section" /></div>
           <Spacer />
           <Stack center>
             <slot name="bottom-section" />
