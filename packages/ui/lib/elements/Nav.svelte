@@ -12,7 +12,10 @@
     : 'flex'}"
 >
   <Stack>
-    <div class="hidden w-full flex-col items-center tall:flex">
+    <div
+      class="hidden w-full flex-col items-center tall:flex"
+      aria-hidden="true"
+    >
       <Logo sm={pane ? "auto" : false} />
       <Separator />
     </div>
@@ -24,7 +27,7 @@
           <slot name="bottom" />
         </Stack>
       {/if}
-      <div class="min-w-[15rem] {pane ? 'hidden xl:flex' : 'flex'}">
+      <section class="min-w-[15rem] {pane ? 'hidden xl:flex' : 'flex'}">
         <Separator />
         <Stack gap="sm" p grow>
           <Header>{section}</Header>
@@ -34,7 +37,7 @@
             <slot name="bottom-section" />
           </Stack>
         </Stack>
-      </div>
+      </section>
     </Stack>
   </Stack>
   <Separator vertical />

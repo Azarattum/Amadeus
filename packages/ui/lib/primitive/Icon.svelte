@@ -22,6 +22,7 @@
     style:width="{size}px"
     style:height="{size}px"
     class="inline-block shrink-0"
+    aria-hidden="true"
   >
     {@html source}
   </div>
