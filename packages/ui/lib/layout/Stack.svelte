@@ -1,7 +1,15 @@
 <script lang="ts">
+  import type { Either } from "../../internal/types";
   import { setContext } from "svelte";
 
-  export let gap: boolean | "sm" | "lg" | "xl" = false;
+  type $$Props = {
+    gap?: boolean | "sm" | "lg" | "xl";
+    grow?: boolean;
+    p?: boolean;
+  } & Either<"baseline" | "center"> &
+    Either<"x" | "z">;
+
+  export let gap: $$Props["gap"] = false;
   export let baseline = false;
   export let center = false;
   export let grow = false;

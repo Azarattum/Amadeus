@@ -1,4 +1,7 @@
 <script lang="ts">
+  import type { Either } from "../../internal/types";
+  type $$Props = Either<"lg" | "xl">;
+
   export let lg = false;
   export let xl = false;
 
