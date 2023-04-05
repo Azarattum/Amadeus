@@ -13,7 +13,7 @@
 <Stack gap grow>
   <Stack x gap>
     {#each Object.keys(props) as prop}
-      <Checkbox label={prop} bind:checked={props[prop]} />
+      <Checkbox bind:checked={props[prop]}>{prop}</Checkbox>
     {/each}
   </Stack>
   <Stack x gap grow>

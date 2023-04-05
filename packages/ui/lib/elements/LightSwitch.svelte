@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Checkbox, Portal } from "@amadeus-music/ui";
+  import { Checkbox, Icon, Portal } from "@amadeus-music/ui";
 
   const isStored = () => "localStorage" in globalThis && "dark" in localStorage;
   const media = globalThis.matchMedia?.("(prefers-color-scheme: dark)");
@@ -24,7 +24,10 @@
   });
 </script>
 
-<Checkbox target="light-switch" iconLeft="sun" iconRight="moon" />
+<Checkbox target="light-switch">
+  <Icon name="sun" />
+  <Icon name="moon" slot="after" />
+</Checkbox>
 <Portal before unique="light-switch">
   <input
     class="absolute appearance-none"

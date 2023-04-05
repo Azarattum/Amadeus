@@ -1,24 +1,17 @@
 <script>
   import { uuid } from "../../internal/util";
-  import Icon from "./Icon.svelte";
 
   export let checked = false;
-  export let iconLeft = "";
-  export let iconRight = "";
-  export let label = "";
   export let target = "";
 
   const id = target || uuid();
 </script>
 
 <label
-  class="group flex w-max cursor-pointer select-none items-center gap-2 p-[6px] text-content-200"
+  class="group relative flex w-max cursor-pointer select-none items-center gap-2 p-[6px] text-content-200"
   for={id}
 >
-  {#if label}
-    <span>{label}</span>
-  {/if}
-  <Icon name={iconLeft} />
+  <slot />
   <div class="relative">
     {#if !target}
       <input
@@ -35,5 +28,5 @@
         : 'peer-checked:bg-primary-600 peer-checked:after:origin-right peer-checked:after:translate-x-2/3'}"
     />
   </div>
-  <Icon name={iconRight} />
+  <slot name="after" />
 </label>

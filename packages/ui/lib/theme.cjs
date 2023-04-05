@@ -17,7 +17,8 @@ const theme = {
       tall: { raw: "(min-height: 30rem)" },
     },
     transitionProperty: {
-      composite: "transform, opacity, color",
+      paint: "transform, opacity, color, background-color",
+      composite: "transform, opacity",
     },
     colors: {
       primary: {

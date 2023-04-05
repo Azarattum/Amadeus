@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     Checkbox,
+    Tooltip,
     Button,
     Stack,
     Group,
@@ -10,10 +11,14 @@
 </script>
 
 <Stack gap>
-  <Checkbox iconLeft="sun" iconRight="moon" />
-  <Checkbox label="Search?" iconLeft="search" />
-  <Input label="Just Input" />
-  <Input icon="search" label="Search" />
+  <Checkbox><Icon name="sun" /><Icon name="moon" slot="after" /></Checkbox>
+  <Checkbox>
+    Search?
+    <Icon name="search" />
+    <Tooltip>Not really...</Tooltip>
+  </Checkbox>
+  <Input placeholder="Just Input"><Tooltip>This is an input!</Tooltip></Input>
+  <Input placeholder="Search"><Icon name="search" /></Input>
   <Stack x gap>
     <Button><Icon name="sun" /></Button>
     <Button primary><Icon name="moon" /></Button>
@@ -25,15 +30,15 @@
     <Button compact air><Icon md name="sun" />Sun</Button>
   </Stack>
   <Stack x gap>
-    <Group size={2}>
-      <Button><Icon name="queue" /></Button>
-      <Button><Icon name="book" /></Button>
-    </Group>
     <Group size={4} value={1}>
       <Button><Icon name="last" /></Button>
       <Button><Icon name="history" /></Button>
       <Button><Icon name="stars" /></Button>
       <Button><Icon name="artists" /></Button>
+    </Group>
+    <Group size={2}>
+      <Button><Icon name="queue" /><Tooltip>Queue</Tooltip></Button>
+      <Button><Icon name="book" /><Tooltip>Lyrics</Tooltip></Button>
     </Group>
     <Group size={3} value={2}>
       <Button><Icon name="note" />Tracks</Button>
