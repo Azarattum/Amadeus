@@ -4,10 +4,12 @@
   import { minmax } from "@amadeus-music/util/math";
   import { position } from "../../internal/pointer";
   import { draggable, hold } from "../../action";
-
   import Virtual from "./Virtual.svelte";
 
-  export let items: any[];
+  type T = $$Generic;
+  type $$Slots = { default: { item: T; index: number; key: symbol | object } };
+
+  export let items: T[];
   export let animation = 0;
   export let dragging = false;
   export let container: HTMLElement | null = null;
@@ -20,7 +22,7 @@
 
   let destroy = () => {};
   let bounds: { top: number; bottom: number } | undefined;
-  const dispatch = createEventDispatcher<{ sort: any[] }>();
+  const dispatch = createEventDispatcher<{ sort: T[] }>();
 
   $: bounds = dragging ? container?.getBoundingClientRect() : undefined;
   $: pointer = bounds ? minmax($position.y, bounds.top, bounds?.bottom) : NaN;

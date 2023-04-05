@@ -3,7 +3,10 @@
   import { afterUpdate, onDestroy, onMount, tick } from "svelte";
   import { finitify, minmax } from "@amadeus-music/util/math";
 
-  export let items: any[];
+  type T = $$Generic;
+  type Item = { index: number; item: T; key: object | symbol };
+
+  export let items: T[];
   export let animation = 0;
   export let container: HTMLElement | null = null;
   export let attributes: Record<string, string> = {};
@@ -12,8 +15,6 @@
   export let offset = 0;
   export let height = 0;
   export let wrapper: HTMLElement | null = null;
-
-  type Item = { index: number; item: any; key: object | symbol };
 
   let destroy = () => {};
   let viewport = 0;
@@ -49,9 +50,9 @@
     };
   }
 
-  function index(updated: any[]) {
-    const counts = new Map<any, number>();
-    const reindexed = new Map<any, Item>();
+  function index(updated: T[]) {
+    const counts = new Map<T, number>();
+    const reindexed = new Map<symbol | object, Item>();
     for (let index = 0; index < updated.length; index++) {
       const item = updated[index];
       const count = (counts.get(item) || 0) + 1;
