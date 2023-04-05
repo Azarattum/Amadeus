@@ -32,7 +32,7 @@
           <Separator />
         {/if}
         <Stack gap="sm" p grow>
-          <Header>{section}</Header>
+          <Header sm>{section}</Header>
           <div class="contents"><slot name="section" /></div>
           <Spacer />
           <Stack center>

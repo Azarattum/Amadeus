@@ -1,12 +1,12 @@
 <script>
-  import { Stack } from "@amadeus-music/ui";
+  import { Stack, Header } from "@amadeus-music/ui";
 </script>
 
 <Stack gap="xl">
   <Stack gap="lg">
-    <h2 class="text-2xl">Colors</h2>
+    <Header xl>Colors</Header>
     <Stack gap>
-      <h2 class="text-xl">Primary</h2>
+      <Header lg>Primary</Header>
       <Stack x gap>
         <div class="h-16 w-16 rounded-md bg-primary-100" />
         <div class="h-16 w-16 rounded-md bg-primary-200" />
@@ -20,7 +20,7 @@
       </Stack>
     </Stack>
     <Stack gap>
-      <h2 class="text-xl">Content</h2>
+      <Header lg>Content</Header>
       <Stack x gap>
         <div class="h-16 w-16 rounded-md bg-content" />
         <div class="h-16 w-16 rounded-md bg-content-100" />
@@ -28,7 +28,7 @@
       </Stack>
     </Stack>
     <Stack gap>
-      <h2 class="text-xl">Highlight</h2>
+      <Header lg>Highlight</Header>
       <Stack x gap>
         <div class="h-16 w-16 rounded-md bg-highlight" />
         <div class="h-16 w-16 rounded-md bg-highlight-100" />
@@ -36,23 +36,37 @@
       </Stack>
     </Stack>
     <Stack gap>
-      <h2 class="text-xl">Surface</h2>
+      <Header lg>Surface</Header>
       <Stack x gap>
         <div class="h-16 w-16 rounded-md bg-surface shadow" />
         <div class="h-16 w-16 rounded-md bg-surface-100 shadow" />
       </Stack>
     </Stack>
+    <Header lg>Glass</Header>
+    <Stack z center>
+      <div class="bg-surface-200 z-50 h-20 w-20 rounded-md backdrop-blur-lg" />
+      <Stack x>
+        <Stack>
+          <div class="h-16 w-16 rounded-tl-md bg-content" />
+          <div class="h-16 w-16 rounded-bl-md bg-primary-600" />
+        </Stack>
+        <Stack>
+          <div class="h-16 w-16 rounded-tr-md bg-primary-300" />
+          <div class="h-16 w-16 rounded-br-md bg-primary-900" />
+        </Stack>
+      </Stack>
+    </Stack>
   </Stack>
 
   <Stack gap>
-    <h2 class="text-2xl">Typography</h2>
+    <Header xl>Typography</Header>
     <Stack x baseline gap>
-      <div class="text-2xl">Header</div>
-      <div class="text-xl">Sub Header</div>
-      <div class="text-lg">Section</div>
-      <div class="text-md">Base Content</div>
-      <div class="text-sm">Secondary Content</div>
-      <div class="text-xs">Tertiary Content</div>
+      <div class="text-2xl">Header 1</div>
+      <div class="text-xl">Header 2</div>
+      <div class="text-lg">Header 3</div>
+      <div class="text-md">Content 1</div>
+      <div class="text-sm">Content 2</div>
+      <div class="text-xs">Content 3</div>
       <div class="text-2xs">Label</div>
     </Stack>
   </Stack>

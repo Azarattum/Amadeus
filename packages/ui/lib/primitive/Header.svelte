@@ -1,23 +1,22 @@
 <script lang="ts">
   import type { Either } from "../../internal/types";
-  type $$Props = Either<"lg" | "xl">;
+  type $$Props = Either<"sm" | "lg" | "xl">;
 
+  export let sm = false;
   export let lg = false;
   export let xl = false;
 
-  const tag = xl ? "h1" : lg ? "h2" : "h3";
+  const tag = sm ? "h5" : lg ? "h3" : xl ? "h2" : "h4";
 </script>
 
 <svelte:element
   this={tag}
-  class:h-11={xl}
-  class:text-xl={xl}
-  class:text-lg={lg}
-  class:py-2={!xl && !lg}
-  class:light={!xl && !lg}
-  class:text-xs={!xl && !lg}
-  class:uppercase={!xl && !lg}
-  class:text-content-200={!xl && !lg}
+  class="
+  {sm ? 'light py-2 text-xs uppercase text-content-200' : ''}
+  {!sm && !lg && !xl ? 'text-lg' : ''}
+  {lg ? 'text-xl' : ''}
+  {xl ? 'h-11 text-2xl' : ''}
+  "
 >
   <slot />
 </svelte:element>
