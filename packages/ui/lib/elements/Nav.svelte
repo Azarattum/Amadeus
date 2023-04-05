@@ -1,12 +1,5 @@
 <script lang="ts">
-  import {
-    Separator,
-    Header,
-    VStack,
-    HStack,
-    Spacer,
-    Logo,
-  } from "@amadeus-music/ui";
+  import { Separator, Header, Stack, Spacer, Logo } from "@amadeus-music/ui";
 
   export let section: string;
 
@@ -18,32 +11,32 @@
     ? 'hidden sm:flex'
     : 'flex'}"
 >
-  <VStack>
-    <div class="tall:flex hidden w-full flex-col items-center">
+  <Stack>
+    <div class="hidden w-full flex-col items-center tall:flex">
       <Logo sm={pane ? "auto" : false} />
       <Separator />
     </div>
-    <HStack grow>
+    <Stack x grow>
       {#if pane}
-        <VStack gap="xl" p>
+        <Stack gap="xl" p>
           <slot />
           <Spacer />
           <slot name="bottom" />
-        </VStack>
+        </Stack>
       {/if}
       <div class="min-w-[15rem] {pane ? 'hidden xl:flex' : 'flex'}">
         <Separator />
-        <VStack gap="sm" p grow>
+        <Stack gap="sm" p grow>
           <Header>{section}</Header>
           <slot name="section" />
           <Spacer />
-          <VStack center>
+          <Stack center>
             <slot name="bottom-section" />
-          </VStack>
-        </VStack>
+          </Stack>
+        </Stack>
       </div>
-    </HStack>
-  </VStack>
+    </Stack>
+  </Stack>
   <Separator vertical />
 </nav>
 <nav
@@ -52,7 +45,7 @@
     : 'hidden'}"
 >
   <Separator vertical={false} />
-  <HStack>
+  <Stack x>
     <slot />
-  </HStack>
+  </Stack>
 </nav>

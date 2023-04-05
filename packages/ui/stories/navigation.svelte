@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Nav, Button, Icon, HStack } from "@amadeus-music/ui";
+  import { Nav, Button, Icon } from "@amadeus-music/ui";
 
   const icons: Record<string, string> = {
     Home: "house",
@@ -27,28 +27,26 @@
   $: subsection = sections[section][0];
 </script>
 
-<HStack gap="xl">
-  <Nav {section}>
-    {#each Object.keys(sections) as x}
-      <Button
-        air
-        compact
-        stretch
-        active={x === section}
-        on:click={() => (section = x)}
-      >
-        <Icon md name={icons[x]} />{x}
+<Nav {section}>
+  {#each Object.keys(sections) as x}
+    <Button
+      air
+      compact
+      stretch
+      active={x === section}
+      on:click={() => (section = x)}
+    >
+      <Icon md name={icons[x]} />{x}
+    </Button>
+  {/each}
+  <svelte:fragment slot="section">
+    {#each sections[section] as x}
+      <Button air active={x === subsection} on:click={() => (subsection = x)}>
+        <Icon name={icons[x]} />{x}
       </Button>
     {/each}
-    <svelte:fragment slot="section">
-      {#each sections[section] as x}
-        <Button air active={x === subsection} on:click={() => (subsection = x)}>
-          <Icon name={icons[x]} />{x}
-        </Button>
-      {/each}
-    </svelte:fragment>
-    <Button air compact stretch slot="bottom">
-      <Icon md name="settings" />Settings
-    </Button>
-  </Nav>
-</HStack>
+  </svelte:fragment>
+  <Button air compact stretch slot="bottom">
+    <Icon md name="settings" />Settings
+  </Button>
+</Nav>

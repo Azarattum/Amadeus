@@ -1,5 +1,5 @@
 <script>
-  import { Checkbox, Input, Gateway, Portal, VStack } from "@amadeus-music/ui";
+  import { Checkbox, Input, Gateway, Portal, Stack } from "@amadeus-music/ui";
 
   let value = "hello";
   let shown = true;
@@ -7,7 +7,7 @@
 </script>
 
 <Gateway>
-  <VStack>
+  <Stack>
     {#if shown}
       <Portal {before}>
         <b>Portal says {value}!</b>
@@ -16,5 +16,5 @@
     <Checkbox bind:checked={shown} label="Show Portal" />
     <Checkbox bind:checked={before} label="Is Before" />
     <Input bind:value />
-  </VStack>
+  </Stack>
 </Gateway>

@@ -2,9 +2,8 @@
 import "./internal/polyfill";
 import "./lib/tailwind.pcss";
 
+export { default as Stack } from "./lib/layout/Stack.svelte";
 export { default as Portal } from "./lib/layout/Portal.svelte";
-export { default as VStack } from "./lib/layout/VStack.svelte";
-export { default as HStack } from "./lib/layout/HStack.svelte";
 export { default as Spacer } from "./lib/layout/Spacer.svelte";
 export { default as Gateway } from "./lib/layout/Gateway.svelte";
 export { default as Overlay } from "./lib/layout/Overlay.svelte";

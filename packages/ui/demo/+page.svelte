@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LightSwitch, HStack, Nav, Button, Icon } from "@amadeus-music/ui";
+  import { LightSwitch, Stack, Nav, Button, Icon } from "@amadeus-music/ui";
   import { capitalize } from "@amadeus-music/util/string";
   import type { PageData } from "./$types";
   import { onMount } from "svelte";
@@ -26,7 +26,7 @@
   });
 </script>
 
-<HStack>
+<Stack x>
   <Nav section="Stories">
     <svelte:fragment slot="section">
       {#each data.stories as story}
@@ -42,4 +42,4 @@
     class="m-8 w-full resize rounded-md p-4 outline outline-1 outline-highlight-100"
     bind:this={preview}
   />
-</HStack>
+</Stack>

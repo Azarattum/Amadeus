@@ -2,20 +2,19 @@
   import {
     Checkbox,
     Button,
-    VStack,
-    HStack,
+    Stack,
     Group,
     Input,
     Icon,
   } from "@amadeus-music/ui";
 </script>
 
-<VStack gap>
+<Stack gap>
   <Checkbox iconLeft="sun" iconRight="moon" />
   <Checkbox label="Search?" iconLeft="search" />
   <Input label="Just Input" />
   <Input icon="search" label="Search" />
-  <HStack gap>
+  <Stack x gap>
     <Button><Icon name="sun" /></Button>
     <Button primary><Icon name="moon" /></Button>
     <Button primary round><Icon name="search" /></Button>
@@ -24,8 +23,8 @@
     <Button air><Icon name="artists" />Air Button</Button>
     <Button compact air><Icon md name="moon" />Moon</Button>
     <Button compact air><Icon md name="sun" />Sun</Button>
-  </HStack>
-  <HStack gap>
+  </Stack>
+  <Stack x gap>
     <Group size={2}>
       <Button><Icon name="queue" /></Button>
       <Button><Icon name="book" /></Button>
@@ -41,5 +40,5 @@
       <Button><Icon name="artists" />Artists</Button>
       <Button><Icon name="album" />Albums</Button>
     </Group>
-  </HStack>
-</VStack>
+  </Stack>
+</Stack>
