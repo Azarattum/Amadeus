@@ -5,9 +5,13 @@
   body {
     color: hsl(var(--color-content));
     background-color: hsl(var(--color-surface));
+    touch-action: manipulation;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
       Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
       sans-serif;
+
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 
     /* Palette playground: https://t.ly/AS7G  */
     --color-primary-100: 350 100% 95%;

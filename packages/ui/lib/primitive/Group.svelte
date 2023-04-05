@@ -31,7 +31,7 @@
 <div
   {id}
   style:grid-template-columns="repeat({size}, minmax(0, 1fr))"
-  class="relative z-10 grid w-max min-w-max justify-around justify-items-center gap-2 rounded-lg bg-highlight p-0.5 outline-2 outline-offset-2 outline-primary-600 [&:has(input:focus-visible)]:outline"
+  class="relative z-10 grid w-max min-w-max touch-manipulation justify-around justify-items-center gap-2 rounded-lg bg-highlight p-0.5 outline-2 outline-offset-2 outline-primary-600 [&:has(input:focus-visible)]:outline"
 >
   <slot />
   <div

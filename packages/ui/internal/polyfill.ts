@@ -18,4 +18,6 @@ if (!("TouchEvent" in scope)) {
   scope.TouchEvent = function () {};
 }
 
+globalThis.addEventListener?.("touchstart", () => {}, false);
+
 export {};
