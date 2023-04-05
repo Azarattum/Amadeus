@@ -45,7 +45,7 @@
   <Separator vertical />
 </nav>
 <nav
-  class="fixed bottom-0 h-12 w-screen flex-col justify-between {pane
+  class="bg-surface-200 fixed bottom-0 z-50 h-12 w-full flex-col justify-between backdrop-blur-lg {pane
     ? 'flex sm:hidden'
     : 'hidden'}"
 >

@@ -45,6 +45,7 @@ const theme = {
       surface: {
         DEFAULT: "hsl(var(--color-surface) / <alpha-value>)",
         100: "hsl(var(--color-surface-100) / <alpha-value>)",
+        200: "hsl(var(--color-surface-200))",
       },
     },
   },
