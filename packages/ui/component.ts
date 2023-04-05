@@ -17,6 +17,7 @@ export { default as Input } from "./lib/primitive/Input.svelte";
 export { default as Group } from "./lib/primitive/Group.svelte";
 export { default as Button } from "./lib/primitive/Button.svelte";
 export { default as Header } from "./lib/primitive/Header.svelte";
+export { default as Tooltip } from "./lib/primitive/Tooltip.svelte";
 export { default as Spinner } from "./lib/primitive/Spinner.svelte";
 export { default as Checkbox } from "./lib/primitive/Checkbox.svelte";
 
