@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Portal from "../layout/Portal.svelte";
   import { uuid } from "../../internal/util";
   import { writable } from "svelte/store";
   import { setContext } from "svelte";
@@ -24,10 +23,6 @@
     .join("");
 </script>
 
-<Portal before unique={id}>
-  <svelte:element this="style">{style}</svelte:element>
-</Portal>
-
 <div
   {id}
   style:grid-template-columns="repeat({size}, minmax(0, 1fr))"
@@ -40,3 +35,5 @@
     style:height="calc({100}% - 0.25rem)"
   />
 </div>
+
+<svelte:element this="style">{style}</svelte:element>

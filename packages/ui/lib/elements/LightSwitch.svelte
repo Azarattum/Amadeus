@@ -28,7 +28,7 @@
   <Icon name="sun" />
   <Icon name="moon" slot="after" />
 </Checkbox>
-<Portal before unique="light-switch">
+<Portal to="start" unique="light-switch">
   <input
     class="absolute appearance-none"
     id="light-switch"

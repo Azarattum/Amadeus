@@ -1,27 +1,28 @@
 <script lang="ts">
-  import { setContext } from "svelte";
+  import type { Realm } from "./Realm.svelte";
+  import { getContext } from "svelte";
+
+  export let name = "";
+
+  const realm = getContext<Realm>("realm");
+  if (!realm) throw new Error("A gateway should exists within a realm!");
+  if (!realm[name]) realm[name] = { unique: new Set(), ssr: "" };
 
   const target = eval("slots");
-  const context: any = { before: [], after: [], mount: null, mounts: {} };
-  setContext("gateway", context);
-
   if (import.meta.env.SSR) {
-    const slot = target.default ? target.default({}) : "";
-    target.default = () =>
-      context.before.join("") + slot + context.after.join("");
+    target.default = () => `<!--<Gateway:${name}>-->`;
   } else {
-    const [original] = target.default;
-    target.default[0] = (..._: any) => {
-      const instance = original(..._);
-      return {
-        ...instance,
-        m(target: any, anchor: any) {
-          context.mount = target;
-          instance.m(target, anchor);
-        },
-      };
-    };
+    eval("$$scope = { ctx: [] }");
+    if (!target.default) target.default = [];
+    target.default[0] = () => ({
+      m: (..._: any[]) => (realm[name].target ??= _),
+      d: () => (realm[name].target = undefined),
+      c: () => {},
+      l: () => {},
+    });
   }
 </script>
 
-<slot />
+{#await import.meta.env.SSR ? null : Promise.resolve() then _}
+  <slot />
+{/await}

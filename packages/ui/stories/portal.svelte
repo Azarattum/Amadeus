@@ -1,20 +1,44 @@
-<script>
-  import { Checkbox, Input, Gateway, Portal, Stack } from "@amadeus-music/ui";
+<script lang="ts">
+  import {
+    Checkbox,
+    Gateway,
+    Button,
+    Portal,
+    Group,
+    Input,
+    Realm,
+    Stack,
+  } from "@amadeus-music/ui";
+  import Tooltip from "$lib/primitive/Tooltip.svelte";
 
   let value = "hello";
   let shown = true;
-  let before = false;
+  let to = 0;
 </script>
 
-<Gateway>
-  <Stack>
+<Realm>
+  Gateway 0: <Gateway name="0" />
+  <Stack gap>
     {#if shown}
-      <Portal {before}>
+      <Portal to={to.toString()} unique="busy">
         <b>Portal says {value}!</b>
       </Portal>
     {/if}
-    <Checkbox bind:checked={shown} label="Show Portal" />
-    <Checkbox bind:checked={before} label="Is Before" />
-    <Input bind:value />
+    <Checkbox bind:checked={shown}>Enabled</Checkbox>
+    <Input bind:value>Message:</Input>
+    <Group size={4} bind:value={to}>
+      <Button>Place 0</Button>
+      <Button>Place 1</Button>
+      <Button>Place 2</Button>
+      <Button>Place 3</Button>
+      <Tooltip>Choose destination for the portal</Tooltip>
+    </Group>
   </Stack>
-</Gateway>
+  Gateway 1: <Gateway name="1" /><br />
+  Gateway 2: <Gateway name="2" /><br />
+  Gateway 3: <Gateway name="3" />
+
+  <Portal to="2" unique="busy">
+    <b>Gateway 2 is busy!</b>
+  </Portal>
+</Realm>

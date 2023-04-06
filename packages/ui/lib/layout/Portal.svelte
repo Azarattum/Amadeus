@@ -1,36 +1,38 @@
 <script lang="ts">
+  import type { Realm } from "./Realm.svelte";
   import { getContext, tick } from "svelte";
 
+  export let to = "";
   export let unique = "";
-  export let before = false;
-  const target = eval("slots");
-  const context = getContext<any>("gateway");
 
+  const realm = getContext<Realm>("realm");
+  if (!realm) throw new Error("A portal should exists within a realm!");
+  if (!realm[to]) realm[to] = { unique: new Set(), ssr: "" };
+
+  const target = eval("slots");
   if (import.meta.env.SSR) {
     const slot = target.default ? target.default({}) : "";
-    if (!context.mounts[unique]) {
-      if (unique) context.mounts[unique] = true;
-      if (before) context.before.push(slot);
-      else context.after.push(slot);
+    if (!realm[to].unique.has(unique)) {
+      if (unique) realm[to].unique.add(unique);
+      realm[to].ssr += slot;
     }
     target.default = undefined;
-  } else {
-    let mounted = false;
+  } else if (target.default) {
+    let mounted: string | null = null;
     const [original] = target.default;
     target.default[0] = (..._: any) => {
       const instance = original(..._);
       return {
         ...instance,
-        async m(target: any, anchor: any) {
-          if (context.mounts[unique]) return;
-          if (unique) (context.mounts[unique] = true), (mounted = true);
+        async m(..._: any) {
+          if (!realm[to]) return;
+          if (realm[to].unique.has(unique)) return;
+          if (unique) realm[to].unique.add(unique), (mounted = to);
           await tick();
-          if (!context.mount) return instance.m(target, anchor);
-          if (!before) return instance.m(context.mount, null);
-          instance.m(context.mount, context.mount.firstChild);
+          if (realm[to].target) instance.m(...(realm[to].target as any[]));
         },
         d(detaching: any) {
-          if (unique && mounted) context.mounts[unique] = false;
+          if (mounted != null) realm[mounted].unique.delete(unique);
           instance.d(detaching);
         },
       };
@@ -38,6 +40,6 @@
   }
 </script>
 
-{#key before}
+{#key to}
   <slot />
 {/key}

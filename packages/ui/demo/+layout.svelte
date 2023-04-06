@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Gateway from "$lib/layout/Gateway.svelte";
+  import Wrapper from "$lib/elements/Wrapper.svelte";
   import "$lib/tailwind.pcss";
 </script>
 
-<Gateway>
+<Wrapper>
   <slot />
-</Gateway>
+</Wrapper>
