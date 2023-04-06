@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Separator, Header, Stack, Spacer, Logo } from "@amadeus-music/ui";
+  import Portal from "$lib/layout/Portal.svelte";
 
   export let section: string;
 
@@ -44,13 +45,14 @@
   </Stack>
   <Separator vertical />
 </nav>
-<nav
-  class="bg-surface-200 fixed bottom-0 z-50 h-12 w-full flex-col justify-between backdrop-blur-lg {pane
-    ? 'flex sm:hidden'
-    : 'hidden'}"
->
-  <Separator vertical={false} />
-  <Stack x>
-    <slot />
-  </Stack>
-</nav>
+<Portal to="bottom">
+  <nav
+    class="h-12 flex-col justify-between bg-surface-200 backdrop-blur-lg
+    {pane ? 'flex sm:hidden' : 'hidden'}"
+  >
+    <Separator vertical={false} />
+    <Stack x>
+      <slot />
+    </Stack>
+  </nav>
+</Portal>
