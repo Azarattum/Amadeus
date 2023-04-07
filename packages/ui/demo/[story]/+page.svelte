@@ -13,5 +13,5 @@
 
 <input type="checkbox" class="hidden" id="light-switch" />
 <main class="contents">
-  <svelte:component this={module.default} />
+  <svelte:component this={module?.default} />
 </main>
