@@ -2,6 +2,8 @@
 import "./internal/polyfill";
 import "./lib/tailwind.pcss";
 
+export { default as Tab } from "./lib/layout/Tab.svelte";
+export { default as Tabs } from "./lib/layout/Tabs.svelte";
 export { default as Realm } from "./lib/layout/Realm.svelte";
 export { default as Stack } from "./lib/layout/Stack.svelte";
 export { default as Portal } from "./lib/layout/Portal.svelte";
