@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Tabs } from "../elements/Tabs.svelte";
+  import type { Tabs } from "./Tabs.svelte";
   import { getContext, tick } from "svelte";
   import { onMount } from "svelte";
 
@@ -8,19 +8,12 @@
   let { container, align } = getContext<Tabs>("tabs");
   let section: HTMLElement;
   let header: HTMLElement;
-  let height = 0;
   let width = 0;
 
-  $: aspect = $container.width / $container.height;
-  $: reposition = 50 * ($container.width - width);
-  $: ratio = $container.width / width;
+  $: ratio = $container / width;
   $: transform = `
     translate3d(0,0,-${ratio - 1}px)
     scale(${ratio})
-    translate(
-      calc(-${reposition / width}%),
-      -${reposition / height / aspect}%
-    )
   `;
 
   onMount(() => {
@@ -45,7 +38,6 @@
 >
   <header
     class="absolute h-11 origin-top-left whitespace-nowrap text-2xl"
-    bind:clientHeight={height}
     bind:clientWidth={width}
     bind:this={header}
     style:transform
