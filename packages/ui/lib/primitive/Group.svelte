@@ -16,7 +16,7 @@
     .map(
       (_, i) =>
         `#${id}>input:checked:nth-last-of-type(${i + 1})` +
-        ` ~ div:last-child { transform: translateX(calc(` +
+        `~div:last-child{transform:translateX(calc(` +
         `${(size - i - 1) * 100}% + ${(size - i - 1) * 8}px` +
         `));}`
     )
@@ -36,4 +36,6 @@
   />
 </div>
 
-<svelte:element this="style">{style}</svelte:element>
+<svelte:head>
+  <svelte:element this="style">{style}</svelte:element>
+</svelte:head>
