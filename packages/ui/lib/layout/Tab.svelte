@@ -10,8 +10,6 @@
   let current = false;
   let stuck = false;
 
-  /// TODO: update page hash
-  // $: if (current) location.hash = `#${name.toLowerCase()}`;
   const scrollUp = () => section.scrollTo({ top: 0, behavior: "smooth" });
 
   onMount(() => {
@@ -27,6 +25,9 @@
       (entries) =>
         entries.forEach((x) => {
           current = x.intersectionRatio > 0.5;
+          if (x.intersectionRatio === 1) {
+            location.hash = `#${name.toLowerCase()}`;
+          }
         }),
       { threshold: [0, 0.5, 1] }
     );
