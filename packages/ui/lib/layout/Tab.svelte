@@ -41,16 +41,19 @@
   bind:this={section}
   id={name.toLowerCase()}
   class="z-10 h-full w-full snap-start snap-always overflow-x-hidden overflow-y-scroll"
-  class:[&~nav_a_div]:-translate-y-full={current && stuck}
-  class:[&~nav_a_div]:opacity-0={current && stuck}
+  class:[&~nav_div_a]:pointer-events-none={current && stuck}
+  class:[&~nav_div_a]:-translate-y-full={current && stuck}
+  class:[&~nav_div_a]:opacity-0={current && stuck}
 >
   <div class="pointer-events-none h-0 p-11" bind:this={trigger} />
   <h2>
     <button
+      tabindex="-1"
       on:click={scrollUp}
-      class="pointer-events-auto fixed top-0 mb-11 flex h-11 w-full -translate-y-full transform-gpu items-center justify-center border-b border-highlight bg-surface-200 bg-gradient-to-t from-surface-200 via-surface-200 to-surface-300 font-semibold opacity-0 backdrop-blur-lg transition-transform"
+      class="fixed top-0 mb-11 flex h-11 w-full -translate-y-full transform-gpu items-center justify-center border-b border-highlight bg-surface-200 bg-gradient-to-t from-surface-200 via-surface-200 to-surface-300 font-semibold opacity-0 backdrop-blur-lg transition-transform"
       class:opacity-100={stuck}
       class:translate-y-0={stuck}
+      class:pointer-events-none={!current}
     >
       {name}
     </button>
