@@ -1,51 +1,85 @@
 <script lang="ts">
-  import type { Tabs } from "./Tabs.svelte";
-  import { getContext, tick } from "svelte";
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
 
-  export let id = undefined as string | undefined;
+  export let name: string;
+  const tabs = getContext<string[]>("tabs");
+  tabs.push(name);
 
-  let { container, align } = getContext<Tabs>("tabs");
+  let trigger: HTMLElement;
   let section: HTMLElement;
-  let header: HTMLElement;
-  let width = 0;
+  let current = false;
+  let stuck = false;
 
-  $: ratio = $container / width;
-  $: transform = `
-    translate3d(0,0,-${ratio - 1}px)
-    scale(${ratio})
-  `;
+  /// TODO: update page hash
+  // $: if (current) location.hash = `#${name.toLowerCase()}`;
+  const scrollUp = () => section.scrollTo({ top: 0, behavior: "smooth" });
 
   onMount(() => {
-    const updated = align.target / align.count || width + align.gap * 1.5;
-    header.style.width = updated + "px";
-    align.target += width + align.gap;
-    align.count += 1;
-
-    tick().then(() => ((align.target = 0), (align.count = 0)));
-    const observer = new IntersectionObserver((entries) =>
-      entries.forEach((x) => x.isIntersecting && id && (location.hash = id))
+    const stuckObserver = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((x) => {
+          if (x.boundingClientRect.x) return;
+          stuck = x.intersectionRatio < 0.8;
+        }),
+      { threshold: 0.8 }
     );
-    observer.observe(section);
-    return observer.disconnect.bind(observer);
+    const sectionObserver = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((x) => {
+          current = x.intersectionRatio > 0.5;
+        }),
+      { threshold: [0, 0.5, 1] }
+    );
+    sectionObserver.observe(section);
+    stuckObserver.observe(trigger);
+
+    return () => (sectionObserver.disconnect(), stuckObserver.disconnect());
   });
 </script>
 
 <section
-  class="relative h-full w-full snap-start snap-always"
-  style="transform-style: preserve-3d;"
-  {id}
+  bind:this={section}
+  id={name.toLowerCase()}
+  class="z-10 h-full w-full snap-start snap-always overflow-x-hidden overflow-y-scroll"
+  class:[&~nav_a_div]:-translate-y-full={current && stuck}
+  class:[&~nav_a_div]:opacity-0={current && stuck}
 >
-  <header
-    class="absolute h-11 origin-top-left whitespace-nowrap text-2xl"
-    bind:clientWidth={width}
-    bind:this={header}
-    style:transform
-  >
-    <slot name="header" />
-  </header>
-  <div bind:this={section} class="absolute left-1/2 h-full" />
-  <div class="mt-11 h-full overflow-x-hidden">
-    <slot />
-  </div>
+  <div class="pointer-events-none h-0 p-11" bind:this={trigger} />
+  <h2>
+    <button
+      on:click={scrollUp}
+      class="pointer-events-auto fixed top-0 mb-11 flex h-11 w-full -translate-y-full transform-gpu items-center justify-center border-b border-highlight bg-surface-200 bg-gradient-to-t from-surface-200 via-surface-200 to-surface-300 font-semibold opacity-0 backdrop-blur-lg transition-transform"
+      class:opacity-100={stuck}
+      class:translate-y-0={stuck}
+    >
+      {name}
+    </button>
+  </h2>
+  <slot />
 </section>
+
+<svelte:head>
+  {#if current && stuck}
+    <meta
+      name="theme-color"
+      content="#f7f7f7"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#121212"
+      media="(prefers-color-scheme: dark)"
+    />
+  {/if}
+</svelte:head>
+
+<style>
+  /* Safari 15 fix for `position: fixed;` */
+  @media not all and (min-resolution: 0.001dpcm) {
+    @supports (-webkit-appearance: none) and (stroke-color: transparent) {
+      .fixed {
+        left: 0;
+      }
+    }
+  }
+</style>
