@@ -1,7 +1,10 @@
 /** @type {import('tailwindcss').Config["theme"]} */
 const theme = {
   fontSize: {
-    "2xs": ["0.625rem", { letterSpacing: "0.03em", lineHeight: "1rem" }],
+    "2xs": [
+      "0.625rem",
+      { fontWeight: "500", letterSpacing: "0.03em", lineHeight: "1rem" },
+    ],
     xs: ["0.8125rem", { lineHeight: "1rem" }],
     sm: ["0.9375rem", { lineHeight: "1.125rem" }],
     md: ["1.0625rem", { lineHeight: "1.3125rem" }],
@@ -46,6 +49,7 @@ const theme = {
         DEFAULT: "hsl(var(--color-surface) / <alpha-value>)",
         100: "hsl(var(--color-surface-100) / <alpha-value>)",
         200: "hsl(var(--color-surface-200))",
+        300: "hsl(var(--color-surface-300) / <alpha-value>)",
       },
     },
   },
