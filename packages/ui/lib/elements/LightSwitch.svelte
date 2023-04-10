@@ -11,6 +11,7 @@
     localStorage.dark = dark;
   }
 
+  /// TODO: update `meta[name='theme-color']`
   export let flipped = checked;
   $: flipped = checked;
   export let theme = dark ? "dark" : "light";
