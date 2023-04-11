@@ -1,0 +1,27 @@
+{
+  "name": "tailwind-dark-toggle",
+  "version": "1.0.0",
+  "description": "Tailwind plugin to make CSS only dark toggles that respect user's preference.",
+  "main": "index.cjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azarattum/Amadeus.git#main"
+  },
+  "keywords": [
+    "tailwind",
+    "plugin",
+    "dark-mode",
+    "light-switch",
+    "css-only",
+    "prefers-color-scheme"
+  ],
+  "author": "Azarattum",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Azarattum/Amadeus/issues"
+  },
+  "homepage": "https://github.com/Azarattum/Amadeus/tree/main/packages/tailwind/dark",
+  "peerDependencies": {
+    "tailwindcss": "^3.2.7"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "tailwind-mobile-hover",
+  "version": "1.0.0",
+  "description": "Tailwind plugin to fix hover styles on touch screens.",
+  "main": "index.cjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azarattum/Amadeus.git#main"
+  },
+  "keywords": [
+    "tailwind",
+    "plugin",
+    "hover",
+    "touch",
+    "mobile",
+    "active"
+  ],
+  "author": "Azarattum",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Azarattum/Amadeus/issues"
+  },
+  "homepage": "https://github.com/Azarattum/Amadeus/tree/main/packages/tailwind/hover",
+  "peerDependencies": {
+    "tailwindcss": "^3.2.7"
+  }
+}

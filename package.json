@@ -4,6 +4,7 @@
   "workspaces": [
     "apps/*",
     "packages/*",
+    "packages/tailwind/*",
     "plugins/*"
   ],
   "scripts": {
