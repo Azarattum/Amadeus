@@ -22,11 +22,8 @@
   });
 
   onMount(() => {
-    if (!location.hash.trim()) location.hash = tabs[0].toLowerCase();
-    else {
-      const temp = location.hash.slice(1);
-      location.hash = "";
-      location.hash = temp;
+    if (!location.hash) {
+      history.replaceState(null, "", `#${tabs[0].toLowerCase()}`);
     }
   });
 
@@ -34,8 +31,15 @@
     return tabs
       .map(
         (x) =>
-          `#${x.toLowerCase()}:target~nav>div[aria-label='${x}']{` +
+          `:where(#${x.toLowerCase()}).target~nav>div{` +
+          `color:hsl(var(--color-content-200));` +
+          `pointer-events:auto;` +
+          `font-weight:normal;` +
+          `}` +
+          `:where(#${x.toLowerCase()}:target~nav)>div[aria-label='${x}'],` +
+          `#${x.toLowerCase()}.target~nav>div[aria-label='${x}']{` +
           `color:hsl(var(--color-content));` +
+          `pointer-events:none;` +
           `font-weight:bold;` +
           `}`
       )
@@ -53,21 +57,21 @@
   <slot />
   <nav
     class="pointer-events-none absolute z-10 mt-11 flex origin-top-left transition-opacity"
-    style="transform-style: preserve-3d;"
+    style="transform-style: preserve-3d; contain: layout;"
     style:transform={transforms[0]
       ? ""
       : "translate3d(0,-2.75rem,-99999px) scale(100000) translate3d(0,2.75rem,0)"}
   >
     {#each tabs as tab, i}
       <div
-        class="h-11 origin-top-left overflow-hidden pl-4 text-center text-2xl font-normal text-content-200 underline-offset-4 transition-opacity duration-300 ease-in hover:text-content-100"
+        class="h-11 origin-top-left overflow-hidden pl-4 text-center text-2xl font-normal text-content-200 underline-offset-4 transition-opacity duration-300 ease-in"
         style:transform={transforms[i]}
         bind:this={elements[i]}
         aria-label={tab}
       >
         <a
           href="#{tab.toLowerCase()}"
-          class="pointer-events-auto block transform-gpu touch-manipulation select-none transition-composite duration-300 will-change-transform focus-visible:underline focus-visible:outline-none"
+          class="block transform-gpu touch-manipulation select-none transition-composite duration-300 will-change-transform focus-visible:underline focus-visible:outline-none hover:text-content-100"
         >
           {tab}
         </a>
@@ -95,5 +99,8 @@
     font-weight: 700;
     display: block;
     height: 0;
+  }
+  :where(div) {
+    pointer-events: auto;
   }
 </style>

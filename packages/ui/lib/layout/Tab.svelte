@@ -13,6 +13,7 @@
   const scrollUp = () => section.scrollTo({ top: 0, behavior: "smooth" });
 
   onMount(() => {
+    if (location.hash === `#${name.toLowerCase()}`) section.scrollIntoView();
     const stuckObserver = new IntersectionObserver(
       (entries) =>
         entries.forEach((x) => {
@@ -45,6 +46,7 @@
   class:[&~nav_div_a]:pointer-events-none={current && stuck}
   class:[&~nav_div_a]:-translate-y-full={current && stuck}
   class:[&~nav_div]:opacity-0={current && stuck}
+  class:target={current}
 >
   <div class="pointer-events-none h-0 p-11" bind:this={trigger} />
   <h2>
