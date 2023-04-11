@@ -1,6 +1,7 @@
 <script lang="ts">
   import { LightSwitch, Stack, Nav, Button, Icon } from "@amadeus-music/ui";
   import { capitalize } from "@amadeus-music/util/string";
+  import { flipped } from "@amadeus-music/ui";
   import type { PageData } from "./$types";
   import { hash } from "../internal/page";
   import { onMount } from "svelte";
@@ -9,11 +10,10 @@
 
   let innerSwitch: HTMLInputElement | undefined;
   let preview: HTMLIFrameElement | undefined;
-  let flipped = false;
 
   $: current = $hash || data.stories[0];
   $: if (preview) preview.src = `/${current}`;
-  $: if (innerSwitch) innerSwitch.checked = flipped;
+  $: if (innerSwitch) innerSwitch.checked = $flipped;
 
   onMount(() => {
     preview?.addEventListener(
@@ -35,7 +35,7 @@
         </Button>
       {/each}
     </svelte:fragment>
-    <LightSwitch bind:flipped slot="bottom-section" />
+    <LightSwitch slot="bottom-section" />
   </Nav>
   <iframe
     title="Story"

@@ -8,6 +8,7 @@ export { default as Realm } from "./lib/layout/Realm.svelte";
 export { default as Stack } from "./lib/layout/Stack.svelte";
 export { default as Portal } from "./lib/layout/Portal.svelte";
 export { default as Spacer } from "./lib/layout/Spacer.svelte";
+export { default as Wrapper } from "./lib/layout/Wrapper.svelte";
 export { default as Gateway } from "./lib/layout/Gateway.svelte";
 export { default as Overlay } from "./lib/layout/Overlay.svelte";
 export { default as Virtual } from "./lib/layout/Virtual.svelte";
@@ -24,5 +25,6 @@ export { default as Tooltip } from "./lib/primitive/Tooltip.svelte";
 export { default as Spinner } from "./lib/primitive/Spinner.svelte";
 export { default as Checkbox } from "./lib/primitive/Checkbox.svelte";
 
+export * from "./lib/elements/LightSwitch.svelte";
 export { default as Nav } from "./lib/elements/Nav.svelte";
 export { default as LightSwitch } from "./lib/elements/LightSwitch.svelte";

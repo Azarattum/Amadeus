@@ -5,13 +5,16 @@
 </script>
 
 <script lang="ts">
+  import { Portal } from "@amadeus-music/ui";
   import { page } from "$app/stores";
 
   $: ({ story } = $page.params);
   $: module = modules[`../../stories/${story}.svelte`] as any;
 </script>
 
-<input type="checkbox" class="hidden" id="light-switch" />
-<main class="contents">
+<Portal to="start" unique="light-switch">
+  <input class="absolute appearance-none" id="light-switch" type="checkbox" />
+</Portal>
+<div class="contents">
   <svelte:component this={module?.default} />
-</main>
+</div>

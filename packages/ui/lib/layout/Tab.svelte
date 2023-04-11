@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte";
+  import { flipped } from "../../component";
 
   export let name: string;
   const tabs = getContext<string[]>("tabs");
@@ -68,12 +69,12 @@
   {#if current && stuck}
     <meta
       name="theme-color"
-      content="#f7f7f7"
+      content="#{$flipped ? '121212' : 'f7f7f7'}"
       media="(prefers-color-scheme: light)"
     />
     <meta
       name="theme-color"
-      content="#121212"
+      content="#{$flipped ? 'f7f7f7' : '121212'}"
       media="(prefers-color-scheme: dark)"
     />
   {/if}

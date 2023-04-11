@@ -1,6 +1,5 @@
-<script>
-  import Gateway from "../layout/Gateway.svelte";
-  import Realm from "../layout/Realm.svelte";
+<script lang="ts">
+  import { flipped, Gateway, Realm } from "../../component";
 </script>
 
 <Realm>
@@ -21,12 +20,12 @@
   />
   <meta
     name="theme-color"
-    content="#ffffff"
+    content="#{$flipped ? '000000' : 'ffffff'}"
     media="(prefers-color-scheme: light)"
   />
   <meta
     name="theme-color"
-    content="#000000"
+    content="#{$flipped ? 'ffffff' : '000000'}"
     media="(prefers-color-scheme: dark)"
   />
 </svelte:head>

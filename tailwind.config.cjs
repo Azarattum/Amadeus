@@ -27,7 +27,7 @@ module.exports = {
             ({ className }) =>
               `:where(#light-switch:checked~*) .dark\\:${e(className)}`
           ),
-          "@media not (prefers-color-scheme: dark)"
+          "@media (prefers-color-scheme: light)"
         ),
       ]);
     }),
