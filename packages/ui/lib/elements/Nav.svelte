@@ -1,6 +1,12 @@
 <script lang="ts">
-  import { Separator, Header, Stack, Spacer, Logo } from "@amadeus-music/ui";
-  import Portal from "$lib/layout/Portal.svelte";
+  import {
+    Separator,
+    Header,
+    Spacer,
+    Portal,
+    Stack,
+    Logo,
+  } from "../../component";
 
   export let section: string;
 

@@ -4,9 +4,7 @@
 </script>
 
 <script lang="ts">
-  import Checkbox from "../primitive/Checkbox.svelte";
-  import Portal from "../layout/Portal.svelte";
-  import Icon from "../primitive/Icon.svelte";
+  import { Checkbox, Portal, Icon } from "../../component";
   import { onMount, tick } from "svelte";
 
   const isStored = () => "localStorage" in globalThis && "dark" in localStorage;

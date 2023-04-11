@@ -4,7 +4,7 @@
   import { minmax } from "@amadeus-music/util/math";
   import { position } from "../../internal/pointer";
   import { draggable, hold } from "../../action";
-  import Virtual from "./Virtual.svelte";
+  import { Virtual } from "../../component";
 
   type T = $$Generic;
   type $$Slots = { default: { item: T; index: number; key: symbol | object } };

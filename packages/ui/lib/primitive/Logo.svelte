@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from "./Icon.svelte";
+  import { Icon } from "../../component";
   export let sm: boolean | "auto" = false;
 </script>
 

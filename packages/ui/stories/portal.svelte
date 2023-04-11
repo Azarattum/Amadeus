@@ -2,6 +2,7 @@
   import {
     Checkbox,
     Gateway,
+    Tooltip,
     Button,
     Portal,
     Group,
@@ -9,7 +10,6 @@
     Realm,
     Stack,
   } from "@amadeus-music/ui";
-  import Tooltip from "$lib/primitive/Tooltip.svelte";
 
   let value = "hello";
   let shown = true;

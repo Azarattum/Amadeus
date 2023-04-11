@@ -1,5 +1,5 @@
 <script>
-  import Stack from "$lib/layout/Stack.svelte";
+  import { Stack } from "@amadeus-music/ui";
 
   export let i = 5;
 </script>
