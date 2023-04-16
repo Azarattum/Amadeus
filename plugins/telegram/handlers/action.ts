@@ -12,19 +12,18 @@ import {
   expand,
 } from "../plugin";
 import { markdown, menu, keyboard, icon, escape } from "../api/markup";
+import { format, identify } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
 import { artist, action as type } from "../types/action";
 import { async, first, map } from "@amadeus-music/core";
 import { shuffle } from "@amadeus-music/util/object";
-import { format } from "@amadeus-music/protocol";
 import { pages } from "../api/pages";
 
 callback(function* (action, message) {
   const { tracks, artists } = persistence();
-  const name = `${bright}${this.name}${reset}`;
   const report = (result: number[], type: string) => {
     const errors = result.filter((x) => !x).length;
-    const op = `${type} download for ${name}`;
+    const op = `${type} download for ${this.name}`;
     const failures = `${bright}${errors}${reset}/${result.length}`;
     if (!errors) ok(`${op} has successfully completed!`);
     else wrn(`${op} failed to send ${failures} items!`);
@@ -45,7 +44,7 @@ callback(function* (action, message) {
     yield* this.reply([track]);
   }
   if (type("page").is(action)) {
-    info(`${name} requested a page download...`);
+    info(`${this.name} requested a page download...`);
     const page = pages.get(action.page);
     const loaded = page?.loaded;
     if (!loaded) return;
@@ -54,17 +53,17 @@ callback(function* (action, message) {
     report(yield* this.reply(page.items), "Page");
   }
   if (type("all").is(action)) {
-    info(`${name} requested a mass download...`);
+    info(`${this.name} requested a mass download...`);
     report(yield* this.reply(pages.get(action.all)?.all || []), "Mass");
   }
   if (type("shuffle").is(action)) {
-    info(`${name} requested a random download...`);
+    info(`${this.name} requested a random download...`);
     const shuffled = shuffle(pages.get(action.shuffle)?.all || []).slice(0, 10);
     report(yield* this.reply(shuffled), "Random");
   }
   if (type("lyrics").is(action)) {
     const track = yield* tracks.get(action.lyrics);
-    info(`${name} requested lyrics for "${format(track)}".`);
+    info(`${this.name} requested lyrics for "${format(track)}".`);
     const fallback =
       `No lyrics found\\. [Try searching the web\\.](https://www.google.com/` +
       `search?q=lyrics+${format(track).replace(/\s+/g, "+")})`;
@@ -89,7 +88,7 @@ callback(function* (action, message) {
   }
   if (type("album").is(action)) {
     const track = yield* tracks.get(action.album);
-    info(`${name} requested an album of "${format(track)}".`);
+    info(`${this.name} requested an album of "${format(track)}".`);
     const [id] = yield* this.reply({
       page: track.album.title,
       icon: icon.album,
@@ -106,7 +105,7 @@ callback(function* (action, message) {
   }
   if (type("similar").is(action)) {
     const track = yield* tracks.get(action.similar);
-    info(`${name} requested similar to "${format(track)}".`);
+    info(`${this.name} requested similar to "${format(track)}".`);
     const [id] = yield* this.reply({
       page: "Similar",
       icon: icon.similar,
@@ -139,7 +138,7 @@ callback(function* (action, message) {
   }
   if (artist.is(action)) {
     const artist = yield* artists.get(action.artist);
-    info(`${name} requested tracks of artist "${artist.title}".`);
+    info(`${this.name} requested tracks of artist "${artist.title}".`);
     const [id] = yield* this.reply({
       page: artist.title,
       icon: icon.artist,
@@ -156,8 +155,11 @@ callback(function* (action, message) {
   }
 });
 
-invite((chat, title) => {
-  info("invite", chat, title);
+invite(function* (chat, title) {
+  const storage = persistence(this.user);
+  yield* storage.playlists.create({ title });
+  yield* storage.settings.store(identify(title).toString(), chat);
+  info(`${this.name} registered playlist "${title}".`);
 });
 
 mention((chat) => {

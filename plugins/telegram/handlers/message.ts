@@ -1,11 +1,11 @@
 import { message, search, voice, info, post, persistence } from "../plugin";
-import { bright, reset } from "@amadeus-music/util/color";
-import { map } from "@amadeus-music/core";
+import { async, first, map } from "@amadeus-music/core";
+import { format } from "@amadeus-music/protocol";
 import { icon } from "../api/markup";
 import { pages } from "../api/pages";
 
 message(function* (text) {
-  info(`${bright}${this.name}${reset} is searching for "${text}"...`);
+  info(`${this.name} is searching for "${text}"...`);
   yield* persistence(this.user).history.log(text);
 
   const [id] = yield* this.reply({ page: text, icon: icon.search });
@@ -18,10 +18,16 @@ message(function* (text) {
   });
 });
 
-voice((file) => {
-  info("voice", file);
+post(function* (text, chat) {
+  const storage = persistence(this.user);
+  const page = yield* async(first(search("track", text, 1)));
+  yield* async(page.loaded);
+  const track = page.items[0];
+  const playlist = +(yield* storage.settings.lookup(chat));
+  yield* storage.library.push([track], playlist);
+  info(`${this.name} added "${format(track)}" to "${playlist}".`);
 });
 
-post((file, chat) => {
-  info("post", file, chat);
+voice((file) => {
+  info("voice", file);
 });
