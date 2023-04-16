@@ -34,7 +34,7 @@ BEGIN
     progress = 0
   WHERE id = NEW.id;
   INSERT INTO feed VALUES (ABS(RANDOM() % POWER(2, 32)), 0, (SELECT track FROM playback WHERE id = NEW.playback), 1);
-  INSERT INTO following SELECT artist, track as seen FROM attribution
+  INSERT OR IGNORE INTO following SELECT artist, track as seen FROM attribution
     WHERE
       EXISTS (SELECT 1 FROM following WHERE following.artist = attribution.artist)
       AND track = (SELECT track FROM playback WHERE id = NEW.playback);
