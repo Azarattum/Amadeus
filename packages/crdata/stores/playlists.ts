@@ -1,22 +1,21 @@
 import { identify, type Playlist } from "@amadeus-music/protocol";
-import { json, groupJSON, sql, APPEND } from "crstore";
+import { metadata, metafields } from "../data/operations";
+import { groupJSON, APPEND } from "crstore";
 import type { DB } from "../data/schema";
 
 export const playlists = ({ store }: DB) =>
   store(
     (db) =>
       db
+        .with("metadata", metadata)
         .selectFrom((db) =>
           db
             .selectFrom("playlists")
             .leftJoin("library", "library.playlist", "playlists.id")
-            .leftJoin("tracks", "tracks.id", "library.track")
-            .leftJoin("albums", "albums.id", "tracks.album")
-            .leftJoin("attribution", "attribution.track", "tracks.id")
-            .leftJoin("artists", "artists.id", "attribution.artist")
+            .leftJoin("metadata", "metadata.id", "library.track")
+            .select(metafields)
             .select([
-              "tracks.id as id",
-              sql<number>`IFNULL(library.id,RANDOM())`.as("entry"),
+              "library.id as entry",
               "playlists.id as group",
               "playlists.order as order",
               "playlists.title as playlist",
@@ -24,27 +23,7 @@ export const playlists = ({ store }: DB) =>
               "playlists.shared as shared",
               "playlists.remote as remote",
               "library.date as date",
-              "tracks.title as title",
-              "tracks.length as length",
-              "tracks.source as source",
             ])
-            .select((qb) =>
-              json(qb, {
-                id: "albums.id",
-                title: "albums.title",
-                year: "albums.year",
-                source: "albums.source",
-                art: "albums.art",
-              }).as("album")
-            )
-            .select((qb) =>
-              groupJSON(qb, {
-                id: "artists.id",
-                title: "artists.title",
-                source: "artists.source",
-                art: "artists.art",
-              }).as("artists")
-            )
             .groupBy("entry")
             .orderBy("library.order")
             .orderBy("library.id")

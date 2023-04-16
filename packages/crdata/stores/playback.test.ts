@@ -4,7 +4,7 @@ import { connect } from "../data";
 import { rm } from "fs/promises";
 
 const { playback, preceding, upcoming, close, feed } = connect({
-  name: "test.db",
+  name: "playback.test.db",
 });
 
 const track = (id: number): TrackDetails => ({
@@ -275,7 +275,7 @@ it("inserts when shuffled", async () => {
 
 afterAll(async () => {
   close();
-  await rm("./test.db");
+  await rm("./playback.test.db");
 });
 
 afterEach(async () => {
