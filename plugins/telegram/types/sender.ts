@@ -19,6 +19,7 @@ const chat = type({
   chat: type({
     id: number(),
     type: string(),
+    title: optional(string()),
   }),
 });
 

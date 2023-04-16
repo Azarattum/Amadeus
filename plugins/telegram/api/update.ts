@@ -10,8 +10,10 @@ import {
   invite,
   update,
   temp,
+  persistence,
 } from "../plugin";
 import { answerCallbackQuery, deleteMessage } from "./methods";
+import { bright, reset } from "@amadeus-music/util/color";
 import { IncomingMessage, ServerResponse } from "http";
 import { async, map } from "@amadeus-music/core";
 import { replier, editor } from "./reply";
@@ -22,8 +24,9 @@ const secret = crypto.randomUUID();
 
 update(function* (body) {
   const data = JSON.parse(body);
-  update.context(yield* verify(data));
-  yield* map(handle.bind(this)(data));
+  const me = this.state.me.username;
+  update.context(yield* verify(me, data));
+  yield* map(handle(me, data));
 });
 
 function request(req: IncomingMessage, res: ServerResponse) {
@@ -42,7 +45,7 @@ function request(req: IncomingMessage, res: ServerResponse) {
   });
 }
 
-function* verify(update: unknown) {
+function* verify(me: string, update: unknown) {
   const data = sender.create(update);
   const from =
     data.callback_query?.from ||
@@ -53,40 +56,49 @@ function* verify(update: unknown) {
     data.channel_post?.chat ||
     data.message?.chat ||
     data.my_chat_member?.chat;
-  const message = data.message?.message_id || data.channel_post?.message_id;
+  let message = data.message?.message_id || data.channel_post?.message_id;
   if (!chat) throw "Failed to get a chat from update!";
 
-  if (type.post.is(update)) {
-    /// TODO: Verify channel posts
-    //    Look for channel id in user's playlists
-    return { chat: chat.id };
+  const all = yield* async(users());
+  let user: [string, { name: string }] | undefined;
+  if (type.post.is(data)) {
+    const candidates = yield* async(
+      Promise.all(
+        Object.entries(all).map((user) =>
+          persistence(user[0])
+            .settings.lookup(chat.id)
+            .then(
+              () => user,
+              () => undefined
+            )
+        )
+      ).then((x) => x.filter((x) => x))
+    );
+    user = candidates[0]; /// TODO: consider multi-user events support
+    if (!user) throw `Unauthorized post to "${chat.title}" (${chat.id})!`;
+    if (!data.channel_post.audio && !data.channel_post.text?.includes(me)) {
+      message = undefined;
+    }
+  } else {
+    if (!from) throw "The update does not have a sender!";
+    user = Object.entries(all).find((x) => x[1].telegram === from.id);
+    if (!user) throw `Unauthorized access from @${from.username} (${from.id})!`;
   }
-
-  if (!from) throw "The update does not have a sender!";
-
-  const user = Object.entries(yield* async(users())).find(
-    (x) => x[1].telegram === from.id
-  );
-  if (!user) throw `Unauthorized access from @${from.username} (${from.id})!`;
 
   if (!temp.has(chat.id)) temp.set(chat.id, new Set());
   if (message) temp.get(chat.id)?.add(message);
   temp.get(chat.id)?.forEach((x) => deleteMessage(chat?.id, x).catch(() => {}));
   temp.get(chat.id)?.clear();
-
   return {
     chat: chat.id,
     user: user[0],
-    name: user[1].name,
+    name: `${bright}${user[1].name}${reset}`,
     edit: editor(chat.id),
     reply: replier(chat.id, user[1].name, chat.type !== "private"),
   };
 }
 
-async function* handle(
-  this: { state: { me: { username: string } } },
-  update: unknown
-) {
+async function* handle(me: string, update: unknown) {
   if (type.voice.is(update)) yield* voice(update.message.voice.file_id);
   if (type.text.is(update)) {
     const { text, reply_to_message } = update.message;
@@ -100,8 +112,11 @@ async function* handle(
   }
   if (type.post.is(update)) {
     const { chat, audio, text } = update.channel_post;
-    if (text?.includes(`@${this.state.me.username}`)) yield* mention(chat.id);
-    if (audio) yield* post(audio.file_id, chat.id);
+    if (text?.includes(`@${me}`)) yield* mention(chat.id);
+    if (audio) {
+      const text = [audio.performer, audio.title].filter((x) => x).join(" - ");
+      yield* post(text, chat.id);
+    }
   }
   if (type.callback.is(update)) {
     const { id, data, from, message } = update.callback_query;

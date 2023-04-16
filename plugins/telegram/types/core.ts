@@ -36,7 +36,8 @@ const post = type({
     }),
     audio: optional(
       type({
-        file_id: string(),
+        title: optional(string()),
+        performer: optional(string()),
       })
     ),
   }),
