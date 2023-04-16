@@ -137,7 +137,6 @@ export const playback = ({ store }: DB) =>
           .select(["direction"])
           .executeTakeFirstOrThrow();
 
-        /// TODO: support shuffled direction
         const target =
           direction != 1
             ? after

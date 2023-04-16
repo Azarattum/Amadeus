@@ -74,7 +74,7 @@ BEGIN
   UPDATE playback SET "temp"="order" WHERE
     (SELECT id FROM queue WHERE position = 0) != id AND device = NEW.id;
   UPDATE playback SET
-    "order"=(SELECT "order" FROM playback WHERE "temp" IS NULL)||hex(randomblob(2))
+    "order"=(SELECT "order" FROM playback WHERE "temp" IS NULL)||trim(hex(randomblob(2)),'0')
   WHERE "temp" IS NOT NULL;
 END;
 
