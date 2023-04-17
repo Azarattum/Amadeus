@@ -13,7 +13,7 @@ import type { Task } from "libfun";
 
 async function* aggregate(
   generators: AsyncGenerator<any>[],
-  { args, id, tasks, controller }: Task<[string, any, number]>
+  { args, id, tasks, controller }: Task<[...any[], number]>
 ) {
   generators = generators.map(batch);
   const groups = tasks.map((x) => x.group as string).filter((x) => x);
@@ -22,7 +22,8 @@ async function* aggregate(
       ? match(typeof args[1] === "string" ? args[1] : args[1].title)
       : undefined;
 
-  const page = pages<any>(groups, { page: args[2], controller, compare });
+  const limit = args[args.length - 1];
+  const page = pages<any>(groups, { page: limit, controller, compare });
   controller.signal.addEventListener("abort", page.close, { once: true });
   const curated = generators.map((generator, id) => {
     return (async function* () {
