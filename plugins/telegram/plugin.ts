@@ -25,6 +25,7 @@ export const {
   relate,
   expand,
   desource,
+  recognize,
   transcribe,
   persistence,
 } = register({
@@ -59,7 +60,7 @@ const update = pool<(data: string) => void>("update");
 const message = pool<(text: string) => void>("message");
 const command = pool<(command: string, replied?: number) => void>("command");
 const mention = pool<(chat: number) => void>("mention");
-const voice = pool<(file: string) => void>("voice");
+const voice = pool<(url: string) => void>("voice");
 const post = pool<(text: string, chat: number) => void>("post");
 const invite = pool<(chat: number, title: string) => void>("invite");
 const callback =

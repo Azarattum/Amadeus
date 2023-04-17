@@ -16,6 +16,7 @@ const icon = {
   load: "⏳",
   history: "📜",
   cancel: "🚫",
+  recognize: "🌀",
 };
 
 function pager(

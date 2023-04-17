@@ -1,5 +1,5 @@
 import { Audio, Message, Text } from "../types/reply";
-import { me, sent } from "../types/core";
+import { file, me, sent } from "../types/core";
 import { fetch, wrn } from "../plugin";
 import { paramify } from "./reply";
 
@@ -77,5 +77,12 @@ export const editMessageText = (
       ...paramify(params),
     },
   }).text();
+
+export const getFile = (id: string) =>
+  fetch("getFile", {
+    params: {
+      file_id: id,
+    },
+  }).as(file);
 
 export const getMe = () => fetch("getMe").as(me);

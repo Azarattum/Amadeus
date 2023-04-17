@@ -1,4 +1,13 @@
-import { message, search, voice, info, post, persistence } from "../plugin";
+import {
+  persistence,
+  message,
+  search,
+  voice,
+  fetch,
+  info,
+  post,
+  recognize,
+} from "../plugin";
 import { async, first, map } from "@amadeus-music/core";
 import { format } from "@amadeus-music/protocol";
 import { icon } from "../api/markup";
@@ -28,6 +37,17 @@ post(function* (text, chat) {
   info(`${this.name} added "${format(track)}" to "${playlist}".`);
 });
 
-voice((file) => {
-  info("voice", file);
+voice(function* (url) {
+  info(`${this.name} requested an audio recognition...`);
+  const [id] = yield* this.reply({ page: "Recognition", icon: icon.recognize });
+  const page = pages.get(id);
+  if (!page) return;
+  this.signal.addEventListener("abort", page.close, { once: true });
+
+  const { response } = yield* fetch(url, { baseURL: "" }).flush();
+  if (!response.body) throw new Error("Could not load voice file!");
+
+  yield* map(recognize(response.body, 8), function* (state) {
+    yield* page.update(state);
+  });
 });

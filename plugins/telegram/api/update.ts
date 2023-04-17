@@ -7,6 +7,7 @@ import {
   post,
   mention,
   callback,
+  fetch,
   invite,
   update,
   temp,
@@ -15,6 +16,7 @@ import {
 import { answerCallbackQuery, deleteMessage } from "./methods";
 import { bright, reset } from "@amadeus-music/util/color";
 import { IncomingMessage, ServerResponse } from "http";
+import { pick } from "@amadeus-music/util/object";
 import { async, map } from "@amadeus-music/core";
 import { replier, editor } from "./reply";
 import { sender } from "../types/sender";
@@ -25,8 +27,8 @@ const secret = crypto.randomUUID();
 update(function* (body) {
   const data = JSON.parse(body);
   const me = this.state.me.username;
-  update.context(yield* verify(me, data));
-  yield* map(handle(me, data));
+  update.context(yield* verify(data, me));
+  yield* map(handle(data, me, pick(this.fetch.baseURL)));
 });
 
 function request(req: IncomingMessage, res: ServerResponse) {
@@ -45,7 +47,7 @@ function request(req: IncomingMessage, res: ServerResponse) {
   });
 }
 
-function* verify(me: string, update: unknown) {
+function* verify(update: unknown, me: string) {
   const data = sender.create(update);
   const from =
     data.callback_query?.from ||
@@ -98,8 +100,20 @@ function* verify(me: string, update: unknown) {
   };
 }
 
-async function* handle(me: string, update: unknown) {
-  if (type.voice.is(update)) yield* voice(update.message.voice.file_id);
+async function* handle(update: unknown, me: string, url?: string) {
+  if (type.voice.is(update) && url) {
+    const id = update.message.voice.file_id;
+    const { data } = await fetch("getFile", {
+      params: { file_id: id },
+    }).request.json();
+    if (!type.file.is(data)) throw "Unable to get voice file data!";
+    yield* voice(
+      new URL(
+        data.result.file_path,
+        url.replace("/bot", "/file/bot")
+      ).toString()
+    );
+  }
   if (type.text.is(update)) {
     const { text, reply_to_message } = update.message;
     if (!text.startsWith("/")) yield* message(text);
