@@ -31,7 +31,6 @@ function fetch(this: Context, url: string, options: FetchOptions = {}) {
   if (params) {
     if (url.includes("?")) url += "&" + params;
     else url += "?" + params;
-    delete options.params;
   }
 
   const request = gretch<unknown, unknown>(url, {

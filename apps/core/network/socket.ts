@@ -9,6 +9,7 @@ import { promisify } from "util";
 
 type ConnectOptions = {
   baseURL?: string | string[];
+  params?: Record<string, string | string[]>;
 };
 
 function connect(this: Context, url = "", options: ConnectOptions = {}) {
@@ -16,8 +17,14 @@ function connect(this: Context, url = "", options: ConnectOptions = {}) {
   const ctx: any = group ? pools.contexts.get(group) || {} : {};
   if (typeof ctx.fetch === "object") options = merge(ctx.connect, options);
 
-  const target = new URL(url, pick(options.baseURL));
-  const socket = new WebSocket(target);
+  url = new URL(url, pick(options.baseURL)).toString();
+  const params = new URLSearchParams(pick(options.params)).toString();
+  if (params) {
+    if (url.includes("?")) url += "&" + params;
+    else url += "?" + params;
+  }
+
+  const socket = new WebSocket(url);
   const connected = promisify(socket.on.bind(socket))("open");
 
   return {
@@ -64,7 +71,10 @@ function connect(this: Context, url = "", options: ConnectOptions = {}) {
                   resolve(parsed as any);
                 }
                 if (until?.is(parsed)) {
-                  new Error("Until condition is reached!", { cause: parsed });
+                  const formatted = JSON.stringify(parsed, null, 2);
+                  throw new Error(
+                    `End condition is reached!\nReceived: ${formatted}`
+                  );
                 }
               } catch (err) {
                 socket.off("message", handler);
