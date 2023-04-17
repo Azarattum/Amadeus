@@ -41,12 +41,14 @@ const relate = pool<
   | ((type: "artist", to: ArtistInfo, page: number) => Aggregated<ArtistInfo>)
 >("relate", { transform: aggregate, timeout });
 
+const recognize = pool<
+  (stream: ReadableStream<Uint8Array>, page: number) => Aggregated<TrackInfo>
+>("recognize", { transform: aggregate, timeout });
+
 const desource = pool<(source: string) => string>("desource");
 const transcribe = pool<(track: TrackInfo) => string>("transcribe", {
   cache: 5,
 });
-
-/// TODO: recognize
 
 // Persistence events
 const persistence = pool<(user?: string) => Database>("persistence");
@@ -61,6 +63,7 @@ export {
   relate,
   expand,
   desource,
+  recognize,
   transcribe,
   persistence,
 };

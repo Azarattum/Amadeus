@@ -68,6 +68,23 @@ const download = type({
   ts: string(),
 });
 
+const match = type({
+  directive: type({
+    payload: union([
+      type({
+        data: type({
+          match: track,
+        }),
+      }),
+      type({
+        error: type({
+          message: string(),
+        }),
+      }),
+    ]),
+  }),
+});
+
 function convert(data: Infer<typeof track>) {
   const toArt = (cover?: string) =>
     cover ? ["https://" + cover.slice(0, -2) + "800x800"] : [];
@@ -90,4 +107,14 @@ function convert(data: Infer<typeof track>) {
   };
 }
 
-export { results, link, download, volumes, tracks, lyrics, similar, convert };
+export {
+  results,
+  link,
+  download,
+  volumes,
+  tracks,
+  lyrics,
+  similar,
+  convert,
+  match,
+};

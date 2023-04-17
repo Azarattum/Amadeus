@@ -12,7 +12,9 @@ export const {
   relate,
   expand,
   command,
+  connect,
   desource,
+  recognize,
   transcribe,
 } = register({
   name,

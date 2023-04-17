@@ -1,4 +1,15 @@
 import {
+  init,
+  search,
+  desource,
+  fetch,
+  relate,
+  transcribe,
+  expand,
+  recognize,
+  connect,
+} from "./plugin";
+import {
   volumes,
   convert,
   download,
@@ -7,21 +18,15 @@ import {
   tracks,
   similar,
   lyrics,
+  match,
 } from "./types";
-import {
-  init,
-  search,
-  desource,
-  fetch,
-  relate,
-  transcribe,
-  expand,
-} from "./plugin";
 import { format } from "@amadeus-music/protocol";
+import { auth, header, transform } from "./meta";
 import { createHash } from "node:crypto";
 
 init(function* ({ yandex: { token } }) {
   if (!token) throw "Plugin disabled! No token found!";
+  this.connect.baseURL = "wss://uniproxy.alice.yandex.net/uni.ws";
   this.fetch.baseURL = "https://api.music.yandex.net/";
   this.fetch.params = { age: "0" };
   this.fetch.headers = {
@@ -103,4 +108,17 @@ transcribe(function* (track) {
   }
   const { result } = yield* fetch(`tracks/${id}/supplement`).as(lyrics);
   if (result.lyrics) yield result.lyrics.fullLyrics;
+});
+
+recognize(function* (stream) {
+  const connection = connect();
+  const init = header();
+  const id = init.event.header.streamId;
+
+  yield* connection.send(auth);
+  yield* connection.send(init);
+  yield* connection.send(stream.pipeThrough(transform(id)));
+  const { directive } = yield* connection.recv(match);
+  if ("data" in directive.payload) yield convert(directive.payload.data.match);
+  yield* connection.close();
 });
