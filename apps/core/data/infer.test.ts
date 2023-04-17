@@ -12,13 +12,13 @@ it("infers tracks", () => {
     "Lau - Game of Thrones Theme - Karliene Version Cover (Audio Only)"
   );
   expect(val.title).toBe("Game of Thrones Theme");
-  expect(val.artists).toEqual(["Lau", "Karliene"]);
+  expect(val.artists).toEqual(["Karliene", "Lau"]);
 
   val = inferTrack(
     "Karliene & Celtic Borders - You Win or You Die - Game of Thrones"
   );
   expect(val.title).toBe("You Win or You Die");
-  expect(val.artists).toEqual(["Karliene", "Celtic Borders"]);
+  expect(val.artists).toEqual(["Celtic Borders", "Karliene"]);
   expect(val.album).toBe("Game of Thrones");
 
   val = inferTrack('"Pollution" by Tom Lehrer');
@@ -61,7 +61,7 @@ it("infers tracks", () => {
 
   val = inferTrack("Pig&Dan -The Saint Job San (Lee Van Dowski Remix)");
   expect(val.title).toBe("The Saint Job San");
-  expect(val.artists).toEqual(["Pig", "Dan", "Lee Van Dowski"]);
+  expect(val.artists).toEqual(["Dan", "Lee Van Dowski", "Pig"]);
 
   val = inferTrack(
     "Ambi Sessions 12/11 {Ambient Techno-Tribal-Dub Techno-Meditative}"
@@ -83,15 +83,15 @@ it("infers tracks", () => {
 
   val = inferTrack("The Prodigy - Voodoo People ( Parasense Rmx )");
   expect(val.title).toBe("Voodoo People");
-  expect(val.artists).toEqual(["The Prodigy", "Parasense"]);
+  expect(val.artists).toEqual(["Parasense", "The Prodigy"]);
 
   val = inferTrack('Giselle "Silk" Favored Nations Remix');
   expect(val.title).toBe("Silk");
-  expect(val.artists).toEqual(["Giselle", "Favored Nations"]);
+  expect(val.artists).toEqual(["Favored Nations", "Giselle"]);
 
   val = inferTrack("WITCHER 3 SONG- Wake The White Wolf By Miracle Of Sound");
   expect(val.title).toBe("Wake The White Wolf");
-  expect(val.artists).toEqual(["WITCHER 3 SONG", "Miracle Of Sound"]);
+  expect(val.artists).toEqual(["Miracle Of Sound", "WITCHER 3 SONG"]);
 
   val = inferTrack(
     "Miracle Of Sound - The Call - Elder Scrolls Online Song [pleer.com]"
@@ -120,7 +120,7 @@ it("infers tracks", () => {
     "Bruno Mars, Anderson .Paak, Silk Sonic - Leave the Door Open [Official Video]"
   );
   expect(val.title).toBe("Leave the Door Open");
-  expect(val.artists).toEqual(["Bruno Mars", "Anderson .Paak", "Silk Sonic"]);
+  expect(val.artists).toEqual(["Anderson .Paak", "Bruno Mars", "Silk Sonic"]);
 
   val = inferTrack(
     "Galasy ZMesta - Ya Nauchu Tebya (I'll Teach You) - Belarus - Official Video - Eurovision 2021"
@@ -146,7 +146,7 @@ it("infers tracks", () => {
     "【Helltaker Original Song】 What the Hell by @OR3O , @Lollia  , and @Sleeping Forest   ft. Friends"
   );
   expect(val.title).toBe("What the Hell");
-  expect(val.artists).toEqual(["OR3O", "Lollia", "Sleeping Forest", "Friends"]);
+  expect(val.artists).toEqual(["Friends", "Lollia", "OR3O", "Sleeping Forest"]);
 
   val = inferTrack("Splatoon ★ Blitz It (Remix\\Cover) | MiatriSs");
   expect(val.title).toBe("Blitz It (Remix\\Cover)");
@@ -173,7 +173,7 @@ it("infers tracks", () => {
   );
   expect(val.title).toBe("Ross Bugden");
   expect(val.album).toBe("Ross Bugden");
-  expect(val.artists).toEqual(["Fall", "AnubisMusic"]);
+  expect(val.artists).toEqual(["AnubisMusic", "Fall"]);
 
   val = inferTrack("Karliene. - Elizabeth");
   expect(val.title).toBe("Elizabeth");
@@ -223,6 +223,12 @@ it("infers tracks", () => {
 
   val = inferTrack("Nice song http://example.com");
   expect(val.title).toBe("Nice song");
+
+  val = inferTrack(
+    "Time's Up (feat. Jonas, Ts3 & T-Bear) feat. Jonas,Ts3,T-Bear"
+  );
+  expect(val.title).toBe("Time's Up");
+  expect(val.artists).toEqual(["Jonas", "T-Bear", "Ts3"]);
 });
 
 it("infers artists", () => {

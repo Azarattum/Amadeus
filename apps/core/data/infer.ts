@@ -273,7 +273,7 @@ function inferTrack(text: string, artistless = false) {
   }
 
   meta = meta.filter((x) => !isJunkGenre(x));
-  artists = artists.map((x) => trim(x));
+  artists = [...new Set(artists.map((x) => trim(x)))].sort();
 
   album = album || title;
   if (meta.length) title += ` (${meta.join(", ")})`;
