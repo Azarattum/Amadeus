@@ -4,6 +4,7 @@ import type { Context } from "../plugin/types";
 import type { Struct } from "superstruct";
 import { async, context } from "libfun";
 import { pools } from "../event/pool";
+import { err } from "../status/log";
 import { Writable } from "stream";
 import { promisify } from "util";
 
@@ -25,7 +26,10 @@ function connect(this: Context, url = "", options: ConnectOptions = {}) {
   }
 
   const socket = new WebSocket(url);
-  const connected = promisify(socket.on.bind(socket))("open");
+  const connected = new Promise((resolve, reject) => {
+    socket.once("open", resolve);
+    socket.once("error", reject);
+  });
 
   return {
     socket,
