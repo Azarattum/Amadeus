@@ -1,0 +1,15 @@
+{
+  "name": "@amadeus-music/plugin-audd",
+  "description": "Recognize sound with AudD for Amadeus.",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.cjs"
+  },
+  "dependencies": {
+    "@amadeus-music/core": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "4.2.1"
+  }
+}
