@@ -4,7 +4,6 @@ import type { Context } from "../plugin/types";
 import type { Struct } from "superstruct";
 import { async, context } from "libfun";
 import { pools } from "../event/pool";
-import { err } from "../status/log";
 import { Writable } from "stream";
 import { promisify } from "util";
 
