@@ -117,7 +117,7 @@ recognize(function* (stream) {
 
   yield* connection.send(auth);
   yield* connection.send(init);
-  yield* connection.send(stream.pipeThrough(transform(id)));
+  yield* connection.send(stream().pipeThrough(transform(id)));
   const { directive } = yield* connection.recv(match);
   if ("data" in directive.payload) yield convert(directive.payload.data.match);
   yield* connection.close();

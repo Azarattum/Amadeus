@@ -42,7 +42,10 @@ const relate = pool<
 >("relate", { transform: aggregate, timeout });
 
 const recognize = pool<
-  (stream: ReadableStream<Uint8Array>, page: number) => Aggregated<TrackInfo>
+  (
+    stream: () => ReadableStream<Uint8Array>,
+    page: number
+  ) => Aggregated<TrackInfo>
 >("recognize", { transform: aggregate, timeout });
 
 const desource = pool<(source: string) => string>("desource");

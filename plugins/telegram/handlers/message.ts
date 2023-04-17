@@ -47,7 +47,14 @@ voice(function* (url) {
   const { response } = yield* fetch(url, { baseURL: "" }).flush();
   if (!response.body) throw new Error("Could not load voice file!");
 
-  yield* map(recognize(response.body, 8), function* (state) {
+  let stream = response.body;
+  const restream = () => {
+    const streams = stream.tee();
+    stream = streams[0];
+    return streams[1];
+  };
+
+  yield* map(recognize(restream, 8), function* (state) {
     yield* page.update(state);
   });
 });
