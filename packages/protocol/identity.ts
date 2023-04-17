@@ -83,6 +83,7 @@ function merge<T extends Record<string, any>>(target: T, source: T) {
       const identified = sorted.map(identify);
       c = sorted.filter((x, i) => identified.indexOf(identify(x)) === i);
     } else if (typeof a === "object") c = merge(a, b);
+    if (typeof a === "number") c = a > b ? a : b;
     target[key] = json ? JSON.stringify(c) : c;
   }
 
