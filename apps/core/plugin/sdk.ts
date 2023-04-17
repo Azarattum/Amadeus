@@ -5,9 +5,11 @@ import {
   type Plugin,
 } from "./types";
 import { bright, reset } from "@amadeus-music/util/color";
+import type { ConnectOptions } from "../network/socket";
 import type { FetchOptions } from "../network/fetch";
 import * as persistence from "../event/persistence";
 import { command, usage } from "../status/commands";
+import * as socket from "../network/socket";
 import { format, plugins } from "./loader";
 import * as fetch from "../network/fetch";
 import * as events from "../event/pool";
@@ -20,6 +22,7 @@ const bound = {
   ...events,
   ...log,
   ...fetch,
+  ...socket,
   ...persistence,
   command,
 };
@@ -40,16 +43,17 @@ function register<
   info(`Loading ${bright}${plugin.name}${reset} plugin v${plugin.version}...`);
   plugins.set(id, plugin);
 
+  type NativeContext = { fetch: FetchOptions; connect: ConnectOptions };
   const context = {
     group: id,
     scope: id,
-    context: { fetch: {}, ...(plugin.context || {}) },
+    context: { fetch: {}, connect: {}, ...(plugin.context || {}) },
   };
   return Object.fromEntries(
     Object.entries(bound)
       .filter((entry) => "bind" in entry[1])
       .map(([key, fn]) => [key, (fn as any).bind(context)])
-  ) as Configure<typeof bound, T, S, C & { fetch: FetchOptions }>;
+  ) as Configure<typeof bound, T, S, C & NativeContext>;
 }
 
 export const path = (to = ".") =>

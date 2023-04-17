@@ -17,10 +17,12 @@
     "gretchen": "^1.5.1",
     "libfun": "workspace:*",
     "string-similarity-js": "^2.1.4",
-    "superstruct": "^1.0.3"
+    "superstruct": "^1.0.3",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.2",
+    "@types/ws": "^8.5.4",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-node-externals": "^5.1.2",
     "vite": "4.2.1",
