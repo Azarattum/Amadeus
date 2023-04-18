@@ -1,11 +1,16 @@
-import { WebSocket, createWebSocketStream, type RawData } from "ws";
+import { WebSocket, createWebSocketStream, WebSocketServer } from "ws";
+import { bright, reset } from "@amadeus-music/util/color";
 import { merge, pick } from "@amadeus-music/util/object";
 import type { Context } from "../plugin/types";
 import type { Struct } from "superstruct";
 import { async, context } from "libfun";
 import { pools } from "../event/pool";
+import { info } from "../status/log";
 import { Writable } from "stream";
+import type { RawData } from "ws";
 import { promisify } from "util";
+import { http } from "./http";
+import { parse } from "url";
 
 type ConnectOptions = {
   baseURL?: string | string[];
@@ -95,5 +100,34 @@ function connect(this: Context, url = "", options: ConnectOptions = {}) {
   };
 }
 
+const server = new WebSocketServer({ noServer: true });
+const registered = new Set<string>();
+function wss(path: string, listen = true) {
+  const parent = http(listen);
+  if (registered.has(path)) return server;
+
+  parent.on("upgrade", (request, socket, head) => {
+    if (!request.url) return;
+    const { pathname } = parse(request.url);
+    if (pathname === path) {
+      server.handleUpgrade(request, socket, head, (ws) => {
+        server.emit("connection", ws, request);
+        info(`WebSocket client connected on ${bright}${path}${reset}.`);
+      });
+    }
+  });
+  registered.add(path);
+  info(`Registered WebSocket handler on ${bright}${path}${reset}.`);
+
+  if (registered.size > 1) return server;
+  parent.on("close", () => {
+    info("Stopping the WebSocket server...");
+    server.removeAllListeners();
+    registered.clear();
+    server.close();
+  });
+  return server;
+}
+
+export { connect, wss };
 export type { ConnectOptions };
-export { connect };

@@ -9,7 +9,7 @@ import type { ConnectOptions } from "../network/socket";
 import type { FetchOptions } from "../network/fetch";
 import * as persistence from "../event/persistence";
 import { command, usage } from "../status/commands";
-import * as socket from "../network/socket";
+import { connect } from "../network/socket";
 import { format, plugins } from "./loader";
 import * as fetch from "../network/fetch";
 import * as events from "../event/pool";
@@ -22,8 +22,8 @@ const bound = {
   ...events,
   ...log,
   ...fetch,
-  ...socket,
   ...persistence,
+  connect,
   command,
 };
 
@@ -61,6 +61,7 @@ export const path = (to = ".") =>
 
 export { register, usage };
 export { http } from "../network/http";
+export { wss } from "../network/socket";
 export { inferTrack, inferArtists } from "../data/infer";
 
 export * from "superstruct";

@@ -1,8 +1,10 @@
 import { createServer, type Server } from "node:http";
 import { init, stop } from "../event/pool";
 import { err, info } from "../status/log";
+import type { Socket } from "net";
 import { async } from "libfun";
 
+const connections = new Set<Socket>();
 let server: Server | undefined;
 let port: number | undefined;
 init((config) => {
@@ -15,6 +17,8 @@ stop(function* () {
   info("Stopping the HTTP server...");
   server.closeAllConnections();
   server.removeAllListeners();
+  connections.forEach((x) => x.destroy());
+  connections.clear();
   yield* async(new Promise((resolve) => server?.close(resolve)));
 });
 
@@ -23,6 +27,10 @@ export function http(listen = true) {
   if (!listen) return server;
   if (!server.listening) {
     info(`HTTP server is listening on port ${port}.`);
+    server.on("connection", (socket) => {
+      socket.once("close", () => connections.delete(socket));
+      connections.add(socket);
+    });
     server.on("error", err);
     server.listen(port);
   }
