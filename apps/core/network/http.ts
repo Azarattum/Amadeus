@@ -16,10 +16,10 @@ stop(function* () {
   if (!server || !server.listening) return;
   info("Stopping the HTTP server...");
   server.closeAllConnections();
-  server.removeAllListeners();
   connections.forEach((x) => x.destroy());
   connections.clear();
   yield* async(new Promise((resolve) => server?.close(resolve)));
+  server.removeAllListeners();
 });
 
 export function http(listen = true) {

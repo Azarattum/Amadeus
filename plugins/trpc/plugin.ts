@@ -1,11 +1,12 @@
 import { defaulted, string, register } from "@amadeus-music/core";
 import { name, version } from "./package.json";
 
-export const { wrn, ok, init, stop, persistence, users, command } = register({
-  name,
-  version,
-  settings: { password: defaulted(string(), "") },
-});
+export const { wrn, ok, info, init, stop, persistence, users, command } =
+  register({
+    name,
+    version,
+    settings: { password: defaulted(string(), "") },
+  });
 
 export const hash = (text: string) =>
   crypto.subtle

@@ -100,7 +100,7 @@ function connect(this: Context, url = "", options: ConnectOptions = {}) {
   };
 }
 
-const server = new WebSocketServer({ noServer: true });
+let server = new WebSocketServer({ noServer: true });
 const registered = new Set<string>();
 function wss(path: string, listen = true) {
   const parent = http(listen);
@@ -112,7 +112,6 @@ function wss(path: string, listen = true) {
     if (pathname?.startsWith(path)) {
       server.handleUpgrade(request, socket, head, (ws) => {
         server.emit("connection", ws, request);
-        info(`WebSocket client connected on ${bright}${path}${reset}.`);
       });
     }
   });
@@ -125,6 +124,7 @@ function wss(path: string, listen = true) {
     server.removeAllListeners();
     registered.clear();
     server.close();
+    server = new WebSocketServer({ noServer: true });
   });
   return server;
 }
