@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Stack, Input, Header } from "@amadeus-music/ui";
+  import { Button, Stack, Input, Header, Spacer } from "@amadeus-music/ui";
   import { playlists, history } from "$lib/data";
 
   let hostname = "";
@@ -23,12 +23,18 @@
   <Input placeholder="Username" bind:value={username} />
   <Input placeholder="Password" bind:value={password} />
   <Button primary stretch on:click={login}>Login</Button>
-  <Stack gap>
+  <Stack gap grow>
+    <Stack x center grow>
+      <Header>History</Header>
+      <Spacer />
+      <Button on:click={() => history.clear()}>Clear</Button>
+    </Stack>
+
     {#each $history as { query }}
       <p>{query}</p>
     {/each}
   </Stack>
-  <Stack gap p>
+  <Stack gap>
     {#each $playlists as playlist}
       <Header>{playlist.playlist}</Header>
       <ul>
