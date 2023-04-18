@@ -1,0 +1,17 @@
+{
+  "name": "@amadeus-music/plugin-trpc",
+  "description": "tTRC endpoint for Amadeus.",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.cjs"
+  },
+  "dependencies": {
+    "@amadeus-music/core": "workspace:*",
+    "@trpc/server": "^10.20.0",
+    "superstruct": "^1.0.3"
+  },
+  "devDependencies": {
+    "vite": "4.2.2"
+  }
+}
