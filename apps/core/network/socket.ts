@@ -109,7 +109,7 @@ function wss(path: string, listen = true) {
   parent.on("upgrade", (request, socket, head) => {
     if (!request.url) return;
     const { pathname } = parse(request.url);
-    if (pathname === path) {
+    if (pathname?.startsWith(path)) {
       server.handleUpgrade(request, socket, head, (ws) => {
         server.emit("connection", ws, request);
         info(`WebSocket client connected on ${bright}${path}${reset}.`);

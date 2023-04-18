@@ -5,10 +5,10 @@ import {
   type Plugin,
 } from "./types";
 import { bright, reset } from "@amadeus-music/util/color";
+import { command, usage, arg } from "../status/commands";
 import type { ConnectOptions } from "../network/socket";
 import type { FetchOptions } from "../network/fetch";
 import * as persistence from "../event/persistence";
-import { command, usage } from "../status/commands";
 import { connect } from "../network/socket";
 import { format, plugins } from "./loader";
 import * as fetch from "../network/fetch";
@@ -59,7 +59,7 @@ function register<
 export const path = (to = ".") =>
   import.meta.env.DEV ? resolve(__dirname, "..", to) : resolve(__dirname, to);
 
-export { register, usage };
+export { register, usage, arg };
 export { http } from "../network/http";
 export { wss } from "../network/socket";
 export { inferTrack, inferArtists } from "../data/infer";
@@ -68,6 +68,7 @@ export * from "superstruct";
 export { map as dict } from "superstruct";
 export * from "libfun";
 export { map } from "libfun";
+export * from "@amadeus-music/util/color";
 
 export { identify } from "@amadeus-music/protocol";
 
