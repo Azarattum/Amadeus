@@ -1,7 +1,7 @@
 import type { DB } from "../data/schema";
 
 export const history = ({ store }: DB) =>
-  store((db) => db.selectFrom("history").selectAll(), {
+  store((db) => db.selectFrom("history").orderBy("date", "desc").selectAll(), {
     async log(db, query: string) {
       await db
         .insertInto("history")
