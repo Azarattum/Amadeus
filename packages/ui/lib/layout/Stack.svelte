@@ -39,6 +39,7 @@
   class:flex-grow={grow}
   class:max-w-[100dvw]={screen && (x || z)}
   class:max-h-[100dvh]={screen && !x}
+  class:overflow-auto={screen}
 >
   <slot />
 </div>
