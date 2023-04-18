@@ -33,7 +33,7 @@ BEGIN
     playback = IFNULL((SELECT id FROM queue WHERE position = 1), playback),
     progress = 0
   WHERE id = NEW.id;
-  INSERT INTO feed VALUES (ABS(RANDOM() % POWER(2, 32)), 0, (SELECT track FROM playback WHERE id = NEW.playback), 1);
+  INSERT INTO feed SELECT ABS(RANDOM() % 4294967296), 0, track, 1 FROM playback WHERE id = NEW.playback;
   INSERT OR IGNORE INTO following SELECT artist, track as seen FROM attribution
     WHERE
       EXISTS (SELECT 1 FROM following WHERE following.artist = attribution.artist)
