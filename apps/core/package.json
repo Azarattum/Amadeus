@@ -25,7 +25,7 @@
     "@types/ws": "^8.5.4",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-node-externals": "^5.1.2",
-    "vite": "4.2.1",
+    "vite": "4.2.2",
     "vite-node": "0.30.1"
   }
 }
