@@ -26,7 +26,10 @@ const stores = (db: DB) => ({
 
 function connect(options: Options) {
   if (!connections.has(options.name)) {
-    const db = database(options.local ? nocrr(schema) : schema, options);
+    const db = database(
+      options.local ? (nocrr(schema) as typeof schema) : schema,
+      options
+    ) as any as DB;
     connections.set(options.name, { ...db, ...stores(db) });
     const statements = Object.values(
       import.meta.glob("../sql/*", { eager: true, as: "raw" })

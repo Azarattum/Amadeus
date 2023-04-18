@@ -90,10 +90,10 @@ ordered(playback, "order", "device");
 const devices = object({
   id: instance(Uint8Array),
   playback: nullable(id()),
-  direction: number(),
-  infinite: number(),
+  direction: integer(),
+  infinite: integer(),
   progress: number(),
-  repeat: number(),
+  repeat: integer(),
 });
 crr(devices);
 primary(devices, "id");
@@ -117,6 +117,7 @@ const history = object({
   query: string(),
   date: integer(),
 });
+crr(history);
 index(history, "date");
 primary(history, "query");
 
