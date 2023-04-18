@@ -9,7 +9,9 @@
     "test": "vitest run -c ../../vite.web.js"
   },
   "dependencies": {
+    "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/crdata": "workspace:*",
+    "@amadeus-music/util": "workspace:*",
     "@amadeus-music/ui": "workspace:*",
     "@trpc/client": "^10.20.0",
     "@trpc/server": "^10.20.0"

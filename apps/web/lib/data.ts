@@ -11,5 +11,6 @@ export const {
   artists,
   library,
   tracks,
+  update,
   feed,
 } = connect({ name: "library.db", push: push.mutate, pull: pull.subscribe });

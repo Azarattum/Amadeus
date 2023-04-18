@@ -1,13 +1,23 @@
-import { defaulted, string, register } from "@amadeus-music/core";
+import { defaulted, string, register, Page } from "@amadeus-music/core";
 import { name, version } from "./package.json";
 
-export const { wrn, ok, info, init, stop, persistence, users, command } =
-  register({
-    name,
-    version,
-    settings: { password: defaulted(string(), "") },
-  });
+export const {
+  ok,
+  wrn,
+  info,
+  init,
+  stop,
+  search,
+  users,
+  command,
+  persistence,
+} = register({
+  name,
+  version,
+  settings: { password: defaulted(string(), "") },
+});
 
+export const loaders = new Map<number, () => void>();
 export const hash = (text: string) =>
   crypto.subtle
     .digest("SHA-1", new TextEncoder().encode(text))

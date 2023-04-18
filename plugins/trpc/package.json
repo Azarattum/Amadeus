@@ -7,6 +7,7 @@
     "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.cjs"
   },
   "dependencies": {
+    "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/core": "workspace:*",
     "@trpc/server": "^10.20.0",
     "superstruct": "^1.0.3"

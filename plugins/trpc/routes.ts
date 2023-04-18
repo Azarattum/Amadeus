@@ -1,8 +1,17 @@
-import { any, array, number, object, string } from "superstruct";
+import {
+  any,
+  array,
+  literal,
+  number,
+  object,
+  string,
+  union,
+} from "superstruct";
+import type { TrackDetails } from "@amadeus-music/protocol";
 import { observable } from "@trpc/server/observable";
 import { TRPCError, initTRPC } from "@trpc/server";
+import { info, loaders, search } from "./plugin";
 import { Context } from "./context";
-import { info } from "./plugin";
 
 const { router, procedure, middleware } = initTRPC.context<Context>().create();
 
@@ -32,6 +41,43 @@ const app = router({
         };
       })
     ),
+  search: procedure
+    .use(auth)
+    .input(
+      object({
+        type: union([literal("track")]),
+        query: string(),
+        page: number(),
+      })
+    )
+    .subscription(({ input: { type, query, page }, ctx }) =>
+      /// TODO: support arbitrary results (inferred from search type)
+      observable<{ id: number; results: TrackDetails[] }>(({ next }) => {
+        info(`${ctx.name} is searching for "${query}"...`);
+        const id = (Math.random() * 2 ** 32) >>> 0;
+        const pages = search(type, query, page);
+        (async () => {
+          /// TODO: this is messy, it needs a rewrite
+          for await (const page of pages) {
+            next({
+              id,
+              results: page.pages.flatMap((x) => x.items as TrackDetails[]),
+            });
+            loaders.set(id, async () => {
+              await page.loaded;
+              page.next();
+            });
+          }
+        })();
+        return () => pages.executor.controller.abort();
+      })
+    ),
+  next: procedure
+    .use(auth)
+    .input(number())
+    .mutation(({ input }) => {
+      loaders.get(input)?.();
+    }),
 });
 
 export { app };
