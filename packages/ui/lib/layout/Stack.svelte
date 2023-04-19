@@ -27,7 +27,7 @@
 <div
   class="
   {z || wrap ? 'grid' : 'flex'}
-  {wrap ? 'grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]' : ''}
+  {wrap ? 'grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))]' : ''}
   {z ? '[&>*]:col-start-1 [&>*]:row-start-1' : ''}
   {center
     ? 'place-items-center'

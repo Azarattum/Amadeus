@@ -5,7 +5,7 @@
 </script>
 
 <span
-  class="[&>*]:align-bottom"
+  class="max-w-full overflow-hidden text-ellipsis whitespace-nowrap [&>*]:align-bottom"
   class:text-content-200={secondary}
   class:font-medium={accent}
   class:text-sm={sm}

@@ -35,6 +35,7 @@
     </div>
   {/if}
   <div
+    style:contain="inline-size"
     class="z-10 box-content flex w-full flex-col justify-center gap-2
     {sm ? '' : 'items-center'}
     "
