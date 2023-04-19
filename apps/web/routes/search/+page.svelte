@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Input, Icon, Stack, Button } from "@amadeus-music/ui";
+  import { Input, Icon, Stack, Button, Spacer } from "@amadeus-music/ui";
   import type { TrackDetails } from "@amadeus-music/protocol";
+  import { history, library, playlists } from "$lib/data";
   import { debounce } from "@amadeus-music/util/async";
   import { format } from "@amadeus-music/protocol";
   import { next, search } from "$lib/trpc";
-  import { history } from "$lib/data";
   import { onDestroy } from "svelte";
 
   let results: TrackDetails[] = [];
@@ -36,6 +36,9 @@
         alt="{format(track)} cover"
       />
       <div>{format(track)}</div>
+      <Spacer />
+      <Button on:click={() => library.push([track], $playlists[0].id)}>+</Button
+      >
     </Stack>
   {/each}
   {#if results.length}
