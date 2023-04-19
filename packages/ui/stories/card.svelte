@@ -2,7 +2,7 @@
   import { Icon, Stack, Text, Card, Header } from "@amadeus-music/ui";
 </script>
 
-<Stack p grow gap="xl">
+<Stack screen p grow gap="xl">
   <Header xl>Cards</Header>
   <Stack x gap="lg" wrap>
     <Card interactive>
