@@ -1,8 +1,10 @@
 import { deleteMessage, getMe, setMyCommands, setWebhook } from "./api/methods";
+import { init, stop, info, temp, persistence, users, changed } from "./plugin";
 import { bright, reset } from "@amadeus-music/util/color";
+import { parseChanges } from "./handlers/database";
 import { async, http } from "@amadeus-music/core";
-import { init, stop, info, temp } from "./plugin";
 import { secret, request } from "./api/update";
+import { editor, replier } from "./api/reply";
 import { icon } from "./api/markup";
 
 init(function* ({ telegram: { token, webhook } }) {
@@ -19,6 +21,28 @@ init(function* ({ telegram: { token, webhook } }) {
   info(`Logged in as ${bright}@${this.state.me.username}${reset}!`);
 
   http().on("request", request);
+
+  // Listen to the database changes for each user
+  for (const [user, { name }] of Object.entries(yield* async(users()))) {
+    const storage = persistence(user);
+    yield* storage.subscribe(["library", "feed"], (changes: any[]) =>
+      parseChanges(changes).forEach(([entries, type], playlist) => {
+        storage.settings.extract(playlist.toString()).then(
+          (chat) => {
+            changed.context({
+              chat,
+              user,
+              reply: replier(chat, name, true),
+              name: `${bright}${name}${reset}`,
+              edit: editor(chat),
+            });
+            changed(type, [...entries]).then();
+          },
+          () => {}
+        );
+      })
+    );
+  }
 });
 
 stop(function* () {

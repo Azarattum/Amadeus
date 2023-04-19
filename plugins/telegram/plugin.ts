@@ -63,6 +63,8 @@ const mention = pool<(chat: number) => void>("mention");
 const voice = pool<(url: string) => void>("voice");
 const post = pool<(text: string, chat: number) => void>("post");
 const invite = pool<(chat: number, title: string) => void>("invite");
+const changed =
+  pool<(type: "library" | "feed", entries: number[]) => void>("changed");
 const callback =
   pool<(request: Infer<typeof query>, message: number, chat: number) => void>(
     "callback"
@@ -77,6 +79,7 @@ export {
   message,
   command,
   mention,
+  changed,
   invite,
   update,
   voice,
