@@ -7,6 +7,7 @@ import {
   info,
   post,
   recognize,
+  wrn,
 } from "../plugin";
 import { async, first, map } from "@amadeus-music/core";
 import { format } from "@amadeus-music/protocol";
@@ -32,6 +33,7 @@ post(function* (text, chat) {
   const page = yield* async(first(search("track", text, 1)));
   yield* async(page.loaded);
   const track = page.items[0];
+  if (!track) return wrn(`Unable to lookup track "${text}"!`);
   const playlist = +(yield* storage.settings.lookup(chat));
   yield* storage.library.push([track], playlist);
   info(`${this.name} added "${format(track)}" to "${playlist}".`);
