@@ -14,6 +14,7 @@ export { default as Overlay } from "./lib/layout/Overlay.svelte";
 export { default as Virtual } from "./lib/layout/Virtual.svelte";
 export { default as Sortable } from "./lib/layout/Sortable.svelte";
 export { default as Separator } from "./lib/layout/Separator.svelte";
+export { default as Swipeable } from "./lib/layout/Swipeable.svelte";
 
 export { default as Input } from "./lib/interactive/Input.svelte";
 export { default as Group } from "./lib/interactive/Group.svelte";
@@ -22,7 +23,9 @@ export { default as Checkbox } from "./lib/interactive/Checkbox.svelte";
 
 export { default as Logo } from "./lib/static/Logo.svelte";
 export { default as Icon } from "./lib/static/Icon.svelte";
+export { default as Card } from "./lib/static/Card.svelte";
 export { default as Header } from "./lib/static/Header.svelte";
+export { default as Text } from "./lib/static/Text.svelte";
 export { default as Tooltip } from "./lib/static/Tooltip.svelte";
 export { default as Spinner } from "./lib/static/Spinner.svelte";
 
