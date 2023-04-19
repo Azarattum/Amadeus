@@ -1,11 +1,19 @@
+import {
+  persistence,
+  command,
+  context,
+  users,
+  hash,
+  init,
+  ok,
+  wrn,
+} from "./plugin";
 import { wss, arg, async, usage, bright, reset } from "@amadeus-music/core";
-import { command, hash, init, ok, persistence, users, wrn } from "./plugin";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
-import { createContext } from "./context";
 import { app } from "./routes";
 
 init(() => {
-  applyWSSHandler({ wss: wss("/trpc"), router: app, createContext });
+  applyWSSHandler({ wss: wss("/trpc"), router: app, createContext: context });
 });
 
 command(

@@ -1,5 +1,5 @@
 import { connect } from "@amadeus-music/crdata";
-import { pull, push } from "./trpc";
+import { sync } from "./trpc";
 
 export const {
   playlists,
@@ -13,4 +13,8 @@ export const {
   tracks,
   update,
   feed,
-} = connect({ name: "library.db", push: push.mutate, pull: pull.subscribe });
+} = connect({
+  name: "library.db",
+  push: sync.push.mutate,
+  pull: sync.pull.subscribe,
+});
