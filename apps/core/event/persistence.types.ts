@@ -23,11 +23,13 @@ type Database = DeepPartial<{
   };
   feed: {
     push(tracks: TrackDetails[], type: FeedType): Promise<void>;
+    get(entries: number[]): Promise<TrackDetails[]>;
     clear(type: FeedType): Promise<void>;
   };
   library: {
     push(tracks: TrackDetails[], playlist?: number): Promise<void>;
     rearrange(entry: number, after?: number): Promise<void>;
+    get(entries: number[]): Promise<TrackDetails[]>;
     purge(entries: number[]): Promise<void>;
   };
   settings: {

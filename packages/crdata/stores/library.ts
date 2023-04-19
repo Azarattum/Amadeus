@@ -1,5 +1,5 @@
+import { metadata, metafields, push, uuid } from "../data/operations";
 import type { TrackDetails } from "@amadeus-music/protocol";
-import { push, uuid } from "../data/operations";
 import type { DB } from "../data/schema";
 import { APPEND } from "crstore";
 
@@ -35,5 +35,15 @@ export const library = ({ store }: DB) =>
         db.deleteFrom("library").where("id", "=", entry).execute()
       );
       await Promise.all(promises);
+    },
+    async get(db, entries: number[]) {
+      if (!entries.length) return [];
+      return db
+        .with("metadata", metadata)
+        .selectFrom("library")
+        .innerJoin("metadata", "metadata.id", "library.track")
+        .select(metafields)
+        .where("library.id", "in", entries)
+        .execute();
     },
   });

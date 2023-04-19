@@ -58,5 +58,15 @@ export const feed = ({ store }: DB) =>
         });
         await Promise.all(promises);
       },
+      async get(db, entries: number[]) {
+        if (!entries.length) return [];
+        return db
+          .with("metadata", metadata)
+          .selectFrom("feed")
+          .innerJoin("metadata", "metadata.id", "feed.track")
+          .select(metafields)
+          .where("feed.id", "in", entries)
+          .execute();
+      },
     }
   );

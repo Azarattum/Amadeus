@@ -14,6 +14,7 @@ import type { Context } from "../plugin/types";
 import { wrap } from "libfun/pool";
 import { async } from "libfun";
 
+const flatten: Strategy = (x) => all(x).then((x) => x.flat());
 const voided: Strategy = (x) => all(x).then(() => undefined);
 const raced: Strategy = (x) => Promise.any(x);
 const merged: Strategy = (x) =>
@@ -27,9 +28,11 @@ const strategies: { [K in Method]?: Strategy } = {
   "settings.extract": raced,
   "settings.lookup": raced,
   "playlists.get": merged,
+  "library.get": flatten,
   "artists.get": merged,
   "tracks.get": merged,
   "history.get": dated,
+  "feed.get": flatten,
   subscribe: composed,
 };
 
