@@ -12,9 +12,8 @@
   on:click
   class="group relative z-10 flex h-full w-full items-center gap-4 overflow-hidden px-4 outline-2 outline-primary-600 focus-visible:outline
   {interactive
-    ? 'cursor-pointer touch-manipulation select-none ' + !flat
-      ? 'transition-transform active:scale-95'
-      : ''
+    ? 'cursor-pointer touch-manipulation select-none ' +
+      (!flat ? 'transition-transform active:scale-95' : '')
     : ''}
   {sm ? 'rounded-lg py-1 focus-visible:z-50' : 'rounded-2xl py-4'}
   {flat ? 'bg-surface' : 'bg-surface-100 shadow-2xl  dark:shadow-none'}
@@ -24,9 +23,8 @@
     aria-hidden
     class="pointer-events-none absolute inset-0 z-0 bg-highlight opacity-0
     {interactive
-      ? 'group-hover:opacity-30' + flat
-        ? 'dark:group-hover:opacity-50'
-        : 'dark:group-hover:opacity-10'
+      ? 'group-hover:opacity-30 ' +
+        (flat ? 'dark:group-hover:opacity-50' : 'dark:group-hover:opacity-10')
       : ''}"
   />
   {#if $$slots.before}
