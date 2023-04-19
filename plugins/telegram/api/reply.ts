@@ -9,8 +9,8 @@ import type { TrackDetails } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
 import { Message, Queue, Replier } from "../types/reply";
 import { pretty } from "@amadeus-music/util/object";
-import { desource, info, pool } from "../plugin";
 import { format } from "@amadeus-music/protocol";
+import { desource, info, pool } from "../plugin";
 import { menu, markdown } from "./markup";
 import { sendPage } from "./pages";
 
@@ -38,7 +38,8 @@ function* queue(
   pool: Pool<Replier, any>,
   notifier: () => void,
   name: string,
-  tracks: TrackDetails[]
+  tracks: TrackDetails[],
+  group = true
 ) {
   let done = false;
   const ping = (notifier(), setInterval(notifier, 3000));
@@ -53,7 +54,7 @@ function* queue(
         title: track.title,
         thumb: JSON.parse(track.album.art)?.[0],
         performer: track.artists.map((x: any) => x.title).join(", "),
-        markup: menu(track.id),
+        markup: !group ? menu(track.id) : undefined,
         mode: markdown(),
       }).then((x) => (setTimeout(() => done || notifier(), 10), x))
     );
@@ -89,7 +90,7 @@ function replier(chat: number, name: string, group = true) {
       const send = pool<Queue>(`queue/${chat}`, { concurrency: 1 });
       if (!send.status().listeners.size) {
         send(function (tracks: TrackDetails[]) {
-          return queue.bind(this)(target, notifier(chat), name, tracks);
+          return queue.bind(this)(target, notifier(chat), name, tracks, group);
         });
       }
 
