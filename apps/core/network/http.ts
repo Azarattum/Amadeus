@@ -1,6 +1,7 @@
 import { createServer, type Server } from "node:http";
 import { init, stop } from "../event/pool";
 import { err, info } from "../status/log";
+import { bright, reset } from "../app";
 import type { Socket } from "net";
 import { async } from "libfun";
 
@@ -26,7 +27,7 @@ export function http(listen = true) {
   if (!server || !port) throw new Error("The server was not initialized!");
   if (!listen) return server;
   if (!server.listening) {
-    info(`HTTP server is listening on port ${port}.`);
+    info(`HTTP server is listening on port ${bright}${port}${reset}.`);
     server.on("connection", (socket) => {
       socket.once("close", () => connections.delete(socket));
       connections.add(socket);
