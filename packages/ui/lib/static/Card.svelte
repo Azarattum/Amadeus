@@ -20,7 +20,8 @@
   {href}
   style:contain="inline-size"
   on:click
-  class="group relative z-10 flex h-full w-full items-center gap-4 overflow-hidden px-4 outline-2 outline-primary-600 focus-visible:outline
+  on:contextmenu
+  class="group relative z-10 flex w-full items-center gap-4 overflow-hidden px-4 outline-2 -outline-offset-2 outline-primary-600 focus-visible:outline
   {interactive
     ? 'cursor-pointer touch-manipulation select-none ' +
       (!flat ? 'transition-transform active:scale-95' : '')
@@ -42,7 +43,7 @@
       : ''}"
   />
   {#if $$slots.before}
-    <div class="z-10 flex items-center">
+    <div class="z-20 flex items-center">
       <slot name="before" />
     </div>
   {/if}
@@ -57,12 +58,12 @@
     {#if flat && (sm || xs)}
       <hr
         aria-hidden
-        class="absolute bottom-0 h-[1px] w-full border-none bg-content-300 group-last-of-type:opacity-0"
+        class="absolute bottom-0 h-[1px] w-full border-none bg-content/10 group-last-of-type:opacity-0"
       />
     {/if}
   </div>
   {#if $$slots.after}
-    <div class="z-10 flex items-center">
+    <div class="z-20 flex items-center">
       <slot name="after" />
     </div>
   {/if}
