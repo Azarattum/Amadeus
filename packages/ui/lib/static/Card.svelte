@@ -1,6 +1,7 @@
 <script lang="ts">
   export let sm = false;
   export let flat = false;
+  export let flow = false;
   export let interactive = false;
   export let href: string | undefined = undefined;
 </script>
@@ -34,9 +35,10 @@
   {/if}
   <div
     style:contain="inline-size"
-    class="z-10 box-content flex w-full flex-col justify-center gap-2
-    {sm ? '' : 'items-center'}
-    "
+    class="z-10 grid w-full
+    {sm ? 'justify-start gap-0.5' : 'justify-center gap-2'}
+    {sm && flow ? 'lg:auto-cols-fr lg:grid-flow-col' : ''}
+  "
   >
     <slot />
     {#if flat && sm}
