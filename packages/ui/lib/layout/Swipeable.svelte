@@ -38,7 +38,7 @@
 </script>
 
 <div
-  class="grid w-full snap-x snap-mandatory overflow-x-visible overflow-y-scroll overscroll-none rounded-lg transition-colors duration-300 ease-linear"
+  class="grid w-full snap-x snap-mandatory overflow-y-hidden overflow-x-scroll rounded-lg transition-colors duration-300 ease-linear"
   style="grid: auto / auto-flow {$$slots.before ? '1fr ' : ''}100%{$$slots.after
     ? ' 1fr'
     : ''};"

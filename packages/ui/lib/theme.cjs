@@ -39,7 +39,6 @@ const theme = {
         DEFAULT: "hsl(var(--color-content) / <alpha-value>)",
         100: "hsl(var(--color-content-100) / <alpha-value>)",
         200: "hsl(var(--color-content-200) / <alpha-value>)",
-        300: "hsl(var(--color-content-300) / <alpha-value>)",
       },
       highlight: {
         DEFAULT: "hsl(var(--color-highlight))",
