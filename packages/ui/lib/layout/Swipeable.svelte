@@ -38,8 +38,10 @@
 </script>
 
 <div
-  class="grid w-full snap-x snap-mandatory overflow-y-hidden overflow-x-scroll overscroll-none rounded-lg transition-colors duration-300 ease-linear"
-  style="grid: auto / auto-flow 1fr 100% 1fr;"
+  class="grid w-full snap-x snap-mandatory overflow-x-visible overflow-y-scroll overscroll-none rounded-lg transition-colors duration-300 ease-linear"
+  style="grid: auto / auto-flow {$$slots.before ? '1fr ' : ''}100%{$$slots.after
+    ? ' 1fr'
+    : ''};"
   class:bg-primary-600={activeBefore || activeAfter}
   on:wheel={({ deltaX }) => (lastDelta = deltaX)}
   on:touchend={finish}

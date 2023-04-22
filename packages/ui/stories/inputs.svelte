@@ -37,7 +37,7 @@
       <Button><Icon name="artists" /></Button>
     </Group>
     <Group size={2}>
-      <Button><Icon name="queue" /><Tooltip>Queue</Tooltip></Button>
+      <Button><Icon name="list" /><Tooltip>Queue</Tooltip></Button>
       <Button><Icon name="book" /><Tooltip>Lyrics</Tooltip></Button>
     </Group>
     <Group size={3} value={2}>
