@@ -41,6 +41,14 @@
   </Stack>
 
   <Stack grow>
+    <When lg>
+      <Card xs flat flow>
+        <div class="w-[48px]" slot="before" />
+        <Header sm>Title</Header>
+        <Header sm>Artist</Header>
+        <Header sm>Album</Header>
+      </Card>
+    </When>
     <Card interactive sm flat flow>
       <Text accent>Rockstar</Text>
       <Text secondary sm>Nickelback</Text>

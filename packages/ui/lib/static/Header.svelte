@@ -14,7 +14,7 @@
 <svelte:element
   this={tag}
   class="
-  transition-colors
+  text-left transition-colors
   {sm ? 'light py-2 text-xs uppercase text-content-200' : ''}
   {!sm && !lg && !xl ? 'text-lg' : ''}
   {lg ? 'text-xl' : ''}

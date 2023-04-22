@@ -1,4 +1,13 @@
 <script lang="ts">
+  import type { Either } from "../../internal/types";
+  type $$Props = Either<"xs" | "sm"> & {
+    href?: string | undefined;
+    interactive?: boolean;
+    flat?: boolean;
+    flow?: boolean;
+  };
+
+  export let xs = false;
   export let sm = false;
   export let flat = false;
   export let flow = false;
@@ -16,7 +25,11 @@
     ? 'cursor-pointer touch-manipulation select-none ' +
       (!flat ? 'transition-transform active:scale-95' : '')
     : ''}
-  {sm ? 'rounded-lg py-1 focus-visible:z-50' : 'rounded-2xl py-4'}
+  {xs
+    ? 'focus-visible:z-50'
+    : sm
+    ? 'rounded-lg py-1 focus-visible:z-50'
+    : 'rounded-2xl py-4'}
   {flat ? 'bg-surface' : 'bg-surface-100 shadow-2xl  dark:shadow-none'}
   "
 >
@@ -36,12 +49,12 @@
   <div
     style:contain="inline-size"
     class="z-10 grid w-full
-    {sm ? 'justify-start gap-0.5' : 'justify-center gap-2'}
-    {sm && flow ? 'lg:auto-cols-fr lg:grid-flow-col' : ''}
+    {sm || xs ? 'justify-start gap-0.5' : 'justify-center gap-2'}
+    {(sm || xs) && flow ? 'lg:auto-cols-fr lg:grid-flow-col' : ''}
   "
   >
     <slot />
-    {#if flat && sm}
+    {#if flat && (sm || xs)}
       <hr
         aria-hidden
         class="absolute bottom-0 h-[1px] w-full border-none bg-content-300 group-last-of-type:opacity-0"
