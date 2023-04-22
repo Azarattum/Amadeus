@@ -32,4 +32,5 @@ export { default as Spinner } from "./lib/static/Spinner.svelte";
 
 export * from "./lib/composite/LightSwitch.svelte";
 export { default as Nav } from "./lib/composite/Nav.svelte";
+export { default as List } from "./lib/composite/List.svelte";
 export { default as LightSwitch } from "./lib/composite/LightSwitch.svelte";
