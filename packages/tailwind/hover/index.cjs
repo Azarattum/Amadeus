@@ -11,4 +11,18 @@ module.exports = plugin(({ addVariant, e }) => {
       "@media (pointer: coarse)"
     ),
   ]);
+  addVariant("group-hover", [
+    ({ modifySelectors }) => (
+      modifySelectors(
+        ({ className }) => `.group:hover .group-hover\\:${e(className)}`
+      ),
+      "@media (hover: hover) and (pointer: fine)"
+    ),
+    ({ modifySelectors }) => (
+      modifySelectors(
+        ({ className }) => `.group:active .group-hover\\:${e(className)}`
+      ),
+      "@media (pointer: coarse)"
+    ),
+  ]);
 });
