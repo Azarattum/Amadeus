@@ -18,10 +18,9 @@
 <svelte:element
   this={interactive ? (href ? "a" : "button") : "article"}
   {href}
-  style:contain="inline-size"
   on:click
   on:contextmenu
-  class="group relative z-10 flex w-full items-center gap-4 overflow-hidden px-4 outline-2 -outline-offset-2 outline-primary-600 focus-visible:outline
+  class="group relative z-10 flex w-full items-center gap-4 overflow-hidden px-4 outline-2 -outline-offset-2 outline-primary-600 contain-inline-size focus-visible:outline
   {interactive
     ? 'cursor-pointer touch-manipulation select-none ' +
       (!flat ? 'transition-transform active:scale-95' : '')
@@ -48,8 +47,7 @@
     </div>
   {/if}
   <div
-    style:contain="inline-size"
-    class="z-10 grid w-full
+    class="z-10 grid w-full contain-inline-size
     {sm || xs ? 'justify-start gap-0.5' : 'justify-center gap-2'}
     {(sm || xs) && flow ? 'lg:auto-cols-fr lg:grid-flow-col' : ''}
   "

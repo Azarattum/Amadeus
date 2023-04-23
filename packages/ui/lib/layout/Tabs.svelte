@@ -56,8 +56,8 @@
 >
   <slot />
   <nav
-    class="pointer-events-none absolute z-10 mt-11 flex origin-top-left transition-opacity"
-    style="transform-style: preserve-3d; contain: layout;"
+    class="pointer-events-none absolute z-10 mt-11 flex origin-top-left transition-opacity contain-layout"
+    style="transform-style: preserve-3d;"
     style:transform={transforms[0]
       ? ""
       : "translate3d(0,-2.75rem,-99999px) scale(100000) translate3d(0,2.75rem,0)"}

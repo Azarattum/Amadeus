@@ -14,5 +14,6 @@ module.exports = {
   plugins: [
     require("./packages/tailwind/dark"),
     require("./packages/tailwind/hover"),
+    require("tailwindcss-contain"),
   ],
 };
