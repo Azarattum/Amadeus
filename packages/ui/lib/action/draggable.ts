@@ -2,7 +2,7 @@ import { position, type Point } from "../../internal/pointer";
 import { createEffect } from "../layout/Overlay.svelte";
 import { lock, unlock } from "../../internal/touch";
 
-export default function draggable(
+export function draggable(
   node: HTMLElement,
   {
     trigger = "touchstart",
@@ -57,7 +57,7 @@ export default function draggable(
 
     const unsubscribe = position.subscribe(drag(effect, offset));
     const stopHandler = (event: Event) => {
-      const callback = new Event("dragend", event) as DraggedEvent;
+      const callback = new Event("dragend", event) as DragEndEvent;
       callback.retract = (override) => {
         if (override === undefined) override = target;
         retract(override, effect, initial)();
@@ -144,16 +144,15 @@ interface DraggableOptions {
   mode?: "self" | "children";
 }
 
-declare global {
-  namespace svelte.JSX {
-    // @ts-ignore
-    interface HTMLAttributes {
-      ondragend?: (event: DraggedEvent) => void;
-    }
-  }
+export type DragEndEvent = Event & {
+  retract: (target?: HTMLElement | null) => void;
+  canceled: boolean;
+};
 
-  interface DraggedEvent extends Event {
-    retract: (target?: HTMLElement | null) => void;
-    canceled: boolean;
+declare global {
+  namespace svelteHTML {
+    interface HTMLAttributes {
+      "on:dragend"?: (event: DragEndEvent) => void;
+    }
   }
 }

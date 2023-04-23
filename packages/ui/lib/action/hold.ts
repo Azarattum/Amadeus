@@ -1,4 +1,4 @@
-export default function hold(
+export function hold(
   node: HTMLElement,
   { touch = true, mouse = false, duration = 300 }: HoldOptions = {}
 ) {
@@ -57,10 +57,9 @@ interface HoldOptions {
 }
 
 declare global {
-  namespace svelte.JSX {
-    // @ts-ignore
+  namespace svelteHtml {
     interface HTMLAttributes {
-      onhold?: (event: TouchEvent | MouseEvent) => void;
+      "on:hold"?: (event: TouchEvent | MouseEvent) => void;
     }
   }
 }

@@ -1,6 +1,6 @@
 import { position, type Point } from "../../internal/pointer";
 
-export default function autoscroll(
+export function autoscroll(
   node: HTMLElement,
   {
     axis = "both",
@@ -108,8 +108,7 @@ interface AutoScrollOptions {
 }
 
 declare global {
-  namespace svelte.JSX {
-    // @ts-ignore
+  namespace svelteHTML {
     interface HTMLAttributes {
       autoscroll?: boolean | "true" | "false" | null;
     }
