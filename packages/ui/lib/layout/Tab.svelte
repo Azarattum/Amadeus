@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { intersection, type IntersectionEvent } from "../../action";
   import { getContext, onMount } from "svelte";
   import { flipped } from "../../component";
 
@@ -6,41 +7,32 @@
   const tabs = getContext<string[]>("tabs");
   tabs.push(name);
 
-  let trigger: HTMLElement;
   let section: HTMLElement;
   let current = false;
   let stuck = false;
 
   const scrollUp = () => section.scrollTo({ top: 0, behavior: "smooth" });
 
+  function scrolled({ detail }: IntersectionEvent) {
+    if (detail.boundingClientRect.x) return;
+    stuck = detail.intersectionRatio < 0.8;
+  }
+
+  function changed({ detail }: IntersectionEvent) {
+    current = detail.intersectionRatio > 0.5;
+    if (detail.intersectionRatio === 1) {
+      location.hash = `#${name.toLowerCase()}`;
+    }
+  }
+
   onMount(() => {
     if (location.hash === `#${name.toLowerCase()}`) section.scrollIntoView();
-    const stuckObserver = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((x) => {
-          if (x.boundingClientRect.x) return;
-          stuck = x.intersectionRatio < 0.8;
-        }),
-      { threshold: 0.8 }
-    );
-    const sectionObserver = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((x) => {
-          current = x.intersectionRatio > 0.5;
-          if (x.intersectionRatio === 1) {
-            location.hash = `#${name.toLowerCase()}`;
-          }
-        }),
-      { threshold: [0, 0.5, 1] }
-    );
-    sectionObserver.observe(section);
-    stuckObserver.observe(trigger);
-
-    return () => (sectionObserver.disconnect(), stuckObserver.disconnect());
   });
 </script>
 
 <section
+  use:intersection={[0, 0.5, 1]}
+  on:intersect={changed}
   bind:this={section}
   id={name.toLowerCase()}
   class="z-10 h-full w-full snap-start snap-always overflow-x-hidden overflow-y-scroll"
@@ -49,7 +41,11 @@
   class:[&~nav_div]:opacity-0={current && stuck}
   class:target={current}
 >
-  <div class="pointer-events-none h-0 p-11" bind:this={trigger} />
+  <div
+    class="pointer-events-none h-0 p-11"
+    on:intersect={scrolled}
+    use:intersection={0.8}
+  />
   <h2>
     <button
       tabindex="-1"

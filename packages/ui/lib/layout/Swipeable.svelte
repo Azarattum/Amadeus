@@ -1,40 +1,26 @@
 <script lang="ts">
-  import { createEventDispatcher, onMount } from "svelte";
+  import { intersection, type IntersectionEvent } from "../../action";
+  import { createEventDispatcher } from "svelte";
 
+  const active = [false, false] as [boolean, boolean];
   const dispatch = createEventDispatcher<{
     before: undefined;
     after: undefined;
   }>();
 
-  let before: HTMLDivElement | undefined;
-  let after: HTMLDivElement | undefined;
-  let activeBefore = false;
-  let activeAfter = false;
-  let lastDelta = 0;
+  let wheel = 0;
 
   function finish() {
-    if (activeBefore) dispatch("before");
-    if (activeAfter) dispatch("after");
+    if (active[0]) dispatch("before");
+    if (active[1]) dispatch("after");
   }
 
-  onMount(() => {
-    const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((entry) => {
-          if (entry.target === before) {
-            if (activeBefore && lastDelta < 0) finish();
-            activeBefore = entry.isIntersecting;
-          } else if (entry.target === after) {
-            if (activeAfter && lastDelta > 0) finish();
-            activeAfter = entry.isIntersecting;
-          }
-        }),
-      { threshold: 0.5 }
-    );
-    if (before) observer.observe(before);
-    if (after) observer.observe(after);
-    return () => observer.disconnect();
-  });
+  function intersected(id: 0 | 1) {
+    return ({ detail }: IntersectionEvent) => {
+      if (active[id] && ((!id && wheel < 0) || (id && wheel > 0))) finish();
+      active[id] = detail.isIntersecting;
+    };
+  }
 </script>
 
 <div
@@ -42,16 +28,17 @@
   style="grid: auto / auto-flow {$$slots.before ? '1fr ' : ''}100%{$$slots.after
     ? ' 1fr'
     : ''};"
-  class:bg-primary-600={activeBefore || activeAfter}
-  on:wheel={({ deltaX }) => (lastDelta = deltaX)}
+  class:bg-primary-600={active[0] || active[1]}
+  on:wheel={({ deltaX }) => (wheel = deltaX)}
   on:touchend={finish}
 >
   {#if $$slots.before}
     <div
-      bind:this={before}
+      use:intersection={0.5}
+      on:intersect={intersected(0)}
       class="flex items-center px-4 text-content-200 transition-colors"
       style="scroll-snap-align: none;"
-      class:text-white={activeBefore}
+      class:text-white={active[0]}
     >
       <slot name="before" />
     </div>
@@ -59,9 +46,10 @@
   <div class="snap-center snap-always"><slot /></div>
   {#if $$slots.after}
     <div
-      bind:this={after}
+      use:intersection={0.5}
+      on:intersect={intersected(1)}
       class="flex items-center px-4 text-content-200 transition-colors"
-      class:text-white={activeAfter}
+      class:text-white={active[1]}
     >
       <slot name="after" />
     </div>

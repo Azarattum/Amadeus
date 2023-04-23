@@ -84,6 +84,8 @@
     "unprefix",
     "unprefixes",
     "unwrappable",
+    "viewenter",
+    "viewleave",
     "vitest",
     "Wrappable",
     "Xlekgb"
