@@ -49,13 +49,13 @@
             <slot name="after" />
           </div>
           <div
-            class="opacity-0 transition-opacity"
+            class="flex justify-center opacity-0 transition-opacity"
             class:opacity-100={selected.size}
           >
             <Icon name="circle" />
           </div>
           <div
-            class="scale-0 transition-transform"
+            class="flex scale-0 justify-center transition-transform"
             class:scale-100={selected.has(id)}
           >
             <Icon name="target" />
@@ -72,16 +72,27 @@
   {#if selected.size}
     <aside
       transition:fly={{ y: 50 }}
-      class="m-2 grid auto-cols-fr grid-flow-col rounded-lg bg-surface-200 backdrop-blur-lg"
+      class="mx-4 mb-2 flex rounded-lg bg-surface-200 backdrop-blur-lg"
+      style:grid-template-columns="repeat(auto-fit,minmax(0,1fr)) 44px"
     >
-      <slot name="panel" />
-      <Button
-        air
-        stretch
-        on:click={() => (selected.clear(), (selected = selected))}
+      {#if $$slots.panel}
+        <div class="grid grow auto-cols-fr grid-flow-col">
+          <slot name="panel" />
+        </div>
+      {/if}
+      <div
+        class="min-w-[3rem]
+      {$$slots.panel ? 'border-l border-highlight' : 'grow'}
+      "
       >
-        <Icon name="close" />
-      </Button>
+        <Button
+          air
+          stretch
+          on:click={() => (selected.clear(), (selected = selected))}
+        >
+          <Icon name="close" />
+        </Button>
+      </div>
     </aside>
   {/if}
 </Portal>
