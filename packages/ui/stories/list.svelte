@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { List, Text, When, Icon, Header } from "@amadeus-music/ui";
+  import { List, Text, When, Icon, Header, Button } from "@amadeus-music/ui";
 
   const items = [
     "Hello",
@@ -40,5 +40,9 @@
     <When lg><Text secondary sm>{item}</Text></When>
     <Text secondary sm slot="after">1:42</Text>
     <Icon name="last" slot="action" />
+    <svelte:fragment slot="panel">
+      <Button air stretch><Icon name="next" /></Button>
+      <Button air stretch><Icon name="last" /></Button>
+    </svelte:fragment>
   </List>
 </div>

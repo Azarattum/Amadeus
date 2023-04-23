@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { Card, Icon, Swipeable } from "../../component";
+  import { Card, Icon, Swipeable, Button, Portal } from "../../component";
   import { createEventDispatcher } from "svelte";
+  import { fly } from "svelte/transition";
   type T = $$Generic;
 
   export let items: T[];
@@ -66,3 +67,21 @@
     </Swipeable>
   </div>
 {/each}
+
+<Portal to="bottom">
+  {#if selected.size}
+    <aside
+      transition:fly={{ y: 50 }}
+      class="m-2 grid auto-cols-fr grid-flow-col rounded-lg bg-surface-200 backdrop-blur-lg"
+    >
+      <slot name="panel" />
+      <Button
+        air
+        stretch
+        on:click={() => (selected.clear(), (selected = selected))}
+      >
+        <Icon name="close" />
+      </Button>
+    </aside>
+  {/if}
+</Portal>
