@@ -13,6 +13,7 @@
   const value = group?.value;
 
   export let href: string | undefined = undefined;
+  export let disabled = false;
   export let primary = false;
   export let compact = false;
   export let stretch = false;
@@ -54,6 +55,7 @@
 <svelte:element
   this={tag}
   for={group ? group.id + index : undefined}
+  {disabled}
   {href}
   {id}
   on:click

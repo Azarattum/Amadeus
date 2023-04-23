@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Icon, Button } from "../../component";
+
   export let placeholder = "";
   export let value = "";
 </script>
@@ -13,4 +15,9 @@
     bind:value
     {placeholder}
   />
+  <div class="opacity-0 transition-opacity" class:opacity-100={value}>
+    <Button disabled={!value} air on:click={() => (value = "")}>
+      <Icon sm name="close" />
+    </Button>
+  </div>
 </label>
