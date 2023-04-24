@@ -8,6 +8,9 @@
   <div class="fixed bottom-0 z-50 flex w-full flex-col-reverse">
     <Gateway name="bottom" />
   </div>
+  <div class="pointer-events-none fixed inset-0 contain-strict">
+    <Gateway name="overlay" />
+  </div>
 </Realm>
 
 <svelte:head>
