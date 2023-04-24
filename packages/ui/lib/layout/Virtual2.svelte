@@ -12,14 +12,16 @@
   export let animate: number | boolean = false;
   export let container: HTMLElement | undefined = undefined;
 
+  let bounds = new DOMRect();
   let wrapper: HTMLElement;
   let rowHeight = 1;
   let perRow = 0;
   let active = 0;
 
-  $: perView = Math.ceil((container?.offsetHeight || 0) / rowHeight) * perRow;
+  $: perView = Math.ceil(bounds.height / rowHeight) * perRow;
   $: from = Math.max(active - overthrow, 0) * perView;
   $: to = Math.max((active + overthrow + 1) * perView, 1);
+  $: max = ~~(items.length / perView);
   $: slice = items.slice(from, to);
   $: index = reindex(items);
 
@@ -32,8 +34,10 @@
   async function reflow(rect: DOMRect) {
     if (!viewHeight) return;
     active -= Math.round(rect.y / viewHeight);
+    if (active < 0) return (active = 0);
+    if (active > max) return (active = max);
 
-    const trigger = wrapper.firstElementChild;
+    const trigger = wrapper?.firstElementChild;
     if (!trigger) return;
     const { resolve, wait } = lock<boolean>();
     const ok = () => resolve(false);
@@ -80,11 +84,13 @@
   }
 
   function measure() {
+    if (!container) return;
+    bounds = container.getBoundingClientRect();
     const target = wrapper?.firstElementChild?.nextElementSibling;
     if (!target) return;
     const { width, height } = target.getBoundingClientRect();
     if (!width || !height) return;
-    perRow = ~~((container?.offsetWidth || 0) / width);
+    perRow = ~~(bounds.width / width);
     rowHeight = height;
   }
 

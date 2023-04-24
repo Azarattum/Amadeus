@@ -4,6 +4,29 @@
 
 const scope = globalThis as any;
 
+if (!("DOMRect" in scope)) {
+  scope.DOMRect = class {
+    bottom: number;
+    right: number;
+    left: number;
+    top: number;
+    constructor(
+      public x = 0,
+      public y = 0,
+      public width = 0,
+      public height = 0
+    ) {
+      this.top = y;
+      this.bottom = y + height;
+      this.left = x;
+      this.right = x + width;
+    }
+    toJSON() {
+      return JSON.stringify(this);
+    }
+  };
+}
+
 if (!("ResizeObserver" in scope)) {
   scope.ResizeObserver = function () {
     return { disconnect() {}, observe() {}, unobserve() {} };
