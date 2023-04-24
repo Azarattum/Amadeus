@@ -9,11 +9,10 @@
   export let key = <R>(x: T) => x as any as R;
   export let container: HTMLElement | undefined = undefined;
 
-  let chunks: T[][] = [];
   let wrapper: HTMLElement;
-  let active = 0;
+  let rowHeight = 1;
   let perRow = 0;
-  let rowHeight = 0;
+  let active = 0;
 
   $: start = Math.max(active - overthrow, 0);
   $: height = Math.ceil(items.length / perRow) * rowHeight;
@@ -22,43 +21,36 @@
   $: template = Number.isInteger(columns)
     ? `repeat(${columns},1fr)`
     : `repeat(auto-fill,minmax(min(100%,${columns}),1fr))`;
+  $: chunks = perView
+    ? Array.from({ length: Math.ceil(items.length / perView) }).map((_, i) =>
+        items.slice(i * perView, (i + 1) * perView)
+      )
+    : items.length
+    ? (tick().then(measure), [[items[0]]])
+    : [];
 
   function update({ detail }: IntersectionEvent) {
+    if (!viewHeight) return;
     active += Math.round(
       (detail.intersectionRect.y - detail.boundingClientRect.y) / viewHeight
     );
   }
 
-  async function measure() {
-    if (!container || !wrapper) return;
-    chunks = [[]];
-    rowHeight = 0;
-    active = 0;
-    let i = 0;
-    do {
-      chunks[0].push(items[i++]);
-      chunks = chunks;
-      await tick();
-      if (!rowHeight) rowHeight = wrapper.offsetHeight;
-    } while (wrapper.offsetHeight <= rowHeight && items[i]);
-    perRow = i - 1;
-    await tick();
-    for (let i = 0; i < Math.ceil(items.length / perView); i++) {
-      chunks[i] = items.slice(i * perView, (i + 1) * perView);
-    }
+  function measure() {
+    const target = wrapper?.firstElementChild?.nextElementSibling;
+    if (!target) return;
+    const { width, height } = target.getBoundingClientRect();
+    if (!width || !height) return;
+    perRow = ~~((container?.offsetWidth || 0) / width);
+    rowHeight = height;
   }
 
   onMount(() => {
     if (!container) container = wrapper.parentElement?.parentElement as any;
     if (!container) throw new Error("Virtual list needs a container!");
-    if (typeof columns === "string") {
-      container.addEventListener("resize", measure);
-      const { destroy } = resize(container);
-      return () => {
-        container?.removeEventListener("resize", measure);
-        destroy();
-      };
-    } else measure();
+    container.addEventListener("resize", measure);
+    const { destroy } = resize(container);
+    return () => (container?.removeEventListener("resize", measure), destroy());
   });
 </script>
 
