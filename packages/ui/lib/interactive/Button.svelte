@@ -59,12 +59,13 @@
   {href}
   {id}
   on:click
-  class="relative flex h-11 min-w-max shrink-0 cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {text} {background} {targeted}
-  {compact ? 'flex-col justify-center text-2xs' : 'gap-[0.625rem]'}
+  class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {text} {background} {targeted}
+  {compact ? 'flex-col text-2xs' : 'gap-[0.625rem]'}
   {round ? 'rounded-full' : 'rounded-lg'}"
   class:px-[0.625rem]={!air || group}
+  class:justify-center={stretch || compact}
+  class:shrink-0={!stretch}
   class:w-full={stretch}
-  class:justify-center={stretch}
 >
   <slot />
 </svelte:element>
