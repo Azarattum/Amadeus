@@ -12,13 +12,14 @@
   export let animate: number | boolean = false;
   export let container: HTMLElement | undefined = undefined;
 
-  let bounds = new DOMRect();
+  let outer = new DOMRect();
+  let inner = new DOMRect();
   let wrapper: HTMLElement;
   let rowHeight = 1;
   let perRow = 0;
   let active = 0;
 
-  $: perView = Math.ceil(bounds.height / rowHeight) * perRow;
+  $: perView = Math.ceil(outer.height / rowHeight) * perRow;
   $: from = Math.max(active - overthrow, 0) * perView;
   $: to = Math.max((active + overthrow + 1) * perView, 1);
   $: max = ~~(items.length / perView);
@@ -58,10 +59,10 @@
 
       if (i < from || i >= to) continue;
       const before = index?.get(id);
-      if (!before) continue;
-      const y = ~~(i / perRow) - ~~(before / perRow);
-      const x = ~~(i % perRow) - ~~(before % perRow);
-      if (y || x) transform(i - from, x, y);
+      if (before == null) continue;
+      const y = ~~(before / perRow) - ~~(i / perRow);
+      const x = ~~(before % perRow) - ~~(i % perRow);
+      if (y || x) transform(before - from, x, y);
     }
     return reindexed;
   }
@@ -84,13 +85,14 @@
   }
 
   function measure() {
-    if (!container) return;
-    bounds = container.getBoundingClientRect();
-    const target = wrapper?.firstElementChild?.nextElementSibling;
+    if (!container || !wrapper) return;
+    outer = container.getBoundingClientRect();
+    inner = wrapper.getBoundingClientRect();
+    const target = wrapper.firstElementChild?.nextElementSibling;
     if (!target) return;
     const { width, height } = target.getBoundingClientRect();
     if (!width || !height) return;
-    perRow = ~~(bounds.width / width);
+    perRow = ~~(outer.width / width);
     rowHeight = height;
   }
 
