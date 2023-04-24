@@ -78,16 +78,17 @@ export function delay(duration: number) {
  * Creates an asynchronous lock that can be waited
  * from multiple places and resolved at any moment.
  */
-export function lock() {
-  let resolved = false;
-  const resolves = new Set<() => void>();
+export function lock<T = void>() {
+  const no = Symbol();
+  let resolved: T | typeof no = no;
+  const resolves = new Set<(value: T) => void>();
   const wait = () =>
-    new Promise<void>((r) =>
-      resolved ? (r(), (resolved = false)) : resolves.add(r)
+    new Promise<T>((r) =>
+      resolved !== no ? (r(resolved), (resolved = no)) : resolves.add(r)
     );
-  const resolve = () => {
-    if (!resolves.size) return (resolved = true);
-    resolves.forEach((x) => x());
+  const resolve = (value: T) => {
+    if (!resolves.size) return (resolved = value);
+    resolves.forEach((x) => x(value));
     resolves.clear();
   };
   return { wait, resolve };
