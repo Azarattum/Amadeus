@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { intersection, resize, type IntersectionEvent } from "../../action";
+  import { intersection, resize } from "../../action";
+  import { lock } from "@amadeus-music/util/async";
   import { onMount, tick } from "svelte";
   type T = $$Generic;
 
@@ -29,11 +30,18 @@
     ? (tick().then(measure), [[items[0]]])
     : [];
 
-  function update({ detail }: IntersectionEvent) {
+  async function reflow(rect: DOMRect) {
     if (!viewHeight) return;
-    active += Math.round(
-      (detail.intersectionRect.y - detail.boundingClientRect.y) / viewHeight
-    );
+    active -= Math.round(rect.y / viewHeight);
+
+    const trigger = wrapper.firstElementChild;
+    if (!trigger) return;
+    const { resolve, wait } = lock<boolean>();
+    const ok = () => resolve(false);
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve(true)));
+    trigger.addEventListener("viewenter", ok, { once: true });
+    if (await wait()) reflow(trigger.getBoundingClientRect());
+    trigger.removeEventListener("viewenter", ok);
   }
 
   function measure() {
@@ -63,8 +71,8 @@
   >
     <div
       style:transform="translateY({+!!active * overthrow * 100}%)"
+      on:viewleave={(x) => reflow(x.detail.boundingClientRect)}
       style:height="{viewHeight}px"
-      on:viewleave={update}
       use:intersection
       class="absolute"
       aria-hidden
