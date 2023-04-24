@@ -3,11 +3,13 @@
   import { lock } from "@amadeus-music/util/async";
   import { onMount, tick } from "svelte";
   type T = $$Generic;
+  type R = $$Generic;
 
   export let items: T[];
   export let overthrow = 1;
   export let columns: number | string = 1;
-  export let key = <R>(x: T) => x as any as R;
+  export let key = (x: T) => x as any as R;
+  export let animate: number | boolean = false;
   export let container: HTMLElement | undefined = undefined;
 
   let wrapper: HTMLElement;
@@ -29,6 +31,8 @@
     : items.length
     ? (tick().then(measure), [[items[0]]])
     : [];
+  $: visible = chunks.slice(start, active + overthrow + 1).flat();
+  $: index = reindex(items);
 
   async function reflow(rect: DOMRect) {
     if (!viewHeight) return;
@@ -42,6 +46,43 @@
     trigger.addEventListener("viewenter", ok, { once: true });
     if (await wait()) reflow(trigger.getBoundingClientRect());
     trigger.removeEventListener("viewenter", ok);
+  }
+
+  function reindex(items: T[]) {
+    if (!animate) return;
+    const reindexed = new Map<R, number>();
+    const from = start * perView;
+    const to = start * perView + visible.length;
+
+    for (let i = 0; i < items.length; i++) {
+      const id = key(items[i]);
+      reindexed.set(id, i);
+
+      if (i < from || i >= to) continue;
+      const before = index?.get(id);
+      if (!before) continue;
+      const y = ~~(i / perRow) - ~~(before / perRow);
+      const x = ~~(i % perRow) - ~~(before % perRow);
+      if (y || x) transform(i - from, x, y);
+    }
+    return reindexed;
+  }
+
+  function transform(element: number, x: number, y: number) {
+    const target = wrapper.children.item(element + 1) as HTMLElement;
+    if (!target || target.style.visibility === "hidden") return;
+    const transform = [
+      `translate3d(${x * 100}%,${y * 100}%,0)`,
+      `translate3d(0,0,0)`,
+    ];
+    target.animate(
+      { transform },
+      {
+        easing: "ease",
+        composite: "accumulate",
+        duration: animate === true ? 300 : animate || 0,
+      }
+    );
   }
 
   function measure() {
@@ -77,10 +118,10 @@
       class="absolute"
       aria-hidden
     />
-    {#each chunks.slice(start, active + overthrow + 1) as chunk, i (start + i)}
-      {#each chunk as item, j (key(item))}
-        <slot {item} index={(start + i) * perView + j} />
-      {/each}
+    {#each visible as item, i (key(item))}
+      <div style="overflow-anchor: none;">
+        <slot {item} index={start * perView + i} />
+      </div>
     {/each}
   </div>
 </div>

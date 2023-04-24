@@ -55,6 +55,7 @@
     "preprocess",
     "randomblob",
     "regexes",
+    "reindex",
     "rescape",
     "resizer",
     "restream",
