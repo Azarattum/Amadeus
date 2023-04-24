@@ -17,22 +17,17 @@
   let perRow = 0;
   let active = 0;
 
-  $: start = Math.max(active - overthrow, 0);
-  $: height = Math.ceil(items.length / perRow) * rowHeight;
   $: perView = Math.ceil((container?.offsetHeight || 0) / rowHeight) * perRow;
+  $: from = Math.max(active - overthrow, 0) * perView;
+  $: to = Math.max((active + overthrow + 1) * perView, 1);
+  $: slice = items.slice(from, to);
+  $: index = reindex(items);
+
+  $: totalHeight = Math.ceil(items.length / perRow) * rowHeight;
   $: viewHeight = (perView / perRow) * rowHeight;
   $: template = Number.isInteger(columns)
     ? `repeat(${columns},1fr)`
     : `repeat(auto-fill,minmax(min(100%,${columns}),1fr))`;
-  $: chunks = perView
-    ? Array.from({ length: Math.ceil(items.length / perView) }).map((_, i) =>
-        items.slice(i * perView, (i + 1) * perView)
-      )
-    : items.length
-    ? (tick().then(measure), [[items[0]]])
-    : [];
-  $: visible = chunks.slice(start, active + overthrow + 1).flat();
-  $: index = reindex(items);
 
   async function reflow(rect: DOMRect) {
     if (!viewHeight) return;
@@ -49,10 +44,9 @@
   }
 
   function reindex(items: T[]) {
-    if (!animate) return;
+    if (!index && items.length) tick().then(measure);
+    if (!animate || !items.length) return;
     const reindexed = new Map<R, number>();
-    const from = start * perView;
-    const to = start * perView + visible.length;
 
     for (let i = 0; i < items.length; i++) {
       const id = key(items[i]);
@@ -103,10 +97,10 @@
   });
 </script>
 
-<div class="contain-[size_layout]" style:height="{height}px">
+<div class="contain-[size_layout]" style:height="{totalHeight}px">
   <div
     class="grid auto-rows-max will-change-transform contain-content"
-    style:transform="translate3d(0,{start * viewHeight}px,0)"
+    style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
     style:grid-template-columns={template}
     bind:this={wrapper}
   >
@@ -118,9 +112,9 @@
       class="absolute"
       aria-hidden
     />
-    {#each visible as item, i (key(item))}
+    {#each slice as item, i (key(item))}
       <div style="overflow-anchor: none;">
-        <slot {item} index={start * perView + i} />
+        <slot {item} index={from + i} />
       </div>
     {/each}
   </div>
