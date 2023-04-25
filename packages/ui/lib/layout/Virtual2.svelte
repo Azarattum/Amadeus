@@ -12,9 +12,9 @@
   export let animate: number | boolean = false;
   export let container: HTMLElement | undefined = undefined;
 
+  let wrapper: HTMLElement | null = null;
   let outer = new DOMRect();
   let inner = new DOMRect();
-  let wrapper: HTMLElement;
   let rowHeight = 1;
   let perRow = 0;
   let active = 0;
@@ -70,7 +70,7 @@
   }
 
   function transform(id: number, x: number, y: number) {
-    const target = wrapper.children.item(id - from + 1) as HTMLElement;
+    const target = wrapper?.children.item(id - from + 1) as HTMLElement;
     if (!target || target.style.visibility === "hidden") return;
     const transform = [
       `translate3d(${x * 100}%,${y * 100}%,0)`,
@@ -96,7 +96,7 @@
   }
 
   onMount(() => {
-    if (!container) container = wrapper.parentElement?.parentElement as any;
+    if (!container) container = wrapper?.parentElement?.parentElement as any;
     if (!container) throw new Error("Virtual list needs a container!");
     container.addEventListener("resize", measure);
     const { destroy } = resize(container);
