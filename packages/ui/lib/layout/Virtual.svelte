@@ -133,6 +133,7 @@
 
   function grab({ target }: DragEvent) {
     if (!sortable || !wrapper || !target || $transfer) return;
+    if (!wrapper.contains(target as Element)) return;
     if (items[hovering] == null) return;
     if (move) rollback = -1;
     else rollback = hovering;
