@@ -10,17 +10,18 @@ export function drag(
 ) {
   function draggable(target: HTMLElement | null) {
     do {
-      if (target?.draggable) return true;
+      if (target?.draggable) return target;
       target = target?.parentElement || null;
     } while (target);
-    return false;
+    return null;
   }
 
   function simulate(event: Event) {
-    if (!draggable(event.target as HTMLElement)) return;
+    const target = draggable(event.target as HTMLElement);
+    if (!target) return;
     lock();
     event.preventDefault();
-    event.target?.dispatchEvent(new DragEvent("dragstart", { bubbles: true }));
+    target.dispatchEvent(new DragEvent("dragstart", { bubbles: true }));
   }
 
   function overwrite(event: DragEvent) {
