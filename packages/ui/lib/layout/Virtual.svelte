@@ -2,7 +2,6 @@
   import { writable } from "svelte/store";
 
   type Transfer<T = any, K = any> = {
-    source: [HTMLElement, number];
     group: string | HTMLElement;
     owner: HTMLElement;
     offset: DOMRect;
@@ -24,6 +23,7 @@
   type K = $$Generic;
 
   export let items: T[];
+  export let move = false;
   export let overthrow = 1;
   export let columns: number | string = 1;
   export let key = (x: T) => x as any as K;
@@ -117,6 +117,7 @@
   }
 
   /* === Sortable Logic === */
+  let rollback: number | undefined;
   let cursor = { x: 0, y: 0 };
   let scroll = { x: 0, y: 0 };
 
@@ -129,19 +130,17 @@
   $: hoveringX = Math.floor(pointerX / (inner.width / perRow));
   $: hovering = minmax(hoveringY * perRow + hoveringX, 0, items.length - 1);
   $: if ($transfer?.group === id) claim(hovering);
-  $: if ($transfer?.source[0] === wrapper && $transfer.owner !== wrapper) {
-    claim($transfer.source[1], false);
-  }
 
   function grab({ target }: DragEvent) {
-    if (!sortable || !wrapper) return;
-    if (items[hovering] == null || !target || $transfer) return;
+    if (!sortable || !wrapper || !target || $transfer) return;
+    if (items[hovering] == null) return;
+    if (move) rollback = -1;
+    else rollback = hovering;
     const offset = (target as Element).getBoundingClientRect();
     offset.x -= cursor.x;
     offset.y -= cursor.y;
     $transfer = {
       group: sortable === true ? wrapper : sortable,
-      source: [wrapper, hovering],
       key: key(items[hovering]),
       data: items[hovering],
       owner: wrapper,
@@ -149,21 +148,33 @@
     };
   }
 
-  function claim(position: number, ownership = true) {
-    if (!sortable || !$transfer || !Number.isInteger(position)) return;
+  function claim(position: number, passive = false) {
+    if (!sortable || !$transfer) return;
+    if (!Number.isInteger(position)) {
+      if (rollback != null && $transfer.owner !== wrapper) {
+        claim(rollback, true);
+        rollback = undefined;
+      }
+      return;
+    }
     if (key(items[position]) === $transfer.key) return;
+
     const index = items.findIndex((x) => key(x) === $transfer?.key);
-    if (~index) items.splice(index, 1);
-    items.splice(position, 0, $transfer.data);
-    requestAnimationFrame(() => (items = items));
-    if (ownership && wrapper) $transfer.owner = wrapper;
+    if (index !== position) {
+      if (!passive && rollback == null) rollback = index;
+      if (~index) items.splice(index, 1);
+      if (~position) items.splice(position, 0, $transfer.data);
+      requestAnimationFrame(() => (items = items));
+    }
+    if (!passive && wrapper) $transfer.owner = wrapper;
   }
 
   async function retract() {
+    rollback = undefined;
     if (!sortable || $transfer?.owner !== wrapper) return;
-    const id = items.findIndex((x) => key(x) === $transfer?.key);
-    if (~id) {
-      const target = wrapper.children.item(id - from + 1) as HTMLElement;
+    const index = items.findIndex((x) => key(x) === $transfer?.key);
+    if (~index) {
+      const target = wrapper.children.item(index - from + 1) as HTMLElement;
       if (target) {
         $transfer.back = target.getBoundingClientRect();
         $transfer.group = Math.random().toString();
