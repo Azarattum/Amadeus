@@ -22,6 +22,7 @@
   type T = $$Generic;
   type K = $$Generic;
 
+  export let gap = 0;
   export let items: T[];
   export let move = false;
   export let overthrow = 1;
@@ -47,7 +48,7 @@
   $: index = reindex(items);
 
   $: duration = animate === true ? 300 : animate || 0;
-  $: totalHeight = Math.ceil(items.length / perRow) * rowHeight;
+  $: totalHeight = Math.ceil(items.length / perRow) * rowHeight - gap;
   $: viewHeight = (perView / perRow) * rowHeight;
   $: template = Number.isInteger(columns)
     ? `repeat(${columns},1fr)`
@@ -108,12 +109,13 @@
     inner = wrapper.parentElement?.getBoundingClientRect() as DOMRect;
     outer = container.getBoundingClientRect();
     inner.y += container.scrollTop;
+    inner.width += gap;
     const target = wrapper.firstElementChild?.nextElementSibling;
     if (!target) return;
     const { width, height } = target.getBoundingClientRect();
     if (!width || !height) return;
-    perRow = ~~(inner.width / width);
-    rowHeight = height;
+    perRow = ~~(inner.width / (width + gap));
+    rowHeight = height + gap;
   }
 
   /* === Sortable Logic === */
@@ -125,7 +127,9 @@
   $: pointerY =
     minmax(cursor.y, outer.top, outer.bottom, NaN) + scroll.y - inner.y;
   $: pointerX =
-    minmax(cursor.x, inner.left, inner.right, NaN) + scroll.x - inner.x;
+    minmax(cursor.x, inner.left, inner.right - gap - 1, NaN) +
+    scroll.x -
+    inner.x;
   $: hoveringY = Math.floor(pointerY / rowHeight);
   $: hoveringX = Math.floor(pointerX / (inner.width / perRow));
   $: hovering = minmax(hoveringY * perRow + hoveringX, 0, items.length - 1);
@@ -212,6 +216,7 @@
     class="grid auto-rows-max will-change-transform contain-content"
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
     style:grid-template-columns={template}
+    style:gap="{gap}px"
     bind:this={wrapper}
     use:drag={"hold"}
     use:hold
@@ -247,12 +252,13 @@
         style:transform="translate3d(
         {$transfer.back
           ? $transfer.back.x
-          : cursor.x + Math.max($transfer.offset.x, -inner.width / perRow)}px,
+          : cursor.x +
+            Math.max($transfer.offset.x, -inner.width / perRow + gap)}px,
         {$transfer.back
           ? $transfer.back.y
-          : cursor.y + Math.max($transfer.offset.y, -rowHeight)}px, 0)"
-        style:width="{inner.width / perRow}px"
-        style:height="{rowHeight}px"
+          : cursor.y + Math.max($transfer.offset.y, -rowHeight + gap)}px, 0)"
+        style:width="{inner.width / perRow - gap}px"
+        style:height="{rowHeight - gap}px"
       >
         <slot item={$transfer.data} index={NaN} />
       </div>
