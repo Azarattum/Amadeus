@@ -32,6 +32,7 @@
   $: template = Number.isInteger(columns)
     ? `repeat(${columns},1fr)`
     : `repeat(auto-fill,minmax(min(100%,${columns}),1fr))`;
+  $: if (Number.isFinite(totalHeight)) tick().then(measure);
 
   async function reflow(rect: DOMRect) {
     if (!viewHeight) return;
@@ -85,6 +86,7 @@
     if (!container || !wrapper) return;
     outer = container.getBoundingClientRect();
     inner = wrapper.getBoundingClientRect();
+    inner.y += container.scrollTop;
     const target = wrapper.firstElementChild?.nextElementSibling;
     if (!target) return;
     const { width, height } = target.getBoundingClientRect();
