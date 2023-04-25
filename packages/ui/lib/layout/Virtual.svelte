@@ -159,6 +159,7 @@
       return;
     }
     if (key(items[position]) === $transfer.key) return;
+    if (position < 0 && !items.length) position = 0;
 
     const index = items.findIndex((x) => key(x) === $transfer?.key);
     if (index !== position) {
