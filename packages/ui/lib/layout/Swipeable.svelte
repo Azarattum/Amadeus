@@ -29,7 +29,7 @@
     ? ' 1fr'
     : ''};"
   class:bg-primary-600={active[0] || active[1]}
-  on:wheel={({ deltaX }) => (wheel = deltaX)}
+  on:wheel|passive={({ deltaX }) => (wheel = deltaX)}
   on:touchend={finish}
 >
   {#if $$slots.before}
