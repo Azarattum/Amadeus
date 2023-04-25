@@ -1,6 +1,24 @@
+<script lang="ts" context="module">
+  import { writable } from "svelte/store";
+
+  type Transfer<T = any, K = any> = {
+    source: [HTMLElement, number];
+    group: string | HTMLElement;
+    owner: HTMLElement;
+    offset: DOMRect;
+    back?: DOMRect;
+    data: T;
+    key: K;
+  };
+  let transfer = writable<Transfer | null>(null);
+</script>
+
 <script lang="ts">
-  import { intersection, resize } from "../../action";
+  import { drag, hold, intersection, resize } from "../../action";
+  import { minmax } from "@amadeus-music/util/math";
+  import { position } from "../../internal/pointer";
   import { lock } from "@amadeus-music/util/async";
+  import { Portal } from "../../component";
   import { onMount, tick } from "svelte";
   type T = $$Generic;
   type K = $$Generic;
@@ -10,8 +28,10 @@
   export let columns: number | string = 1;
   export let key = (x: T) => x as any as K;
   export let animate: number | boolean = false;
+  export let sortable: boolean | string = false;
   export let container: HTMLElement | undefined = undefined;
 
+  /* === Virtual Logic === */
   let wrapper: HTMLElement | null = null;
   let outer = new DOMRect();
   let inner = new DOMRect();
@@ -59,6 +79,7 @@
       const id = key(items[i]);
       reindexed.set(id, i);
 
+      if ($transfer?.owner === wrapper && id === $transfer?.key) continue;
       if (i < from || i >= to) continue;
       const before = index?.get(id);
       if (before == null) continue;
@@ -95,13 +116,77 @@
     rowHeight = height;
   }
 
+  /* === Sortable Logic === */
+  let cursor = { x: 0, y: 0 };
+  let scroll = { x: 0, y: 0 };
+
+  $: id = sortable === true ? wrapper : sortable;
+  $: pointerY =
+    minmax(cursor.y, inner.top, inner.bottom, NaN) + scroll.y - inner.y;
+  $: pointerX =
+    minmax(cursor.x, inner.left, inner.right, NaN) + scroll.x - inner.x;
+  $: hoveringY = Math.floor(pointerY / rowHeight);
+  $: hoveringX = Math.floor(pointerX / (inner.width / perRow));
+  $: hovering = minmax(hoveringY * perRow + hoveringX, 0, items.length - 1);
+  $: if ($transfer?.group === id) claim(hovering);
+  $: if ($transfer?.source[0] === wrapper && $transfer.owner !== wrapper) {
+    claim($transfer.source[1], false);
+  }
+
+  function grab({ target }: DragEvent) {
+    if (!sortable || !wrapper) return;
+    if (items[hovering] == null || !target || $transfer) return;
+    const offset = (target as Element).getBoundingClientRect();
+    offset.x -= cursor.x;
+    offset.y -= cursor.y;
+    $transfer = {
+      group: sortable === true ? wrapper : sortable,
+      source: [wrapper, hovering],
+      key: key(items[hovering]),
+      data: items[hovering],
+      owner: wrapper,
+      offset,
+    };
+  }
+
+  function claim(position: number, ownership = true) {
+    if (!sortable || !$transfer || !Number.isInteger(position)) return;
+    if (key(items[position]) === $transfer.key) return;
+    const index = items.findIndex((x) => key(x) === $transfer?.key);
+    if (~index) items.splice(index, 1);
+    items.splice(position, 0, $transfer.data);
+    requestAnimationFrame(() => (items = items));
+    if (ownership && wrapper) $transfer.owner = wrapper;
+  }
+
+  async function retract() {
+    if (!sortable || $transfer?.owner !== wrapper) return;
+    const id = items.findIndex((x) => key(x) === $transfer?.key);
+    if (~id) {
+      const target = wrapper.children.item(id - from + 1) as HTMLElement;
+      $transfer.back = target.getBoundingClientRect();
+      $transfer.group = Math.random().toString();
+      await new Promise((r) => setTimeout(r, 150));
+    }
+    $transfer = null;
+  }
+
   onMount(() => {
+    function scroller() {
+      scroll.x = container?.scrollLeft || 0;
+      scroll.y = container?.scrollTop || 0;
+    }
+
     if (!container) container = wrapper?.parentElement?.parentElement as any;
     if (!container) throw new Error("Virtual list needs a container!");
+    const unsubscribe = sortable && position.subscribe((x) => (cursor = x));
+    if (sortable) container.addEventListener("scroll", scroller);
     container.addEventListener("resize", measure);
     const { destroy } = resize(container);
     return () => {
+      container?.removeEventListener("scroll", scroller);
       container?.removeEventListener("resize", measure);
+      if (unsubscribe) unsubscribe();
       destroy();
     };
   });
@@ -113,6 +198,8 @@
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
     style:grid-template-columns={template}
     bind:this={wrapper}
+    use:drag={"hold"}
+    use:hold
   >
     <div
       style:transform="translateY({+!!active * overthrow * 100}%)"
@@ -123,9 +210,37 @@
       aria-hidden
     />
     {#each slice as item, i (key(item))}
-      <div style="overflow-anchor: none;">
+      <div
+        class:invisible={$transfer?.owner === wrapper &&
+          $transfer?.key === key(item)}
+        draggable={sortable ? "true" : undefined}
+        style="overflow-anchor: none;"
+      >
         <slot {item} index={from + i} />
       </div>
     {/each}
   </div>
 </div>
+
+<svelte:window on:dragstart={grab} on:dragend={retract} />
+{#if sortable}
+  <Portal to="overlay">
+    {#if $transfer?.owner === wrapper}
+      <div
+        class="absolute will-change-transform contain-[size_layout]"
+        class:transition-transform={$transfer.back}
+        style:transform="translate3d(
+        {$transfer.back
+          ? $transfer.back.x
+          : cursor.x + Math.max($transfer.offset.x, -inner.width / perRow)}px,
+        {$transfer.back
+          ? $transfer.back.y
+          : cursor.y + Math.max($transfer.offset.y, -rowHeight)}px, 0)"
+        style:width="{inner.width / perRow}px"
+        style:height="{rowHeight}px"
+      >
+        <slot item={$transfer.data} index={NaN} />
+      </div>
+    {/if}
+  </Portal>
+{/if}
