@@ -25,7 +25,6 @@ export function drag(
 
   function overwrite(event: DragEvent) {
     event.preventDefault();
-    target = event.target;
     addEventListener("pointercancel", finish);
     addEventListener("pointerup", finish);
   }
@@ -34,16 +33,13 @@ export function drag(
     unlock();
     removeEventListener("pointercancel", finish);
     removeEventListener("pointerup", finish);
-    target?.dispatchEvent(new DragEvent("dragend", { bubbles: true }));
-    target = null;
+    node.dispatchEvent(new DragEvent("dragend", { bubbles: true }));
   }
 
-  let target: EventTarget | null = null;
   node.addEventListener(trigger, simulate);
   node.addEventListener("dragstart", overwrite);
   return {
     destroy() {
-      target = null;
       node.removeEventListener(trigger, simulate);
       node.removeEventListener("dragstart", overwrite);
     },
