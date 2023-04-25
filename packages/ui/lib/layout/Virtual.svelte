@@ -125,9 +125,11 @@
 
   $: id = sortable === true ? wrapper : sortable;
   $: pointerY =
-    minmax(cursor.y, outer.top, outer.bottom, NaN) + scroll.y - inner.y;
+    minmax(cursor.y + gap / 2, outer.top, outer.bottom, NaN) +
+    scroll.y -
+    inner.y;
   $: pointerX =
-    minmax(cursor.x, inner.left, inner.right - gap - 1, NaN) +
+    minmax(cursor.x + gap / 2, inner.left, inner.right - gap - 1, NaN) +
     scroll.x -
     inner.x;
   $: hoveringY = Math.floor(pointerY / rowHeight);
