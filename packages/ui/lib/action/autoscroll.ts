@@ -3,11 +3,11 @@ import { position, type Point } from "../../internal/pointer";
 export function autoscroll(
   node: HTMLElement,
   {
-    axis = "both",
-    threshold = 64,
+    trigger = "auto" as "auto" | "always" | "none",
+    axis = "both" as "both" | "x" | "y",
     enabled = false,
-    trigger = "auto",
-  }: AutoScrollOptions = {}
+    threshold = 64,
+  } = {}
 ) {
   let bounds: DOMRect;
   const direction = { x: 0, y: 0 };
@@ -19,6 +19,8 @@ export function autoscroll(
     let dx = 0;
     let dy = 0;
 
+    if (x < bounds.left || x > bounds.right) return;
+    if (y < bounds.top || y > bounds.bottom) return;
     if (axis !== "x") {
       if (y - bounds.top < threshold) {
         dy = -(bounds.top - y + threshold);
@@ -82,29 +84,22 @@ export function autoscroll(
   }
 
   if (trigger === "auto") {
-    node.addEventListener("dragstart", enable);
-    node.addEventListener("dragend", disable);
+    addEventListener("dragstart", enable);
+    addEventListener("dragend", disable);
   }
   toggle();
 
   return {
-    update(config: AutoScrollOptions) {
+    update(config: { enabled: boolean }) {
       if (config.enabled != null) toggle(config.enabled);
     },
     destroy() {
-      node.removeEventListener("dragstart", enable);
-      node.removeEventListener("dragend", disable);
+      removeEventListener("dragstart", enable);
+      removeEventListener("dragend", disable);
       trigger = "none";
       toggle(false);
     },
   };
-}
-
-interface AutoScrollOptions {
-  enabled?: boolean;
-  threshold?: number;
-  axis?: "both" | "x" | "y";
-  trigger?: "auto" | "always" | "none";
 }
 
 declare global {

@@ -105,8 +105,8 @@
 
   function measure() {
     if (!container || !wrapper) return;
+    inner = wrapper.parentElement?.getBoundingClientRect() as DOMRect;
     outer = container.getBoundingClientRect();
-    inner = wrapper.getBoundingClientRect();
     inner.y += container.scrollTop;
     const target = wrapper.firstElementChild?.nextElementSibling;
     if (!target) return;
@@ -122,7 +122,7 @@
 
   $: id = sortable === true ? wrapper : sortable;
   $: pointerY =
-    minmax(cursor.y, inner.top, inner.bottom, NaN) + scroll.y - inner.y;
+    minmax(cursor.y, outer.top, outer.bottom, NaN) + scroll.y - inner.y;
   $: pointerX =
     minmax(cursor.x, inner.left, inner.right, NaN) + scroll.x - inner.x;
   $: hoveringY = Math.floor(pointerY / rowHeight);
@@ -164,9 +164,11 @@
     const id = items.findIndex((x) => key(x) === $transfer?.key);
     if (~id) {
       const target = wrapper.children.item(id - from + 1) as HTMLElement;
-      $transfer.back = target.getBoundingClientRect();
-      $transfer.group = Math.random().toString();
-      await new Promise((r) => setTimeout(r, 150));
+      if (target) {
+        $transfer.back = target.getBoundingClientRect();
+        $transfer.group = Math.random().toString();
+        await new Promise((r) => setTimeout(r, 150));
+      }
     }
     $transfer = null;
   }

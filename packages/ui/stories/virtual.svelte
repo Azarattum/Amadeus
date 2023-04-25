@@ -8,7 +8,7 @@
 
 <div class="flex h-full gap-8">
   <div
-    class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll scroll-smooth p-4"
+    class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll p-4"
   >
     <Header>List 1</Header>
     <Virtual
@@ -29,7 +29,7 @@
   </div>
   <div
     use:autoscroll
-    class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll scroll-smooth p-4"
+    class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll p-4"
   >
     <Header>List 2</Header>
     <Virtual
