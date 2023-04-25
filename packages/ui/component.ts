@@ -11,9 +11,7 @@ export { default as Portal } from "./lib/layout/Portal.svelte";
 export { default as Spacer } from "./lib/layout/Spacer.svelte";
 export { default as Wrapper } from "./lib/layout/Wrapper.svelte";
 export { default as Gateway } from "./lib/layout/Gateway.svelte";
-export { default as Overlay } from "./lib/layout/Overlay.svelte";
 export { default as Virtual } from "./lib/layout/Virtual.svelte";
-export { default as Sortable } from "./lib/layout/Sortable.svelte";
 export { default as Separator } from "./lib/layout/Separator.svelte";
 export { default as Swipeable } from "./lib/layout/Swipeable.svelte";
 

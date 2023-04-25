@@ -1,30 +1,51 @@
 <script lang="ts">
-  import { delay } from "@amadeus-music/util/async";
-  import { Virtual } from "@amadeus-music/ui";
-  import { onMount } from "svelte";
+  import { Header, Virtual } from "@amadeus-music/ui";
+  import { autoscroll } from "../action";
 
-  let items = Array.from({ length: 30 }).map((_, i) => i);
-
-  let list: HTMLElement;
-  onMount(async () => {
-    await delay(100);
-    list.scrollBy(0, 64 * 10);
-    await delay(1000);
-    [items[10], items[14]] = [items[14], items[10]];
-    await delay(2500);
-    [items[10], items[11]] = [items[11], items[10]];
-    await delay(1000);
-    list.scrollBy(0, 64 * 1);
-  });
+  let items1 = Array.from({ length: 30 }).map((_, i) => i);
+  let items2 = Array.from({ length: 30 }).map((_, i) => 30 + i);
 </script>
 
-<!-- "webkit-overflow-scrolling" Bug fix for iOS safari hiding scroll underneath the content -->
-<div
-  bind:this={list}
-  class="scroll h-full w-auto overflow-y-scroll scroll-smooth rounded-md"
-  style="-webkit-overflow-scrolling: touch"
->
-  <Virtual {items} let:item animation={5000}>
-    <p class="mt-8 h-8 rounded bg-pink-300 shadow-md shadow-black/30">{item}</p>
-  </Virtual>
+<div class="flex h-full gap-8">
+  <div
+    class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll scroll-smooth p-4"
+  >
+    <Header>List 1</Header>
+    <Virtual
+      items={items1}
+      let:item
+      let:index
+      animate
+      columns="7rem"
+      sortable="a"
+    >
+      <p
+        class:shadow-lg={Number.isNaN(index)}
+        class="flex h-11 items-center justify-center border border-highlight bg-surface"
+      >
+        {item}
+      </p>
+    </Virtual>
+  </div>
+  <div
+    use:autoscroll
+    class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll scroll-smooth p-4"
+  >
+    <Header>List 2</Header>
+    <Virtual
+      items={items2}
+      let:item
+      let:index
+      animate
+      columns="20rem"
+      sortable="a"
+    >
+      <p
+        class:shadow-lg={Number.isNaN(index)}
+        class="flex h-20 items-center justify-center border border-highlight bg-surface"
+      >
+        {item}
+      </p>
+    </Virtual>
+  </div>
 </div>
