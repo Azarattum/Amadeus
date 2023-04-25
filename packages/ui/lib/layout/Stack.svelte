@@ -44,8 +44,8 @@
   class:gap-8={gap === "xl"}
   class:p-4={p === true}
   class:flex-grow={grow}
-  class:max-w-[100dvw]={screen && (x || z)}
-  class:max-h-[100dvh]={screen && !x}
+  class:max-w-[100dvw]={screen}
+  class:max-h-[100dvh]={screen}
   class:overflow-auto={screen}
 >
   <slot />
