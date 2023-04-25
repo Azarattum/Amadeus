@@ -3,12 +3,12 @@
   import { lock } from "@amadeus-music/util/async";
   import { onMount, tick } from "svelte";
   type T = $$Generic;
-  type R = $$Generic;
+  type K = $$Generic;
 
   export let items: T[];
   export let overthrow = 1;
   export let columns: number | string = 1;
-  export let key = (x: T) => x as any as R;
+  export let key = (x: T) => x as any as K;
   export let animate: number | boolean = false;
   export let container: HTMLElement | undefined = undefined;
 
@@ -26,6 +26,7 @@
   $: slice = items.slice(from, to);
   $: index = reindex(items);
 
+  $: duration = animate === true ? 300 : animate || 0;
   $: totalHeight = Math.ceil(items.length / perRow) * rowHeight;
   $: viewHeight = (perView / perRow) * rowHeight;
   $: template = Number.isInteger(columns)
@@ -51,7 +52,7 @@
   function reindex(items: T[]) {
     if (!index && items.length) tick().then(measure);
     if (!animate || !items.length) return;
-    const reindexed = new Map<R, number>();
+    const reindexed = new Map<K, number>();
 
     for (let i = 0; i < items.length; i++) {
       const id = key(items[i]);
@@ -62,13 +63,13 @@
       if (before == null) continue;
       const y = ~~(before / perRow) - ~~(i / perRow);
       const x = ~~(before % perRow) - ~~(i % perRow);
-      if (y || x) transform(before - from, x, y);
+      if (y || x) transform(before, x, y);
     }
     return reindexed;
   }
 
-  function transform(element: number, x: number, y: number) {
-    const target = wrapper.children.item(element + 1) as HTMLElement;
+  function transform(id: number, x: number, y: number) {
+    const target = wrapper.children.item(id - from + 1) as HTMLElement;
     if (!target || target.style.visibility === "hidden") return;
     const transform = [
       `translate3d(${x * 100}%,${y * 100}%,0)`,
@@ -76,11 +77,7 @@
     ];
     target.animate(
       { transform },
-      {
-        easing: "ease",
-        composite: "accumulate",
-        duration: animate === true ? 300 : animate || 0,
-      }
+      { easing: "ease", composite: "accumulate", duration }
     );
   }
 
@@ -92,7 +89,7 @@
     if (!target) return;
     const { width, height } = target.getBoundingClientRect();
     if (!width || !height) return;
-    perRow = ~~(outer.width / width);
+    perRow = ~~(inner.width / width);
     rowHeight = height;
   }
 
@@ -101,11 +98,14 @@
     if (!container) throw new Error("Virtual list needs a container!");
     container.addEventListener("resize", measure);
     const { destroy } = resize(container);
-    return () => (container?.removeEventListener("resize", measure), destroy());
+    return () => {
+      container?.removeEventListener("resize", measure);
+      destroy();
+    };
   });
 </script>
 
-<div class="contain-[size_layout]" style:height="{totalHeight}px">
+<div class="shrink-0 contain-[size_layout]" style:height="{totalHeight}px">
   <div
     class="grid auto-rows-max will-change-transform contain-content"
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
