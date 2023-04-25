@@ -1,9 +1,14 @@
 /**
  * Returns a value within min & max boundary
  */
-export function minmax(value: number, min: number, max: number) {
-  if (value < min) return min;
-  if (value > max) return max;
+export function minmax(
+  value: number,
+  min: number,
+  max: number,
+  fallback?: number
+) {
+  if (value < min) return fallback != null ? fallback : min;
+  if (value > max) return fallback != null ? fallback : max;
   return value;
 }
 
