@@ -23,12 +23,12 @@ export { default as Checkbox } from "./lib/interactive/Checkbox.svelte";
 export { default as Logo } from "./lib/static/Logo.svelte";
 export { default as Icon } from "./lib/static/Icon.svelte";
 export { default as Card } from "./lib/static/Card.svelte";
-export { default as Header } from "./lib/static/Header.svelte";
 export { default as Text } from "./lib/static/Text.svelte";
+export { default as Image } from "./lib/static/Image.svelte";
+export { default as Header } from "./lib/static/Header.svelte";
 export { default as Tooltip } from "./lib/static/Tooltip.svelte";
 export { default as Spinner } from "./lib/static/Spinner.svelte";
 
 export * from "./lib/composite/LightSwitch.svelte";
 export { default as Nav } from "./lib/composite/Nav.svelte";
-export { default as List } from "./lib/composite/List.svelte";
 export { default as LightSwitch } from "./lib/composite/LightSwitch.svelte";
