@@ -8,14 +8,16 @@
 
 <script lang="ts">
   import { fade } from "svelte/transition";
+  import { onMount } from "svelte";
 
   export let src: string;
   export let size = 48;
   export let alt = "";
 
-  $: resized = cache.has(src) ? cache.get(src) : resize(desource(src));
-  $: loaded = typeof resized === "string";
-  $: Promise.resolve(resized).then(() => (loaded = true));
+  $: resized = cache.has(desource(src))
+    ? cache.get(desource(src))
+    : resize(desource(src));
+  let loaded = typeof resized === "string";
 
   function desource(src: string) {
     try {
@@ -43,12 +45,17 @@
           canvas.width,
           canvas.height
         );
-        const url = canvas.toDataURL("image/png");
+        const url = canvas.toDataURL("image/webp");
         cache.set(src, url);
         resolve(url);
       };
     });
   }
+
+  onMount(async () => {
+    await resized;
+    loaded = true;
+  });
 </script>
 
 <div
