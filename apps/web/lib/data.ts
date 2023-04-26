@@ -1,4 +1,5 @@
 import { connect } from "@amadeus-music/crdata";
+import { writable } from "svelte/store";
 import { sync } from "./trpc";
 
 export const {
@@ -18,3 +19,5 @@ export const {
   push: sync.push.mutate,
   pull: sync.pull.subscribe,
 });
+
+export const search = writable("");

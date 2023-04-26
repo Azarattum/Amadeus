@@ -5,13 +5,14 @@
     Nav,
     Button,
     Icon,
-    When,
     Input,
     LightSwitch,
   } from "@amadeus-music/ui";
+  import { beforeNavigate, preloadData } from "$app/navigation";
   import { capitalize } from "@amadeus-music/util/string";
-  import { preloadData } from "$app/navigation";
+  import { autoscroll } from "@amadeus-music/ui/action";
   import { page } from "$app/stores";
+  import { search } from "$lib/data";
   import { onMount } from "svelte";
 
   const icons: Record<string, string> = {
@@ -34,14 +35,18 @@
     Library: ["Playlists", "Artists", "Timeline"],
     Explore: ["Tracks", "Artists", "Albums"],
   };
-  $: section = capitalize($page.route.id?.slice(1) || "home");
+  $: section = capitalize($page.route.id?.split("/")?.[1] || "home");
 
-  function toURL(section: string): string {
-    if (section in sections) {
-      return `/${section === "Home" ? "" : section.toLowerCase()}`;
+  function toURL(target: string): string {
+    if (target in sections) {
+      return `/${target === "Home" ? "" : target.toLowerCase()}`;
     }
-    return `#${section.toLowerCase()}`;
+    return `${toURL(section)}#${target.toLowerCase()}`;
   }
+
+  beforeNavigate(() => {
+    $search = "";
+  });
 
   onMount(() => {
     preloadData("/");
@@ -70,13 +75,13 @@
       </Button>
     </Nav>
     <Stack screen grow>
-      <When sm>
-        <Stack p x gap="2xl">
-          <Input stretch placeholder="Search"><Icon name="search" /></Input>
-          <LightSwitch />
-        </Stack>
-      </When>
-      <slot />
+      <div class="hidden gap-16 p-4 pb-0 sm:flex">
+        <Input bind:value={$search} stretch placeholder="Search"
+          ><Icon name="search" /></Input
+        >
+        <LightSwitch />
+      </div>
+      <div use:autoscroll class="h-full overflow-y-scroll"><slot /></div>
     </Stack>
   </Stack>
 </Wrapper>
