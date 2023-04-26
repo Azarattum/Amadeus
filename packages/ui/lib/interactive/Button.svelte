@@ -70,6 +70,7 @@
 <svelte:element
   this={tag}
   for={group ? group.id + index : undefined}
+  draggable="false"
   {disabled}
   {href}
   {id}
