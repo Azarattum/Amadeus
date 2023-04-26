@@ -102,7 +102,7 @@
     {#if selected.size}
       <aside
         transition:fly={{ y: 50 }}
-        class="relative left-1/2 mx-4 mb-2 flex max-w-md -translate-x-1/2 rounded-lg border border-highlight bg-surface-200 backdrop-blur-lg"
+        class="relative left-[calc(50%-1rem)] -z-20 mx-4 mb-2 flex max-w-md -translate-x-1/2 rounded-lg border border-highlight bg-surface-200 backdrop-blur-lg"
         style:grid-template-columns="repeat(auto-fit,minmax(0,1fr)) 44px"
       >
         <div class="grid grow auto-cols-fr grid-flow-col">

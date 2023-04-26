@@ -4,6 +4,7 @@ const resolve = (path) => require("path").resolve(__dirname, path);
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
+    "./apps/web/lib/**/*.{html,js,svelte,ts}",
     "./apps/web/routes/**/*.{html,js,svelte,ts}",
     "./packages/ui/lib/**/*.{html,js,svelte,ts}",
     "./packages/ui/demo/**/*.{html,js,svelte,ts}",
