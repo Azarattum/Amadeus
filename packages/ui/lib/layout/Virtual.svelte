@@ -14,13 +14,15 @@
 
 <script lang="ts">
   import { drag, hold, intersection, resize } from "../../action";
+  import { createEventDispatcher, onMount, tick } from "svelte";
   import { minmax } from "@amadeus-music/util/math";
   import { position } from "../../internal/pointer";
   import { lock } from "@amadeus-music/util/async";
   import { Portal } from "../../component";
-  import { onMount, tick } from "svelte";
   type T = $$Generic;
   type K = $$Generic;
+
+  const dispatch = createEventDispatcher<{ end: void }>();
 
   export let gap = 0;
   export let items: T[];
@@ -36,6 +38,7 @@
   let wrapper: HTMLElement | null = null;
   let outer = new DOMRect();
   let inner = new DOMRect();
+  let ended = false;
   let rowHeight = 1;
   let perRow = 0;
   let active = 0;
@@ -53,11 +56,12 @@
   $: template = Number.isInteger(columns)
     ? `repeat(${columns},1fr)`
     : `repeat(auto-fill,minmax(min(100%,${columns}),1fr))`;
-  $: if (Number.isFinite(totalHeight)) tick().then(measure);
+  $: if (Number.isFinite(totalHeight)) tick().then(measure), (ended = false);
 
   async function reflow(rect: DOMRect) {
     if (!viewHeight) return;
     active -= Math.round(rect.y / viewHeight);
+    if (!ended && active >= max - 1) dispatch("end"), (ended = true);
     if (active < 0) return (active = 0);
     if (active > max) return (active = max);
 
