@@ -14,7 +14,12 @@
   const scrollUp = () => section.scrollTo({ top: 0, behavior: "smooth" });
 
   function scrolled({ detail }: IntersectionEvent) {
-    if (detail.boundingClientRect.x) return;
+    if (
+      Math.round(detail.boundingClientRect.x) !==
+      Math.round(section.parentElement?.getBoundingClientRect().x || 0)
+    ) {
+      return;
+    }
     stuck = detail.intersectionRatio < 0.8;
   }
 
