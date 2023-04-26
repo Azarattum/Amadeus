@@ -22,7 +22,10 @@
   type T = $$Generic;
   type K = $$Generic;
 
-  const dispatch = createEventDispatcher<{ end: void }>();
+  const dispatch = createEventDispatcher<{
+    edit: { action: "rearrange" | "purge" | "push"; item: T; index: number };
+    end: void;
+  }>();
 
   export let gap = 0;
   export let items: T[];
@@ -124,6 +127,7 @@
 
   /* === Sortable Logic === */
   let rollback: number | undefined;
+  let original: number | undefined;
   let cursor = { x: 0, y: 0 };
   let scroll = { x: 0, y: 0 };
 
@@ -145,8 +149,8 @@
     if (!sortable || !wrapper || !target || $transfer) return;
     if ((target as HTMLElement).parentElement !== wrapper) return;
     if (items[hovering] == null) return;
-    if (move) rollback = -1;
-    else rollback = hovering;
+    original = hovering;
+    rollback = move ? -1 : original;
     const offset = (target as Element).getBoundingClientRect();
     offset.x -= cursor.x;
     offset.y -= cursor.y;
@@ -173,7 +177,7 @@
 
     const index = items.findIndex((x) => key(x) === $transfer?.key);
     if (index !== position) {
-      if (!passive && rollback == null) rollback = index;
+      if (!passive && rollback == null) (rollback = index), (original = index);
       if (~index) items.splice(index, 1);
       if (~position) items.splice(position, 0, $transfer.data);
       requestAnimationFrame(() => (items = items));
@@ -182,18 +186,26 @@
   }
 
   async function retract() {
-    rollback = undefined;
-    if (!sortable || $transfer?.owner !== wrapper) return;
+    if (!sortable || !$transfer || original == null) return;
     const index = items.findIndex((x) => key(x) === $transfer?.key);
-    if (~index) {
-      const target = wrapper.children.item(index - from + 1) as HTMLElement;
-      if (target) {
-        $transfer.back = target.getBoundingClientRect();
-        $transfer.group = Math.random().toString();
-        await new Promise((r) => setTimeout(r, 150));
+    if ($transfer.owner === wrapper) {
+      if (~index) {
+        const target = wrapper.children.item(index - from + 1) as HTMLElement;
+        if (target) {
+          $transfer.back = target.getBoundingClientRect();
+          $transfer.group = Math.random().toString();
+          await new Promise((r) => setTimeout(r, 150));
+        }
       }
     }
-    $transfer = null;
+    if (original !== index) {
+      const flag = (+!!~original << 1) + +!!~index;
+      const action = ([undefined, "push", "purge", "rearrange"] as const)[flag];
+      if (action) dispatch("edit", { action, index, item: $transfer.data });
+    }
+    original = undefined;
+    rollback = undefined;
+    if ($transfer.owner === wrapper) $transfer = null;
   }
 
   onMount(() => {
