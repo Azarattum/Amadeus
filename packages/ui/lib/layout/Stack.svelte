@@ -3,7 +3,7 @@
   import { setContext } from "svelte";
 
   type $$Props = {
-    gap?: boolean | "xs" | "sm" | "lg" | "xl";
+    gap?: boolean | "xs" | "sm" | "lg" | "xl" | "2xl";
     screen?: boolean;
     grow?: boolean;
     p?: boolean;
@@ -42,6 +42,7 @@
   class:gap-2={gap === true}
   class:gap-4={gap === "lg"}
   class:gap-8={gap === "xl"}
+  class:gap-16={gap === "2xl"}
   class:p-4={p === true}
   class:flex-grow={grow}
   class:max-w-[100dvw]={screen}
