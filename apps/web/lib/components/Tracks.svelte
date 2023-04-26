@@ -1,3 +1,11 @@
+<script lang="ts" context="module">
+  export type EditEvent<T> = CustomEvent<{
+    action: "push" | "purge" | "rearrange";
+    item: T;
+    index: number;
+  }>;
+</script>
+
 <script lang="ts">
   import {
     Header,
@@ -12,31 +20,36 @@
   import { createEventDispatcher } from "svelte";
   import { fly } from "svelte/transition";
   import Track from "./Track.svelte";
+  type T = $$Generic<TrackInfo & { entry?: number; id?: number }>;
 
-  type TrackItem = TrackInfo & { entry?: number; id?: number };
   const dispatch = createEventDispatcher<{
-    action: TrackItem;
-    click: TrackItem;
+    action: T;
+    click: T;
+    edit: {
+      action: "push" | "purge" | "rearrange";
+      item: T;
+      index: number;
+    };
   }>();
 
   export let sm = false;
-  export let tracks: TrackItem[];
-  export let selected = new Set<TrackItem>();
+  export let tracks: T[];
+  export let selected = new Set<T>();
 
-  function select(track: TrackItem) {
+  function select(track: T) {
     if (selected.has(track)) selected.delete(track);
     else selected.add(track);
     selected = selected;
   }
 
-  function check(track: TrackItem, selection: Set<TrackItem>) {
+  function check(track: T, selection: Set<T>) {
     if (!selection.size) return false;
     if (selection.has(track)) return true;
     return "passive";
   }
 </script>
 
-{#if !sm}
+{#if !sm && tracks.length}
   <When lg>
     <div
       class="sticky top-0 z-50 grid auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface-200 pl-20 pr-16 backdrop-blur-lg"
