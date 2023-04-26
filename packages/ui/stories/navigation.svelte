@@ -6,7 +6,7 @@
     Library: "note",
     Explore: "compass",
     Added: "last",
-    Playlists: "queue",
+    Playlists: "last",
     Artists: "artists",
     Timeline: "clock",
     Tracks: "note",
