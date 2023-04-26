@@ -21,6 +21,7 @@
   import { Portal } from "../../component";
   type T = $$Generic;
   type K = $$Generic;
+  type $$Slots = { default: { item: T; index: number } };
 
   const dispatch = createEventDispatcher<{
     edit: { action: "rearrange" | "purge" | "push"; item: T; index: number };
@@ -231,7 +232,7 @@
 
 <div class="shrink-0 contain-[size_layout]" style:height="{totalHeight}px">
   <div
-    class="grid auto-rows-max will-change-transform contain-content"
+    class="grid auto-rows-max will-change-transform contain-layout"
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
     style:grid-template-columns={template}
     style:gap="{gap}px"
@@ -244,7 +245,7 @@
       on:viewleave={(x) => reflow(x.detail.boundingClientRect)}
       style:height="{viewHeight}px"
       use:intersection
-      class="absolute"
+      class="absolute z-50 w-0.5"
       aria-hidden
     />
     {#each slice as item, i (key(item))}
