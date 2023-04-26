@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Writable } from "svelte/store";
+  import { uuid } from "../../internal/util";
   import { getContext } from "svelte";
 
   type Group = {
@@ -21,7 +22,7 @@
   export let air = false;
 
   const tag = group ? "label" : href ? "a" : "button";
-  const id = href ? href.split("#").pop() : undefined;
+  const id = uuid();
 
   $: background =
     air || group
@@ -36,9 +37,23 @@
     : primary
     ? "text-white"
     : "text-content-100 hover:text-content";
-  $: targeted = air
-    ? "target:text-primary-600 target:hover:text-primary-700"
-    : "target:text-white target:hover:text-white target:bg-primary-600 target:hover:bg-primary-700";
+
+  function style() {
+    const target = href?.split("#").pop();
+    if (!target) return;
+    return (
+      `body:has(#${target}:target) #${id}{` +
+      (air
+        ? "color:hsl(var(--color-primary-600));"
+        : "color:white;background:hsl(var(--color-primary-600));") +
+      "}" +
+      `body:has(#${target}:target) #${id}:hover{` +
+      (air
+        ? "color:hsl(var(--color-primary-700));"
+        : "color:white;background:hsl(var(--color-primary-700));") +
+      "}"
+    );
+  }
 </script>
 
 {#if group}
@@ -59,7 +74,7 @@
   {href}
   {id}
   on:click
-  class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {text} {background} {targeted}
+  class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {text} {background}
   {compact ? 'flex-col text-2xs' : 'gap-[0.625rem]'}
   {round ? 'rounded-full' : 'rounded-lg'}"
   class:px-[0.625rem]={!air || group}
@@ -69,3 +84,9 @@
 >
   <slot />
 </svelte:element>
+
+<svelte:head>
+  {#await style() then css}
+    <svelte:element this="style">{css}</svelte:element>
+  {/await}
+</svelte:head>

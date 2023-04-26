@@ -1,5 +1,13 @@
 <script lang="ts">
   import { flipped, Gateway, Realm } from "../../component";
+  import { onMount } from "svelte";
+
+  onMount(() => {
+    // Fix hash targets
+    const hash = location.hash.slice(1);
+    location.hash = "";
+    location.hash = hash;
+  });
 </script>
 
 <Realm>
