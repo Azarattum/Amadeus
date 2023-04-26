@@ -8,16 +8,16 @@
 
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { onMount } from "svelte";
 
   export let src: string;
   export let size = 48;
   export let alt = "";
 
-  $: resized = cache.has(desource(src))
-    ? cache.get(desource(src))
+  $: resized = cache.has(desource(src) + size)
+    ? cache.get(desource(src) + size)
     : resize(desource(src));
-  let loaded = typeof resized === "string";
+  $: loaded = typeof resized === "string";
+  $: Promise.resolve(resized).then(() => (loaded = true));
 
   function desource(src: string) {
     try {
@@ -27,6 +27,7 @@
   }
 
   function resize(src: string) {
+    if (!("Image" in globalThis)) return new Promise<string>(() => {});
     return new Promise<string>((resolve) => {
       const image = new Image();
       image.crossOrigin = "anonymous";
@@ -46,16 +47,11 @@
           canvas.height
         );
         const url = canvas.toDataURL("image/webp");
-        cache.set(src, url);
+        cache.set(src + size, url);
         resolve(url);
       };
     });
   }
-
-  onMount(async () => {
-    await resized;
-    loaded = true;
-  });
 </script>
 
 <div
