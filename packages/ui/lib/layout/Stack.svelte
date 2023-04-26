@@ -45,6 +45,8 @@
   class:gap-16={gap === "2xl"}
   class:p-4={p === true}
   class:flex-grow={grow}
+  class:h-[100dvh]={!x && !z && screen}
+  class:w-[100dvw]={x && screen}
   class:max-w-[100dvw]={screen}
   class:max-h-[100dvh]={screen}
   class:overflow-auto={screen}

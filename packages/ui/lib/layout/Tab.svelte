@@ -50,7 +50,7 @@
     <button
       tabindex="-1"
       on:click={scrollUp}
-      class="fixed top-0 mb-11 flex h-11 w-full -translate-y-full transform-gpu touch-manipulation select-none items-center justify-center border-b border-highlight bg-surface-200 bg-gradient-to-t from-surface-200 via-surface-200 to-surface-300 font-semibold opacity-0 backdrop-blur-lg transition-transform"
+      class="fixed top-0 z-50 mb-11 flex h-11 w-full -translate-y-full transform-gpu touch-manipulation select-none items-center justify-center border-b border-highlight bg-surface-200 bg-gradient-to-t from-surface-200 via-surface-200 to-surface-300 font-semibold opacity-0 backdrop-blur-lg transition-transform"
       class:opacity-100={stuck}
       class:translate-y-0={stuck}
       class:pointer-events-none={!current}
@@ -58,7 +58,9 @@
       {name}
     </button>
   </h2>
-  <slot />
+  <div class="p-4">
+    <slot />
+  </div>
 </section>
 
 <svelte:head>

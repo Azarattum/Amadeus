@@ -1,9 +1,13 @@
 <script lang="ts">
   import type { Either } from "../../internal/types";
-  type $$Props = Either<"sm" | "lg" | "xl"> & { href?: string };
+  type $$Props = Either<"sm" | "lg" | "xl"> & {
+    center?: boolean;
+    href?: string;
+  };
 
   export let href = undefined as string | undefined;
 
+  export let center = false;
   export let sm = false;
   export let lg = false;
   export let xl = false;
@@ -14,7 +18,7 @@
 <svelte:element
   this={tag}
   class="
-  text-left transition-colors
+  {center ? 'text-center' : 'text-left'} transition-colors
   {sm ? 'light py-2 text-xs uppercase text-content-200' : ''}
   {!sm && !lg && !xl ? 'text-lg' : ''}
   {lg ? 'text-xl' : ''}
