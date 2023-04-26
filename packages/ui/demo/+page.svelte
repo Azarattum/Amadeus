@@ -32,6 +32,7 @@
       {#each data.stories as story}
         <Button href="#{story}" air>
           <Icon name="book" />{capitalize(story)}
+          <span id={story} />
         </Button>
       {/each}
     </svelte:fragment>
