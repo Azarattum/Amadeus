@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Icon, Stack, Header, Image, Text } from "@amadeus-music/ui";
   import { hash } from "@amadeus-music/ui/internal/page";
-  import Tracks from "$lib/components/Tracks.svelte";
   import { artists, playlists } from "$lib/data";
+  import Tracks from "$lib/ui/Tracks.svelte";
 
   /// TODO: this is bad! should be reworked on the data level!
   $: artist = $artists.find((x) => x.id === +$hash);

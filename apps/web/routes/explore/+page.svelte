@@ -3,7 +3,7 @@
   import { Header, Stack, Button, Icon } from "@amadeus-music/ui";
   import type { TrackDetails } from "@amadeus-music/protocol";
   import { debounce } from "@amadeus-music/util/async";
-  import Tracks from "$lib/components/Tracks.svelte";
+  import Tracks from "$lib/ui/Tracks.svelte";
   import { search } from "$lib/trpc";
   import { onDestroy } from "svelte";
 

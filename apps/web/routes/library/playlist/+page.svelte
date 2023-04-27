@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Text, Icon, Stack, Spacer, Header, Button } from "@amadeus-music/ui";
-  import Tracks, { type EditEvent } from "$lib/components/Tracks.svelte";
+  import Tracks, { type EditEvent } from "$lib/ui/Tracks.svelte";
   import { hash } from "@amadeus-music/ui/internal/page";
   import { library, playlists } from "$lib/data";
 
