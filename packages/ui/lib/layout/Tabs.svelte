@@ -21,12 +21,6 @@
     `;
   });
 
-  onMount(() => {
-    if (!location.hash) {
-      history.replaceState(null, "", `#${tabs[0].toLowerCase()}`);
-    }
-  });
-
   function style() {
     return tabs
       .map(

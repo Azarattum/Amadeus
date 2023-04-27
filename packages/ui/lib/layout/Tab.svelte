@@ -2,6 +2,7 @@
   import { intersection, type IntersectionEvent } from "../../action";
   import { getContext, onMount } from "svelte";
   import { flipped } from "../../component";
+  import { goto } from "$app/navigation";
 
   export let name: string;
   const tabs = getContext<string[]>("tabs");
@@ -25,8 +26,8 @@
 
   function changed({ detail }: IntersectionEvent) {
     current = detail.intersectionRatio > 0.5;
-    if (detail.intersectionRatio === 1) {
-      location.hash = `#${name.toLowerCase()}`;
+    if (detail.intersectionRatio >= 0.999 && tabs.length > 1) {
+      goto(`#${name.toLowerCase()}`, { replaceState: true });
     }
   }
 
@@ -36,7 +37,7 @@
 </script>
 
 <section
-  use:intersection={[0, 0.5, 1]}
+  use:intersection={[0, 0.5, 0.999]}
   on:intersect={changed}
   bind:this={section}
   id={name.toLowerCase()}
