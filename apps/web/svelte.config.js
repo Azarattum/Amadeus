@@ -12,6 +12,9 @@ const config = {
     },
 
     adapter: adapter({ pages: "../../build/public" }),
+    prerender: {
+      handleMissingId: "warn",
+    },
   },
 };
 
