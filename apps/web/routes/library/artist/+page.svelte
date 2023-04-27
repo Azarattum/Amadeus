@@ -1,11 +1,11 @@
 <script lang="ts">
   import { Icon, Stack, Header, Image, Text } from "@amadeus-music/ui";
-  import { hash } from "@amadeus-music/ui/internal/page";
   import { artists, playlists } from "$lib/data";
   import Tracks from "$lib/ui/Tracks.svelte";
+  import { page } from "$app/stores";
 
   /// TODO: this is bad! should be reworked on the data level!
-  $: artist = $artists.find((x) => x.id === +$hash);
+  $: artist = $artists.find((x) => x.id === +$page.url.hash.slice(1));
   $: name = artist?.title || "Loading";
   $: tracks = $playlists
     .flatMap((x) => x.tracks)

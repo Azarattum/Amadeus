@@ -3,7 +3,7 @@
   import { capitalize } from "@amadeus-music/util/string";
   import { flipped } from "@amadeus-music/ui";
   import type { PageData } from "./$types";
-  import { hash } from "../internal/page";
+  import { page } from "$app/stores";
   import { onMount } from "svelte";
 
   export let data: PageData;
@@ -11,7 +11,7 @@
   let innerSwitch: HTMLInputElement | undefined;
   let preview: HTMLIFrameElement | undefined;
 
-  $: current = $hash || data.stories[0];
+  $: current = $page.url.hash.slice(1) || data.stories[0];
   $: if (preview) preview.src = `/${current}`;
   $: if (innerSwitch) innerSwitch.checked = $flipped;
 

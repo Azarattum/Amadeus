@@ -1,10 +1,10 @@
 <script lang="ts">
   import { Text, Icon, Stack, Spacer, Header, Button } from "@amadeus-music/ui";
   import Tracks, { type EditEvent } from "$lib/ui/Tracks.svelte";
-  import { hash } from "@amadeus-music/ui/internal/page";
   import { library, playlists } from "$lib/data";
+  import { page } from "$app/stores";
 
-  $: playlist = $playlists.find((x) => x.id === +$hash);
+  $: playlist = $playlists.find((x) => x.id === +$page.url.hash.slice(1));
   $: title = playlist?.playlist || "Loading";
   $: tracks = playlist?.tracks.filter((x) => x.id) || [];
 
