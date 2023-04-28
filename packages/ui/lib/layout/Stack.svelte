@@ -8,15 +8,13 @@
     grow?: boolean;
     p?: boolean;
   } & Either<"baseline" | "center"> &
-    Either<"x" | "z"> &
-    Either<"wrap" | "z">;
+    Either<"x" | "z">;
 
   export let gap: $$Props["gap"] = false;
   export let baseline = false;
   export let center = false;
   export let screen = false;
   export let grow = false;
-  export let wrap = false;
   export let p = false;
   export let x = false;
   export let z = false;
@@ -26,8 +24,7 @@
 
 <div
   class="
-  {z || wrap ? 'grid' : 'flex'}
-  {wrap ? 'grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))]' : ''}
+  {z ? 'grid' : 'flex'}
   {z ? '[&>*]:col-start-1 [&>*]:row-start-1' : ''}
   {center
     ? 'place-items-center'

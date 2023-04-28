@@ -4,7 +4,7 @@
 
 <Stack screen p grow gap="xl">
   <Header xl>Cards</Header>
-  <Stack x gap="lg" wrap>
+  <Stack x gap="lg">
     <Card interactive>
       <Header>Epic Music</Header>
       <Stack x gap="lg">
