@@ -31,9 +31,8 @@
   };
 
   const urls: Record<string, string> = {
-    Home: "/",
-    Listened: "/feed#0",
-    Recommended: "/feed#1",
+    Listened: "/home/feed#0",
+    Recommended: "/home/feed#1",
   };
 
   const sections: Record<string, string[]> = {
