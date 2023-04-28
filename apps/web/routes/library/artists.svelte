@@ -29,7 +29,7 @@
       slot="after"
       class="aspect-square w-max shrink-0 overflow-hidden rounded-full shadow-xl"
     >
-      <Image size={104} src={item.art} alt="Artist Avatar" />
+      <Image size={104} src={item.art} />
     </div>
   </Card>
 </Virtual>

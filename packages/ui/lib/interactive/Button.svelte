@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Writable } from "svelte/store";
+  import { getContext, onMount } from "svelte";
   import { uuid } from "../../internal/util";
-  import { getContext } from "svelte";
+  import { goto } from "$app/navigation";
 
   type Group = {
     id: string;
@@ -38,11 +39,10 @@
     ? "text-white"
     : "text-content-100 hover:text-content";
 
-  function style() {
-    const target = href?.split("#").pop();
-    if (!target) return;
-    return (
-      `body:has(#${target}:target) #${id}{` +
+  $: target = href?.includes("#") ? href?.split("#").pop() : "";
+  $: style = !target
+    ? ""
+    : `body:has(#${target}:target) #${id}{` +
       (air
         ? "color:hsl(var(--color-primary-600));"
         : "color:white;background:hsl(var(--color-primary-600));") +
@@ -51,31 +51,17 @@
       (air
         ? "color:hsl(var(--color-primary-700));"
         : "color:white;background:hsl(var(--color-primary-700));") +
-      "}"
-    );
-  }
+      "}";
 </script>
 
-{#if group}
-  <input
-    class="sibling peer absolute appearance-none"
-    type="radio"
-    bind:group={$value}
-    id="{group.id}{index}"
-    checked={$value === index?.toString()}
-    value={index}
-    name={group.id}
-  />
-{/if}
 <svelte:element
   this={tag}
-  for={group ? group.id + index : undefined}
   draggable="false"
   {disabled}
   {href}
   {id}
   on:click
-  class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [.sibling:checked+&]:text-white {text} {background}
+  class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:text-white {text} {background}
   {compact ? 'flex-col text-2xs' : 'gap-[0.625rem]'}
   {round ? 'rounded-full' : 'rounded-lg'}"
   class:px-[0.625rem]={!air || group}
@@ -83,11 +69,21 @@
   class:shrink-0={!stretch}
   class:w-full={stretch}
 >
+  {#if group}
+    <input
+      class="sibling peer absolute appearance-none"
+      checked={$value === index?.toString()}
+      bind:group={$value}
+      name={group.id}
+      value={index}
+      type="radio"
+    />
+  {/if}
   <slot />
 </svelte:element>
 
 <svelte:head>
-  {#await style() then css}
-    <svelte:element this="style">{css}</svelte:element>
-  {/await}
+  {#if style}
+    <svelte:element this="style">{style}</svelte:element>
+  {/if}
 </svelte:head>

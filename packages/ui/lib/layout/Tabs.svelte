@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, setContext } from "svelte";
+  import { setContext } from "svelte";
 
   const elements: HTMLElement[] = [];
   const tabs: string[] = [];

@@ -14,12 +14,12 @@
   import { page } from "$app/stores";
   import { search } from "$lib/data";
   import { onMount } from "svelte";
+  import "@amadeus-music/ui";
 
   const icons: Record<string, string> = {
     Home: "house",
     Library: "note",
     Explore: "compass",
-    Added: "last",
     Playlists: "last",
     Artists: "artists",
     Timeline: "clock",
@@ -30,17 +30,22 @@
     Following: "artists",
   };
 
+  const urls: Record<string, string> = {
+    Home: "/",
+    Listened: "/feed#0",
+    Recommended: "/feed#1",
+  };
+
   const sections: Record<string, string[]> = {
-    Home: ["Added", "Listened", "Recommended", "Following"],
+    Home: ["Listened", "Recommended", "Following"],
     Library: ["Playlists", "Artists", "Timeline"],
     Explore: ["Tracks", "Artists", "Albums"],
   };
   $: section = capitalize($page.route.id?.split("/")?.[1] || "home");
 
   function toURL(target: string): string {
-    if (target in sections) {
-      return `/${target === "Home" ? "" : target.toLowerCase()}`;
-    }
+    if (target in urls) return urls[target];
+    if (target in sections) return `/${target.toLowerCase()}`;
     return `${toURL(section)}#${target.toLowerCase()}`;
   }
 
@@ -64,7 +69,7 @@
         </Button>
       {/each}
       <svelte:fragment slot="section">
-        {#each sections[section] || [] as x}
+        {#each sections[section] || [] as x (x)}
           <Button air href={toURL(x)}>
             <Icon name={icons[x]} />{x}
           </Button>

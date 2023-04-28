@@ -1,5 +1,17 @@
 <script lang="ts">
   import { flipped, Gateway, Realm } from "../../component";
+  import { goto } from "$app/navigation";
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
+
+  onMount(() => {
+    function fixState() {
+      if (location.hash === $page.url.hash) return;
+      goto(location.hash, { replaceState: true });
+    }
+    addEventListener("popstate", fixState);
+    return () => removeEventListener("popstate", fixState);
+  });
 </script>
 
 <Realm>

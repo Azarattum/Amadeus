@@ -42,7 +42,7 @@
 </script>
 
 <Stack p gap>
-  <Header xl>Search</Header>
+  <Header xl>Explore</Header>
 </Stack>
 <Tracks
   {tracks}

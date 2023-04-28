@@ -11,9 +11,11 @@
   let innerSwitch: HTMLInputElement | undefined;
   let preview: HTMLIFrameElement | undefined;
 
-  $: current = $page.url.hash.slice(1) || data.stories[0];
   $: if (preview) preview.src = `/${current}`;
   $: if (innerSwitch) innerSwitch.checked = $flipped;
+  $: current =
+    $page.url.hash.slice(1) ||
+    (globalThis.location?.replace("#" + data.stories[0]), data.stories[0]);
 
   onMount(() => {
     preview?.addEventListener(

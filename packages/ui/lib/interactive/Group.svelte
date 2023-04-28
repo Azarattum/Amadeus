@@ -15,7 +15,7 @@
   const style = Array.from({ length: size })
     .map(
       (_, i) =>
-        `#${id}>input:checked:nth-last-of-type(${i + 1})` +
+        `#${id} :has([name="${id}"]:checked):nth-last-of-type(${i + 1})` +
         `~div:last-child{transform:translateX(calc(` +
         `${(size - i - 1) * 100}% + ${(size - i - 1) * 8}px` +
         `));}`

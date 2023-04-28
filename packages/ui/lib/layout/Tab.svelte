@@ -27,7 +27,7 @@
   function changed({ detail }: IntersectionEvent) {
     current = detail.intersectionRatio > 0.5;
     if (detail.intersectionRatio >= 0.999 && tabs.length > 1) {
-      goto(`#${name.toLowerCase()}`, { replaceState: true });
+      location.replace(`#${name.toLowerCase()}`);
     }
   }
 

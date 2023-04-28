@@ -30,7 +30,7 @@
       class="grid aspect-square w-max shrink-0 grid-cols-2 gap-2 overflow-hidden rounded-2xl shadow-xl"
     >
       {#each item.tracks.slice(0, 4) as track}
-        <Image src={track.album.art} alt="Album Preview" />
+        <Image src={track.album.art} />
       {/each}
     </div>
   </Card>

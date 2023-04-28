@@ -12,9 +12,10 @@
   $: module = modules[`../../stories/${story}.svelte`] as any;
 </script>
 
-<Portal to="start" unique="light-switch">
-  <input class="absolute appearance-none" id="light-switch" type="checkbox" />
-</Portal>
 <div class="contents">
   <svelte:component this={module?.default} />
 </div>
+
+<Portal to="start" unique="light-switch">
+  <input class="absolute appearance-none" id="light-switch" type="checkbox" />
+</Portal>

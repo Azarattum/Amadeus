@@ -31,7 +31,7 @@
         <Stack gap="xl" p>
           <slot />
           <Spacer />
-          <div class="contents"><slot name="bottom" /></div>
+          <slot name="bottom" />
         </Stack>
       {/if}
       <section class="min-w-[15rem] {pane ? 'hidden xl:flex' : 'flex'}">
@@ -40,7 +40,7 @@
         {/if}
         <Stack gap="sm" p grow>
           <Header sm>{section}</Header>
-          <div class="contents"><slot name="section" /></div>
+          <slot name="section" />
           <Spacer />
           <Stack center>
             <slot name="bottom-section" />
