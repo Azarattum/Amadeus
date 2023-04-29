@@ -80,9 +80,9 @@
     </Nav>
     <Stack screen grow>
       <div class="hidden gap-16 p-4 pb-0 sm:flex">
-        <Input bind:value={$search} stretch placeholder="Search"
-          ><Icon name="search" /></Input
-        >
+        <Input bind:value={$search} stretch placeholder="Search">
+          <Icon name="search" />
+        </Input>
         <LightSwitch />
       </div>
       <div use:autoscroll class="h-full overflow-y-scroll"><slot /></div>

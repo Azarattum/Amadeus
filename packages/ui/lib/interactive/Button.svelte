@@ -1,8 +1,7 @@
 <script lang="ts">
   import type { Writable } from "svelte/store";
-  import { getContext, onMount } from "svelte";
   import { uuid } from "../../internal/util";
-  import { goto } from "$app/navigation";
+  import { getContext } from "svelte";
 
   type Group = {
     id: string;
@@ -15,22 +14,21 @@
   const value = group?.value;
 
   export let href: string | undefined = undefined;
+  export let stretch = !!group;
   export let disabled = false;
   export let primary = false;
   export let compact = false;
-  export let stretch = false;
   export let round = false;
-  export let air = false;
+  export let air = !!group;
 
   const tag = group ? "label" : href ? "a" : "button";
   const id = uuid();
 
-  $: background =
-    air || group
-      ? ""
-      : primary
-      ? "bg-primary-600 hover:bg-primary-700"
-      : "bg-highlight hover:bg-highlight-100";
+  $: background = air
+    ? ""
+    : primary
+    ? "bg-primary-600 hover:bg-primary-700"
+    : "bg-highlight hover:bg-highlight-100";
   $: text = air
     ? primary
       ? "text-primary-600 hover:text-primary-700"
