@@ -9,12 +9,13 @@
     "test": "vitest run -c ../../vite.web.js"
   },
   "dependencies": {
-    "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/crdata": "workspace:*",
-    "@amadeus-music/util": "workspace:*",
+    "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/ui": "workspace:*",
+    "@amadeus-music/util": "workspace:*",
     "@trpc/client": "^10.20.0",
-    "@trpc/server": "^10.20.0"
+    "@trpc/server": "^10.20.0",
+    "sha1-browser": "^1.1.1"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "2.0.2",
