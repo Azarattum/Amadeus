@@ -1,0 +1,28 @@
+{
+  "short_name": "Amadeus",
+  "name": "Amadeus",
+  "start_url": "/home",
+  "icons": [
+    {
+      "src": "images/logo-180.webp",
+      "type": "image/webp",
+      "purpose": "any maskable",
+      "sizes": "180x180"
+    },
+    {
+      "src": "images/logo-512.webp",
+      "type": "image/webp",
+      "purpose": "any maskable",
+      "sizes": "512x512"
+    },
+    {
+      "src": "images/logo.svg",
+      "type": "image/svg+xml",
+      "purpose": "any maskable",
+      "sizes": "any"
+    }
+  ],
+  "display": "standalone",
+  "scope": "/",
+  "description": "Listen to your music with Amadeus"
+}

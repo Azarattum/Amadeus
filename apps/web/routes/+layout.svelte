@@ -13,8 +13,16 @@
   import { autoscroll } from "@amadeus-music/ui/action";
   import { page } from "$app/stores";
   import { search } from "$lib/data";
+  import { base } from "$app/paths";
   import { onMount } from "svelte";
   import "@amadeus-music/ui";
+
+  const splashes = [
+    [320, 568, 2, "5"],
+    [375, 667, 2, "8"],
+    [375, 812, 3, "x"],
+    [414, 736, 3, "plus"],
+  ];
 
   const icons: Record<string, string> = {
     Home: "house",
@@ -89,3 +97,18 @@
     </Stack>
   </Stack>
 </Wrapper>
+
+<svelte:head>
+  <title>Amadeus</title>
+  <meta name="description" content="Listen to your music with Amadeus!" />
+  <link rel="icon" type="image/png" href="{base}/images/favicon.webp" />
+  <link rel="apple-touch-icon" href="{base}/images/logo-180.webp" />
+  <link rel="manifest" href="{base}/manifest.json" />
+  {#each splashes as [w, h, r, image]}
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: {w}px) and (device-height: {h}px) and (-webkit-device-pixel-ratio: {r})"
+      href="{base}/images/splash-{image}.webp"
+    />
+  {/each}
+</svelte:head>
