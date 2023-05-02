@@ -1,13 +1,20 @@
 <script lang="ts">
   import { Icon, Button } from "../../component";
+  import { getContext } from "svelte";
 
   export let placeholder = "";
   export let stretch = false;
   export let value = "";
+
+  const panel = !!getContext("panel");
 </script>
 
 <label
-  class="relative flex cursor-text touch-manipulation items-center gap-3 rounded-xl bg-highlight px-3 text-content-200 focus-within:bg-highlight-100 hover:bg-highlight-100"
+  class="relative flex cursor-text touch-manipulation items-center gap-3 px-3 text-content-200
+  {panel
+    ? 'rounded-lg focus-within:bg-content/5 hover:bg-content/5'
+    : 'rounded-xl bg-highlight focus-within:bg-highlight-100 hover:bg-highlight-100'}
+  "
   class:w-full={stretch}
 >
   <slot />

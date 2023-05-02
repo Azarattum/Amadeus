@@ -9,6 +9,8 @@
     i: number;
     size: number;
   } | null;
+
+  const panel = !!getContext("panel");
   const group = getContext<Group>("group");
   const index = group ? group.i++ % group.size : undefined;
   const value = group?.value;
@@ -18,6 +20,7 @@
   export let disabled = false;
   export let primary = false;
   export let compact = false;
+  export let square = false;
   export let round = false;
   export let air = !!group;
 
@@ -25,7 +28,9 @@
   const id = uuid();
 
   $: background = air
-    ? ""
+    ? group
+      ? "hover:bg-content/5"
+      : ""
     : primary
     ? "bg-primary-600 hover:bg-primary-700"
     : "bg-highlight hover:bg-highlight-100";
@@ -59,11 +64,13 @@
   {href}
   {id}
   on:click
-  class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:text-white {text} {background}
+  class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white {text} {background}
   {compact ? 'flex-col text-2xs' : 'gap-[0.625rem]'}
-  {round ? 'rounded-full' : 'rounded-lg'}"
+  {round ? 'rounded-full' : 'rounded-lg'}
+  "
   class:px-[0.625rem]={!air || group}
-  class:justify-center={stretch || compact}
+  class:justify-center={stretch || compact || panel}
+  class:aspect-square={square}
   class:shrink-0={!stretch}
   class:w-full={stretch}
 >

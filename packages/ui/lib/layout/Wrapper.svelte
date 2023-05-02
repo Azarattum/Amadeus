@@ -17,7 +17,10 @@
 <Realm>
   <Gateway name="start" />
   <slot />
-  <div class="fixed bottom-0 z-50 flex w-full touch-none flex-col-reverse">
+  <!-- /// TODO: layout properly -->
+  <div
+    class="fixed bottom-0 z-50 flex w-full touch-none flex-col-reverse items-center pl-0 sm:pl-[77px] xl:pl-[317px]"
+  >
     <Gateway name="bottom" />
   </div>
   <div class="pointer-events-none fixed inset-0 contain-strict">

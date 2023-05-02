@@ -53,7 +53,7 @@
 </nav>
 <Portal to="bottom">
   <nav
-    class="h-12 flex-col justify-between bg-surface-200 backdrop-blur-lg
+    class="h-12 w-full flex-col justify-between bg-surface-200 backdrop-blur-lg
     {pane ? 'flex sm:hidden' : 'hidden'}"
   >
     <Separator vertical={false} />

@@ -8,17 +8,19 @@
 
 <script lang="ts">
   import {
-    Header,
+    Swipeable,
+    Separator,
     Virtual,
-    When,
+    Header,
     Portal,
     Button,
+    When,
     Icon,
-    Swipeable,
+    Panel,
+    Stack,
   } from "@amadeus-music/ui";
   import type { TrackInfo } from "@amadeus-music/protocol";
   import { createEventDispatcher } from "svelte";
-  import { fly } from "svelte/transition";
   import Track from "./Track.svelte";
   type T = $$Generic<TrackInfo & { entry?: number; id?: number }>;
 
@@ -35,6 +37,7 @@
   export let sm = false;
   export let tracks: T[];
   export let selected = new Set<T>();
+  $: if (!tracks.length) clear();
 
   function select(track: T) {
     if (selected.has(track)) selected.delete(track);
@@ -46,6 +49,11 @@
     if (!selection.size) return false;
     if (selection.has(track)) return true;
     return "passive";
+  }
+
+  function clear() {
+    selected.clear();
+    selected = selected;
   }
 </script>
 
@@ -100,24 +108,13 @@
 {#if $$slots.default || $$slots.action}
   <Portal to="bottom">
     {#if selected.size}
-      <aside
-        transition:fly={{ y: 50 }}
-        class="relative left-[calc(50%-1rem)] -z-20 mx-4 mb-2 flex max-w-md -translate-x-1/2 rounded-lg border border-highlight bg-surface-200 backdrop-blur-lg"
-        style:grid-template-columns="repeat(auto-fit,minmax(0,1fr)) 44px"
-      >
-        <div class="grid grow auto-cols-fr grid-flow-col">
+      <Panel>
+        <Stack x grow>
           <slot />
-        </div>
-        <div class="min-w-[3rem] border-l border-highlight">
-          <Button
-            air
-            stretch
-            on:click={() => (selected.clear(), (selected = selected))}
-          >
-            <Icon name="close" />
-          </Button>
-        </div>
-      </aside>
+          <Separator />
+          <Button air square on:click={clear}><Icon name="close" /></Button>
+        </Stack>
+      </Panel>
     {/if}
   </Portal>
 {/if}
