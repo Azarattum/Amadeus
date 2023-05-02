@@ -18,7 +18,7 @@
     <Tooltip>Not really...</Tooltip>
   </Checkbox>
   <Input placeholder="Just Input"><Tooltip>This is an input!</Tooltip></Input>
-  <Input placeholder="Search"><Icon name="search" /></Input>
+  <Input placeholder="Search" resettable><Icon name="search" /></Input>
   <Stack x gap>
     <Button><Icon name="sun" /></Button>
     <Button primary><Icon name="moon" /></Button>

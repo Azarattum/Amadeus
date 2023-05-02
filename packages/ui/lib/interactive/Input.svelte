@@ -2,6 +2,7 @@
   import { Icon, Button } from "../../component";
   import { getContext } from "svelte";
 
+  export let resettable = false;
   export let placeholder = "";
   export let stretch = false;
   export let value = "";
@@ -24,13 +25,15 @@
     bind:value
     {placeholder}
   />
-  <div
-    class="opacity-0 transition-opacity"
-    class:pointer-events-none={!value}
-    class:opacity-100={value}
-  >
-    <Button disabled={!value} air on:click={() => (value = "")}>
-      <Icon sm name="close" />
-    </Button>
-  </div>
+  {#if resettable}
+    <div
+      class="opacity-0 transition-opacity"
+      class:pointer-events-none={!value}
+      class:opacity-100={value}
+    >
+      <Button disabled={!value} air on:click={() => (value = "")}>
+        <Icon sm name="close" />
+      </Button>
+    </div>
+  {/if}
 </label>

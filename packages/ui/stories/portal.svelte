@@ -25,7 +25,7 @@
       </Portal>
     {/if}
     <Checkbox bind:checked={shown}>Enabled</Checkbox>
-    <Input bind:value>Message:</Input>
+    <Input bind:value resettable>Message:</Input>
     <Group size={4} bind:value={to}>
       <Button>Place 0</Button>
       <Button>Place 1</Button>

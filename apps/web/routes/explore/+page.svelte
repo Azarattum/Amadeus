@@ -69,7 +69,7 @@
 <Portal to="bottom">
   <Panel>
     <When not sm>
-      <Input bind:value={$query} stretch placeholder="Search">
+      <Input bind:value={$query} stretch resettable placeholder="Search">
         <Icon name="search" />
       </Input>
     </When>

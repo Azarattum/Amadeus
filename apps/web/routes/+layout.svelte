@@ -88,7 +88,7 @@
     </Nav>
     <Stack screen grow>
       <div class="hidden gap-16 p-4 pb-0 sm:flex">
-        <Input bind:value={$search} stretch placeholder="Search">
+        <Input bind:value={$search} stretch resettable placeholder="Search">
           <Icon name="search" />
         </Input>
         <LightSwitch />
