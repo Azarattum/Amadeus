@@ -46,7 +46,7 @@
   });
 </script>
 
-<div bind:this={container} class="h-full w-full">
+<div bind:this={container} class="h-full w-full will-change-transform">
   <slot />
 </div>
 

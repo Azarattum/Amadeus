@@ -1,6 +1,16 @@
 <script lang="ts">
+  import {
+    KeyboardFocus,
+    Header,
+    Button,
+    Portal,
+    Stack,
+    Group,
+    Input,
+    Icon,
+    When,
+  } from "@amadeus-music/ui";
   import { history, library, playlists, search as query } from "$lib/data";
-  import { Header, Stack, Button, Icon } from "@amadeus-music/ui";
   import type { TrackDetails } from "@amadeus-music/protocol";
   import { debounce } from "@amadeus-music/util/async";
   import Tracks from "$lib/ui/Tracks.svelte";
@@ -55,3 +65,22 @@
     <Icon name="save" />
   </Button>
 </Tracks>
+
+<Portal to="bottom">
+  <KeyboardFocus>
+    <div
+      class="m-4 mb-2 overflow-hidden rounded-lg bg-surface-200 backdrop-blur-lg [&>*]:rounded-none [&_label]:rounded-none"
+    >
+      <When not sm>
+        <Input bind:value={$query} stretch placeholder="Search">
+          <Icon name="search" />
+        </Input>
+      </When>
+      <Group size={3} stretch>
+        <Button>Tracks</Button>
+        <Button>Artists</Button>
+        <Button>Albums</Button>
+      </Group>
+    </div>
+  </KeyboardFocus>
+</Portal>
