@@ -29,6 +29,8 @@ export { default as Header } from "./lib/static/Header.svelte";
 export { default as Tooltip } from "./lib/static/Tooltip.svelte";
 export { default as Spinner } from "./lib/static/Spinner.svelte";
 
+export { default as KeyboardFocus } from "./lib/misc/KeyboardFocus.svelte";
+
 export * from "./lib/composite/LightSwitch.svelte";
 export { default as Nav } from "./lib/composite/Nav.svelte";
 export { default as LightSwitch } from "./lib/composite/LightSwitch.svelte";

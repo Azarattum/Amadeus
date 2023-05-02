@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Either } from "../../internal/types";
-  type $$Props = Either<"sm" | "md" | "lg" | "xl">;
+  type $$Props = Either<"sm" | "md" | "lg" | "xl"> & { not?: boolean };
 
+  export let not = false;
   export let sm = false;
   export let md = false;
   export let lg = false;
@@ -9,11 +10,15 @@
 </script>
 
 <div
-  class="hidden"
-  class:sm:contents={sm}
-  class:md:contents={md}
-  class:lg:contents={lg}
-  class:xl:contents={xl}
+  class={not ? "contents" : "hidden"}
+  class:sm:contents={!not && sm}
+  class:md:contents={!not && md}
+  class:lg:contents={!not && lg}
+  class:xl:contents={!not && xl}
+  class:sm:hidden={not && sm}
+  class:md:hidden={not && md}
+  class:lg:hidden={not && lg}
+  class:xl:hidden={not && xl}
 >
   <slot />
 </div>
