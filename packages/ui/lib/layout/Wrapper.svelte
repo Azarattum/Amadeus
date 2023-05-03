@@ -16,12 +16,17 @@
 
 <Realm>
   <Gateway name="start" />
-  <slot />
-  <!-- /// TODO: layout properly -->
-  <div
-    class="fixed bottom-0 z-50 flex w-full touch-none flex-col-reverse items-center pl-0 sm:pl-[77px] xl:pl-[317px]"
-  >
-    <Gateway name="bottom" />
+  <div class="flex">
+    <aside><Gateway name="left" /></aside>
+    <div class="grow contain-layout">
+      <slot />
+      <footer
+        class="fixed bottom-0 z-50 flex w-full touch-none flex-col-reverse items-center"
+      >
+        <Gateway name="bottom" />
+      </footer>
+    </div>
+    <aside><Gateway name="right" /></aside>
   </div>
   <div class="pointer-events-none fixed inset-0 contain-strict">
     <Gateway name="overlay" />

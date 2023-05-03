@@ -68,33 +68,31 @@
 </script>
 
 <Wrapper>
-  <Stack x grow>
-    <Nav {section}>
-      {#each Object.keys(sections) as x}
-        <Button air compact stretch primary={x === section} href={toURL(x)}>
-          <Icon md name={icons[x]} />{x}
+  <Nav {section}>
+    {#each Object.keys(sections) as x}
+      <Button air compact stretch primary={x === section} href={toURL(x)}>
+        <Icon md name={icons[x]} />{x}
+      </Button>
+    {/each}
+    <svelte:fragment slot="section">
+      {#each sections[section] || [] as x (x)}
+        <Button air href={toURL(x)}>
+          <Icon name={icons[x]} />{x}
         </Button>
       {/each}
-      <svelte:fragment slot="section">
-        {#each sections[section] || [] as x (x)}
-          <Button air href={toURL(x)}>
-            <Icon name={icons[x]} />{x}
-          </Button>
-        {/each}
-      </svelte:fragment>
-      <Button air compact stretch slot="bottom" href="/settings">
-        <Icon md name="settings" />Settings
-      </Button>
-    </Nav>
-    <Stack screen grow>
-      <div class="hidden gap-16 p-4 pb-0 sm:flex">
-        <Input bind:value={$search} stretch resettable placeholder="Search">
-          <Icon name="search" />
-        </Input>
-        <LightSwitch />
-      </div>
-      <div use:autoscroll class="h-full overflow-y-scroll"><slot /></div>
-    </Stack>
+    </svelte:fragment>
+    <Button air compact stretch slot="bottom" href="/settings">
+      <Icon md name="settings" />Settings
+    </Button>
+  </Nav>
+  <Stack screen grow>
+    <div class="hidden gap-16 p-4 pb-0 sm:flex">
+      <Input bind:value={$search} stretch resettable placeholder="Search">
+        <Icon name="search" />
+      </Input>
+      <LightSwitch />
+    </div>
+    <div use:autoscroll class="h-full overflow-y-scroll"><slot /></div>
   </Stack>
 </Wrapper>
 
