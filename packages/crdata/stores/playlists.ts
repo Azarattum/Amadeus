@@ -12,7 +12,7 @@ export const playlists = ({ store }: DB) =>
           db
             .selectFrom("playlists")
             .leftJoin("library", "library.playlist", "playlists.id")
-            .leftJoin("metadata", "metadata.id", "library.track")
+            .innerJoin("metadata", "metadata.id", "library.track")
             .select(metafields)
             .select([
               "library.id as entry",
