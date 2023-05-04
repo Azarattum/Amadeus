@@ -74,9 +74,11 @@ export function autoscroll(
   function toggle(state = enabled) {
     enabled = state || trigger === "always";
     if (enabled) {
+      node.style.scrollBehavior = "auto";
       bounds = node.getBoundingClientRect();
       unsubscribe = position.subscribe(update);
     } else {
+      node.style.scrollBehavior = "";
       direction.x = 0;
       direction.y = 0;
       unsubscribe();
