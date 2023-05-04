@@ -236,6 +236,7 @@
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
     style:grid-template-columns={template}
     style:gap="{gap}px"
+    class:pointer-events-none={!!$transfer}
     bind:this={wrapper}
     use:drag={"hold"}
     use:hold

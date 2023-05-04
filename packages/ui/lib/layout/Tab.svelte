@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { intersection, type IntersectionEvent } from "../../action";
+  import { autoscroll, intersection } from "../../action";
+  import type { IntersectionEvent } from "../../action";
   import { getContext, onMount } from "svelte";
   import { Topbar } from "../../component";
 
@@ -28,6 +29,7 @@
   use:intersection={[0, 0.5, 0.999]}
   on:intersect={changed}
   bind:this={section}
+  use:autoscroll
   id={name.toLowerCase()}
   class="relative z-10 h-full w-full snap-start snap-always overflow-x-hidden overflow-y-scroll"
   class:[&~nav_div_a]:pointer-events-none={current && stuck}
