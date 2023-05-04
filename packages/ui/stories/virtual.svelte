@@ -6,7 +6,7 @@
   let items2 = Array.from({ length: 30 }).map((_, i) => 30 + i);
 </script>
 
-<div class="flex h-full gap-8">
+<div class="flex h-[100dvh] gap-8">
   <div
     class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll p-4"
   >

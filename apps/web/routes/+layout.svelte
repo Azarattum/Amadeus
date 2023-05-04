@@ -68,6 +68,17 @@
 </script>
 
 <Wrapper>
+  <Stack screen grow>
+    <div class="hidden gap-16 p-[21px] pb-0 sm:flex">
+      <Input bind:value={$search} stretch resettable placeholder="Search">
+        <Icon name="search" />
+      </Input>
+      <LightSwitch />
+    </div>
+    <div use:autoscroll class="relative h-full overflow-y-scroll scroll-smooth">
+      <slot />
+    </div>
+  </Stack>
   <Nav {section}>
     {#each Object.keys(sections) as x}
       <Button air compact stretch primary={x === section} href={toURL(x)}>
@@ -85,17 +96,6 @@
       <Icon md name="settings" />Settings
     </Button>
   </Nav>
-  <Stack screen grow>
-    <div class="hidden gap-16 p-[21px] pb-0 sm:flex">
-      <Input bind:value={$search} stretch resettable placeholder="Search">
-        <Icon name="search" />
-      </Input>
-      <LightSwitch />
-    </div>
-    <div use:autoscroll class="relative h-full overflow-y-scroll scroll-smooth">
-      <slot />
-    </div>
-  </Stack>
 </Wrapper>
 
 <svelte:head>

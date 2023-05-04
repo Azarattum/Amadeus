@@ -259,28 +259,28 @@
       </div>
     {/each}
   </div>
+  {#if sortable}
+    <Portal to="overlay">
+      {#if $transfer?.owner === wrapper}
+        <div
+          class="absolute will-change-transform contain-[size_layout]"
+          class:transition-transform={$transfer.back}
+          style:transform="translate3d(
+          {$transfer.back
+            ? $transfer.back.x
+            : cursor.x +
+              Math.max($transfer.offset.x, -inner.width / perRow + gap)}px,
+          {$transfer.back
+            ? $transfer.back.y
+            : cursor.y + Math.max($transfer.offset.y, -rowHeight + gap)}px, 0)"
+          style:width="{inner.width / perRow - gap}px"
+          style:height="{rowHeight - gap}px"
+        >
+          <slot item={$transfer.data} index={NaN} />
+        </div>
+      {/if}
+    </Portal>
+  {/if}
 </div>
 
 <svelte:window on:dragstart={grab} on:dragend={retract} />
-{#if sortable}
-  <Portal to="overlay">
-    {#if $transfer?.owner === wrapper}
-      <div
-        class="absolute will-change-transform contain-[size_layout]"
-        class:transition-transform={$transfer.back}
-        style:transform="translate3d(
-        {$transfer.back
-          ? $transfer.back.x
-          : cursor.x +
-            Math.max($transfer.offset.x, -inner.width / perRow + gap)}px,
-        {$transfer.back
-          ? $transfer.back.y
-          : cursor.y + Math.max($transfer.offset.y, -rowHeight + gap)}px, 0)"
-        style:width="{inner.width / perRow - gap}px"
-        style:height="{rowHeight - gap}px"
-      >
-        <slot item={$transfer.data} index={NaN} />
-      </div>
-    {/if}
-  </Portal>
-{/if}
