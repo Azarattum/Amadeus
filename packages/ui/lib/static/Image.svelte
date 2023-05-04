@@ -61,10 +61,23 @@
   style:width="{size}px"
 >
   {#if typeof resized === "string"}
-    <img src={resized} {alt} width="{size}px" height="{size}px" />
+    <img
+      {alt}
+      src={resized}
+      width="{size}px"
+      height="{size}px"
+      draggable="false"
+    />
   {:else}
     {#await resized then src}
-      <img in:fade {src} {alt} width="{size}px" height="{size}px" />
+      <img
+        {src}
+        {alt}
+        in:fade
+        width="{size}px"
+        height="{size}px"
+        draggable="false"
+      />
     {/await}
   {/if}
 </div>
