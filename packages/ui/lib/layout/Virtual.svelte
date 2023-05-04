@@ -15,6 +15,7 @@
 <script lang="ts">
   import { drag, hold, intersection, resize } from "../../action";
   import { createEventDispatcher, onMount, tick } from "svelte";
+  import { getScrollParent } from "../../internal/util";
   import { minmax } from "@amadeus-music/util/math";
   import { position } from "../../internal/pointer";
   import { lock } from "@amadeus-music/util/async";
@@ -215,8 +216,7 @@
       scroll.y = container?.scrollTop || 0;
     }
 
-    if (!container) container = wrapper?.parentElement?.parentElement as any;
-    if (!container) throw new Error("Virtual list needs a container!");
+    if (!container) container = getScrollParent(wrapper);
     const unsubscribe = sortable && position.subscribe((x) => (cursor = x));
     if (sortable) container.addEventListener("scroll", scroller);
     container.addEventListener("resize", measure);
