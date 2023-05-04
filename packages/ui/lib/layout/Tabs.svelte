@@ -45,7 +45,7 @@
   bind:this={main}
   bind:clientWidth={container}
   class:scroll-smooth={compact}
-  class="grid h-full snap-x snap-mandatory overflow-y-hidden overflow-x-scroll"
+  class="grid h-full max-h-[100dvh] snap-x snap-mandatory overflow-y-hidden overflow-x-scroll"
   style="grid: auto / auto-flow 100%; perspective: 1px; perspective-origin: top left;"
 >
   <slot />

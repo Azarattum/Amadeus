@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LightSwitch, Stack, Nav, Button, Icon } from "@amadeus-music/ui";
+  import { LightSwitch, Nav, Button, Icon } from "@amadeus-music/ui";
   import { capitalize } from "@amadeus-music/util/string";
   import { flipped } from "@amadeus-music/ui";
   import type { PageData } from "./$types";
@@ -28,21 +28,21 @@
   });
 </script>
 
-<Stack x grow>
-  <Nav section="Stories">
-    <svelte:fragment slot="section">
-      {#each data.stories as story}
-        <Button href="#{story}" air>
-          <Icon name="book" />{capitalize(story)}
-          <span id={story} />
-        </Button>
-      {/each}
-    </svelte:fragment>
-    <LightSwitch slot="bottom-section" />
-  </Nav>
+<Nav section="Stories">
+  <svelte:fragment slot="section">
+    {#each data.stories as story}
+      <Button href="#{story}" air>
+        <Icon name="book" />{capitalize(story)}
+        <span id={story} />
+      </Button>
+    {/each}
+  </svelte:fragment>
+  <LightSwitch slot="bottom-section" />
+</Nav>
+<div class="h-full w-full p-8">
   <iframe
     title="Story"
-    class="m-8 w-full resize rounded-md p-4 outline outline-1 outline-highlight-100"
+    class="h-full w-full grow resize rounded-md p-4 outline outline-1 outline-highlight-100"
     bind:this={preview}
   />
-</Stack>
+</div>

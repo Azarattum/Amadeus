@@ -57,53 +57,55 @@
   }
 </script>
 
-{#if !sm && tracks.length}
-  <When lg>
-    <div
-      class="sticky top-0 z-50 grid auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface-200 pl-20 pr-16 backdrop-blur-lg"
-    >
-      <Header sm>Title</Header>
-      <Header sm>Artist</Header>
-      <Header sm>Album</Header>
-    </div>
-  </When>
-{/if}
-<Virtual
-  key={(x) => x.entry ?? x.id ?? x}
-  sortable="tracks"
-  let:item={track}
-  items={tracks}
-  animate
-  on:edit
-  on:end
->
-  <!-- /// TODO: fix `hr` between tracks -->
-  <!-- <div class="[&_hr]:!opacity-100 [&_hr]:last-of-type:!opacity-0"> -->
-  {#if $$slots.default || $$slots.action}
-    <Swipeable
-      on:before={() => dispatch("action", track)}
-      on:after={() => select(track)}
-    >
-      <slot name="action" slot="before" />
+<div>
+  {#if !sm && tracks.length}
+    <When lg>
+      <div
+        class="sticky top-11 z-50 grid auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-16 backdrop-blur-md"
+      >
+        <Header sm>Title</Header>
+        <Header sm>Artist</Header>
+        <Header sm>Album</Header>
+      </div>
+    </When>
+  {/if}
+  <Virtual
+    key={(x) => x.entry ?? x.id ?? x}
+    sortable="tracks"
+    let:item={track}
+    items={tracks}
+    animate
+    on:edit
+    on:end
+  >
+    <!-- /// TODO: fix `hr` between tracks -->
+    <!-- <div class="[&_hr]:!opacity-100 [&_hr]:last-of-type:!opacity-0"> -->
+    {#if $$slots.default || $$slots.action}
+      <Swipeable
+        on:before={() => dispatch("action", track)}
+        on:after={() => select(track)}
+      >
+        <slot name="action" slot="before" />
+        <Track
+          {sm}
+          {track}
+          selected={check(track, selected)}
+          on:click={() =>
+            selected.size ? select(track) : dispatch("click", track)}
+          on:contextmenu={(e) => (e.preventDefault(), select(track))}
+        />
+        <Icon name="list" slot="after" />
+      </Swipeable>
+    {:else}
       <Track
         {sm}
         {track}
         selected={check(track, selected)}
-        on:click={() =>
-          selected.size ? select(track) : dispatch("click", track)}
-        on:contextmenu={(e) => (e.preventDefault(), select(track))}
+        on:click={() => dispatch("click", track)}
       />
-      <Icon name="list" slot="after" />
-    </Swipeable>
-  {:else}
-    <Track
-      {sm}
-      {track}
-      selected={check(track, selected)}
-      on:click={() => dispatch("click", track)}
-    />
-  {/if}
-</Virtual>
+    {/if}
+  </Virtual>
+</div>
 
 {#if $$slots.default || $$slots.action}
   <Portal to="bottom">

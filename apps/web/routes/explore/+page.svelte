@@ -1,9 +1,9 @@
 <script lang="ts">
   import {
-    Header,
     Button,
     Portal,
-    Stack,
+    Header,
+    Topbar,
     Group,
     Input,
     Panel,
@@ -51,9 +51,10 @@
   onDestroy(unsubscribe);
 </script>
 
-<Stack p gap>
-  <Header xl>Explore</Header>
-</Stack>
+<Topbar title="Explore"><Header xl indent>Explore</Header></Topbar>
+{#if tracks.length}
+  <Header sm indent>Search</Header>
+{/if}
 <Tracks
   {tracks}
   bind:selected

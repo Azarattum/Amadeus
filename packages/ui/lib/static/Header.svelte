@@ -2,11 +2,13 @@
   import type { Either } from "../../internal/types";
   type $$Props = Either<"sm" | "lg" | "xl"> & {
     center?: boolean;
+    indent?: boolean;
     id?: string;
   };
 
   export let id: string | undefined = undefined;
   export let center = false;
+  export let indent = false;
   export let sm = false;
   export let lg = false;
   export let xl = false;
@@ -17,13 +19,15 @@
 <svelte:element
   this={tag}
   {id}
-  class="
+  class="box-content
   {center ? 'text-center' : 'text-left'} transition-colors
   {sm ? 'light py-2 text-xs uppercase text-content-200' : ''}
   {!sm && !lg && !xl ? 'text-lg' : ''}
   {lg ? 'text-xl' : ''}
   {xl ? 'h-11 text-2xl' : ''}
   "
+  class:indent-4={indent}
+  class:pt-11={xl}
 >
   {#if id}
     <a href="#{id}"><slot /></a>

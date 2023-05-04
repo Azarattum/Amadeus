@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Icon, Stack, Header, Image, Text } from "@amadeus-music/ui";
+  import { Icon, Stack, Header, Image, Text, Topbar } from "@amadeus-music/ui";
   import { artists, playlists } from "$lib/data";
   import Tracks from "$lib/ui/Tracks.svelte";
   import { page } from "$app/stores";
@@ -12,19 +12,21 @@
     .filter((y) => y.artists.find((z) => z.id === artist?.id));
 </script>
 
-<Stack gap="lg" x center p>
-  <div class="overflow-hidden rounded-full">
-    <Image src={artist?.art || ""} size={104} />
-  </div>
-  <Stack gap>
-    <Header xl>{name}</Header>
-    <Stack x gap="lg">
-      <Text secondary><Icon name="note" sm /> {tracks.length}</Text>
-      <Text secondary><Icon name="clock" sm /> TODO</Text>
+<Topbar title={name}>
+  <Stack gap="lg" x center p>
+    <div class="overflow-hidden rounded-full">
+      <Image src={artist?.art || ""} size={104} />
+    </div>
+    <Stack gap>
+      <Header>{name}</Header>
+      <Stack x gap="lg">
+        <Text secondary><Icon name="note" sm /> {tracks.length}</Text>
+        <Text secondary><Icon name="clock" sm /> TODO</Text>
+      </Stack>
     </Stack>
   </Stack>
-</Stack>
-<!-- TODO: albums -->
+</Topbar>
+<!-- /// TODO: albums -->
 
 <Tracks {tracks}>
   <Icon name="last" slot="action" />

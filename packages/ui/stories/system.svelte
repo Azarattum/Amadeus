@@ -38,7 +38,7 @@
             class="h-16 w-16 rounded-md bg-surface-100 shadow-lg dark:shadow-none"
           />
           <div
-            class="bg-surface-200 z-50 h-16 w-16 rounded-md backdrop-blur-lg"
+            class="z-50 h-16 w-16 rounded-md bg-surface-200 backdrop-blur-md"
           />
         </Stack>
       </Stack>

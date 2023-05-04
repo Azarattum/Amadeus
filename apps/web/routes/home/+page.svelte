@@ -7,15 +7,16 @@
     Icon,
     Stack,
     Virtual,
+    Topbar,
   } from "@amadeus-music/ui";
   import { feed } from "$lib/data";
 
   const types: Record<number, string> = { 0: "Listened", 1: "Recommended" };
 </script>
 
+<Topbar title="Home"><Header xl indent>Home</Header></Topbar>
 <Stack p grow gap="lg">
-  <Header xl>Home</Header>
-  <Header id="following" sm>Other Devices</Header>
+  <Header sm>Other Devices</Header>
   <!-- /// TODO add playback stuff -->
 
   <Virtual key={(x) => x.type} items={$feed} columns="20rem" let:item gap={32}>

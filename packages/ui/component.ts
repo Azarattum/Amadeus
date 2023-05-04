@@ -26,6 +26,7 @@ export { default as Card } from "./lib/static/Card.svelte";
 export { default as Text } from "./lib/static/Text.svelte";
 export { default as Panel } from "./lib/static/Panel.svelte";
 export { default as Image } from "./lib/static/Image.svelte";
+export { default as Topbar } from "./lib/static/Topbar.svelte";
 export { default as Header } from "./lib/static/Header.svelte";
 export { default as Tooltip } from "./lib/static/Tooltip.svelte";
 export { default as Spinner } from "./lib/static/Spinner.svelte";
