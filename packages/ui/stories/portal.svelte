@@ -21,7 +21,7 @@
   <Stack gap>
     {#if shown}
       <Portal to={to.toString()} unique="busy">
-        <b>Portal says {value}!</b>
+        <b id="glow" class="target:text-primary-600">Portal says {value}!</b>
       </Portal>
     {/if}
     <Checkbox bind:checked={shown}>Enabled</Checkbox>

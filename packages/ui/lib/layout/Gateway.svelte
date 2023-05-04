@@ -6,7 +6,7 @@
 
   const realm = getContext<Realm>("realm");
   if (!realm) throw new Error("A gateway should exists within a realm!");
-  if (!realm[name]) realm[name] = { unique: new Set(), ssr: "" };
+  if (!realm[name]) realm[name] = { unique: new Set(), ssr: "", nodes: [] };
 
   const target = eval("slots");
   if (import.meta.env.SSR) {
@@ -15,14 +15,12 @@
     eval("$$scope = { ctx: [] }");
     if (!target.default) target.default = [];
     target.default[0] = () => ({
-      m: (..._: any[]) => (realm[name].target ??= _),
+      l: (nodes: any) => ((realm[name].nodes = [...nodes]), (nodes.length = 0)),
+      m: (target: Node) => (realm[name].target ??= target),
       d: () => (realm[name].target = undefined),
       c: () => {},
-      l: () => {},
     });
   }
 </script>
 
-{#await import.meta.env.SSR ? null : Promise.resolve() then _}
-  <slot />
-{/await}
+<div class="contents"><slot /></div>

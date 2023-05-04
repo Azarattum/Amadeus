@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { end_hydrating, start_hydrating } from "svelte/internal";
   import type { Realm } from "./Realm.svelte";
   import { getContext, tick } from "svelte";
 
@@ -7,7 +8,7 @@
 
   const realm = getContext<Realm>("realm");
   if (!realm) throw new Error("A portal should exists within a realm!");
-  if (!realm[to]) realm[to] = { unique: new Set(), ssr: "" };
+  if (!realm[to]) realm[to] = { unique: new Set(), ssr: "", nodes: [] };
 
   const target = eval("slots");
   if (import.meta.env.SSR) {
@@ -24,12 +25,18 @@
       const instance = original(..._);
       return {
         ...instance,
+        l() {},
         async m(..._: any) {
           if (!realm[to]) return;
           if (realm[to].unique.has(unique)) return;
           if (unique) realm[to].unique.add(unique), (mounted = to);
+          instance.l(realm[to].nodes);
+          const next = realm[to].nodes[0];
           await tick();
-          if (realm[to].target) instance.m(...(realm[to].target as any[]));
+          if (!realm[to].target) return;
+          start_hydrating();
+          instance.m(realm[to].target, next);
+          end_hydrating();
         },
         d(detaching: any) {
           if (mounted != null) realm[mounted].unique.delete(unique);

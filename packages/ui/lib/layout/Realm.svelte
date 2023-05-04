@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   export type Realm = Record<
     string,
-    { unique: Set<string>; ssr: string; target?: any[] }
+    { unique: Set<string>; ssr: string; target?: Node; nodes: Node[] }
   >;
 </script>
 
