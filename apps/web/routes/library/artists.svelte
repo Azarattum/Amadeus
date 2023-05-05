@@ -1,22 +1,23 @@
 <script lang="ts">
   import { Card, Header, Stack, Virtual, Text, Icon } from "@amadeus-music/ui";
-  import { playlists, artists } from "$lib/data";
+  import { format } from "@amadeus-music/util/string";
   import Avatar from "$lib/ui/Avatar.svelte";
-
-  /// TODO: this is bad! should be reworked on the data level!
-  $: tracks = $playlists.flatMap((x) => x.tracks);
-  $: grouped = $artists.map((x) => ({
-    ...x,
-    tracks: tracks.filter((y) => y.artists.find((z) => z.id === x.id)),
-  }));
+  import { artists } from "$lib/data";
 </script>
 
-<Virtual key={(x) => x.id} items={grouped} columns="20rem" let:item gap={32}>
+<Virtual
+  key={(x) => x.id}
+  items={$artists}
+  columns="20rem"
+  let:item
+  gap={32}
+  animate
+>
   <Card interactive href="/library/artist#{item.id}">
     <Header center>{item.title}</Header>
-    <Stack x gap="lg">
-      <Text secondary><Icon name="note" sm /> {item.tracks.length}</Text>
-      <Text secondary><Icon name="clock" sm /> TODO</Text>
+    <Stack x justify gap="lg">
+      <Text secondary><Icon name="note" sm /> {item.tracks}</Text>
+      <Text secondary><Icon name="clock" sm /> {format(item.length)}</Text>
     </Stack>
     <Avatar round of={item} slot="after" />
   </Card>
