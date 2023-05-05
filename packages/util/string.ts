@@ -59,10 +59,25 @@ export function split(text: string) {
 }
 
 /**
- * Creates an approximate relative date string representation
- * @param date Relative date
+ * Formats the date into a relative or absolute string representation
+ * @param date Date to format
  */
-export function format(date: Date) {
+export function format(date: Date | number, relative = false) {
+  if (!relative) {
+    date = Math.round(+date);
+    if (date <= 0) date = 0;
+    const hours = ~~(date / 3600);
+    date -= hours * 3600;
+    const minutes = ~~(date / 60);
+    date -= minutes * 60;
+    const seconds = date;
+
+    const pad = (x: number) => x.toString().padStart(2, "0");
+    if (hours) return `${hours}:${pad(minutes)}:${pad(seconds)}`;
+    if (minutes) return `${minutes}:${pad(seconds)}`;
+    return seconds;
+  }
+
   const intl = new Intl.RelativeTimeFormat("en");
 
   const seconds = Math.floor((Date.now() - +date) / 1000);

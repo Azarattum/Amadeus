@@ -99,7 +99,7 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
     message += `${x.listeners.size}${handlers} `;
     message += `${yellow}${x.pending.size}${pending}${reset} `;
     message += `${green}${x.executing.size}${running}${reset} `;
-    if (x.last) message += `${bright + black}(${format(x.last)})${reset}`;
+    if (x.last) message += `${bright + black}(${format(x.last, true)})${reset}`;
     message += "\n";
 
     x.executing.forEach((executor) => {

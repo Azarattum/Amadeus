@@ -3,6 +3,7 @@ import type { DB } from "../data/schema";
 export const history = ({ store }: DB) =>
   store((db) => db.selectFrom("history").orderBy("date", "desc").selectAll(), {
     async log(db, query: string) {
+      if (!query.trim()) return;
       await db
         .insertInto("history")
         .onConflict((x) => x.doUpdateSet({ date: Date.now() }))

@@ -31,7 +31,7 @@ export const playlists = ({ store }: DB) =>
         )
         .select([
           "group as id",
-          "playlist",
+          "playlist as title",
           "relevancy",
           "shared",
           "remote",
