@@ -105,3 +105,7 @@
     </Group>
   </Panel>
 </Portal>
+
+<svelte:head>
+  <title>Explore - Amadeus</title>
+</svelte:head>

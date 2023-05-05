@@ -18,9 +18,7 @@
   const tag = sm ? "h5" : lg ? "h3" : xl ? "h2" : "h4";
 </script>
 
-{#if xl}
-  <div aria-hidden class="h-11" />
-{/if}
+<div aria-hidden class="h-11" class:hidden={!xl} />
 <svelte:element
   this={tag}
   {id}

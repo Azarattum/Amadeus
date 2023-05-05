@@ -12,12 +12,16 @@
     When,
   } from "@amadeus-music/ui";
   import { feed } from "$lib/data";
+  import { onMount } from "svelte";
 
   const types: Record<number, string> = { 0: "Listened", 1: "Recommended" };
+  onMount(() => {
+    if (!location.hash) location.replace("#feed");
+  });
 </script>
 
 <Topbar title="Home">
-  <Header xl indent>
+  <Header xl indent id="feed">
     Home
     <When not sm slot="after">
       <Button round href="/settings"><Icon name="settings" /></Button>
@@ -49,3 +53,7 @@
   <Header id="following" sm>New for You</Header>
   <!-- /// TODO add artists cards -->
 </Stack>
+
+<svelte:head>
+  <title>Amadeus</title>
+</svelte:head>

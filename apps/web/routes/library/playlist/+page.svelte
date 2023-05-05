@@ -29,3 +29,7 @@
   <Icon name="last" slot="action" />
   <Button air stretch on:click={purge}><Icon name="trash" /></Button>
 </Playlist>
+
+<svelte:head>
+  <title>{info ? `${info.title} - ` : ""}Amadeus</title>
+</svelte:head>

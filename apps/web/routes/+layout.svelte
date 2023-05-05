@@ -26,6 +26,7 @@
 
   const icons: Record<string, string> = {
     Home: "house",
+    Feed: "activity",
     Library: "note",
     Explore: "compass",
     Playlists: "last",
@@ -39,12 +40,12 @@
   };
 
   const urls: Record<string, string> = {
-    Listened: "/home/feed#0",
-    Recommended: "/home/feed#1",
+    Recommended: "/home/feed#recommended",
+    Listened: "/home/feed#listened",
   };
 
   const sections: Record<string, string[]> = {
-    Home: ["Listened", "Recommended", "Following"],
+    Home: ["Feed", "Following", "Listened", "Recommended"],
     Library: ["Playlists", "Artists", "Timeline"],
     Explore: ["Tracks", "Artists", "Albums"],
   };
@@ -98,7 +99,6 @@
 </Wrapper>
 
 <svelte:head>
-  <title>Amadeus</title>
   <meta name="description" content="Listen to your music with Amadeus!" />
   <link rel="icon" type="image/png" href="{base}/images/favicon.webp" />
   <link rel="apple-touch-icon" href="{base}/images/logo-180.webp" />

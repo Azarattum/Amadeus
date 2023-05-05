@@ -25,3 +25,7 @@
     </Stack>
   </Tab>
 </Tabs>
+
+<svelte:head>
+  <title>Library - Amadeus</title>
+</svelte:head>
