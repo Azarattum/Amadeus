@@ -33,6 +33,7 @@
   <!-- /// TODO add playback stuff -->
 
   <Virtual key={(x) => x.type} items={$feed} columns="20rem" let:item gap={32}>
+    <!-- /// TODO replace with in-app card component -->
     <Card interactive href="/feed#{item.type}">
       <Header center id="added">{types[item.type]}</Header>
       <Stack x gap="lg">

@@ -107,5 +107,5 @@
 </Portal>
 
 <svelte:head>
-  <title>Explore - Amadeus</title>
+  <title>{$query || "Explore"} - Amadeus</title>
 </svelte:head>

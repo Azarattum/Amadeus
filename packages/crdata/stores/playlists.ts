@@ -29,6 +29,7 @@ export const playlists = ({ store }: DB) =>
             .orderBy("library.id")
             .as("data")
         )
+        .select((qb) => qb.fn.sum<number>("data.length").as("length"))
         .select([
           "group as id",
           "playlist as title",
