@@ -3,7 +3,7 @@
   import { autoscroll } from "../action";
 
   let items1 = Array.from({ length: 30 }).map((_, i) => i);
-  let items2 = Array.from({ length: 30 }).map((_, i) => 30 + i);
+  let items2 = Array.from({ length: 300 }).map((_, i) => 30 + i);
 </script>
 
 <div class="flex h-[100dvh] gap-8">

@@ -16,9 +16,9 @@
   import { drag, hold, intersection, resize } from "../../action";
   import { createEventDispatcher, onMount, tick } from "svelte";
   import { getScrollParent } from "../../internal/util";
+  import { debounce } from "@amadeus-music/util/async";
   import { minmax } from "@amadeus-music/util/math";
   import { position } from "../../internal/pointer";
-  import { lock } from "@amadeus-music/util/async";
   import { Portal } from "../../component";
   type T = $$Generic;
   type K = $$Generic;
@@ -43,6 +43,7 @@
   let wrapper: HTMLElement | null = null;
   let outer = new DOMRect();
   let inner = new DOMRect();
+  let visible = false;
   let ended = false;
   let rowHeight = 1;
   let perRow = 0;
@@ -63,21 +64,10 @@
     : `repeat(auto-fill,minmax(min(100%,${columns}),1fr))`;
   $: if (Number.isFinite(totalHeight)) tick().then(measure), (ended = false);
 
-  async function reflow(rect: DOMRect) {
-    if (!viewHeight) return;
+  function reflow(rect = wrapper?.firstElementChild?.getBoundingClientRect()) {
+    if (!viewHeight || !rect) return;
     active -= Math.round(rect.y / viewHeight);
     if (!ended && active >= max - 1) dispatch("end"), (ended = true);
-    if (active < 0) return (active = 0);
-    if (active > max) return (active = max);
-
-    const trigger = wrapper?.firstElementChild;
-    if (!trigger) return;
-    const { resolve, wait } = lock<boolean>();
-    const ok = () => resolve(false);
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve(true)));
-    trigger.addEventListener("viewenter", ok, { once: true });
-    if (await wait()) reflow(trigger.getBoundingClientRect());
-    trigger.removeEventListener("viewenter", ok);
   }
 
   function reindex(items: T[]) {
@@ -147,7 +137,9 @@
   $: hovering = minmax(hoveringY * perRow + hoveringX, 0, items.length - 1);
   $: if ($transfer?.group === id) claim(hovering);
 
-  function grab({ target }: DragEvent) {
+  async function grab({ target }: DragEvent) {
+    measure(); // Remeasure in case elements moved
+    await tick();
     if (!sortable || !wrapper || !target || $transfer) return;
     if ((target as HTMLElement).parentElement !== wrapper) return;
     if (items[hovering] == null) return;
@@ -211,14 +203,17 @@
   }
 
   onMount(() => {
+    const fixFlow = debounce(() => visible || reflow(), 100);
     function scroller() {
+      fixFlow();
+      if (!sortable) return;
       scroll.x = container?.scrollLeft || 0;
       scroll.y = container?.scrollTop || 0;
     }
 
     if (!container) container = getScrollParent(wrapper);
     const unsubscribe = sortable && position.subscribe((x) => (cursor = x));
-    if (sortable) container.addEventListener("scroll", scroller);
+    container.addEventListener("scroll", scroller);
     container.addEventListener("resize", measure);
     const { destroy } = resize(container);
     return () => {
@@ -243,6 +238,7 @@
   >
     <div
       style:transform="translateY({+!!active * overthrow * 100}%)"
+      on:intersect={(x) => (visible = x.detail.isIntersecting)}
       on:viewleave={(x) => reflow(x.detail.boundingClientRect)}
       style:height="{viewHeight}px"
       use:intersection
