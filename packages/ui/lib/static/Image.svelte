@@ -9,7 +9,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
 
-  export let src: string;
+  export let src: string | undefined = undefined;
   export let size = 48;
   export let alt = "";
 
@@ -19,15 +19,16 @@
   $: loaded = typeof resized === "string";
   $: Promise.resolve(resized).then(() => (loaded = true));
 
-  function desource(src: string) {
+  function desource(src?: string) {
+    if (!src) return src;
     try {
       return JSON.parse(src)[0];
     } catch {}
     return src;
   }
 
-  function resize(src: string) {
-    if (!("Image" in globalThis)) return new Promise<string>(() => {});
+  function resize(src?: string) {
+    if (!("Image" in globalThis) || !src) return new Promise<string>(() => {});
     return new Promise<string>((resolve) => {
       const image = new Image();
       image.crossOrigin = "anonymous";

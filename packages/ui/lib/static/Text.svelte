@@ -1,15 +1,17 @@
 <script lang="ts">
   export let secondary = false;
+  export let loading = false;
   export let accent = false;
   export let indent = false;
   export let sm = false;
 </script>
 
 <span
-  class="max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-left [&>*]:align-bottom"
+  class="max-w-max overflow-hidden text-ellipsis whitespace-nowrap rounded-md text-left [&>*]:align-bottom
+  {loading ? 'animate-pulse bg-highlight text-transparent' : ''}"
   class:text-content-200={secondary}
   class:font-medium={accent}
-  class:indent-4={indent}
+  class:ml-4={indent}
   class:text-sm={sm}
 >
   <slot />

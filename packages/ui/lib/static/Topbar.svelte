@@ -1,8 +1,8 @@
 <script lang="ts">
   import { intersection, type IntersectionEvent } from "../../action";
 
-  export let title: string;
   export let stuck = false;
+  export let title = "";
 
   let trigger: HTMLDivElement | undefined;
 

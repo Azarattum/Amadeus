@@ -58,7 +58,7 @@
 </script>
 
 <div>
-  {#if !sm && tracks.length}
+  {#if !sm}
     <When lg>
       <div
         class="sticky top-11 z-50 grid auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-16 backdrop-blur-md"
@@ -105,6 +105,11 @@
       />
     {/if}
   </Virtual>
+  {#if !tracks.length}
+    {#each Array.from({ length: 10 }) as _}
+      <Track />
+    {/each}
+  {/if}
 </div>
 
 {#if $$slots.default || $$slots.action}

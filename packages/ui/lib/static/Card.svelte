@@ -58,7 +58,7 @@
   <div
     class="z-10 grid w-full contain-inline-size
     {sm || xs ? 'justify-start gap-0.5' : 'justify-center gap-2'}
-    {(sm || xs) && flow ? 'lg:auto-cols-fr lg:grid-flow-col' : ''}
+    {(sm || xs) && flow ? 'lg:auto-cols-fr lg:grid-flow-col lg:gap-4' : ''}
   "
   >
     <slot />
