@@ -23,8 +23,8 @@
   }
 </script>
 
+<Header indent xl>Connect</Header>
 <Stack grow gap p screen>
-  <Header xl>Connect</Header>
   <Input placeholder="Hostname" bind:value={hostname} />
   <Input placeholder="Username" bind:value={username} />
   <Input placeholder="Password" bind:value={password} />

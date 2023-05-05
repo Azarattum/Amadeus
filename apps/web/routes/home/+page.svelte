@@ -8,13 +8,22 @@
     Stack,
     Virtual,
     Topbar,
+    Button,
+    When,
   } from "@amadeus-music/ui";
   import { feed } from "$lib/data";
 
   const types: Record<number, string> = { 0: "Listened", 1: "Recommended" };
 </script>
 
-<Topbar title="Home"><Header xl indent>Home</Header></Topbar>
+<Topbar title="Home">
+  <Header xl indent>
+    Home
+    <When not sm slot="after">
+      <Button round href="/settings"><Icon name="settings" /></Button>
+    </When>
+  </Header>
+</Topbar>
 <Stack p grow gap="lg">
   <Header sm>Other Devices</Header>
   <!-- /// TODO add playback stuff -->
