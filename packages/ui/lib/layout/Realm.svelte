@@ -1,7 +1,13 @@
 <script lang="ts" context="module">
   export type Realm = Record<
     string,
-    { unique: Set<string>; ssr: string; target?: Node; nodes: Node[] }
+    {
+      anchor?: Node | null;
+      unique: Set<string>;
+      nodes: Node[];
+      target?: Node;
+      ssr: string;
+    }
   >;
 </script>
 
@@ -14,7 +20,10 @@
     const target = eval("slots");
     let html: string = target.default ? target.default({}) : "";
     for (const [key, value] of Object.entries(realm)) {
-      html = html.replace(`<!--<Gateway:${key}>-->`, value.ssr);
+      html = html.replace(
+        `<!--<Gateway:${key}>-->`,
+        `<!--<Gateway:${key}>-->` + value.ssr + `<!--</Gateway:${key}>-->`
+      );
     }
     target.default = () => html;
   }

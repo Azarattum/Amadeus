@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { end_hydrating, start_hydrating } from "svelte/internal";
   import type { Realm } from "./Realm.svelte";
   import { getContext, tick } from "svelte";
 
@@ -28,15 +27,16 @@
         l() {},
         async m(..._: any) {
           if (!realm[to]) return;
+          // Skip unique nodes
           if (realm[to].unique.has(unique)) return;
           if (unique) realm[to].unique.add(unique), (mounted = to);
+          // Claim SSRed nodes from the gateway
           instance.l(realm[to].nodes);
-          const next = realm[to].nodes[0];
-          await tick();
+          const temp = realm[to].nodes[0];
+          await tick().then(tick);
           if (!realm[to].target) return;
-          start_hydrating();
-          instance.m(realm[to].target, next);
-          end_hydrating();
+          // Mount current instance
+          instance.m(realm[to].target, temp || realm[to].anchor);
         },
         d(detaching: any) {
           if (mounted != null) realm[mounted].unique.delete(unique);
