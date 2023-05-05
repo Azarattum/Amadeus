@@ -4,6 +4,7 @@
 
   type $$Props = {
     gap?: boolean | "xs" | "sm" | "lg" | "xl" | "2xl";
+    justify?: boolean;
     screen?: boolean;
     grow?: boolean;
     p?: boolean;
@@ -12,6 +13,7 @@
 
   export let gap: $$Props["gap"] = false;
   export let baseline = false;
+  export let justify = false;
   export let center = false;
   export let screen = false;
   export let grow = false;
@@ -33,6 +35,7 @@
     : !grow
     ? 'place-items-start'
     : ''}"
+  class:justify-center={justify}
   class:flex-col={!x && !z}
   class:gap-0.5={gap === "xs"}
   class:gap-1={gap === "sm"}

@@ -78,32 +78,32 @@
     on:edit
     on:end
   >
-    <!-- /// TODO: fix `hr` between tracks -->
-    <!-- <div class="[&_hr]:!opacity-100 [&_hr]:last-of-type:!opacity-0"> -->
-    {#if $$slots.default || $$slots.action}
-      <Swipeable
-        on:before={() => dispatch("action", track)}
-        on:after={() => select(track)}
-      >
-        <slot name="action" slot="before" />
+    <div class="[&_hr]:!opacity-100 [*:has(>&):last-of-type_hr]:!opacity-0">
+      {#if $$slots.default || $$slots.action}
+        <Swipeable
+          on:before={() => dispatch("action", track)}
+          on:after={() => select(track)}
+        >
+          <slot name="action" slot="before" />
+          <Track
+            {sm}
+            {track}
+            selected={check(track, selected)}
+            on:click={() =>
+              selected.size ? select(track) : dispatch("click", track)}
+            on:contextmenu={(e) => (e.preventDefault(), select(track))}
+          />
+          <Icon name="list" slot="after" />
+        </Swipeable>
+      {:else}
         <Track
           {sm}
           {track}
           selected={check(track, selected)}
-          on:click={() =>
-            selected.size ? select(track) : dispatch("click", track)}
-          on:contextmenu={(e) => (e.preventDefault(), select(track))}
+          on:click={() => dispatch("click", track)}
         />
-        <Icon name="list" slot="after" />
-      </Swipeable>
-    {:else}
-      <Track
-        {sm}
-        {track}
-        selected={check(track, selected)}
-        on:click={() => dispatch("click", track)}
-      />
-    {/if}
+      {/if}
+    </div>
   </Virtual>
   {#if !tracks.length}
     {#each Array.from({ length: 10 }) as _}
