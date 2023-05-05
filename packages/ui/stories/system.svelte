@@ -2,7 +2,7 @@
   import { Stack, Header } from "@amadeus-music/ui";
 </script>
 
-<Stack gap="xl">
+<Stack screen>
   <Stack gap="lg">
     <Header xl>Colors</Header>
     <Stack gap>
