@@ -1,13 +1,13 @@
 <script lang="ts">
   import { comment, detach, insert_hydration, tick } from "svelte/internal";
-  import type { Realm } from "./Realm.svelte";
+  import { initRealm, type Realm } from "./Realm.svelte";
   import { getContext } from "svelte";
 
   export let name = "";
 
   const realm = getContext<Realm>("realm");
   if (!realm) throw new Error("A gateway should exists within a realm!");
-  if (!realm[name]) realm[name] = { unique: new Set(), ssr: "", nodes: [] };
+  $: if (!realm[name]) realm[name] = initRealm();
 
   const target = eval("slots");
   if (import.meta.env.SSR) {
@@ -15,7 +15,6 @@
   } else {
     eval("$$scope = { ctx: [] }");
     if (!target.default) target.default = [];
-    let hydrating: Node[] = [];
 
     target.default[0] = () => ({
       l: (nodes: Node[]) => {
@@ -29,32 +28,29 @@
         });
 
         // Removed marker comments and set order
-        hydrating = nodes.splice(from, to - from + 1);
-        detach(hydrating.shift() as Node);
-        detach(hydrating.pop() as Node);
-        for (const x of hydrating) {
+        const claimed = nodes.splice(from, to - from + 1);
+        detach(claimed.shift() as Node);
+        detach(claimed.pop() as Node);
+        for (const x of claimed) {
           (x as any).claim_order = meta.total_claimed;
           meta.total_claimed += 1;
         }
-        realm[name].nodes = [...hydrating];
-      },
-      m: (target: Node, anchor: Node) => {
-        // Create a temp element to remember mount position
-        const temp = hydrating.length ? undefined : comment("");
-        if (temp) hydrating.push(temp);
-        // Hydrate all the SSR nodes
-        hydrating.forEach((x) => insert_hydration(target, x, anchor));
-        const last = hydrating[hydrating.length - 1];
-        hydrating = [];
 
-        tick().then(() => {
-          // Save `anchor` and `target` for portal to render
-          realm[name].anchor = last?.nextSibling;
-          realm[name].target = target;
-          if (temp) detach(last);
-        });
+        realm[name].claim.forEach((x) => x(claimed));
+        claimed.forEach(detach);
       },
-      d: () => (realm[name].target = undefined),
+      m: async (target: Node, anchor: Node) => {
+        realm[name].mount.forEach((x) => x(target, anchor));
+        const temp = comment("");
+        insert_hydration(target, temp, anchor);
+        await tick();
+        realm[name].target = [temp.parentNode, temp.nextSibling];
+        detach(temp);
+      },
+      d: (detaching: boolean) => {
+        realm[name].destroy.forEach((x) => x(detaching));
+        realm[name] = initRealm();
+      },
       c: () => {},
     });
   }

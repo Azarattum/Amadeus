@@ -1,14 +1,14 @@
 <script lang="ts" context="module">
-  export type Realm = Record<
-    string,
-    {
-      anchor?: Node | null;
-      unique: Set<string>;
-      nodes: Node[];
-      target?: Node;
-      ssr: string;
-    }
-  >;
+  export type Realm = Record<string, ReturnType<typeof initRealm>>;
+  export const initRealm = () => ({
+    ssr: "",
+    claimed: new Set<string>(),
+    mounted: new Set<string>(),
+    claim: new Set<(nodes?: Node[]) => void>(),
+    destroy: new Set<(detaching: boolean) => void>(),
+    mount: new Set<(target: Node, anchor?: Node | null) => void>(),
+    target: undefined as [Node | null, Node | null] | undefined,
+  });
 </script>
 
 <script lang="ts">
