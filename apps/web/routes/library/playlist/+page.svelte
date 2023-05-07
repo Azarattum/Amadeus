@@ -1,20 +1,23 @@
 <script lang="ts">
+  import { library, playlist, playlists, target } from "$lib/data";
+  import type { TrackEntry } from "@amadeus-music/protocol";
   import type { EditEvent } from "$lib/ui/Tracks.svelte";
   import { Icon, Button } from "@amadeus-music/ui";
   import Playlist from "$lib/ui/Playlist.svelte";
-  import { library, playlists } from "$lib/data";
   import { page } from "$app/stores";
+  import { onDestroy } from "svelte";
 
-  $: info = $playlists.find((x) => x.id === +$page.url.hash.slice(1));
-  $: tracks = info?.tracks.filter((x) => x.id) || [];
+  $: $target = +$page.url.hash.slice(1) || 0;
+  $: info = $playlist[0]
+    ? $playlist[0]
+    : $playlists.find(({ id }) => id === $target);
 
-  let selected = new Set<(typeof tracks)[number]>();
+  let selected = new Set<TrackEntry>();
 
-  function edit({
-    detail: { action, index, item },
-  }: EditEvent<(typeof tracks)[number]>) {
+  function edit({ detail: { action, index, item } }: EditEvent<TrackEntry>) {
+    if (!info) return;
     if (action === "rearrange") {
-      library.rearrange(item.entry, tracks[index - 1]?.entry);
+      library.rearrange(item.entry, info.tracks[index - 1]?.entry);
     }
   }
 
@@ -23,9 +26,11 @@
     selected.clear();
     selected = selected;
   }
+
+  onDestroy(() => playlist.set([]));
 </script>
 
-<Playlist {info} {tracks} bind:selected on:edit={edit}>
+<Playlist {info} bind:selected on:edit={edit}>
   <Icon name="last" slot="action" />
   <Button air stretch on:click={purge}><Icon name="trash" /></Button>
 </Playlist>

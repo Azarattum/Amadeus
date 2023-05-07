@@ -1,4 +1,5 @@
 import { upcoming, preceding, playback } from "../stores/playback";
+import { target, playlist } from "../stores/lazy";
 import { playlists } from "../stores/playlists";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
@@ -14,6 +15,7 @@ const connections = new Map<string, Connection>();
 const stores = (db: DB) => ({
   playlists: playlists(db),
   preceding: preceding(db),
+  playlist: playlist(db),
   playback: playback(db),
   upcoming: upcoming(db),
   settings: settings(db),
@@ -68,4 +70,4 @@ type Options = Parameters<typeof database>[1] & {
   local?: boolean;
 };
 
-export { connect, close };
+export { connect, close, target };

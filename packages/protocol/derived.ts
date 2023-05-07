@@ -1,5 +1,5 @@
+import { array, assign, number, object } from "superstruct";
 import { album, artist, playlist, track } from "./base";
-import { array, assign, object } from "superstruct";
 import type { Infer } from "superstruct";
 import { unique } from "./modifiers";
 
@@ -11,18 +11,26 @@ const trackDetails = assign(
     artists: array(unique(artist)),
   })
 );
+const trackEntry = assign(trackDetails, object({ entry: number() }));
 
-const artistInfo = artist;
+const collection = object({
+  count: number(),
+  length: number(),
+  tracks: array(trackEntry),
+});
+
+const artistInfo = assign(artist, collection);
 const artistDetails = unique(artist);
 
-const albumInfo = album;
+const albumInfo = assign(album, collection);
 const albumDetails = unique(album);
 
-const playlistInfo = playlist;
+const playlistInfo = assign(playlist, collection);
 const playlistDetails = unique(playlist);
 
 type TrackInfo = Infer<typeof trackInfo>;
 type TrackDetails = Infer<typeof trackDetails>;
+type TrackEntry = Infer<typeof trackEntry>;
 type ArtistInfo = Infer<typeof artistInfo>;
 type ArtistDetails = Infer<typeof artistDetails>;
 type AlbumInfo = Infer<typeof albumInfo>;
@@ -37,6 +45,7 @@ type FeedType = "listened" | "recommended" | "following";
 export type {
   TrackInfo,
   TrackDetails,
+  TrackEntry,
   ArtistInfo,
   ArtistDetails,
   AlbumInfo,

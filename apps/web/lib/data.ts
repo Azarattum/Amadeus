@@ -5,6 +5,7 @@ import { sync } from "./trpc";
 export const {
   playlists,
   preceding,
+  playlist,
   playback,
   upcoming,
   settings,
@@ -21,3 +22,4 @@ export const {
 });
 
 export const search = writable("");
+export { target } from "@amadeus-music/crdata";
