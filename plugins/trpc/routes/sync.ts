@@ -10,7 +10,7 @@ export const sync = router({
   pull: procedure
     .input(object({ version: number(), client: string() }))
     .subscription(({ input, ctx }) =>
-      observable<any[]>(({ next }) => {
+      observable<unknown>(({ next }) => {
         info(`${ctx.name} subscribed to database changes.`);
         const promise = ctx.persistence.subscribe(["*"], next, input).then();
         return async () => {
