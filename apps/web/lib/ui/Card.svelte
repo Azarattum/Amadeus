@@ -4,9 +4,10 @@
   import Avatar from "./Avatar.svelte";
 
   type Info = {
+    tracks: { album: { art?: string } }[];
     album?: { art: string };
-    tracks: any[] | number;
     length: number;
+    count: number;
     title: string;
     art?: string;
   };
@@ -22,11 +23,7 @@
 
   $: title = ok(item) ? item.title : "Loading...";
   $: length = ok(item) ? item.length : 0;
-  $: tracks = ok(item)
-    ? Array.isArray(item.tracks)
-      ? item.tracks.length
-      : item.tracks
-    : 0;
+  $: count = ok(item) ? item.count : 0;
   $: art = ok(item)
     ? Array.isArray(item.tracks)
       ? item.tracks
@@ -37,7 +34,7 @@
 <Card interactive={!!href && !loading} {href}>
   <Header center {loading}>{title}</Header>
   <Stack justify x gap="lg">
-    <Text secondary {loading}><Icon name="note" sm /> {tracks}</Text>
+    <Text secondary {loading}><Icon name="note" sm /> {count}</Text>
     <Text secondary {loading}><Icon name="clock" sm /> {format(length)}</Text>
   </Stack>
   <Avatar round={!!artist} of={art} slot="after" />

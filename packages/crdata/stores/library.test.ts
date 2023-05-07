@@ -26,7 +26,7 @@ it("saves tracks", async () => {
   expect(await playlists).toMatchObject([
     {
       id: identify("Test"),
-      playlist: "Test",
+      title: "Test",
       tracks: [t0],
     },
   ]);

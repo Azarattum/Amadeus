@@ -10,14 +10,14 @@ export const artists = ({ store }: DB) =>
         .leftJoin("tracks", "tracks.id", "attribution.track")
         .groupBy("artists.id")
         .select((qb) => qb.fn.sum<number>("length").as("length"))
-        .select((qb) => qb.fn.count<number>("attribution.track").as("tracks"))
+        .select((qb) => qb.fn.count<number>("attribution.track").as("count"))
         .select([
           "artists.id",
           "artists.title",
           "artists.source",
           "artists.art",
         ])
-        .orderBy("tracks", "desc")
+        .orderBy("count", "desc")
         .orderBy("artists.title"),
     {
       async edit(db, id: number, artist: Partial<Artist>) {

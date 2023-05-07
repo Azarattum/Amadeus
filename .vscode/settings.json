@@ -11,6 +11,7 @@
     "binsert",
     "bpmb",
     "catchable",
+    "cmpr",
     "crdata",
     "crsql",
     "crsqlite",

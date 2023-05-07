@@ -11,6 +11,7 @@
   columns="20rem"
   gap={32}
   sortable
+  animate
 >
   <Card href="/library/playlist#{item.id}" playlist={item} />
 </Virtual>
