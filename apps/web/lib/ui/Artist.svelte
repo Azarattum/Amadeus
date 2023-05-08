@@ -1,14 +1,12 @@
 <script lang="ts">
+  import type { ArtistCollection, TrackEntry } from "@amadeus-music/protocol";
   import { Icon, Stack, Header, Text, Topbar } from "@amadeus-music/ui";
-  import type { ArtistInfo, TrackInfo } from "@amadeus-music/protocol";
   import { format } from "@amadeus-music/util/string";
   import Tracks from "$lib/ui/Tracks.svelte";
   import Avatar from "./Avatar.svelte";
 
-  export let selected = new Set<(typeof tracks)[number]>();
-  export let info: ArtistInfo | undefined = undefined;
-  export let tracks: TrackInfo[];
-  $: time = format(tracks.reduce((a, b) => a + b.length, 0));
+  export let selected = new Set<TrackEntry>();
+  export let info: ArtistCollection | undefined = undefined;
 </script>
 
 <Topbar title={info?.title || ""}>
@@ -17,13 +15,13 @@
     <Stack gap>
       <Header loading={!info}>{info?.title}</Header>
       <Stack x gap="lg">
-        <Text secondary loading={!tracks.length}>
+        <Text secondary loading={!info}>
           <Icon name="note" sm />
-          {tracks.length}
+          {info?.count}
         </Text>
-        <Text secondary loading={!time}>
+        <Text secondary loading={!info}>
           <Icon name="clock" sm />
-          {time}
+          {format(info?.length || 0)}
         </Text>
       </Stack>
     </Stack>
@@ -31,7 +29,7 @@
 </Topbar>
 <!-- /// TODO: albums -->
 
-<Tracks fixed {tracks} on:edit on:click on:action bind:selected>
+<Tracks fixed tracks={info?.tracks} on:edit on:click on:action bind:selected>
   <slot name="action" slot="action" />
   <slot />
 </Tracks>

@@ -19,24 +19,36 @@ const collection = object({
   tracks: array(trackEntry),
 });
 
-const artistInfo = assign(artist, collection);
-const artistDetails = unique(artist);
+const artistInfo = artist;
+const artistDetails = unique(artistInfo);
+const artistCollection = assign(artistDetails, collection);
 
-const albumInfo = assign(album, collection);
-const albumDetails = unique(album);
+const albumInfo = assign(album, object({ artists: array(artist) }));
+const albumDetails = assign(
+  unique(album),
+  object({ artists: array(unique(artist)) })
+);
+const albumCollection = assign(albumDetails, collection);
 
-const playlistInfo = assign(playlist, collection);
-const playlistDetails = unique(playlist);
+const playlistInfo = playlist;
+const playlistDetails = unique(playlistInfo);
+const playlistCollection = assign(playlistDetails, collection);
 
 type TrackInfo = Infer<typeof trackInfo>;
 type TrackDetails = Infer<typeof trackDetails>;
 type TrackEntry = Infer<typeof trackEntry>;
+
 type ArtistInfo = Infer<typeof artistInfo>;
 type ArtistDetails = Infer<typeof artistDetails>;
+type ArtistCollection = Infer<typeof artistCollection>;
+
 type AlbumInfo = Infer<typeof albumInfo>;
 type AlbumDetails = Infer<typeof albumDetails>;
+type AlbumCollection = Infer<typeof albumCollection>;
+
 type PlaylistInfo = Infer<typeof playlistInfo>;
 type PlaylistDetails = Infer<typeof playlistDetails>;
+type PlaylistCollection = Infer<typeof playlistCollection>;
 
 type PlaybackDirection = "forward" | "backward" | "shuffled";
 type PlaybackRepeat = "none" | "single" | "all";
@@ -48,10 +60,13 @@ export type {
   TrackEntry,
   ArtistInfo,
   ArtistDetails,
+  ArtistCollection,
   AlbumInfo,
   AlbumDetails,
+  AlbumCollection,
   PlaylistInfo,
   PlaylistDetails,
+  PlaylistCollection,
   PlaybackDirection,
   PlaybackRepeat,
   FeedType,
@@ -59,10 +74,14 @@ export type {
 export {
   trackInfo,
   trackDetails,
+  trackEntry,
   artistInfo,
   artistDetails,
+  artistCollection,
   albumInfo,
   albumDetails,
+  albumCollection,
   playlistInfo,
   playlistDetails,
+  playlistCollection,
 };

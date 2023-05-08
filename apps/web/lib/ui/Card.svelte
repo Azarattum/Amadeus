@@ -25,7 +25,9 @@
   $: length = ok(item) ? item.length : 0;
   $: count = ok(item) ? item.count : 0;
   $: art = ok(item)
-    ? Array.isArray(item.tracks)
+    ? item.art
+      ? item
+      : Array.isArray(item.tracks)
       ? item.tracks
       : item
     : undefined;

@@ -1,11 +1,11 @@
 <script lang="ts">
+  import type { PlaylistCollection, TrackEntry } from "@amadeus-music/protocol";
   import { Header, Icon, Stack, Text, Topbar, Spacer } from "@amadeus-music/ui";
-  import type { PlaylistInfo, TrackEntry } from "@amadeus-music/protocol";
   import { format } from "@amadeus-music/util/string";
   import Tracks from "./Tracks.svelte";
 
   export let selected = new Set<TrackEntry>();
-  export let info: PlaylistInfo | undefined = undefined;
+  export let info: PlaylistCollection | undefined = undefined;
 </script>
 
 <Stack gap="lg" grow>
