@@ -35,9 +35,13 @@
   }>();
 
   export let sm = false;
-  export let tracks: T[];
+  export let fixed = false;
   export let selected = new Set<T>();
-  $: if (!tracks.length) clear();
+  export let tracks: (T | undefined)[] | undefined = undefined;
+
+  const prerender = 10;
+  $: items = tracks || Array.from<undefined>({ length: prerender });
+  $: if (!tracks?.length) clear();
 
   function select(track: T) {
     if (selected.has(track)) selected.delete(track);
@@ -70,46 +74,47 @@
     </When>
   {/if}
   <Virtual
-    key={(x) => x.entry ?? x.id ?? x}
+    key={(x) => x?.entry || x?.id}
     sortable="tracks"
     let:item={track}
-    items={tracks}
-    animate
+    animate={!fixed}
+    {prerender}
+    {fixed}
+    {items}
     on:edit
     on:end
   >
     <div class="[&_hr]:!opacity-100 [*:has(>&):last-of-type_hr]:!opacity-0">
-      {#if $$slots.default || $$slots.action}
-        <Swipeable
-          on:before={() => dispatch("action", track)}
-          on:after={() => select(track)}
-        >
-          <slot name="action" slot="before" />
+      {#if track}
+        {#if $$slots.default || $$slots.action}
+          <Swipeable
+            on:before={() => dispatch("action", track)}
+            on:after={() => select(track)}
+          >
+            <slot name="action" slot="before" />
+            <Track
+              {sm}
+              {track}
+              selected={check(track, selected)}
+              on:click={() =>
+                selected.size ? select(track) : dispatch("click", track)}
+              on:contextmenu={(e) => (e.preventDefault(), select(track))}
+            />
+            <Icon name="list" slot="after" />
+          </Swipeable>
+        {:else}
           <Track
             {sm}
             {track}
             selected={check(track, selected)}
-            on:click={() =>
-              selected.size ? select(track) : dispatch("click", track)}
-            on:contextmenu={(e) => (e.preventDefault(), select(track))}
+            on:click={() => dispatch("click", track)}
           />
-          <Icon name="list" slot="after" />
-        </Swipeable>
+        {/if}
       {:else}
-        <Track
-          {sm}
-          {track}
-          selected={check(track, selected)}
-          on:click={() => dispatch("click", track)}
-        />
+        <Track {sm} />
       {/if}
     </div>
   </Virtual>
-  {#if !tracks.length}
-    {#each Array.from({ length: 10 }) as _}
-      <Track />
-    {/each}
-  {/if}
 </div>
 
 {#if $$slots.default || $$slots.action}

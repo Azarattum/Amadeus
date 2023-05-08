@@ -25,7 +25,9 @@
   let pages: TrackDetails[][] = [];
   let selected = new Set<TrackDetails>();
 
-  $: tracks = pages.flat();
+  $: tracks = pages.length
+    ? pages.flat()
+    : Array.from<undefined>({ length: 10 });
 
   let unsubscribe = () => {};
   const update = debounce(() => {
@@ -65,6 +67,7 @@
 {#if $query}
   <Header sm indent>Search</Header>
   <Tracks
+    fixed
     {tracks}
     bind:selected
     on:end={() => search.next.mutate(id)}

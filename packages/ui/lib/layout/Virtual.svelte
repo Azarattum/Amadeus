@@ -254,7 +254,7 @@
       <div
         class:invisible={$transfer?.owner === wrapper &&
           $transfer?.key === key(item)}
-        draggable={sortable ? "true" : undefined}
+        draggable={sortable && key(item) != null ? "true" : undefined}
         style="overflow-anchor: none;"
       >
         <slot {item} index={from + i} />

@@ -29,7 +29,7 @@
     </Stack>
   </Stack>
 
-  <Tracks tracks={info?.tracks || []} on:edit on:click on:action bind:selected>
+  <Tracks tracks={info?.tracks} on:edit on:click on:action bind:selected>
     <slot name="action" slot="action" />
     <slot />
   </Tracks>
