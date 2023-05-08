@@ -56,7 +56,10 @@
   }
 
   $: $query = decodeURIComponent($page.url.hash.slice(1));
-  $: if (!$query) globalThis.history?.replaceState(null, "", "#");
+  $: if (!$query) {
+    globalThis.history?.replaceState(null, "", "#");
+    unsubscribe();
+  }
 
   onDestroy(unsubscribe);
 </script>
