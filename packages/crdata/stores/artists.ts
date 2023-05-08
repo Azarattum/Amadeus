@@ -3,8 +3,6 @@ import type { Artist } from "@amadeus-music/protocol";
 import type { DB } from "../data/schema";
 import { groupJSON, sql } from "crstore";
 
-const PREVIEW = 30;
-
 export const artists = ({ store }: DB) =>
   store(
     (db) =>
@@ -25,9 +23,6 @@ export const artists = ({ store }: DB) =>
               "artists.id as group",
               "artists.following",
               "artists.art",
-              sql`row_number() OVER(PARTITION BY artists.id ORDER BY tracks.title)`.as(
-                "row"
-              ),
               (qb) =>
                 qb.fn
                   .count<number>("metadata.length")
@@ -39,7 +34,7 @@ export const artists = ({ store }: DB) =>
                   .over((qb) => qb.partitionBy("artists.id"))
                   .as("duration"),
             ])
-            .orderBy("row")
+            .orderBy("tracks.title")
             .as("grouped")
         )
         .select([
@@ -61,9 +56,6 @@ export const artists = ({ store }: DB) =>
           (qb) => qb.fn.coalesce("duration", sql.lit(0)).as("length"),
           (qb) => qb.fn.coalesce("count", sql.lit(0)).as("count"),
         ])
-        .where(({ or, cmpr }) =>
-          or([cmpr("row", "<=", PREVIEW), cmpr("row", "is", null)])
-        )
         .groupBy("group")
         .orderBy("count", "desc")
         .orderBy("artist"),

@@ -1,16 +1,12 @@
 <script lang="ts">
-  import { library, playlist, playlists, target } from "$lib/data";
   import type { TrackEntry } from "@amadeus-music/protocol";
   import type { EditEvent } from "$lib/ui/Tracks.svelte";
   import { Icon, Button } from "@amadeus-music/ui";
   import Playlist from "$lib/ui/Playlist.svelte";
+  import { library, playlists } from "$lib/data";
   import { page } from "$app/stores";
-  import { onDestroy } from "svelte";
 
-  $: $target = +$page.url.hash.slice(1) || 0;
-  $: info = $playlist[0]
-    ? $playlist[0]
-    : $playlists.find(({ id }) => id === $target);
+  $: info = $playlists.find((x) => x.id === +$page.url.hash.slice(1));
 
   let selected = new Set<TrackEntry>();
 
@@ -26,8 +22,6 @@
     selected.clear();
     selected = selected;
   }
-
-  onDestroy(() => playlist.set([]));
 </script>
 
 <Playlist {info} bind:selected on:edit={edit}>

@@ -3,8 +3,6 @@ import { metadata, metafields } from "../data/operations";
 import { APPEND, groupJSON, sql } from "crstore";
 import type { DB } from "../data/schema";
 
-const PREVIEW = 100;
-
 export const playlists = ({ store }: DB) =>
   store(
     (db) =>
@@ -56,9 +54,6 @@ export const playlists = ({ store }: DB) =>
           (qb) => qb.fn.coalesce("duration", sql.lit(0)).as("length"),
           (qb) => qb.fn.coalesce("count", sql.lit(0)).as("count"),
         ])
-        .where(({ or, cmpr }) =>
-          or([cmpr("row", "<=", PREVIEW), cmpr("row", "is", null)])
-        )
         .groupBy("playlists.id")
         .orderBy("playlists.order")
         .orderBy("playlists.id"),

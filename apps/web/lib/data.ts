@@ -5,14 +5,12 @@ import { sync } from "./trpc";
 export const {
   playlists,
   preceding,
-  playlist,
   playback,
   upcoming,
   settings,
   history,
   artists,
   library,
-  artist,
   tracks,
   update,
   feed,
@@ -23,4 +21,4 @@ export const {
 });
 
 export const search = writable("");
-export { target, ready } from "@amadeus-music/crdata";
+export { ready } from "@amadeus-music/crdata";

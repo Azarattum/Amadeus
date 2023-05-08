@@ -1,5 +1,4 @@
 import { upcoming, preceding, playback } from "../stores/playback";
-import { target, playlist, artist } from "../stores/lazy";
 import { playlists } from "../stores/playlists";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
@@ -15,14 +14,12 @@ const connections = new Map<string, Connection>();
 const stores = (db: DB) => ({
   playlists: playlists(db),
   preceding: preceding(db),
-  playlist: playlist(db),
   playback: playback(db),
   upcoming: upcoming(db),
   settings: settings(db),
   history: history(db),
   artists: artists(db),
   library: library(db),
-  artist: artist(db),
   tracks: tracks(db),
   feed: feed(db),
 });
@@ -71,4 +68,4 @@ type Options = Parameters<typeof database>[1] & {
   local?: boolean;
 };
 
-export { connect, close, target };
+export { connect, close };
