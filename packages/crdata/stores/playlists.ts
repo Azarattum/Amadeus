@@ -59,9 +59,9 @@ export const playlists = ({ store }: DB) =>
         .where(({ or, cmpr }) =>
           or([cmpr("row", "<=", PREVIEW), cmpr("row", "is", null)])
         )
-        .groupBy("group")
-        .orderBy("order")
-        .orderBy("group"),
+        .groupBy("playlists.id")
+        .orderBy("playlists.order")
+        .orderBy("playlists.id"),
     {
       async create(db, playlist: Partial<Playlist> & { title: string }) {
         await db
