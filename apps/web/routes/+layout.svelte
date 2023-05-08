@@ -103,7 +103,6 @@
 
 <svelte:head>
   <meta name="description" content="Listen to your music with Amadeus!" />
-  <link rel="icon" type="image/png" href="{base}/images/favicon.webp" />
   <link rel="apple-touch-icon" href="{base}/images/logo-180.webp" />
   <link rel="manifest" href="{base}/manifest.json" />
   {#each splashes as [w, h, r, image]}
