@@ -10,7 +10,7 @@ const metadata = (qc: QueryCreator<Schema>) =>
   qc
     .selectFrom("tracks")
     .leftJoin("albums", "albums.id", "tracks.album")
-    .leftJoin("attribution", "attribution.track", "tracks.id")
+    .leftJoin("attribution", "attribution.album", "albums.id")
     .leftJoin("artists", "artists.id", "attribution.artist")
     .select([
       "tracks.id as id",
@@ -111,7 +111,7 @@ async function push(db: Kysely<Schema>, track: TrackDetails) {
     await db
       .insertInto("artists")
       .onConflict((x) => x.doUpdateSet(artist))
-      .values(artist)
+      .values({ ...artist, following: 0 })
       .execute();
   }
   await db
@@ -136,7 +136,7 @@ async function push(db: Kysely<Schema>, track: TrackDetails) {
     .onConflict((x) => x.doNothing())
     .values(
       track.artists.map(({ id }) => ({
-        track: track.id,
+        album: track.album.id,
         artist: id,
       }))
     )

@@ -17,6 +17,7 @@ import {
   unique,
 } from "@amadeus-music/protocol";
 import { primary, crr, ordered, index, type Database } from "crstore";
+import type { Struct } from "superstruct";
 
 const id = integer;
 
@@ -29,17 +30,20 @@ const albums = unique(album);
 crr(albums);
 primary(albums, "id");
 
-const artists = unique(artist);
+const artists = assign(
+  unique(artist),
+  object({ following: integer() as Struct<0 | 1, null> })
+);
 crr(artists);
 primary(artists, "id");
 
 const attribution = object({
-  track: id(),
+  album: id(),
   artist: id(),
 });
 crr(attribution);
 index(attribution, "artist");
-primary(attribution, "track", "artist");
+primary(attribution, "album", "artist");
 
 const playlists = assign(unique(playlist), object({ order: string() }));
 crr(playlists);
@@ -98,13 +102,6 @@ const devices = object({
 crr(devices);
 primary(devices, "id");
 
-const following = object({
-  artist: id(),
-  seen: nullable(id()),
-});
-crr(following);
-primary(following, "artist", "seen");
-
 const settings = object({
   key: string(),
   value: string(),
@@ -137,7 +134,6 @@ export const schema = object({
   playlists,
   playback,
   devices,
-  following,
   settings,
   history,
 });

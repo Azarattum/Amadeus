@@ -34,10 +34,6 @@ BEGIN
     progress = 0
   WHERE id = NEW.id;
   INSERT INTO feed SELECT ABS(RANDOM() % 4294967296), 0, track, 1 FROM playback WHERE id = NEW.playback;
-  INSERT OR IGNORE INTO following SELECT artist, track as seen FROM attribution
-    WHERE
-      EXISTS (SELECT 1 FROM following WHERE following.artist = attribution.artist)
-      AND track = (SELECT track FROM playback WHERE id = NEW.playback);
   SELECT RAISE(IGNORE);
 END;
 

@@ -63,11 +63,11 @@ BEGIN
   DELETE FROM albums WHERE id = OLD.album;
 END;
 
-CREATE TRIGGER IF NOT EXISTS cascade_tracks_attribution
-AFTER DELETE ON tracks
+CREATE TRIGGER IF NOT EXISTS cascade_albums_attribution
+AFTER DELETE ON albums
 FOR EACH ROW
 BEGIN
-  DELETE FROM attribution WHERE track = OLD.id;
+  DELETE FROM attribution WHERE album = OLD.id;
 END;
 
 CREATE TRIGGER IF NOT EXISTS cascade_attribution_artists
@@ -76,23 +76,6 @@ FOR EACH ROW
 WHEN NOT EXISTS (
   SELECT 1 FROM attribution
     WHERE artist = OLD.artist
-  UNION ALL SELECT 1 FROM following
-    WHERE artist = OLD.artist
-  LIMIT 1
-)
-BEGIN
-  DELETE FROM artists WHERE id = OLD.artist;
-END;
-
-CREATE TRIGGER IF NOT EXISTS cascade_following_artists
-AFTER DELETE ON following
-FOR EACH ROW
-WHEN NOT EXISTS (
-  SELECT 1 FROM attribution
-    WHERE artist = OLD.artist
-  UNION ALL SELECT 1 FROM following
-    WHERE artist = OLD.artist
-  LIMIT 1
 )
 BEGIN
   DELETE FROM artists WHERE id = OLD.artist;
