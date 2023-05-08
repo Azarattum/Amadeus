@@ -1,5 +1,5 @@
 import { upcoming, preceding, playback } from "../stores/playback";
-import { target, playlist } from "../stores/lazy";
+import { target, playlist, artist } from "../stores/lazy";
 import { playlists } from "../stores/playlists";
 import { settings } from "../stores/settings";
 import { history } from "../stores/history";
@@ -22,6 +22,7 @@ const stores = (db: DB) => ({
   history: history(db),
   artists: artists(db),
   library: library(db),
+  artist: artist(db),
   tracks: tracks(db),
   feed: feed(db),
 });

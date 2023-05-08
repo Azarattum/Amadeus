@@ -1,26 +1,26 @@
 <script lang="ts">
   import { Virtual } from "@amadeus-music/ui";
+  import { artists, ready } from "$lib/data";
   import Card from "$lib/ui/Card.svelte";
-  import { artists } from "$lib/data";
+
+  const prerender = 3;
+  $: items = ready($artists)
+    ? $artists
+    : Array.from<undefined>({ length: prerender });
 </script>
 
 <Virtual
-  key={(x) => x.id}
-  items={$artists}
+  key={(x) => x?.id}
   columns="20rem"
+  {prerender}
   let:item
   gap={32}
   animate
+  {items}
 >
-  <Card href="/library/artist#{item.id}" artist={item} />
+  {#if item}
+    <Card href="/library/artist#{item.id}" artist={item} />
+  {:else}
+    <Card artist />
+  {/if}
 </Virtual>
-<!-- Loading State -->
-{#if !$artists.length}
-  <div
-    class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-8"
-  >
-    {#each Array.from({ length: 3 }) as _}
-      <Card artist />
-    {/each}
-  </div>
-{/if}

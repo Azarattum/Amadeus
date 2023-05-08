@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { artists, playlists } from "$lib/data";
+  import { artists, artist, target } from "$lib/data";
   import Artist from "$lib/ui/Artist.svelte";
   import { Icon } from "@amadeus-music/ui";
   import { page } from "$app/stores";
+  import { onDestroy } from "svelte";
 
-  /// TODO: this is bad! should be reworked on the data level!
-  $: info = $artists.find((x) => x.id === +$page.url.hash.slice(1));
-  $: tracks = $playlists
-    .flatMap((x) => x.tracks)
-    .filter((y) => y.artists.find((z) => z.id === info?.id));
+  $: $target = +$page.url.hash.slice(1) || 0;
+  $: info = $artist[0] ? $artist[0] : $artists.find(({ id }) => id === $target);
+
+  onDestroy(() => artist.set([]));
 </script>
 
-<Artist {info} {tracks}>
+<Artist {info}>
   <Icon name="last" slot="action" />
 </Artist>
 
