@@ -13,7 +13,13 @@
     Icon,
     When,
   } from "@amadeus-music/ui";
-  import { history, library, playlists, search as query } from "$lib/data";
+  import {
+    history,
+    library,
+    playlists,
+    search as query,
+    tracks,
+  } from "$lib/data";
   import type { TrackDetails } from "@amadeus-music/protocol";
   import { debounce } from "@amadeus-music/util/async";
   import Tracks from "$lib/ui/Tracks.svelte";
@@ -22,16 +28,23 @@
   import { onDestroy } from "svelte";
 
   let id = 0;
+  let local: TrackDetails[] = [];
   let pages: TrackDetails[][] = [];
   let selected = new Set<TrackDetails>();
 
-  $: tracks = pages.length
+  $: $query = decodeURIComponent($page.url.hash.slice(1));
+  $: update($query), (pages = []);
+
+  $: tracks.search($query).then((x) => (local = x));
+  $: remote = pages.length
     ? pages.flat()
     : Array.from<undefined>({ length: 10 });
 
   let unsubscribe = () => {};
-  const update = debounce(() => {
+  const update = debounce((x) => {
+    if (import.meta.env.SSR) return;
     unsubscribe();
+    if (!x) return globalThis.history?.replaceState(null, "", "#");
     const page = ~~((innerHeight / 56) * 2.5);
     ({ unsubscribe } = search.tracks.subscribe(
       { query: $query, page },
@@ -40,12 +53,11 @@
           id = data.id;
           pages[data.page] = data.results;
           globalThis.history?.replaceState(null, "", "#" + $query);
+          history.log(x);
         },
       }
     ));
   });
-  const log = debounce(() => history.log($query).then(), 2000);
-  $: ($query && (update(), log())) || (pages = []);
 
   function save(tracks: TrackDetails[] | Set<TrackDetails>) {
     library.push([...tracks], $playlists[0].id);
@@ -55,32 +67,37 @@
     }
   }
 
-  $: $query = decodeURIComponent($page.url.hash.slice(1));
-  $: if (!$query) {
-    globalThis.history?.replaceState(null, "", "#");
-    unsubscribe();
-  }
-
   onDestroy(unsubscribe);
 </script>
 
 <Topbar title="Explore">
   <Header xl indent>Explore</Header>
 </Topbar>
+
 {#if $query}
-  <Header sm indent>Search</Header>
-  <Tracks
-    fixed
-    {tracks}
-    bind:selected
-    on:end={() => search.next.mutate(id)}
-    on:action={({ detail }) => save([detail])}
-  >
-    <Icon name="save" slot="action" />
-    <Button air stretch on:click={() => save(selected)}>
-      <Icon name="save" />
-    </Button>
-  </Tracks>
+  <Stack grow gap="lg">
+    {#if local.length}
+      <div>
+        <Header sm indent>Library</Header>
+        <Tracks fixed tracks={local}><Icon name="last" slot="action" /></Tracks>
+      </div>
+    {/if}
+    <div>
+      <Header sm indent>Search</Header>
+      <Tracks
+        fixed
+        tracks={remote}
+        bind:selected
+        on:end={() => search.next.mutate(id)}
+        on:action={({ detail }) => save([detail])}
+      >
+        <Icon name="save" slot="action" />
+        <Button air stretch on:click={() => save(selected)}>
+          <Icon name="save" />
+        </Button>
+      </Tracks>
+    </div>
+  </Stack>
 {:else if $history.length}
   <div class="m-auto max-w-xl p-8 [&>*:first-child]:opacity-50">
     <Stack x baseline>

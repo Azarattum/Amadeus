@@ -65,7 +65,7 @@
   {#if !sm}
     <When lg>
       <div
-        class="sticky top-11 z-50 grid auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-16 backdrop-blur-md"
+        class="sticky top-11 z-10 grid auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-16 backdrop-blur-md"
       >
         <Header sm>Title</Header>
         <Header sm>Artist</Header>
