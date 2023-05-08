@@ -1,33 +1,61 @@
+import { bright, reset } from "@amadeus-music/core";
 import { changed, persistence } from "../plugin";
+import { editor, replier } from "../api/reply";
+import { decode } from "crstore";
+
+persistence(function* (user = "shared") {
+  const storage = persistence(user);
+  yield {
+    async merge(changes) {
+      const parsed = parseChanges(changes);
+      const id = await storage.settings.extract("name", "settings");
+      const name = `${bright}${id}${reset}`;
+
+      for (const type in parsed) {
+        for (const [playlist, entries] of parsed[type as keyof typeof parsed]) {
+          try {
+            const chat = await storage.settings.extract(playlist);
+            const reply = replier(chat, name, true);
+            const edit = editor(chat);
+            changed.context({ chat, user, reply, name, edit });
+            await changed(type as keyof typeof parsed, [...entries]);
+          } catch {}
+        }
+      }
+    },
+  };
+});
 
 changed(function* (type, entries) {
   yield* this.reply(yield* persistence(this.user)[type].get(entries));
 });
 
-export function parseChanges(changes: any[]) {
-  const entries = new Map<number, [Set<number>, "feed" | "library"]>();
-  let lastId = 0;
+function parseChanges(changes: any) {
+  let target: string | null = null;
   let consequent = 0;
-  let target = -1;
-  for (let i = 3; i < changes.length; i += 6) {
-    const table = changes[i];
+  let last = "";
+
+  const feed = new Map<string, Set<number>>();
+  const library = new Map<string, Set<number>>();
+
+  for (const { table, cid, val, pk } of decode(changes)) {
     if (table !== "library" && table !== "feed") continue;
-    const column = changes[i - 2];
-    const value = changes[i + 1];
-    const id = changes[i - 1];
-    if (lastId === id) consequent++;
+    if (last === pk) consequent++;
     else consequent = 1;
-    lastId = id;
-    if (table === "library" && column === "playlist") target = value;
-    if (table === "feed" && column === "type") target = value;
-    if (
-      // 3 & 4 are the number of columns other than the primary one
-      (table === "feed" && consequent === 3) ||
-      (table === "library" && consequent === 4)
-    ) {
-      if (!entries.has(target)) entries.set(target, [new Set(), table]);
-      entries.get(target)?.[0]?.add(id);
+    last = pk;
+    if (table === "library" && cid === "playlist") target = val;
+    if (table === "feed" && cid === "type") target = val;
+    if (consequent < 3 || !target) continue;
+    const entry = +(pk || NaN);
+    if (!Number.isInteger(entry)) continue;
+    // 3 & 4 are the number of columns other than the primary one
+    if (table === "feed" && consequent === 3) {
+      if (!feed.has(target)) feed.set(target, new Set());
+      feed.get(target)?.add(entry);
+    } else if (table === "library" && consequent === 4) {
+      if (!library.has(target)) library.set(target, new Set());
+      library.get(target)?.add(entry);
     }
   }
-  return entries;
+  return { feed, library };
 }

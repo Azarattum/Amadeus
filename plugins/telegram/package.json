@@ -9,7 +9,8 @@
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
     "@amadeus-music/protocol": "workspace:*",
-    "@amadeus-music/util": "workspace:*"
+    "@amadeus-music/util": "workspace:*",
+    "crstore": "^0.14.6"
   },
   "devDependencies": {
     "vite": "4.3.5"
