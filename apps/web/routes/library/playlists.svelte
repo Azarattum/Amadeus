@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { PlaylistDetails } from "@amadeus-music/protocol";
+  import type { EditEvent } from "$lib/ui/Tracks.svelte";
   import { playlists, ready, search } from "$lib/data";
   import { Icon, Virtual } from "@amadeus-music/ui";
   import Card from "$lib/ui/Card.svelte";
@@ -8,12 +10,20 @@
   $: items = ready($playlists)
     ? [...$playlists, null].filter(match($search))
     : Array.from<undefined>({ length: prerender });
+
+  function edit({ detail }: EditEvent<PlaylistDetails | undefined | null>) {
+    if (!detail.item) return;
+    if (detail.action === "rearrange") {
+      playlists.rearrange(detail.item.id, items[detail.index - 1]?.id);
+    }
+  }
 </script>
 
 <Virtual
   key={(x) => x?.id}
   fixed={!!$search}
   columns="20rem"
+  on:edit={edit}
   {prerender}
   let:item
   gap={32}
