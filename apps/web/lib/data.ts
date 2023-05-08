@@ -22,4 +22,4 @@ export const {
 });
 
 export const search = writable("");
-export { target } from "@amadeus-music/crdata";
+export { target, ready } from "@amadeus-music/crdata";
