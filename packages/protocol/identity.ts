@@ -41,9 +41,11 @@ function stringify(data: any) {
     : has(data, "artists") && has(data, "title") && has(data, "album")
     ? `${data.artists.map(titled)} - ${data.title} - ${titled(data.album)}`
     : has(data, "artists") && has(data, "title")
-    ? `${data.artists} - ${data.title}`
+    ? `${data.artists.map(titled)} - ${data.title}`
     : has(data, "title")
     ? data.title
+    : Array.isArray(data)
+    ? data.map(titled).toString()
     : JSON.stringify(data);
 }
 
@@ -99,7 +101,10 @@ function uniquify<T>(target: T): Uniqueified<T> {
 
   const copy: Record<string, any> = { ...target, id: identify(target) };
   for (const key in copy) {
-    copy[key] = uniquify(copy[key]);
+    if (key === "album" && typeof copy[key] === "object" && "artists" in copy) {
+      const id = identify({ ...copy[key], artists: copy["artists"] });
+      copy[key] = { ...copy[key], id };
+    } else copy[key] = uniquify(copy[key]);
   }
   return copy as any;
 }
