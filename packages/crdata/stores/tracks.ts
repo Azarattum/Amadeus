@@ -1,5 +1,5 @@
+import { metadata, metafields, sanitize } from "../data/operations";
 import type { Album, Track } from "@amadeus-music/protocol";
-import { metadata, metafields } from "../data/operations";
 import type { DB } from "../data/schema";
 
 export const tracks = ({ store }: DB) =>
@@ -18,6 +18,17 @@ export const tracks = ({ store }: DB) =>
           .set(track.album)
           .execute();
       }
+    },
+    async search(db, query: string) {
+      if (!query) return [];
+      return db
+        .with("metadata", metadata)
+        .selectFrom("tracks_fts" as any)
+        .where("tracks_fts", "match", sanitize(query))
+        .orderBy("rank")
+        .innerJoin("metadata", "metadata.id", "rowid")
+        .select(metafields)
+        .execute();
     },
     get(db, id: number) {
       return db

@@ -26,6 +26,8 @@ const composed: Strategy = (x) =>
 
 const strategies: { [K in Method]?: Strategy } = {
   "settings.extract": raced,
+  "artists.search": flatten,
+  "tracks.search": flatten,
   "settings.lookup": raced,
   "playlists.get": merged,
   "library.get": flatten,

@@ -44,10 +44,12 @@ type Database = DeepPartial<{
   };
   tracks: {
     edit(id: number, track: Partial<Track & { album: Album }>): Promise<void>;
+    search(query: string): Promise<TrackDetails[]>;
     get(id: number): Promise<TrackDetails>;
   };
   artists: {
     edit(id: number, artist: Partial<Artist>): Promise<void>;
+    search(query: string): Promise<ArtistDetails[]>;
     get(id: number): Promise<ArtistDetails>;
     unfollow(id: number): Promise<void>;
     follow(id: number): Promise<void>;

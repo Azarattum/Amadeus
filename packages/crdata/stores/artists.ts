@@ -1,4 +1,4 @@
-import { metadata, metafields } from "../data/operations";
+import { metadata, metafields, sanitize } from "../data/operations";
 import type { Artist } from "@amadeus-music/protocol";
 import type { DB } from "../data/schema";
 import { groupJSON, sql } from "crstore";
@@ -75,6 +75,16 @@ export const artists = ({ store }: DB) =>
           .updateTable("artists")
           .set({ following: 0 })
           .where("id", "=", id)
+          .execute();
+      },
+      async search(db, query: string) {
+        if (!query) return [];
+        return db
+          .selectFrom("artists_fts" as any)
+          .where("artists_fts", "match", sanitize(query))
+          .orderBy("rank")
+          .innerJoin("artists", "artists.id", "artists_fts.rowid")
+          .select(["id", "artists.title", "following", "source", "art"])
           .execute();
       },
       get(db, id: number) {

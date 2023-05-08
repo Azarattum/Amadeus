@@ -102,11 +102,6 @@ const position = {
 };
 
 async function push(db: Kysely<Schema>, track: TrackDetails) {
-  await db
-    .insertInto("albums")
-    .onConflict((x) => x.doUpdateSet(track.album))
-    .values(track.album)
-    .execute();
   for (const artist of track.artists) {
     await db
       .insertInto("artists")
@@ -114,6 +109,21 @@ async function push(db: Kysely<Schema>, track: TrackDetails) {
       .values({ ...artist, following: 0 })
       .execute();
   }
+  await db
+    .insertInto("attribution")
+    .onConflict((x) => x.doNothing())
+    .values(
+      track.artists.map(({ id }) => ({
+        album: track.album.id,
+        artist: id,
+      }))
+    )
+    .execute();
+  await db
+    .insertInto("albums")
+    .onConflict((x) => x.doUpdateSet(track.album))
+    .values(track.album)
+    .execute();
   await db
     .insertInto("tracks")
     .onConflict((x) =>
@@ -131,16 +141,11 @@ async function push(db: Kysely<Schema>, track: TrackDetails) {
       album: track.album.id,
     })
     .execute();
-  await db
-    .insertInto("attribution")
-    .onConflict((x) => x.doNothing())
-    .values(
-      track.artists.map(({ id }) => ({
-        album: track.album.id,
-        artist: id,
-      }))
-    )
-    .execute();
 }
 
-export { uuid, push, metadata, position, metafields, localDevice };
+function sanitize(query: string) {
+  const phrases = query.replace(/-/g, " ").split(/\s+/g);
+  return phrases.map((x) => `"${x.replace('"', '""')}"`).join(" ");
+}
+
+export { uuid, push, metadata, sanitize, position, metafields, localDevice };
