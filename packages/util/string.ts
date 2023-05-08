@@ -111,7 +111,7 @@ export function prefix(words: string[]) {
  * @param text Text to clean
  */
 export function clean(text: string) {
-  return text.normalize().trim().toLowerCase().replace(/\s/g, " ");
+  return text.normalize().trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 /**
