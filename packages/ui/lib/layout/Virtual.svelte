@@ -22,6 +22,8 @@
   import { Portal } from "../../component";
   type T = $$Generic;
   type K = $$Generic;
+  type P = $$Generic<number>;
+  type Prerender = P & (P extends 0 ? never : NonNullable<unknown>);
   type $$Slots = { default: { item: T; index: number } };
 
   const dispatch = createEventDispatcher<{
@@ -32,7 +34,9 @@
   export let gap = 0;
   export let items: T[];
   export let move = false;
+  export let fixed = false;
   export let overthrow = 1;
+  export let prerender = 1 as Prerender;
   export let columns: number | string = 1;
   export let key = (x: T) => x as any as K;
   export let animate: number | boolean = false;
@@ -51,7 +55,7 @@
 
   $: perView = Math.ceil(outer.height / rowHeight) * perRow;
   $: from = Math.max(active - overthrow, 0) * perView;
-  $: to = Math.max((active + overthrow + 1) * perView, 1);
+  $: to = Math.max((active + overthrow + 1) * perView, prerender);
   $: max = ~~(items.length / perView);
   $: slice = items.slice(from, to);
   $: index = reindex(items);
@@ -142,7 +146,7 @@
     await tick();
     if (!sortable || !wrapper || !target || $transfer) return;
     if ((target as HTMLElement).parentElement !== wrapper) return;
-    if (items[hovering] == null) return;
+    if (items[hovering] == null || key(items[hovering]) == null) return;
     original = hovering;
     rollback = move ? -1 : original;
     const offset = (target as Element).getBoundingClientRect();
@@ -158,7 +162,8 @@
   }
 
   function claim(position: number, passive = false) {
-    if (!sortable || !$transfer) return;
+    if (!sortable || !$transfer || fixed) return;
+    if (key(items[position]) == null) return;
     if (!Number.isInteger(position)) {
       if (rollback != null && $transfer.owner !== wrapper) {
         claim(rollback, true);
@@ -245,7 +250,7 @@
       class="absolute z-50 w-0.5"
       aria-hidden
     />
-    {#each slice as item, i (key(item))}
+    {#each slice as item, i (key(item) == null ? i : key(item))}
       <div
         class:invisible={$transfer?.owner === wrapper &&
           $transfer?.key === key(item)}
