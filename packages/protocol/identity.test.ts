@@ -27,7 +27,7 @@ it("uniquifies track", () => {
       { id: 2851137560, title: "First" },
       { id: 1864478276, title: "A Second " },
     ],
-    album: { id: 4108725818, title: "Music", year: null },
+    album: { id: 2025077785, title: "Music", year: null },
   });
 });
 

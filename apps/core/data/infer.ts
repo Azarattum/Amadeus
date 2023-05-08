@@ -112,8 +112,8 @@ function isJunk(text: string) {
 function isGenre(text: string, strict = false) {
   text = text.toLowerCase();
 
-  if (strict) return genres.some((x) => x.toLowerCase() === text);
-  return genres.some((x) =>
+  if (strict) return genres.some((x: string) => x.toLowerCase() === text);
+  return genres.some((x: string) =>
     text.match(new RegExp(r`(\s|^)${x.toLowerCase()}(\s|$)`))
   );
 }

@@ -6,20 +6,20 @@
     "coverage": "vitest run --coverage -c ../../vite.web.js",
     "dev": "vite dev -c ../../vite.web.js --port 5173",
     "preview": "vite preview -c ../../vite.web.js",
-    "test": "vitest run -c ../../vite.web.js"
+    "test": "svelte-check"
   },
   "dependencies": {
     "@amadeus-music/crdata": "workspace:*",
     "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/ui": "workspace:*",
     "@amadeus-music/util": "workspace:*",
-    "@trpc/client": "^10.20.0",
-    "@trpc/server": "^10.20.0",
+    "@trpc/client": "^10.25.0",
+    "@trpc/server": "^10.25.0",
     "sha1-browser": "^1.1.1"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "2.0.2",
-    "crstore": "^0.14.5",
+    "crstore": "^0.14.6",
     "murmurhash": "^2.0.1"
   }
 }

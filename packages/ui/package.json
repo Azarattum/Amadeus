@@ -9,7 +9,8 @@
   },
   "scripts": {
     "build": "svelte-kit sync",
-    "dev": "vite dev -c ../../vite.web.js --port 5174"
+    "dev": "vite dev -c ../../vite.web.js --port 5174",
+    "test": "svelte-check"
   },
   "dependencies": {
     "@amadeus-music/util": "workspace:*"

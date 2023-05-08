@@ -5,8 +5,8 @@ import {
   bright,
   reset,
 } from "@amadeus-music/core";
-import { TRPCError, inferAsyncReturnType, initTRPC } from "@trpc/server";
-import { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws";
+import { TRPCError, type inferAsyncReturnType, initTRPC } from "@trpc/server";
+import type { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws";
 import { name, version } from "./package.json";
 
 export const {
