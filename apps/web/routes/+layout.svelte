@@ -62,8 +62,11 @@
   });
 
   onMount(() => {
-    preloadData("/");
+    preloadData("/home");
+    preloadData("/home/feed");
     preloadData("/library");
+    preloadData("/library/playlist");
+    preloadData("/library/artist");
     preloadData("/explore");
   });
 </script>
