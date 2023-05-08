@@ -81,6 +81,7 @@
 
     for (let i = 0; i < items.length; i++) {
       const id = key(items[i]);
+      if (id == null) continue;
       reindexed.set(id, i);
 
       if ($transfer?.owner === wrapper && id === $transfer?.key) continue;

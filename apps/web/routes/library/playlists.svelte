@@ -1,16 +1,18 @@
 <script lang="ts">
+  import { playlists, ready, search } from "$lib/data";
   import { Icon, Virtual } from "@amadeus-music/ui";
-  import { playlists, ready } from "$lib/data";
   import Card from "$lib/ui/Card.svelte";
+  import { match } from "$lib/util";
 
   const prerender = 3;
   $: items = ready($playlists)
-    ? [...$playlists, null]
+    ? [...$playlists, null].filter(match($search))
     : Array.from<undefined>({ length: prerender });
 </script>
 
 <Virtual
   key={(x) => x?.id}
+  fixed={!!$search}
   columns="20rem"
   {prerender}
   let:item

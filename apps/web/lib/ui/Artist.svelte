@@ -4,9 +4,13 @@
   import { format } from "@amadeus-music/util/string";
   import Tracks from "$lib/ui/Tracks.svelte";
   import Avatar from "./Avatar.svelte";
+  import { search } from "$lib/data";
+  import { match } from "$lib/util";
 
   export let selected = new Set<TrackEntry>();
   export let info: ArtistCollection | undefined = undefined;
+
+  $: tracks = info?.tracks.filter(match($search));
 </script>
 
 <Topbar title={info?.title || ""}>
@@ -29,7 +33,7 @@
 </Topbar>
 <!-- /// TODO: albums -->
 
-<Tracks fixed tracks={info?.tracks} on:edit on:click on:action bind:selected>
+<Tracks fixed {tracks} on:edit on:click on:action bind:selected>
   <slot name="action" slot="action" />
   <slot />
 </Tracks>

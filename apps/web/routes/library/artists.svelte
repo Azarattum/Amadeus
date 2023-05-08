@@ -1,11 +1,12 @@
 <script lang="ts">
+  import { artists, ready, search } from "$lib/data";
   import { Virtual } from "@amadeus-music/ui";
-  import { artists, ready } from "$lib/data";
   import Card from "$lib/ui/Card.svelte";
+  import { match } from "$lib/util";
 
   const prerender = 3;
   $: items = ready($artists)
-    ? $artists
+    ? $artists.filter(match($search))
     : Array.from<undefined>({ length: prerender });
 </script>
 

@@ -3,9 +3,13 @@
   import { Header, Icon, Stack, Text, Topbar, Spacer } from "@amadeus-music/ui";
   import { format } from "@amadeus-music/util/string";
   import Tracks from "./Tracks.svelte";
+  import { search } from "$lib/data";
+  import { match } from "$lib/util";
 
   export let selected = new Set<TrackEntry>();
   export let info: PlaylistCollection | undefined = undefined;
+
+  $: tracks = info?.tracks.filter(match($search));
 </script>
 
 <Stack gap="lg" grow>
@@ -29,7 +33,7 @@
     </Stack>
   </Stack>
 
-  <Tracks tracks={info?.tracks} on:edit on:click on:action bind:selected>
+  <Tracks fixed={!!$search} {tracks} on:edit on:click on:action bind:selected>
     <slot name="action" slot="action" />
     <slot />
   </Tracks>

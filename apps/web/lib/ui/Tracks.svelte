@@ -77,10 +77,10 @@
     key={(x) => x?.entry || x?.id}
     sortable="tracks"
     let:item={track}
-    animate={!fixed}
     {prerender}
     {fixed}
     {items}
+    animate
     on:edit
     on:end
   >
