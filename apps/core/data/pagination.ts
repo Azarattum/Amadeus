@@ -38,6 +38,9 @@ function page<T extends Record<string, any>>(
     satisfied(id: number) {
       return progress[id].size >= size || completed.has(id);
     },
+    has(item: T) {
+      return !!progress.find((x) => x.has(identify(item)));
+    },
     get items() {
       return items as Uniqueified<T>[];
     },
@@ -75,6 +78,9 @@ function pages<T extends Record<string, any>>(
     async append(id: number, batch: T[], number = last()) {
       if (!batch.length) return;
       if (!pages[number]) pages[number] = create(number);
+      batch = batch.filter((x) =>
+        pages.slice(0, number).every((y) => !y.has(x))
+      );
       pages[number].append(id, batch).forEach((batch, id) => {
         this.append(id, batch, number + 1);
       });

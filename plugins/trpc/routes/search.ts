@@ -9,7 +9,12 @@ import { observable } from "@trpc/server/observable";
 import { number, object, string } from "superstruct";
 import type { Page } from "@amadeus-music/core";
 
-type SearchResult<T> = { id: number; page: number; results: T[] };
+type SearchResult<T> = {
+  id: number;
+  page: number;
+  results: T[];
+  progress: number;
+};
 const searchProcedure = procedure.input(
   object({ query: string(), page: number() })
 );
@@ -46,7 +51,12 @@ function startSearch<T>(
   const id = (Math.random() * 2 ** 32) >>> 0;
   (async () => {
     for await (const page of pages) {
-      next({ id, page: page.number, results: page.items });
+      next({
+        id,
+        page: page.number,
+        results: page.items,
+        progress: page.progress,
+      });
       searches.set(id, async () => {
         await page.loaded;
         page.next();

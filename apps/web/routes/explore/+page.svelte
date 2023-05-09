@@ -33,7 +33,7 @@
   let selected = new Set<TrackDetails>();
 
   $: $query = decodeURIComponent($page.url.hash.slice(1));
-  $: update($query), (pages = []);
+  $: update($query), log($query), (pages = []);
 
   $: tracks.search($query).then((x) => (local = x));
   $: remote = pages.length
@@ -41,19 +41,20 @@
     : Array.from<undefined>({ length: 10 });
 
   let unsubscribe = () => {};
-  const update = debounce((x) => {
+  const log = debounce((x: string) => history.log(x), 2000);
+  const update = debounce((query: string) => {
     if (import.meta.env.SSR) return;
     unsubscribe();
-    if (!x) return globalThis.history?.replaceState(null, "", "#");
+    globalThis.history?.replaceState(null, "", "#" + query);
+    if (!query) return;
     const page = ~~((innerHeight / 56) * 2.5);
     ({ unsubscribe } = search.tracks.subscribe(
-      { query: $query, page },
+      { query, page },
       {
-        onData: (data) => {
+        onData(data) {
           id = data.id;
+          if (!data.results.length && data.progress < 1) return;
           pages[data.page] = data.results;
-          globalThis.history?.replaceState(null, "", "#" + $query);
-          history.log(x);
         },
       }
     ));
