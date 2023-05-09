@@ -16,6 +16,8 @@
   const value = group?.value;
 
   export let href: string | undefined = undefined;
+  export let id: string | undefined = undefined;
+  export let to: string | undefined = undefined;
   export let stretch = !!group;
   export let disabled = false;
   export let primary = false;
@@ -24,8 +26,8 @@
   export let round = false;
   export let air = !!group;
 
-  const tag = group ? "label" : href ? "a" : "button";
-  const id = uuid();
+  const tag = group || to ? "label" : href ? "a" : "button";
+  const uid = group ? uuid() : id || uuid();
 
   $: background = air
     ? group
@@ -42,15 +44,15 @@
     ? "text-white"
     : "text-content-100 hover:text-content";
 
-  $: target = href?.includes("#") ? href?.split("#").pop() : "";
+  $: target = href?.includes("#") ? href?.split("#").pop() : to;
   $: style = !target
     ? ""
-    : `body:has(#${target}:target) #${id}{` +
+    : `body:has(#${target}:is(:target,:checked)) #${uid}{` +
       (air
         ? "color:hsl(var(--color-primary-600));"
         : "color:white;background:hsl(var(--color-primary-600));") +
       "}" +
-      `body:has(#${target}:target) #${id}:hover{` +
+      `body:has(#${target}:id(:target,:checked)) #${uid}:hover{` +
       (air
         ? "color:hsl(var(--color-primary-700));"
         : "color:white;background:hsl(var(--color-primary-700));") +
@@ -59,10 +61,11 @@
 
 <svelte:element
   this={tag}
+  for={to || undefined}
   draggable="false"
   {disabled}
+  id={uid}
   {href}
-  {id}
   on:click
   class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white {text} {background}
   {compact ? 'flex-col text-2xs' : 'gap-[0.625rem]'}
@@ -82,6 +85,7 @@
       name={group.id}
       value={index}
       type="radio"
+      {id}
     />
   {/if}
   <slot />
