@@ -16,6 +16,6 @@
   {/if}
   <div>
     <Header sm>Search</Header>
-    <Artists artists={remote} on:end />
+    <Artists artists={remote} href="/explore" on:end />
   </div>
 </Stack>

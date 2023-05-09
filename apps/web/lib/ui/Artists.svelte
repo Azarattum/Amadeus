@@ -6,6 +6,7 @@
   import { match } from "$lib/util";
 
   export let artists: (ArtistDetails | undefined)[] | undefined = undefined;
+  export let href = "/library";
   export let filter = "";
 
   const prerender = 3;
@@ -26,7 +27,7 @@
   on:end
 >
   {#if item}
-    <Card href="/library/artist#{item.id}" artist={item} />
+    <Card href="{href}/artist#{item.id}" artist={item} />
   {:else}
     <Card artist />
   {/if}
