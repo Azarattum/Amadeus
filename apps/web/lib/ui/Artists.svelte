@@ -5,13 +5,14 @@
   import { ready } from "$lib/data";
   import { match } from "$lib/util";
 
-  export let artists: ArtistDetails[] = [];
+  export let artists: (ArtistDetails | undefined)[] | undefined = undefined;
   export let filter = "";
 
   const prerender = 3;
-  $: items = ready(artists)
-    ? artists.filter(match(filter))
-    : Array.from<undefined>({ length: prerender });
+  $: items =
+    artists && ready(artists)
+      ? artists.filter(match(filter))
+      : Array.from<undefined>({ length: prerender });
 </script>
 
 <Virtual
@@ -22,6 +23,7 @@
   gap={32}
   animate
   {items}
+  on:end
 >
   {#if item}
     <Card href="/library/artist#{item.id}" artist={item} />

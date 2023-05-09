@@ -8,6 +8,8 @@
     Stack,
   } from "@amadeus-music/ui";
   import { history } from "$lib/data";
+
+  export let type = "tracks";
 </script>
 
 {#if $history.length}
@@ -21,7 +23,7 @@
     </Stack>
     <Separator />
     {#each $history.slice(0, 6) as entry}
-      <Button air stretch href="#{entry.query}">{entry.query}</Button>
+      <Button air stretch href="#{type}/{entry.query}">{entry.query}</Button>
     {/each}
   </div>
 {/if}

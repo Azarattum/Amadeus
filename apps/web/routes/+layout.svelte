@@ -30,13 +30,13 @@
     Library: "note",
     Explore: "compass",
     Playlists: "last",
-    Artists: "artists",
+    Artists: "people",
     Timeline: "clock",
     Tracks: "note",
     Albums: "album",
     Listened: "history",
     Recommended: "stars",
-    Following: "artists",
+    Following: "people",
   };
 
   const urls: Record<string, string> = {
@@ -51,14 +51,20 @@
   };
   $: section = capitalize($page.route.id?.split("/")?.[1] || "home");
 
-  function toURL(target: string): string {
+  function toURL(target: string): string | undefined {
     if (target in urls) return urls[target];
     if (target in sections) return `/${target.toLowerCase()}`;
+    if (section === "Explore") return undefined;
     return `${toURL(section)}#${target.toLowerCase()}`;
   }
 
-  beforeNavigate(() => {
-    $search = "";
+  function toTarget(target: string) {
+    if (section !== "Explore") return undefined;
+    return target.toLowerCase();
+  }
+
+  beforeNavigate(({ from, to }) => {
+    if (from?.url.pathname !== to?.url.pathname) $search = "";
   });
 
   onMount(() => {
@@ -79,8 +85,8 @@
       </Button>
     {/each}
     <svelte:fragment slot="section">
-      {#each sections[section] || [] as x (x)}
-        <Button air href={toURL(x)}>
+      {#each sections[section] || [] as x (section + x)}
+        <Button air href={toURL(x)} to={toTarget(x)}>
           <Icon name={icons[x]} />{x}
         </Button>
       {/each}

@@ -2,7 +2,7 @@ import type { TrackInfo } from "@amadeus-music/protocol";
 
 function match(query: string) {
   query = query.toLowerCase();
-  return (x: Partial<TrackInfo> | null) =>
+  return (x: Partial<TrackInfo> | null | undefined) =>
     query
       ? x
         ? !!x.title?.toLowerCase().includes(query) ||

@@ -25,7 +25,7 @@
     <Button primary round><Icon name="search" /></Button>
     <Button primary>Primary Button</Button>
     <Button><Icon name="sun" />Button With Icon</Button>
-    <Button air><Icon name="artists" />Air Button</Button>
+    <Button air><Icon name="people" />Air Button</Button>
     <Button compact air><Icon md name="moon" />Moon</Button>
     <Button compact air><Icon md name="sun" />Sun</Button>
   </Stack>
@@ -34,7 +34,7 @@
       <Button><Icon name="last" /></Button>
       <Button><Icon name="history" /></Button>
       <Button><Icon name="stars" /></Button>
-      <Button><Icon name="artists" /></Button>
+      <Button><Icon name="people" /></Button>
     </Group>
     <Group size={2}>
       <Button><Icon name="list" /><Tooltip>Queue</Tooltip></Button>
@@ -42,7 +42,7 @@
     </Group>
     <Group size={3} value={2}>
       <Button><Icon name="note" />Tracks</Button>
-      <Button><Icon name="artists" />Artists</Button>
+      <Button><Icon name="people" />Artists</Button>
       <Button><Icon name="album" />Albums</Button>
     </Group>
   </Stack>
