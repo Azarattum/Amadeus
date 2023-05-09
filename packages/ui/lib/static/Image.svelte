@@ -22,12 +22,13 @@
   function desource(src?: string) {
     if (!src) return src;
     try {
-      return JSON.parse(src)[0];
+      return JSON.parse(src)[0] || "";
     } catch {}
     return src;
   }
 
   function resize(src?: string) {
+    if (src === "") return src;
     if (!("Image" in globalThis) || !src) return new Promise<string>(() => {});
     return new Promise<string>((resolve) => {
       const image = new Image();
@@ -61,7 +62,7 @@
   style:height="{size}px"
   style:width="{size}px"
 >
-  {#if typeof resized === "string"}
+  {#if resized && typeof resized === "string"}
     <img
       {alt}
       src={resized}
@@ -69,6 +70,8 @@
       height="{size}px"
       draggable="false"
     />
+  {:else if resized === ""}
+    <slot />
   {:else}
     {#await resized then src}
       <img
@@ -79,6 +82,8 @@
         height="{size}px"
         draggable="false"
       />
+    {:catch}
+      <slot />
     {/await}
   {/if}
 </div>

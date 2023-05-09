@@ -1,14 +1,21 @@
 <script lang="ts">
-  import { Image, Text, When, Card } from "@amadeus-music/ui";
-  import type { TrackInfo } from "@amadeus-music/protocol";
+  import { Image, Text, When, Card, Icon } from "@amadeus-music/ui";
+  import type { TrackDetails } from "@amadeus-music/protocol";
 
   export let sm = false;
   export let selected: boolean | "passive" = false;
-  export let track: TrackInfo | undefined = undefined;
+  export let track: TrackDetails | undefined = undefined;
 </script>
 
 <Card sm flat flow={!sm} interactive on:contextmenu on:click {selected}>
-  <Image src={track?.album.art} slot="before" />
+  <Image src={track?.album.art} slot="before">
+    <div
+      class="flex h-full w-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
+      style:filter="hue-rotate({track?.id || 0}deg)"
+    >
+      <Icon name="note" />
+    </div>
+  </Image>
   <Text accent loading={!track}>
     {track?.title}
   </Text>
