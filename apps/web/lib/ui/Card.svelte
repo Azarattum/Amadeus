@@ -4,10 +4,10 @@
   import Avatar from "./Avatar.svelte";
 
   type Info = {
-    tracks: { album: { art?: string } }[];
+    tracks?: { album: { art?: string } }[];
     album?: { art: string };
-    length: number;
-    count: number;
+    length?: number;
+    count?: number;
     title: string;
     art?: string;
   };
@@ -22,8 +22,8 @@
   $: loading = item === true;
 
   $: title = ok(item) ? item.title : "Loading...";
-  $: length = ok(item) ? item.length : 0;
-  $: count = ok(item) ? item.count : 0;
+  $: length = ok(item) ? item.length || 0 : 0;
+  $: count = ok(item) ? item.count || 0 : 0;
   $: art = ok(item)
     ? item.art
       ? item

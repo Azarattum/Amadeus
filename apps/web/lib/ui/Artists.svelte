@@ -1,12 +1,16 @@
 <script lang="ts">
-  import { artists, ready, search } from "$lib/data";
+  import type { ArtistDetails } from "@amadeus-music/protocol";
   import { Virtual } from "@amadeus-music/ui";
   import Card from "$lib/ui/Card.svelte";
+  import { ready } from "$lib/data";
   import { match } from "$lib/util";
 
+  export let artists: ArtistDetails[] = [];
+  export let filter = "";
+
   const prerender = 3;
-  $: items = ready($artists)
-    ? $artists.filter(match($search))
+  $: items = ready(artists)
+    ? artists.filter(match(filter))
     : Array.from<undefined>({ length: prerender });
 </script>
 
