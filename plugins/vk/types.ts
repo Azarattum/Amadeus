@@ -83,14 +83,14 @@ const audio = type({
 const responseCatalog = object({
   response: type({
     catalog,
-    audios: array(audio),
+    audios: optional(array(audio)),
   }),
 });
 
 const responseBlock = object({
   response: type({
     block,
-    audios: array(audio),
+    audios: optional(array(audio)),
   }),
 });
 

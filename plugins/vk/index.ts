@@ -1,5 +1,5 @@
 import { convert, responseBlock, responseCatalog } from "./types";
-import { init, search, fetch } from "./plugin";
+import { init, search, fetch, desource } from "./plugin";
 
 init(function* ({ vk: { token } }) {
   if (!token) throw "Plugin disabled! No token found!";
@@ -18,10 +18,10 @@ search(function* (type, query, page) {
     params: { query, need_blocks: "1" },
   }).as(responseCatalog);
 
-  yield* response.audios.map(convert);
+  if (response.audios) yield* response.audios.map(convert);
   let block = response.catalog.sections
     .flatMap((x) => x.blocks)
-    .find((x) => x.audios_ids);
+    .find((x) => x.audios_ids && x.next_from);
   while (block?.next_from) {
     const { response } = yield* fetch("catalog.getBlockItems", {
       params: {
@@ -30,7 +30,12 @@ search(function* (type, query, page) {
         start_from: block.next_from,
       },
     }).as(responseBlock);
-    yield* response.audios.map(convert);
+    if (response.audios) yield* response.audios.map(convert);
     block = response.block;
   }
+});
+
+desource(function* (source) {
+  source = JSON.parse(source).find((x: string) => x.startsWith("vk/"));
+  if (source) yield source.replace(/^vk\//, "");
 });
