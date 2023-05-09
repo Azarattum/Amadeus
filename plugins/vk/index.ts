@@ -1,4 +1,4 @@
-import { convert, responseBlock, responseCatalog } from "./types";
+import { toTrack, responseBlock, responseCatalog, toArtist } from "./types";
 import { init, search, fetch, desource } from "./plugin";
 
 init(function* ({ vk: { token } }) {
@@ -13,15 +13,28 @@ init(function* ({ vk: { token } }) {
 });
 
 search(function* (type, query, page) {
-  if (type !== "track") return;
+  // Setup context
+  const { target, convert, next } = {
+    track: { target: "audios", convert: toTrack, next: "audios_ids" } as const,
+    artist: { target: "links", convert: toArtist, next: "links_ids" } as const,
+    album: {} as never, /// TODO: implement album
+  }[type];
+  const map = convert as (
+    x: Parameters<typeof convert>[0]
+  ) => ReturnType<typeof convert>;
+  const truthy = <T>(x: T): x is NonNullable<T> => !!x;
+
+  // Perform search
   const { response } = yield* fetch("catalog.getAudioSearch", {
     params: { query, need_blocks: "1" },
   }).as(responseCatalog);
 
-  if (response.audios) yield* response.audios.map(convert);
+  yield* response[target]?.map(map).filter(truthy) || [];
+
+  // Continue pagination
   let block = response.catalog.sections
     .flatMap((x) => x.blocks)
-    .find((x) => x.audios_ids && x.next_from);
+    .find((x) => x[next] && x.next_from);
   while (block?.next_from) {
     const { response } = yield* fetch("catalog.getBlockItems", {
       params: {
@@ -30,7 +43,7 @@ search(function* (type, query, page) {
         start_from: block.next_from,
       },
     }).as(responseBlock);
-    if (response.audios) yield* response.audios.map(convert);
+    yield* response[target]?.map(map).filter(truthy) || [];
     block = response.block;
   }
 });

@@ -8,6 +8,28 @@ import {
   union,
 } from "@amadeus-music/core";
 
+function toTrack(data: Infer<typeof track>) {
+  const toArt = (cover?: string) =>
+    cover ? ["https://" + cover.slice(0, -2) + "800x800"] : [];
+
+  return {
+    title: data.title,
+    length: data.durationMs / 1000,
+    source: JSON.stringify([`yandex/${data.id}`]),
+    album: {
+      title: data.albums[0]?.title || data.title,
+      year: data.albums[0]?.year || 0,
+      art: JSON.stringify(toArt(data.coverUri)),
+      source: JSON.stringify([`yandex/${data.albums[0].id}`]),
+    },
+    artists: data.artists.map((x) => ({
+      title: x.name,
+      art: JSON.stringify(toArt(x.cover?.uri)),
+      source: JSON.stringify([`yandex/${x.id}`]),
+    })),
+  };
+}
+
 const track = type({
   id: union([number(), string()]),
   coverUri: optional(string()),
@@ -85,36 +107,14 @@ const match = type({
   }),
 });
 
-function convert(data: Infer<typeof track>) {
-  const toArt = (cover?: string) =>
-    cover ? ["https://" + cover.slice(0, -2) + "800x800"] : [];
-
-  return {
-    title: data.title,
-    length: data.durationMs / 1000,
-    source: JSON.stringify([`yandex/${data.id}`]),
-    album: {
-      title: data.albums[0]?.title || data.title,
-      year: data.albums[0]?.year || 0,
-      art: JSON.stringify(toArt(data.coverUri)),
-      source: JSON.stringify([`yandex/${data.albums[0].id}`]),
-    },
-    artists: data.artists.map((x) => ({
-      title: x.name,
-      art: JSON.stringify(toArt(x.cover?.uri)),
-      source: JSON.stringify([`yandex/${x.id}`]),
-    })),
-  };
-}
-
 export {
-  results,
-  link,
   download,
+  results,
   volumes,
+  similar,
+  toTrack,
   tracks,
   lyrics,
-  similar,
-  convert,
   match,
+  link,
 };

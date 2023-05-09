@@ -68,9 +68,8 @@
   }
 
   function subscribe(type: number, query: string) {
-    if (type) return; /// TEMP! implement other types
     const page = ~~((innerHeight / 56) * 2.5);
-    ({ unsubscribe } = search.tracks.subscribe(
+    ({ unsubscribe } = search[types[type]].subscribe(
       { query, page },
       {
         onData(data) {

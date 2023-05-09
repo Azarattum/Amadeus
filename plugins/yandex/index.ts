@@ -11,7 +11,7 @@ import {
 } from "./plugin";
 import {
   volumes,
-  convert,
+  toTrack,
   download,
   link,
   results,
@@ -50,7 +50,7 @@ search(function* (type, query, page) {
 
     const { result } = yield* fetch("search", { params }).as(results);
     if (!result.tracks) break;
-    yield* result.tracks.results.map(convert);
+    yield* result.tracks.results.map(toTrack);
   }
 });
 
@@ -59,7 +59,7 @@ expand(function* (type, source, page) {
   if (!id) return;
   if (type === "album") {
     const { result } = yield* fetch(`albums/${id}/with-tracks`).as(volumes);
-    yield* result.volumes.flat().map(convert);
+    yield* result.volumes.flat().map(toTrack);
   } else if (type === "artist") {
     for (let i = 0; ; ) {
       const url = `artists/${id}/tracks`;
@@ -69,7 +69,7 @@ expand(function* (type, source, page) {
       };
       const { result } = yield* fetch(url, { params }).as(tracks);
       if (!result.tracks) break;
-      yield* result.tracks.map(convert);
+      yield* result.tracks.map(toTrack);
     }
   }
 });
@@ -95,7 +95,7 @@ relate(function* (type, to, _) {
       if (!id) return;
     }
     const { result } = yield* fetch(`tracks/${id}/similar`).as(similar);
-    yield* result.similarTracks.map(convert);
+    yield* result.similarTracks.map(toTrack);
   }
   /// Properly support other `type`s!
 });
@@ -121,6 +121,6 @@ recognize(function* (stream) {
   yield* connection.send(init);
   yield* connection.send(stream().pipeThrough(transform(id)));
   const { directive } = yield* connection.recv(match);
-  if ("data" in directive.payload) yield convert(directive.payload.data.match);
+  if ("data" in directive.payload) yield toTrack(directive.payload.data.match);
   yield* connection.close();
 });

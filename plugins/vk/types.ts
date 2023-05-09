@@ -9,28 +9,42 @@ import {
   boolean,
 } from "@amadeus-music/core";
 
-function convert(data: Infer<typeof audio>) {
+function toTrack(data: Infer<typeof audio>) {
+  const toJSON = <T>(x?: T) => JSON.stringify(x ? [x] : []);
+
   return {
-    title: data.title,
+    title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
     length: data.duration,
-    source: JSON.stringify([`vk/${data.url}`]),
+    source: toJSON(`vk/${data.url}`),
     album: {
       title: data.album?.title || data.title,
       year: 0,
-      art: data.album?.thumb
-        ? JSON.stringify([data.album.thumb.photo_1200])
-        : "[]",
+      art: toJSON(data.album?.thumb?.photo_1200),
       source: data.album
-        ? JSON.stringify([
-            `vk/${data.album.owner_id}/${data.album.id}/${data.album.access_key}`,
-          ])
+        ? toJSON(
+            `vk/${data.album.owner_id}/${data.album.id}/${data.album.access_key}`
+          )
         : "[]",
     },
     artists: data.main_artists?.map((x) => ({
-      source: x.id ? JSON.stringify([`vk/${x.id}`]) : "[]",
+      source: x.id ? toJSON(`vk/${x.id}`) : "[]",
       title: x.name,
       art: "[]",
     })) || [{ title: data.artist, source: "[]", art: "[]" }],
+  };
+}
+
+function toArtist(data: Infer<typeof link>) {
+  if (data.meta.content_type !== "artist") return;
+  const toJSON = <T>(x?: T) => JSON.stringify(x ? [x] : []);
+  const art = data.image?.reduce((a, b) =>
+    a.width * a.height > b.width * b.height ? a : b
+  ).url;
+
+  return {
+    title: data.title,
+    source: toJSON(data.url.split("/").pop()),
+    art: toJSON(art),
   };
 }
 
@@ -38,6 +52,7 @@ const block = type({
   id: string(),
   next_from: optional(string()),
   audios_ids: optional(array(string())),
+  links_ids: optional(array(string())),
 });
 
 const catalog = type({
@@ -72,6 +87,7 @@ const audio = type({
   artist: string(),
   owner_id: number(),
   title: string(),
+  subtitle: optional(string()),
   duration: number(),
   url: string(),
   date: number(),
@@ -80,10 +96,26 @@ const audio = type({
   has_lyrics: optional(boolean()),
 });
 
+const link = type({
+  url: string(),
+  title: string(),
+  meta: type({ content_type: string() }),
+  image: optional(
+    array(
+      type({
+        url: string(),
+        width: number(),
+        height: number(),
+      })
+    )
+  ),
+});
+
 const responseCatalog = object({
   response: type({
     catalog,
     audios: optional(array(audio)),
+    links: optional(array(link)),
   }),
 });
 
@@ -91,7 +123,8 @@ const responseBlock = object({
   response: type({
     block,
     audios: optional(array(audio)),
+    links: optional(array(link)),
   }),
 });
 
-export { responseCatalog, responseBlock, convert };
+export { responseCatalog, responseBlock, toTrack, toArtist };
