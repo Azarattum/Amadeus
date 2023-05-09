@@ -39,7 +39,7 @@
   on:edit={edit}
   {prerender}
   let:item
-  gap={32}
+  gap={16}
   animate
   {items}
 >

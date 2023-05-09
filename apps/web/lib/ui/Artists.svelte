@@ -20,7 +20,7 @@
   columns="20rem"
   {prerender}
   let:item
-  gap={32}
+  gap={16}
   animate
   {items}
   on:end

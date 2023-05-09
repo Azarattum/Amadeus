@@ -32,7 +32,7 @@
   <Header sm>Other Devices</Header>
   <!-- /// TODO add playback stuff -->
   <!-- /// Do proper prerendering -->
-  <Virtual key={(x) => x.type} items={$feed} columns="20rem" let:item gap={32}>
+  <Virtual key={(x) => x.type} items={$feed} columns="20rem" let:item gap={16}>
     <!-- /// TODO replace with in-app card component -->
     <Card interactive href="/feed#{item.type}">
       <Header center id="added">{types[item.type]}</Header>
