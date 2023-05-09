@@ -1,0 +1,16 @@
+{
+  "name": "@amadeus-music/plugin-vk",
+  "description": "Aggregate data from VK Music for Amadeus.",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.cjs"
+  },
+  "dependencies": {
+    "@amadeus-music/core": "workspace:*",
+    "@amadeus-music/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "4.3.5"
+  }
+}
