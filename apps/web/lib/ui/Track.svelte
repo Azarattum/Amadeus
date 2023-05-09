@@ -1,10 +1,10 @@
 <script lang="ts">
   import { Image, Text, When, Card, Icon } from "@amadeus-music/ui";
-  import type { TrackDetails } from "@amadeus-music/protocol";
+  import type { TrackInfo } from "@amadeus-music/protocol";
 
   export let sm = false;
   export let selected: boolean | "passive" = false;
-  export let track: TrackDetails | undefined = undefined;
+  export let track: (TrackInfo & { id?: number }) | undefined = undefined;
 </script>
 
 <Card sm flat flow={!sm} interactive on:contextmenu on:click {selected}>
