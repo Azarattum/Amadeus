@@ -22,8 +22,8 @@
   $: loading = item === true;
 
   $: title = ok(item) ? item.title : "Loading...";
-  $: length = ok(item) ? item.length || 0 : 0;
-  $: count = ok(item) ? item.count || 0 : 0;
+  $: length = ok(item) ? item.length || undefined : 0;
+  $: count = ok(item) ? item.count || undefined : 0;
   $: art = ok(item)
     ? item.art
       ? item
@@ -35,9 +35,11 @@
 
 <Card interactive={!!href && !loading} {href}>
   <Header center {loading}>{title}</Header>
-  <Stack justify x gap="lg">
-    <Text secondary {loading}><Icon name="note" sm /> {count}</Text>
-    <Text secondary {loading}><Icon name="clock" sm /> {format(length)}</Text>
-  </Stack>
+  {#if count != null && length != null}
+    <Stack justify x gap="lg">
+      <Text secondary {loading}><Icon name="note" sm /> {count}</Text>
+      <Text secondary {loading}><Icon name="clock" sm /> {format(length)}</Text>
+    </Stack>
+  {/if}
   <Avatar round={!!artist} of={art} slot="after" />
 </Card>

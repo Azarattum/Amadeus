@@ -8,9 +8,9 @@
 
 <span
   class="max-w-max overflow-hidden text-ellipsis whitespace-nowrap rounded-md text-left [&>*]:align-bottom
-  {loading ? 'animate-pulse bg-highlight text-transparent' : ''}"
+  {loading ? 'animate-pulse bg-highlight text-transparent' : ''}
+  {accent ? 'font-medium' : 'font-normal'}"
   class:text-content-200={secondary}
-  class:font-medium={accent}
   class:ml-4={indent}
   class:text-sm={sm}
 >

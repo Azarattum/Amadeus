@@ -5,6 +5,9 @@
   export let sm = false;
   export let selected: boolean | "passive" = false;
   export let track: (TrackInfo & { id?: number }) | undefined = undefined;
+
+  $: [primary = undefined, ...sub] = track?.title.split("(") || [];
+  $: secondary = sub.length ? "(" + sub.join("(") : "";
 </script>
 
 <Card sm flat flow={!sm} interactive on:contextmenu on:click {selected}>
@@ -17,7 +20,8 @@
     </div>
   </Image>
   <Text accent loading={!track}>
-    {track?.title}
+    {primary}
+    <Text secondary>{secondary}</Text>
   </Text>
   <Text secondary sm loading={!track}>
     {track?.artists.map((x) => x.title).join(", ")}
