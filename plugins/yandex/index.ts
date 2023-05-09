@@ -36,18 +36,20 @@ init(function* ({ yandex: { token } }) {
 });
 
 search(function* (type, query, page) {
+  /// Properly support other `type`s!
+  if (type !== "track") return;
+
   for (let i = 0; ; ) {
     const params = {
       type,
       text: query,
       nococrrect: "false",
       page: (i++).toString(),
-      "page-size": (page * 2).toString(),
+      "page-size": page.toString(),
     };
 
     const { result } = yield* fetch("search", { params }).as(results);
     if (!result.tracks) break;
-    /// Properly support other `type`s!
     yield* result.tracks.results.map(convert);
   }
 });
@@ -63,7 +65,7 @@ expand(function* (type, source, page) {
       const url = `artists/${id}/tracks`;
       const params = {
         page: (i++).toString(),
-        "page-size": (page * 2).toString(),
+        "page-size": page.toString(),
       };
       const { result } = yield* fetch(url, { params }).as(tracks);
       if (!result.tracks) break;

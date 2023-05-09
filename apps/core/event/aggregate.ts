@@ -22,7 +22,8 @@ async function* aggregate(
       ? match(typeof args[1] === "string" ? args[1] : args[1].title)
       : undefined;
 
-  const limit = args[args.length - 1];
+  const last = args[args.length - 1];
+  const limit = Number.isInteger(+last) ? +last : 10;
   const page = pages<any>(groups, { page: limit, controller, compare });
   controller.signal.addEventListener("abort", page.close, { once: true });
   const curated = generators.map((generator, id) => {
