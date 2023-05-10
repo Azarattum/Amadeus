@@ -27,7 +27,12 @@
   type $$Slots = { default: { item: T; index: number } };
 
   const dispatch = createEventDispatcher<{
-    edit: { action: "rearrange" | "purge" | "push"; item: T; index: number };
+    edit: {
+      action: "rearrange" | "purge" | "push";
+      after: T | undefined;
+      index: number;
+      item: T;
+    };
     end: void;
   }>();
 
@@ -103,7 +108,7 @@
       `translate3d(0,0,0)`,
     ];
     target.animate(
-      { transform },
+      { transform, zIndex: ["100", "100"] },
       { easing: "ease", composite: "accumulate", duration }
     );
   }
@@ -199,9 +204,11 @@
       }
     }
     if (original !== index) {
+      const item = $transfer.data;
+      const after = items[index - 1];
       const flag = (+!!~original << 1) + +!!~index;
       const action = ([undefined, "push", "purge", "rearrange"] as const)[flag];
-      if (action) dispatch("edit", { action, index, item: $transfer.data });
+      if (action) dispatch("edit", { action, index, after, item });
     }
     original = undefined;
     rollback = undefined;

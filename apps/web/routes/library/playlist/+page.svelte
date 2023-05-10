@@ -10,11 +10,8 @@
 
   let selected = new Set<TrackEntry>();
 
-  function edit({ detail: { action, index, item } }: EditEvent<TrackEntry>) {
-    if (!info) return;
-    if (action === "rearrange") {
-      library.rearrange(item.entry, info.tracks[index - 1]?.entry);
-    }
+  function edit({ detail: { action, after, item } }: EditEvent<TrackEntry>) {
+    if (action === "rearrange") library.rearrange(item.entry, after?.entry);
   }
 
   function purge() {

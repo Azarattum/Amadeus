@@ -1,8 +1,9 @@
 <script lang="ts" context="module">
   export type EditEvent<T> = CustomEvent<{
     action: "push" | "purge" | "rearrange";
-    item: T;
+    after: T | undefined;
     index: number;
+    item: T;
   }>;
 </script>
 
