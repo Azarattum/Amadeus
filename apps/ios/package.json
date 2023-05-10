@@ -1,0 +1,17 @@
+{
+  "name": "@amadeus-music/ios",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cap build ios",
+    "sync": "cap sync",
+    "dev": "cap run ios",
+    "open": "cap open ios"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@capacitor/ios": "^5.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^5.0.2"
+  }
+}

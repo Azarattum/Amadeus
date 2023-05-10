@@ -34,7 +34,7 @@
     "prettier-plugin-svelte": "^2.10.0",
     "prettier-plugin-tailwindcss": "^0.2.8",
     "rimraf": "^5.0.0",
-    "rollup": "^3.21.5",
+    "rollup": "^3.21.6",
     "rollup-plugin-node-externals": "^6.0.0",
     "svelte": "^3.59.1",
     "svelte-check": "^3.3.2",
@@ -45,5 +45,8 @@
     "typescript": "^5.0.4",
     "vite": "4.3.5",
     "vitest": "0.31.0"
+  },
+  "dependencies": {
+    "@capacitor/core": "^5.0.2"
   }
 }
