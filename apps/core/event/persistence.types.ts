@@ -10,6 +10,7 @@ import type {
   AlbumDetails,
   TrackDetails,
   FeedType,
+  Unique,
 } from "@amadeus-music/protocol";
 import type { IsNever } from "libfun/utils/types";
 import type { async } from "libfun";
@@ -59,6 +60,7 @@ type Database = DeepPartial<{
   albums: {
     search(query: string): Promise<AlbumDetails[]>;
     push(albums: AlbumDetails[]): Promise<void>;
+    get(id: number): Promise<Unique<Album>>;
   };
   playback: {
     push(

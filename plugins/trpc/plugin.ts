@@ -17,6 +17,7 @@ export const {
   stop,
   search,
   users,
+  expand,
   command,
   persistence,
 } = register({
@@ -36,7 +37,11 @@ function hash(text: string) {
 }
 
 async function context({ req }: CreateWSSContextFnOptions) {
-  const nobody = {} as { persistence?: undefined; name?: undefined };
+  const nobody = {} as {
+    persistence?: undefined;
+    cache?: undefined;
+    name?: undefined;
+  };
   try {
     if (!req.url) return nobody;
     const [trpc, user, password] = req.url.replace(/^\//, "").split("/");
@@ -46,8 +51,9 @@ async function context({ req }: CreateWSSContextFnOptions) {
 
     if (self.password !== (await hash(password))) return nobody;
     return {
-      persistence: persistence(user.toLowerCase()),
+      persistence: () => persistence(user.toLowerCase()),
       name: `${bright}${self.name}${reset}`,
+      cache: () => persistence(),
     };
   } catch {
     return nobody;

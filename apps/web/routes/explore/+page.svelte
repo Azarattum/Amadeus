@@ -10,78 +10,40 @@
     Icon,
     When,
   } from "@amadeus-music/ui";
-  import type {
-    AlbumDetails,
-    ArtistDetails,
-    TrackDetails,
-  } from "@amadeus-music/protocol";
   import { albums, artists, history, search as query, tracks } from "$lib/data";
   import { debounce } from "@amadeus-music/util/async";
   import { navigating, page } from "$app/stores";
+  import { search, streams } from "$lib/trpc";
+  import { multistream } from "$lib/stream";
   import History from "./history.svelte";
   import Artists from "./artists.svelte";
   import Albums from "./albums.svelte";
   import Tracks from "./tracks.svelte";
-  import { search } from "$lib/trpc";
-  import { onDestroy } from "svelte";
+
+  let type = 0;
+  let local: any[] = [];
 
   const types = ["tracks", "artists", "albums"] as const;
-  type Search<K, T> = { type: K; local: T[]; remote: T[][] | undefined };
-
-  let id = 0;
-  let type = 0;
-  let results:
-    | Search<"tracks", TrackDetails>
-    | Search<"artists", ArtistDetails>
-    | Search<"albums", AlbumDetails> = {
-    type: types[type],
-    remote: [],
-    local: [],
-  };
+  const log = debounce((x: string) => history.log(x), 2000);
+  const estimate = ~~((globalThis.innerHeight / 56) * 2.5);
+  const remote = multistream(
+    { tracks: search.tracks, artists: search.artists, albums: search.albums },
+    streams.next,
+    types[type]
+  );
 
   $: navigate($page.url.hash.slice(1));
-  $: lookup(type, $query);
-
-  let unsubscribe = () => {};
-  const log = debounce((x: string) => history.log(x), 2000);
-  const next = () => search.next.mutate(id);
-  const update = debounce(subscribe);
-
-  async function lookup(type: number, query: string) {
-    if (import.meta.env.SSR) return;
-    unsubscribe();
-    results = {
-      type: types[type],
-      remote: undefined,
-      local: [],
-    };
-    if (!$navigating) {
-      const hash = `#${types[type]}/${query}`;
-      if (location.hash !== hash) {
-        globalThis.history.replaceState(null, "", hash);
-      }
-    }
-    if (!query) return;
-    log(query);
-    update(type, query);
-    const store = [tracks, artists, albums][type];
-    results.local = await store.search(query);
+  $: if (!$navigating) {
+    globalThis.history?.replaceState(null, "", `#${types[type]}/${$query}`);
   }
 
-  function subscribe(type: number, query: string) {
-    const page = ~~((innerHeight / 56) * 2.5);
-    ({ unsubscribe } = search[types[type]].subscribe(
-      { query, page },
-      {
-        onData(data) {
-          id = data.id;
-          if (!data.results.length && data.progress < 1) return;
-          if (!results.remote) results.remote = [];
-          results.remote[data.page] = data.results;
-        },
-      }
-    ));
-  }
+  $: remote.choose(types[type]);
+  $: remote.update($query ? { query: $query, page: estimate } : null);
+
+  $: store = [tracks, artists, albums][type];
+  $: (local = []), store.search($query).then((x) => (local = x));
+
+  $: log($query);
 
   function navigate(hash: string) {
     const parts = decodeURIComponent(hash).split("/");
@@ -90,8 +52,6 @@
     if (!~type) type = 0;
     if ($query !== parts[1]) $query = parts[1];
   }
-
-  onDestroy(unsubscribe);
 </script>
 
 <Topbar title="Explore">
@@ -99,24 +59,12 @@
 </Topbar>
 
 {#if $query}
-  {#if results.type === "tracks"}
-    <Tracks
-      remote={results.remote?.flat()}
-      local={results.local}
-      on:end={next}
-    />
-  {:else if results.type === "artists"}
-    <Artists
-      remote={results.remote?.flat()}
-      local={results.local}
-      on:end={next}
-    />
-  {:else if results.type === "albums"}
-    <Albums
-      remote={results.remote?.flat()}
-      local={results.local}
-      on:end={next}
-    />
+  {#if $remote.type === "tracks"}
+    <Tracks remote={$remote.data} {local} on:end={remote.next} />
+  {:else if $remote.type === "artists"}
+    <Artists remote={$remote.data} {local} on:end={remote.next} />
+  {:else if $remote.type === "albums"}
+    <Albums remote={$remote.data} {local} on:end={remote.next} />
   {/if}
 {:else}
   <History type={types[type]} />

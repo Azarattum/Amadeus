@@ -56,5 +56,12 @@ export const albums = ({ store }: DB) =>
           .groupBy("albums.id")
           .execute();
       },
+      get(db, id: number) {
+        return db
+          .selectFrom("albums")
+          .where("albums.id", "=", id)
+          .selectAll()
+          .executeTakeFirstOrThrow();
+      },
     }
   );
