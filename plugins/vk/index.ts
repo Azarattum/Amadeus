@@ -1,4 +1,10 @@
-import { toTrack, responseBlock, responseCatalog, toArtist } from "./types";
+import {
+  toTrack,
+  toAlbum,
+  toArtist,
+  responseBlock,
+  responseCatalog,
+} from "./types";
 import { init, search, fetch, desource } from "./plugin";
 
 init(function* ({ vk: { token } }) {
@@ -14,14 +20,14 @@ init(function* ({ vk: { token } }) {
 
 search(function* (type, query, page) {
   // Setup context
-  const { target, convert, next } = {
-    track: { target: "audios", convert: toTrack, next: "audios_ids" } as const,
-    artist: { target: "links", convert: toArtist, next: "links_ids" } as const,
-    album: {} as never, /// TODO: implement album
+  const { name, map, next } = {
+    track: { name: "audios", map: toTrack, next: "All music" } as const,
+    artist: { name: "links", map: toArtist, next: "Artists" } as const,
+    album: { name: "playlists", map: toAlbum, next: "Albums" } as const,
   }[type];
-  const map = convert as (
-    x: Parameters<typeof convert>[0]
-  ) => ReturnType<typeof convert>;
+  const covert = map as (
+    x: Parameters<typeof map>[0]
+  ) => ReturnType<typeof map>;
   const truthy = <T>(x: T): x is NonNullable<T> => !!x;
 
   // Perform search
@@ -29,12 +35,12 @@ search(function* (type, query, page) {
     params: { query, need_blocks: "1" },
   }).as(responseCatalog);
 
-  yield* response[target]?.map(map).filter(truthy) || [];
+  yield* response[name]?.map(covert).filter(truthy) || [];
 
   // Continue pagination
-  let block = response.catalog.sections
-    .flatMap((x) => x.blocks)
-    .find((x) => x[next] && x.next_from);
+  const blocks = response.catalog.sections.flatMap((x) => x.blocks);
+  const index = blocks.findIndex((x) => x.layout?.title === next);
+  let block = ~index ? blocks[index + 1] : undefined;
   while (block?.next_from) {
     const { response } = yield* fetch("catalog.getBlockItems", {
       params: {
@@ -43,7 +49,7 @@ search(function* (type, query, page) {
         start_from: block.next_from,
       },
     }).as(responseBlock);
-    yield* response[target]?.map(map).filter(truthy) || [];
+    yield* response[name]?.map(covert).filter(truthy) || [];
     block = response.block;
   }
 });

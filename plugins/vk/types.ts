@@ -9,9 +9,9 @@ import {
   boolean,
 } from "@amadeus-music/core";
 
-function toTrack(data: Infer<typeof audio>) {
-  const toJSON = <T>(x?: T) => JSON.stringify(x ? [x] : []);
+const toJSON = <T>(x?: T) => JSON.stringify(x ? [x] : []);
 
+function toTrack(data: Infer<typeof audio>) {
   return {
     title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
     length: data.duration,
@@ -36,7 +36,6 @@ function toTrack(data: Infer<typeof audio>) {
 
 function toArtist(data: Infer<typeof link>) {
   if (data.meta.content_type !== "artist") return;
-  const toJSON = <T>(x?: T) => JSON.stringify(x ? [x] : []);
   const art = data.image?.reduce((a, b) =>
     a.width * a.height > b.width * b.height ? a : b
   ).url;
@@ -48,11 +47,25 @@ function toArtist(data: Infer<typeof link>) {
   };
 }
 
+function toAlbum(data: Infer<typeof playlist>) {
+  if (data.type !== 1) return;
+  return {
+    title: data.title,
+    year: data.year || 0,
+    art: toJSON(data.photo?.photo_1200),
+    source: toJSON(`vk/${data.owner_id}/${data.id}/${data.access_key}`),
+    artists: data.main_artists?.map((x) => ({
+      source: x.id ? toJSON(`vk/${x.id}`) : "[]",
+      title: x.name,
+      art: "[]",
+    })),
+  };
+}
+
 const block = type({
   id: string(),
   next_from: optional(string()),
-  audios_ids: optional(array(string())),
-  links_ids: optional(array(string())),
+  layout: optional(type({ title: optional(string()) })),
 });
 
 const catalog = type({
@@ -111,11 +124,28 @@ const link = type({
   ),
 });
 
+const playlist = type({
+  id: number(),
+  type: number(),
+  year: optional(number()),
+  title: string(),
+  owner_id: number(),
+  access_key: string(),
+  main_artists: optional(array(artist)),
+  photo: optional(
+    type({
+      photo_68: string(),
+      photo_1200: string(),
+    })
+  ),
+});
+
 const responseCatalog = object({
   response: type({
     catalog,
     audios: optional(array(audio)),
     links: optional(array(link)),
+    playlists: optional(array(playlist)),
   }),
 });
 
@@ -124,7 +154,8 @@ const responseBlock = object({
     block,
     audios: optional(array(audio)),
     links: optional(array(link)),
+    playlists: optional(array(playlist)),
   }),
 });
 
-export { responseCatalog, responseBlock, toTrack, toArtist };
+export { responseCatalog, responseBlock, toTrack, toArtist, toAlbum };
