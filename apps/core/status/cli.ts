@@ -18,7 +18,10 @@ function handle(command: string) {
 }
 
 async function interactive() {
-  if (!stdin.isTTY) return wrn("Running in non-interactive mode!");
+  if (!stdin.isTTY) {
+    process.on("SIGINT", () => stop().then(() => process.exit(0)));
+    return wrn("Running in non-interactive mode!");
+  }
   const cli = createInterface({
     input: stdin,
     output: stdout,

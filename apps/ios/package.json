@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "preview": "cap run ios",
-    "dev": "cap open ios",
+    "xcode": "cap open ios",
     "build": "cap sync"
   },
   "keywords": [],
