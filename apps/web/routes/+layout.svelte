@@ -33,7 +33,7 @@
     Artists: "people",
     Timeline: "clock",
     Tracks: "note",
-    Albums: "album",
+    Albums: "disk",
     Listened: "history",
     Recommended: "stars",
     Following: "people",

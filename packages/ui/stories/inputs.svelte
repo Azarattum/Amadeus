@@ -43,7 +43,7 @@
     <Group size={3} value={2}>
       <Button><Icon name="note" />Tracks</Button>
       <Button><Icon name="people" />Artists</Button>
-      <Button><Icon name="album" />Albums</Button>
+      <Button><Icon name="disk" />Albums</Button>
     </Group>
   </Stack>
 </Stack>
