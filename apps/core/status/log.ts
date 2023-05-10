@@ -12,9 +12,9 @@ import {
 } from "@amadeus-music/util/color";
 import type { Context } from "../plugin/types";
 import { log as logged } from "../event/pool";
-import { pipeline, take } from "libfun";
+import { stderr, stdout } from "node:process";
 import { format } from "../data/error";
-import { stdout } from "node:process";
+import { pipeline } from "libfun";
 import { inspect } from "util";
 
 function time() {
@@ -30,7 +30,8 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
   const save = pipeline(clean, logged, () => {});
   const log = console[level];
 
-  stdout.write(clear);
+  if (level === "info") stdout.write(clear);
+  else stderr.write(clear);
 
   if (pure) {
     log(...data);
