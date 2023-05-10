@@ -8,6 +8,7 @@ const config = {
     files: {
       lib: "lib",
       routes: "routes",
+      serviceWorker: "./cache.worker.ts",
       appTemplate: "routes/+layout.html",
     },
 
