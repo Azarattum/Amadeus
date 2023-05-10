@@ -4,12 +4,12 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.cjs"
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.js"
   },
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
     "@amadeus-music/protocol": "workspace:*",
-    "@trpc/server": "^10.25.0",
+    "@trpc/server": "^10.25.1",
     "superstruct": "^1.0.3"
   },
   "devDependencies": {

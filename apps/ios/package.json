@@ -2,10 +2,9 @@
   "name": "@amadeus-music/ios",
   "version": "1.0.0",
   "scripts": {
-    "build": "cap build ios",
-    "sync": "cap sync",
-    "dev": "cap run ios",
-    "open": "cap open ios"
+    "preview": "cap run ios",
+    "dev": "cap open ios",
+    "build": "cap sync"
   },
   "keywords": [],
   "dependencies": {

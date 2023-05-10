@@ -1,16 +1,16 @@
-const { externals } = require("rollup-plugin-node-externals");
-const replace = require("@rollup/plugin-replace").default;
-const copy = require("rollup-plugin-copy");
-const { existsSync } = require("node:fs");
-const { resolve } = require("node:path");
-const { defineConfig } = require("vite");
+import externals from "rollup-plugin-node-externals";
+import { existsSync, readFileSync } from "node:fs";
+import replace from "@rollup/plugin-replace";
+import copy from "rollup-plugin-copy";
+import { resolve } from "node:path";
+import { defineConfig } from "vite";
 
-const identifier = require(resolve("./package.json")).name;
+const identifier = JSON.parse(readFileSync(resolve("./package.json"))).name;
 const name = identifier.replace(/(@(\w|-)*\/)|((\w|-)*-)/g, "");
 const monorepo = existsSync(resolve("../../package.json"));
 const build = monorepo ? "../../build/plugins" : "./build";
 
-module.exports = defineConfig({
+export default defineConfig({
   plugins: [
     { ...externals({ deps: false }), enforce: "pre" },
     replace({

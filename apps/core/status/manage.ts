@@ -9,6 +9,10 @@ import { interactive } from "./cli";
 
 let started: null | number = null;
 
+// Environment variables to fix running `ws` in prod
+process.env.WS_NO_BUFFER_UTIL = "true";
+process.env.WS_NO_UTF_8_VALIDATE = "true";
+
 const launch = () =>
   pipe(pools.catch(err))(
     start,

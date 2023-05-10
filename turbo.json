@@ -18,6 +18,9 @@
     },
     "coverage": {
       "outputs": ["coverage/**"]
+    },
+    "@amadeus-music/ios#build": {
+      "dependsOn": ["@amadeus-music/web#build"]
     }
   }
 }

@@ -88,7 +88,6 @@
     if (parts.length < 2) return;
     type = types.indexOf(parts[0] as (typeof types)[number]);
     if (!~type) type = 0;
-    console.log(parts, parts[1], $query);
     if ($query !== parts[1]) $query = parts[1];
   }
 
