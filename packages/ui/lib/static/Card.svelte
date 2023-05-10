@@ -56,7 +56,7 @@
     </div>
   {/if}
   <div
-    class="z-10 grid w-full grid-cols-1 items-baseline contain-inline-size
+    class="z-10 grid w-full grid-cols-1 items-baseline overflow-hidden contain-inline-size
     {sm || xs
       ? 'justify-start gap-0.5'
       : 'place-items-center justify-center gap-2'}

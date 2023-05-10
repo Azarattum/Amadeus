@@ -37,11 +37,9 @@
 <Card interactive={!!href && !loading} {href}>
   <Header center {loading}>{title}</Header>
   {#if album && ok(item) && item.artists}
-    <Stack justify x>
-      <Text secondary {loading}>
-        {item.artists.map((x) => x.title).join(", ")}
-      </Text>
-    </Stack>
+    <Text secondary {loading}>
+      {item.artists.map((x) => x.title).join(", ")}
+    </Text>
   {:else if count != null && length != null}
     <Stack justify x gap="lg">
       <Text secondary {loading}><Icon name="note" sm /> {count}</Text>
