@@ -29,7 +29,7 @@
         class="flex h-full w-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
         style:filter="hue-rotate({of?.id || 0}deg)"
       >
-        <Icon name="person" xl />
+        <Icon name={of && "year" in of ? "disk" : "person"} xl />
       </div>
     </Image>
   {/if}

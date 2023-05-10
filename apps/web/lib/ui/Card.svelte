@@ -5,6 +5,7 @@
 
   type Info = {
     tracks?: { album: { art?: string } }[];
+    artists?: { title: string }[];
     album?: { art: string };
     length?: number;
     count?: number;
@@ -35,7 +36,13 @@
 
 <Card interactive={!!href && !loading} {href}>
   <Header center {loading}>{title}</Header>
-  {#if count != null && length != null}
+  {#if album && ok(item) && item.artists}
+    <Stack justify x>
+      <Text secondary {loading}>
+        {item.artists.map((x) => x.title).join(", ")}
+      </Text>
+    </Stack>
+  {:else if count != null && length != null}
     <Stack justify x gap="lg">
       <Text secondary {loading}><Icon name="note" sm /> {count}</Text>
       <Text secondary {loading}><Icon name="clock" sm /> {format(length)}</Text>

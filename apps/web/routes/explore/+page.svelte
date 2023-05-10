@@ -20,6 +20,7 @@
   import { navigating, page } from "$app/stores";
   import History from "./history.svelte";
   import Artists from "./artists.svelte";
+  import Albums from "./albums.svelte";
   import Tracks from "./tracks.svelte";
   import { search } from "$lib/trpc";
   import { onDestroy } from "svelte";
@@ -112,7 +113,11 @@
       on:end={next}
     />
   {:else if results.type === "albums"}
-    <!-- /// TODO: albums -->
+    <Albums
+      remote={results.remote?.flat()}
+      local={results.local}
+      on:end={next}
+    />
   {/if}
 {:else}
   <History type={types[type]} />
