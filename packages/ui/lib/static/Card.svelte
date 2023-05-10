@@ -57,7 +57,9 @@
   {/if}
   <div
     class="z-10 grid w-full grid-cols-1 items-baseline contain-inline-size
-    {sm || xs ? 'justify-start gap-0.5' : 'justify-center gap-2'}
+    {sm || xs
+      ? 'justify-start gap-0.5'
+      : 'place-items-center justify-center gap-2'}
     {(sm || xs) && flow ? 'lg:auto-cols-fr lg:grid-flow-col lg:gap-4' : ''}
   "
   >
