@@ -36,13 +36,14 @@ function toTrack(data: Infer<typeof audio>) {
 
 function toArtist(data: Infer<typeof link>) {
   if (data.meta.content_type !== "artist") return;
+  const id = data.url.split("/").pop();
   const art = data.image?.reduce((a, b) =>
     a.width * a.height > b.width * b.height ? a : b
   ).url;
 
   return {
+    source: id ? toJSON(`vk/${id}`) : "[]",
     title: data.title,
-    source: toJSON(data.url.split("/").pop()),
     art: toJSON(art),
   };
 }
