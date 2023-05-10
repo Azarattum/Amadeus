@@ -8,7 +8,7 @@ const theme = {
     xs: ["0.8125rem", { lineHeight: "1rem" }],
     sm: ["0.9375rem", { lineHeight: "1.125rem" }],
     md: ["1.0625rem", { lineHeight: "1.3125rem" }],
-    lg: ["1.375rem", { fontWeight: "600" }],
+    lg: ["1.375rem", { lineHeight: "1.55rem", fontWeight: "600" }],
     xl: ["1.5rem", { fontWeight: "600", lineHeight: "1.6875rem" }],
     "2xl": [
       "2.125rem",

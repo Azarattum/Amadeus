@@ -22,7 +22,7 @@
 <svelte:element
   this={tag}
   {id}
-  class="relative box-content rounded-md
+  class="relative box-content line-clamp-3 rounded-md
   {center ? 'text-center' : 'text-left'}
   {sm ? 'light py-2 text-xs uppercase text-content-200' : ''}
   {!sm && !lg && !xl ? 'text-lg' : ''}
