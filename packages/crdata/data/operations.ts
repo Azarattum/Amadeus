@@ -1,5 +1,9 @@
+import type {
+  AlbumDetails,
+  ArtistDetails,
+  TrackDetails,
+} from "@amadeus-music/protocol";
 import type { ExpressionBuilder, Kysely, QueryCreator } from "crstore";
-import type { TrackDetails } from "@amadeus-music/protocol";
 import { groupJSON, json, sql } from "crstore";
 import type { Schema } from "./schema";
 
@@ -101,29 +105,8 @@ const position = {
       .limit(1),
 };
 
-async function push(db: Kysely<Schema>, track: TrackDetails) {
-  for (const artist of track.artists) {
-    await db
-      .insertInto("artists")
-      .onConflict((x) => x.doUpdateSet(artist))
-      .values({ ...artist, following: 0 })
-      .execute();
-  }
-  await db
-    .insertInto("attribution")
-    .onConflict((x) => x.doNothing())
-    .values(
-      track.artists.map(({ id }) => ({
-        album: track.album.id,
-        artist: id,
-      }))
-    )
-    .execute();
-  await db
-    .insertInto("albums")
-    .onConflict((x) => x.doUpdateSet(track.album))
-    .values(track.album)
-    .execute();
+async function pushTrack(db: Kysely<Schema>, track: TrackDetails) {
+  await pushAlbum(db, { ...track.album, artists: track.artists });
   await db
     .insertInto("tracks")
     .onConflict((x) =>
@@ -143,9 +126,47 @@ async function push(db: Kysely<Schema>, track: TrackDetails) {
     .execute();
 }
 
+async function pushAlbum(db: Kysely<Schema>, album: AlbumDetails) {
+  for (const artist of album.artists) await pushArtist(db, artist);
+  await db
+    .insertInto("attribution")
+    .onConflict((x) => x.doNothing())
+    .values(
+      album.artists.map(({ id }) => ({
+        album: album.id,
+        artist: id,
+      }))
+    )
+    .execute();
+  const pure = { ...album, artists: undefined };
+  await db
+    .insertInto("albums")
+    .onConflict((x) => x.doUpdateSet(pure))
+    .values(pure)
+    .execute();
+}
+
+async function pushArtist(db: Kysely<Schema>, artist: ArtistDetails) {
+  await db
+    .insertInto("artists")
+    .onConflict((x) => x.doUpdateSet(artist))
+    .values({ ...artist, following: 0 })
+    .execute();
+}
+
 function sanitize(query: string) {
   const phrases = query.replace(/-/g, " ").split(/\s+/g);
   return phrases.map((x) => `"${x.replace('"', '""')}"`).join(" ");
 }
 
-export { uuid, push, metadata, sanitize, position, metafields, localDevice };
+export {
+  uuid,
+  metadata,
+  sanitize,
+  position,
+  pushTrack,
+  pushAlbum,
+  pushArtist,
+  metafields,
+  localDevice,
+};

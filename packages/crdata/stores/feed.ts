@@ -1,5 +1,5 @@
+import { metadata, metafields, pushTrack, uuid } from "../data/operations";
 import type { FeedType, TrackDetails } from "@amadeus-music/protocol";
-import { metadata, metafields, push, uuid } from "../data/operations";
 import { groupJSON, APPEND } from "crstore";
 import type { DB } from "../data/schema";
 
@@ -44,7 +44,7 @@ export const feed = ({ store }: DB) =>
       },
       async push(db, tracks: TrackDetails[], type: FeedType) {
         const promises = tracks.map(async (track) => {
-          await push(db, track);
+          await pushTrack(db, track);
           await db
             .insertInto("feed")
             .onConflict((x) => x.doNothing())

@@ -11,6 +11,7 @@ export const {
   history,
   artists,
   library,
+  albums,
   tracks,
   update,
   feed,

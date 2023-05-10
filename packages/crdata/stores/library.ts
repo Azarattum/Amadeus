@@ -1,4 +1,4 @@
-import { metadata, metafields, push, uuid } from "../data/operations";
+import { metadata, metafields, pushTrack, uuid } from "../data/operations";
 import type { TrackDetails } from "@amadeus-music/protocol";
 import type { DB } from "../data/schema";
 import { APPEND } from "crstore";
@@ -7,7 +7,7 @@ export const library = ({ store }: DB) =>
   store((db) => db.selectFrom("library").selectAll(), {
     async push(db, tracks: TrackDetails[], playlist?: number) {
       const promises = tracks.map(async (track) => {
-        await push(db, track);
+        await pushTrack(db, track);
         if (playlist == null) return;
         await db
           .insertInto("library")

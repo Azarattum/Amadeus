@@ -1,6 +1,6 @@
 import {
   metadata,
-  push,
+  pushTrack,
   uuid,
   localDevice,
   metafields,
@@ -54,7 +54,7 @@ export const playback = ({ store }: DB) =>
         tracks: TrackDetails[],
         at: "first" | "next" | "last" | "random" | number = "next"
       ) {
-        await Promise.all(tracks.map((x) => push(db, x)));
+        await Promise.all(tracks.map((x) => pushTrack(db, x)));
         const { direction, playback } = await db
           .selectFrom("devices")
           .where("id", "=", localDevice)

@@ -15,7 +15,7 @@
     ArtistDetails,
     TrackDetails,
   } from "@amadeus-music/protocol";
-  import { artists, history, search as query, tracks } from "$lib/data";
+  import { albums, artists, history, search as query, tracks } from "$lib/data";
   import { debounce } from "@amadeus-music/util/async";
   import { navigating, page } from "$app/stores";
   import History from "./history.svelte";
@@ -64,7 +64,7 @@
     if (!query) return;
     log(query);
     update(type, query);
-    const store = [tracks, artists][type];
+    const store = [tracks, artists, albums][type];
     results.local = await store.search(query);
   }
 

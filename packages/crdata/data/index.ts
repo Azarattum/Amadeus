@@ -6,6 +6,7 @@ import { artists } from "../stores/artists";
 import { library } from "../stores/library";
 import { type DB, schema } from "./schema";
 import { tracks } from "../stores/tracks";
+import { albums } from "../stores/albums";
 import { database, sql } from "crstore";
 import { feed } from "../stores/feed";
 
@@ -20,6 +21,7 @@ const stores = (db: DB) => ({
   history: history(db),
   artists: artists(db),
   library: library(db),
+  albums: albums(db),
   tracks: tracks(db),
   feed: feed(db),
 });

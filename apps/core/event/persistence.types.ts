@@ -7,6 +7,7 @@ import type {
   Track,
   PlaylistDetails,
   ArtistDetails,
+  AlbumDetails,
   TrackDetails,
   FeedType,
 } from "@amadeus-music/protocol";
@@ -50,9 +51,14 @@ type Database = DeepPartial<{
   artists: {
     edit(id: number, artist: Partial<Artist>): Promise<void>;
     search(query: string): Promise<ArtistDetails[]>;
+    push(artists: ArtistDetails[]): Promise<void>;
     get(id: number): Promise<ArtistDetails>;
     unfollow(id: number): Promise<void>;
     follow(id: number): Promise<void>;
+  };
+  albums: {
+    search(query: string): Promise<AlbumDetails[]>;
+    push(albums: AlbumDetails[]): Promise<void>;
   };
   playback: {
     push(

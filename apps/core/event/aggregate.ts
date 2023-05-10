@@ -1,4 +1,9 @@
-import { normalize, trackDetails } from "@amadeus-music/protocol";
+import {
+  normalize,
+  albumDetails,
+  trackDetails,
+  artistDetails,
+} from "@amadeus-music/protocol";
 import stringSimilarity from "string-similarity-js";
 import { batch } from "@amadeus-music/util/object";
 import { clean } from "@amadeus-music/util/string";
@@ -47,8 +52,11 @@ async function* aggregate(
   for await (const state of page.values()) {
     if (is(state.items, array(trackDetails))) {
       await cache.library.push(state.items);
+    } else if (is(state.items, array(albumDetails))) {
+      await cache.albums.push(state.items);
+    } else if (is(state.items, array(artistDetails))) {
+      await cache.artists.push(state.items);
     }
-    /// TODO: cache other media types
     yield state;
   }
 }

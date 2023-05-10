@@ -1,5 +1,5 @@
-import { metadata, metafields, sanitize } from "../data/operations";
-import type { Artist } from "@amadeus-music/protocol";
+import { metadata, metafields, pushArtist, sanitize } from "../data/operations";
+import type { Artist, ArtistDetails } from "@amadeus-music/protocol";
 import type { DB } from "../data/schema";
 import { groupJSON, sql } from "crstore";
 
@@ -60,6 +60,9 @@ export const artists = ({ store }: DB) =>
         .orderBy("count", "desc")
         .orderBy("artist"),
     {
+      async push(db, artists: ArtistDetails[]) {
+        await Promise.all(artists.map((x) => pushArtist(db, x)));
+      },
       async edit(db, id: number, artist: Partial<Artist>) {
         await db.updateTable("artists").where("id", "=", id).set(artist);
       },
