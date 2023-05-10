@@ -6,13 +6,14 @@
     Button,
     Icon,
     Input,
+    Separator,
     LightSwitch,
   } from "@amadeus-music/ui";
   import { beforeNavigate, preloadData } from "$app/navigation";
   import { capitalize } from "@amadeus-music/util/string";
   import { autoscroll } from "@amadeus-music/ui/action";
+  import { extra, search } from "$lib/data";
   import { page } from "$app/stores";
-  import { search } from "$lib/data";
   import { base } from "$app/paths";
   import { onMount } from "svelte";
   import "@amadeus-music/ui";
@@ -64,7 +65,9 @@
   }
 
   beforeNavigate(({ from, to }) => {
-    if (from?.url.pathname !== to?.url.pathname) $search = "";
+    if (from?.url.pathname === to?.url.pathname) return;
+    $extra = null;
+    $search = "";
   });
 
   onMount(() => {
@@ -90,6 +93,10 @@
           <Icon name={icons[x]} />{x}
         </Button>
       {/each}
+      {#if $extra}
+        <Separator />
+        <Button air primary><Icon name={$extra[1]} />{$extra[0]}</Button>
+      {/if}
     </svelte:fragment>
     <Button air compact stretch slot="bottom" href="/settings">
       <Icon md name="settings" />Settings

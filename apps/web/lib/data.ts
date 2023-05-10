@@ -22,4 +22,5 @@ export const {
 });
 
 export const search = writable("");
+export const extra = writable(null as [string, string] | null);
 export { ready } from "@amadeus-music/crdata";
