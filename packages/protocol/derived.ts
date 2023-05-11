@@ -13,26 +13,27 @@ const trackDetails = assign(
 );
 const trackEntry = assign(trackDetails, object({ entry: number() }));
 
-const collection = object({
-  count: number(),
-  length: number(),
-  tracks: array(trackEntry),
-});
+const collection = (track: typeof trackDetails | typeof trackEntry) =>
+  object({
+    count: number(),
+    length: number(),
+    tracks: array(track),
+  });
 
 const artistInfo = artist;
 const artistDetails = unique(artistInfo);
-const artistCollection = assign(artistDetails, collection);
+const artistCollection = assign(artistDetails, collection(trackDetails));
 
 const albumInfo = assign(album, object({ artists: array(artist) }));
 const albumDetails = assign(
   unique(album),
   object({ artists: array(unique(artist)) })
 );
-const albumCollection = assign(albumDetails, collection);
+const albumCollection = assign(albumDetails, collection(trackDetails));
 
 const playlistInfo = playlist;
 const playlistDetails = unique(playlistInfo);
-const playlistCollection = assign(playlistDetails, collection);
+const playlistCollection = assign(playlistDetails, collection(trackEntry));
 
 type TrackInfo = Infer<typeof trackInfo>;
 type TrackDetails = Infer<typeof trackDetails>;
