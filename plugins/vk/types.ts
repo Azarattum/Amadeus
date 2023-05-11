@@ -63,6 +63,25 @@ function toAlbum(data: Infer<typeof playlist>) {
   };
 }
 
+function toSection(type: "track" | "artist" | "album") {
+  return ({ track: "audios", artist: "links", album: "playlists" } as const)[
+    type
+  ];
+}
+
+function convert<T extends "track" | "artist" | "album">(
+  data: Exclude<Infer<typeof responseCatalog>["response"], "catalog">,
+  type: T
+) {
+  const truthy = <T>(x: T): x is NonNullable<T> => !!x;
+  const map = { track: toTrack, artist: toArtist, album: toAlbum }[type];
+  const convert = map as (
+    x: Parameters<typeof map>[0]
+  ) => ReturnType<typeof map>;
+
+  return data[toSection(type)]?.map(convert).filter(truthy) || [];
+}
+
 const block = type({
   id: string(),
   next_from: optional(string()),
@@ -159,4 +178,4 @@ const responseBlock = object({
   }),
 });
 
-export { responseCatalog, responseBlock, toTrack, toArtist, toAlbum };
+export { responseCatalog, responseBlock, convert };
