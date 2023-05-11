@@ -23,7 +23,7 @@
 
 <Topbar title={info?.title || ""}>
   <Stack gap="lg" x center p>
-    <Avatar round of={info} />
+    <Avatar href="/explore/artist#{info?.id}" round of={info} />
     <Stack gap>
       <Header loading={!info}>{info?.title}</Header>
       <Stack x gap="lg">
@@ -37,7 +37,7 @@
             {format(info?.length || 0)}
           </Text>
         {:else}
-          <Text secondary>{sources}</Text>
+          <Text secondary><Icon name="globe" sm /> {sources}</Text>
         {/if}
       </Stack>
     </Stack>

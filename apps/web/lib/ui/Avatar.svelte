@@ -6,11 +6,14 @@
     | { album: { art?: string } }[]
     | undefined = undefined;
   export let round = false;
+  export let href: string | undefined = undefined;
 
   const size = 104;
 </script>
 
-<div
+<svelte:element
+  this={href ? "a" : "div"}
+  {href}
   style:width="{size}px"
   style:height="{size}px"
   class="grid shrink-0 grid-cols-2 gap-2 overflow-hidden shadow-lg contain-paint
@@ -33,4 +36,4 @@
       </div>
     </Image>
   {/if}
-</div>
+</svelte:element>
