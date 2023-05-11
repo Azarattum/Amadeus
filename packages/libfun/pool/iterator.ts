@@ -21,8 +21,8 @@ const reyield = function* <T>(item: T) {
 
 const async = function* <T>(promise: PromiseLike<T>) {
   (promise as any)[passthrough] = true;
-  const result: T = yield promise as any as Passthrough<T>;
-  return result;
+  const result: unknown = yield promise as any as Passthrough<T>;
+  return result as T;
 };
 
 const context = {
