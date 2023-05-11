@@ -131,6 +131,9 @@ function pages<T extends Record<string, any>>(
     get current() {
       return pages[selected];
     },
+    get completed() {
+      return completed.size === groups.length;
+    },
     async *values() {
       while (active) {
         if (selected || pages[selected].progress) {
@@ -155,6 +158,7 @@ type Page<T> = {
   pages: ReturnType<typeof page>[];
   items: Uniqueified<T>[];
   loaded: Promise<void>;
+  completed: boolean;
   progress: number;
   number: number;
 

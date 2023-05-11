@@ -27,6 +27,7 @@ function stream<T, U>(
           streams.delete(id);
         });
       }
+      if (page.completed) page.close();
     }
   })();
   return () => (pages as any).executor.controller.abort();
