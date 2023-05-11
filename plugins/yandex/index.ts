@@ -54,6 +54,17 @@ search(function* (type, query, page) {
   }
 });
 
+desource(function* (source) {
+  const id = source?.match(/yandex\/([0-9]+)/)?.[1];
+  if (!id) return;
+  const { result } = yield* fetch(`tracks/${id}/download-info`).as(link);
+  const url = result[0].downloadInfoUrl + "&format=json";
+  const info = yield* fetch(url).as(download);
+  const trackUrl = `XGRlBW9FXlekgbPrRHuSiA${info.path.slice(1)}${info.s}`;
+  const sign = createHash("md5").update(trackUrl).digest("hex");
+  yield `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`;
+});
+
 expand(function* (type, source, page) {
   const id = source?.match(/yandex\/([0-9]+)/)?.[1];
   if (!id) return;
@@ -72,17 +83,6 @@ expand(function* (type, source, page) {
       yield* result.tracks.map(toTrack);
     }
   }
-});
-
-desource(function* (source) {
-  const id = source?.match(/yandex\/([0-9]+)/)?.[1];
-  if (!id) return;
-  const { result } = yield* fetch(`tracks/${id}/download-info`).as(link);
-  const url = result[0].downloadInfoUrl + "&format=json";
-  const info = yield* fetch(url).as(download);
-  const trackUrl = `XGRlBW9FXlekgbPrRHuSiA${info.path.slice(1)}${info.s}`;
-  const sign = createHash("md5").update(trackUrl).digest("hex");
-  yield `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`;
 });
 
 relate(function* (type, to, _) {
