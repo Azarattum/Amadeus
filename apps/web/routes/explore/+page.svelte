@@ -10,6 +10,11 @@
     Icon,
     When,
   } from "@amadeus-music/ui";
+  import type {
+    ArtistDetails,
+    AlbumDetails,
+    TrackDetails,
+  } from "@amadeus-music/protocol";
   import { albums, artists, history, search as query, tracks } from "$lib/data";
   import { debounce } from "@amadeus-music/util/async";
   import { navigating, page } from "$app/stores";
@@ -21,7 +26,6 @@
   import Tracks from "./tracks.svelte";
 
   let type = 0;
-  let local: any[] = [];
 
   const types = ["tracks", "artists", "albums"] as const;
   const log = debounce((x: string) => history.log(x), 2000);
@@ -40,8 +44,12 @@
   $: remote.choose(types[type]);
   $: remote.update($query ? { query: $query, page: estimate } : null);
 
-  $: store = [tracks, artists, albums][type];
-  $: (local = []), store.search($query).then((x) => (local = x));
+  let localTracks: TrackDetails[] = [];
+  let localAlbums: AlbumDetails[] = [];
+  let localArtists: ArtistDetails[] = [];
+  $: tracks.search($query).then((x) => (localTracks = x));
+  $: albums.search($query).then((x) => (localAlbums = x));
+  $: artists.search($query).then((x) => (localArtists = x));
 
   $: log($query);
 
@@ -60,11 +68,11 @@
 
 {#if $query}
   {#if $remote.type === "tracks"}
-    <Tracks remote={$remote.data} {local} on:end={remote.next} />
+    <Tracks remote={$remote.data} local={localTracks} on:end={remote.next} />
   {:else if $remote.type === "artists"}
-    <Artists remote={$remote.data} {local} on:end={remote.next} />
+    <Artists remote={$remote.data} local={localArtists} on:end={remote.next} />
   {:else if $remote.type === "albums"}
-    <Albums remote={$remote.data} {local} on:end={remote.next} />
+    <Albums remote={$remote.data} local={localAlbums} on:end={remote.next} />
   {/if}
 {:else}
   <History type={types[type]} />
