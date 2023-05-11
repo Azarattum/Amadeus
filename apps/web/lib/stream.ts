@@ -20,6 +20,9 @@ function stream<I, T, U>(from: Subscription<I, Stream<T, U>>, next: Next) {
         pages[data.page] = data.results;
         set(Object.assign(pages.flat(), { detail: data.detail }));
       },
+      onError(err) {
+        console.error(err);
+      },
     }).unsubscribe;
   });
 
@@ -86,7 +89,10 @@ type Stream<T, U = undefined> = {
 };
 
 type Subscription<I = any, T = any> = {
-  subscribe(input: I, options: { onData(value: T): void }): Unsubscribable;
+  subscribe(
+    input: I,
+    options: { onData(value: T): void; onError(error: unknown): void }
+  ): Unsubscribable;
 };
 
 type Next = { mutate: (id: number) => void };
