@@ -33,7 +33,9 @@ function page<T extends Record<string, any>>(
       combine(items, batch, params);
       if (this.progress >= 1) resolve();
       const overshoot = items.splice(size);
-      return progress.map((x) => overshoot.filter((y) => x.has(identify(y))));
+      return progress.map((x) =>
+        overshoot.filter((y) => x.delete(identify(y)))
+      );
     },
     satisfied(id: number) {
       return progress[id].size >= size || completed.has(id);
