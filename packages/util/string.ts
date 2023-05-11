@@ -5,7 +5,8 @@ import { black, bright, reset } from "./color";
  * @param string String to capitalize
  * @param all Capitalize all the words
  */
-export function capitalize(string: string, all = true) {
+export function capitalize(string?: string, all = true) {
+  if (!string) return string;
   if (all) return string.replace(/\b\w/g, (c) => c.toUpperCase());
   return string.replace(/\b\w/, (c) => c.toUpperCase());
 }

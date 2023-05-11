@@ -15,7 +15,7 @@
   $: sources = [
     ...new Set<string>(
       JSON.parse(info?.source || "[]")
-        .map((x: string) => x.split("/")[0])
+        .map((x: string) => capitalize(x.split("/")[0]))
         .filter((x: string) => x)
     ),
   ].join(", ");
@@ -37,7 +37,7 @@
             {format(info?.length || 0)}
           </Text>
         {:else}
-          <Text secondary>{capitalize(sources)}</Text>
+          <Text secondary>{sources}</Text>
         {/if}
       </Stack>
     </Stack>

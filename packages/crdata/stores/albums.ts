@@ -59,8 +59,23 @@ export const albums = ({ store }: DB) =>
       get(db, id: number) {
         return db
           .selectFrom("albums")
+          .innerJoin("attribution", "attribution.album", "albums.id")
+          .innerJoin("artists", "artists.id", "attribution.artist")
+          .select([
+            "albums.id",
+            "albums.title",
+            "albums.year",
+            "albums.source",
+            "albums.art",
+            (qb) =>
+              groupJSON(qb, {
+                id: "artists.id",
+                art: "artists.art",
+                title: "artists.title",
+                source: "artists.source",
+              }).as("artists"),
+          ])
           .where("albums.id", "=", id)
-          .selectAll()
           .executeTakeFirstOrThrow();
       },
     }
