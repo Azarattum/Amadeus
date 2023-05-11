@@ -143,7 +143,7 @@ const playlist = type({
 
 const responseCatalog = object({
   response: type({
-    catalog,
+    catalog: optional(catalog),
     audios: optional(array(audio)),
     links: optional(array(link)),
     playlists: optional(array(playlist)),

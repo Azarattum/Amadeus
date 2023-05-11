@@ -39,7 +39,7 @@ search(function* (type, query, page) {
   yield* response[name]?.map(covert).filter(truthy) || [];
 
   // Continue pagination
-  const blocks = response.catalog.sections.flatMap((x) => x.blocks);
+  const blocks = response.catalog?.sections.flatMap((x) => x.blocks) || [];
   const index = blocks.findIndex((x) => x.layout?.title === next);
   let block = ~index ? blocks[index + 1] : undefined;
   while (block?.next_from) {
@@ -64,10 +64,16 @@ expand(function* (type, source, _) {
   const ids = create(JSON.parse(source), array(string()))
     .filter((x: string) => x.startsWith("vk/"))
     .map((x) => x.slice(3));
-  for (const id of ids) {
+  for (const source of ids) {
     if (type === "artist") {
       const { response } = yield* fetch("catalog.getAudioArtist", {
-        params: { artist_id: id, need_blocks: "1" },
+        params: { artist_id: source, need_blocks: "1" },
+      }).as(responseCatalog);
+      yield* response.audios?.map(toTrack) || [];
+    } else {
+      const [owner_id, id, access_key] = source.split("/");
+      const { response } = yield* fetch("execute.getPlaylist", {
+        params: { owner_id, id, access_key },
       }).as(responseCatalog);
       yield* response.audios?.map(toTrack) || [];
     }
