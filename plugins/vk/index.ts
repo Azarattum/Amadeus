@@ -5,7 +5,8 @@ import {
   responseBlock,
   responseCatalog,
 } from "./types";
-import { init, search, fetch, desource } from "./plugin";
+import { init, search, fetch, desource, expand } from "./plugin";
+import { array, create, string } from "@amadeus-music/core";
 
 init(function* ({ vk: { token } }) {
   if (!token) throw "Plugin disabled! No token found!";
@@ -55,6 +56,20 @@ search(function* (type, query, page) {
 });
 
 desource(function* (source) {
-  source = JSON.parse(source).find((x: string) => x.startsWith("vk/"));
+  source = JSON.parse(source)?.find?.((x: string) => x.startsWith("vk/"));
   if (source) yield source.replace(/^vk\//, "");
+});
+
+expand(function* (type, source, _) {
+  const ids = create(JSON.parse(source), array(string()))
+    .filter((x: string) => x.startsWith("vk/"))
+    .map((x) => x.slice(3));
+  for (const id of ids) {
+    if (type === "artist") {
+      const { response } = yield* fetch("catalog.getAudioArtist", {
+        params: { artist_id: id, need_blocks: "1" },
+      }).as(responseCatalog);
+      yield* response.audios?.map(toTrack) || [];
+    }
+  }
 });
