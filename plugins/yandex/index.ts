@@ -49,7 +49,7 @@ search(function* (type, query, page) {
     };
 
     const { result } = yield* fetch("search", { params }).as(results);
-    if (!result.tracks) break;
+    if (!result.tracks?.results.length) break;
     yield* result.tracks.results.map(toTrack);
   }
 });
@@ -68,7 +68,7 @@ expand(function* (type, source, page) {
         "page-size": page.toString(),
       };
       const { result } = yield* fetch(url, { params }).as(tracks);
-      if (!result.tracks) break;
+      if (!result.tracks?.length) break;
       yield* result.tracks.map(toTrack);
     }
   }

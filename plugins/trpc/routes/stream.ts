@@ -10,6 +10,7 @@ function stream<T, U>(
 ) {
   const id = (Math.random() * 2 ** 32) >>> 0;
   (async () => {
+    let requested = 0;
     for await (const page of pages) {
       next({
         progress: page.progress,
@@ -18,10 +19,14 @@ function stream<T, U>(
         detail,
         id,
       });
-      streams.set(id, async () => {
-        await page.loaded;
-        page.next();
-      });
+      if (page.progress >= 1 && requested > page.number) page.next();
+      else {
+        streams.set(id, () => {
+          if (requested === page.number) requested += 1;
+          if (page.progress >= 1) page.next();
+          streams.delete(id);
+        });
+      }
     }
   })();
   return () => (pages as any).executor.controller.abort();

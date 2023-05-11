@@ -31,17 +31,16 @@ function page<T extends Record<string, any>>(
 
       batch.forEach((x) => progress[id].add(identify(x)));
       combine(items, batch, params);
-      if (this.progress >= 1) resolve();
       const overshoot = items.splice(size);
-      return progress.map((x) =>
-        overshoot.filter((y) => x.delete(identify(y)))
-      );
+      overshoot.forEach((x) => map.delete(identify(x)));
+      if (this.progress >= 1) resolve();
+      return progress.map((x) => overshoot.filter((y) => x.has(identify(y))));
     },
     satisfied(id: number) {
-      return progress[id].size >= size || completed.has(id);
+      return progress[id].size >= size;
     },
     has(item: T) {
-      return !!progress.find((x) => x.has(identify(item)));
+      return map.has(identify(item));
     },
     get items() {
       return items as Uniqueified<T>[];
@@ -50,7 +49,10 @@ function page<T extends Record<string, any>>(
       const part = 1 / progress.length;
       return progress.reduce(
         (acc, x, id) =>
-          acc + (this.satisfied(id) ? part : part * (x.size / size)),
+          acc +
+          (this.satisfied(id) || completed.has(id)
+            ? part
+            : part * (x.size / size)),
         0
       );
     },
