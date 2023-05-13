@@ -232,7 +232,10 @@ function pools(options: Partial<Options<any>> = {}): Pools {
         contexts.set(group, Object.assign(data, context.context));
       }
 
-      const fn = Function.bind.call(this as any, context);
+      const self = this as any;
+      const fn = function (this: any, ...args: any[]) {
+        return Function.bind.call(self, { ...context, ...this })(...args);
+      };
       const pool = Object.setPrototypeOf(fn, prototype);
       if (context?.group) pool.group = context.group;
       return Object.assign(pool, { [state]: this[state] });
