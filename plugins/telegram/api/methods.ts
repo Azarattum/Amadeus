@@ -5,14 +5,14 @@ import { paramify } from "./reply";
 
 export const sendChatAction = (chat: number, action: "upload_voice") =>
   fetch("sendChatAction", {
-    params: { chat_id: chat.toString(), action },
+    params: { chat_id: chat, action },
   })
     .request.text()
     .catch(wrn);
 
 export const deleteMessage = (chat: number, message: number) =>
   fetch("deleteMessage", {
-    params: { chat_id: chat.toString(), message_id: message.toString() },
+    params: { chat_id: chat, message_id: message },
   })
     .request.text()
     .catch(wrn);
@@ -27,7 +27,7 @@ export const answerCallbackQuery = (query: string) =>
 export const sendAudio = (chat: number, message: Audio) =>
   fetch("sendAudio", {
     params: {
-      chat_id: chat.toString(),
+      chat_id: chat,
       ...paramify(message),
     },
   }).as(sent);
@@ -35,7 +35,7 @@ export const sendAudio = (chat: number, message: Audio) =>
 export const sendMessage = (chat: number, message: Text) =>
   fetch("sendMessage", {
     params: {
-      chat_id: chat.toString(),
+      chat_id: chat,
       ...paramify(message),
     },
   }).as(sent);
@@ -59,8 +59,8 @@ export const editMessageCaption = (
 ) =>
   fetch("editMessageCaption", {
     params: {
-      chat_id: chat.toString(),
-      message_id: message.toString(),
+      chat_id: chat,
+      message_id: message,
       ...paramify(params),
     },
   }).text();
@@ -72,8 +72,8 @@ export const editMessageText = (
 ) =>
   fetch("editMessageText", {
     params: {
-      chat_id: chat.toString(),
-      message_id: message.toString(),
+      chat_id: chat,
+      message_id: message,
       ...paramify(params),
     },
   }).text();

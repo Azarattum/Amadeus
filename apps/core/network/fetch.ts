@@ -13,7 +13,7 @@ type FetchOptions = {
     ? Record<string, string | string[]>
     : GretchOptions[K];
 } & {
-  params?: Record<string, string | string[]>;
+  params?: Record<string, string | number | (string | number)[]>;
 };
 
 function fetcher(this: Context, defaults: FetchOptions = {}) {
@@ -27,7 +27,7 @@ function fetch(this: Context, url: string, options: FetchOptions = {}) {
   const ctx: any = group ? pools.contexts.get(group) || {} : {};
   if (typeof ctx.fetch === "object") options = merge(ctx.fetch, options);
 
-  const params = new URLSearchParams(pick(options.params)).toString();
+  const params = new URLSearchParams(pick(options.params) as any).toString();
   if (params) {
     if (url.includes("?")) url += "&" + params;
     else url += "?" + params;

@@ -33,7 +33,7 @@ function register<
   C extends Record<string, any> = Record<string, never>
 >(plugin: Plugin<T, S, C>) {
   assert(plugin, pluginInfo, "Tried to register an invalid plugin!");
-  plugin.name = format(plugin.name);
+  plugin.name = format(plugin.name) as string;
 
   const id = plugin.name.toLowerCase();
   if (plugins.has(id)) {
@@ -70,6 +70,6 @@ export * from "libfun";
 export { map } from "libfun";
 export * from "@amadeus-music/util/color";
 
-export { identify } from "@amadeus-music/protocol";
+export { identify, format } from "@amadeus-music/protocol";
 
 export type { Page } from "../data/pagination";
