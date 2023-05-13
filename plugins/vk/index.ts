@@ -1,6 +1,6 @@
 import { items, convert, responseOf, track, artist, album } from "./types";
-import { init, search, fetch, desource, expand } from "./plugin";
-import { array, create, string } from "@amadeus-music/core";
+import { array, create, format, map, string } from "@amadeus-music/core";
+import { init, search, fetch, desource, expand, relate } from "./plugin";
 
 init(function* ({ vk: { token } }) {
   if (!token) throw "Plugin disabled! No token found!";
@@ -17,7 +17,7 @@ search(function* (type, query, page) {
 
   for (let i = 0; ; i += page) {
     const { response } = yield* fetch(`audio.search${method}`, {
-      params: { q: query, count: page.toString(), offset: i.toString() },
+      params: { q: query, count: page, offset: i },
     }).as(responseOf(items(struct)));
 
     yield* convert(response.items, type);
@@ -52,7 +52,7 @@ expand(function* (type, source, page) {
   for (const src of ids) {
     for (let i = 0, count = 1; i < count; i += page) {
       const { response } = yield* fetch(`audio.${method}`, {
-        params: { ...args(src), count: page.toString(), offset: i.toString() },
+        params: { ...args(src), count: page, offset: i },
       }).as(responseOf(items(track)));
 
       yield* convert(response.items, "track");
@@ -60,3 +60,27 @@ expand(function* (type, source, page) {
     }
   }
 });
+
+relate(function* (type, to, page) {
+  /// Consider supporting other types
+  if (type !== "track") return;
+  const id = yield* identify(to, type);
+  if (!id) return;
+
+  // Pagination or shuffling do not work for `target_audio` recommendations
+  const { response } = yield* fetch("audio.getRecommendations", {
+    params: { target_audio: id, count: page },
+  }).as(responseOf(items(track)));
+  yield* convert(response.items, type);
+});
+
+function* identify(to: { source: string }, type: "track" | "artist" | "album") {
+  const regex = /vk\/([0-9_-]+)/;
+  return (
+    to.source.match(regex)?.[1] ||
+    (yield* map(search.where("vk")(type as any, format(to), 1), function* (x) {
+      if (x.progress >= 1) x.close();
+      return x.items[0]?.source.match(regex)?.[1];
+    })).find((x) => x)
+  );
+}
