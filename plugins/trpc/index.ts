@@ -12,7 +12,8 @@ import { wss, arg, async, usage, bright, reset } from "@amadeus-music/core";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import { app } from "./routes";
 
-init(() => {
+init(function* () {
+  yield* async(new Promise((r) => setTimeout(r, 100)));
   applyWSSHandler({ wss: wss("/trpc"), router: app, createContext: context });
 });
 
