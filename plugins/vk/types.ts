@@ -6,134 +6,79 @@ import {
   optional,
   string,
   object,
-  boolean,
+  Struct,
 } from "@amadeus-music/core";
 
-const toJSON = <T>(x?: T) => JSON.stringify(x ? [x] : []);
+const json = (strings: readonly string[], ...args: any[]) =>
+  args.every((x) => x != null)
+    ? JSON.stringify([
+        strings.reduce((a, b, i) => a + b + (i in args ? args[i] : ""), ""),
+      ])
+    : "[]";
 
-function toTrack(data: Infer<typeof audio>) {
+function toArtist(data: Infer<typeof artist> | string) {
+  if (typeof data === "string") return { title: data, source: "[]", art: "[]" };
+
+  const art = data.photo?.length
+    ? data.photo?.reduce((a, b) =>
+        a.width * a.height > b.width * b.height ? a : b
+      ).url
+    : undefined;
+
   return {
-    title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
-    length: data.duration,
-    source: toJSON(`vk/${data.url}`),
-    album: {
-      title: data.album?.title || data.title,
-      year: 0,
-      art: toJSON(data.album?.thumb?.photo_1200),
-      source: data.album
-        ? toJSON(
-            `vk/${data.album.owner_id}/${data.album.id}/${data.album.access_key}`
-          )
-        : "[]",
-    },
-    artists: data.main_artists?.map((x) => ({
-      source: x.id ? toJSON(`vk/${x.id}`) : "[]",
-      title: x.name,
-      art: "[]",
-    })) || [{ title: data.artist, source: "[]", art: "[]" }],
+    title: data.name,
+    art: json`${art}`,
+    source: json`vk/${data.id}`,
   };
 }
 
-function toArtist(data: Infer<typeof link>) {
-  if (data.meta.content_type !== "artist") return;
-  const id = data.url.split("/").pop();
-  const art = data.image?.reduce((a, b) =>
-    a.width * a.height > b.width * b.height ? a : b
-  ).url;
+function toAlbum(data: Infer<typeof album> | string) {
+  if (typeof data === "string") {
+    return { title: data, year: 0, art: "[]", source: "[]" };
+  }
 
-  return {
-    source: id ? toJSON(`vk/${id}`) : "[]",
-    title: data.title,
-    art: toJSON(art),
-  };
-}
+  const artists = data.main_artists
+    ?.map(toArtist)
+    .concat(data.featured_artists?.map(toArtist) || []);
 
-function toAlbum(data: Infer<typeof playlist>) {
-  if (data.type !== 1) return;
   return {
     title: data.title,
     year: data.year || 0,
-    art: toJSON(data.photo?.photo_1200),
-    source: toJSON(`vk/${data.owner_id}/${data.id}/${data.access_key}`),
-    artists: data.main_artists?.map((x) => ({
-      source: x.id ? toJSON(`vk/${x.id}`) : "[]",
-      title: x.name,
-      art: "[]",
-    })),
+    art: json`${data.photo?.photo_1200 || data.thumb?.photo_1200}`,
+    source: json`vk/${data.owner_id}/${data.id}/${data.access_key}`,
+    ...(artists ? { artists } : {}),
   };
 }
 
-function toSection(type: "track" | "artist" | "album") {
-  return ({ track: "audios", artist: "links", album: "playlists" } as const)[
-    type
-  ];
+function toTrack(data: Infer<typeof track>) {
+  return {
+    length: data.duration,
+    album: toAlbum(data.album || data.title),
+    source: json`vk/${data.owner_id}_${data.id}`,
+    title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
+    artists: data.main_artists
+      ?.map(toArtist)
+      .concat(data.featured_artists?.map(toArtist) || []) || [
+      toArtist(data.artist),
+    ],
+  };
 }
 
 function convert<T extends "track" | "artist" | "album">(
-  data: Exclude<Infer<typeof responseCatalog>["response"], "catalog">,
+  data: Infer<typeof track | typeof album | typeof artist>[],
   type: T
 ) {
-  const truthy = <T>(x: T): x is NonNullable<T> => !!x;
   const map = { track: toTrack, artist: toArtist, album: toAlbum }[type];
   const convert = map as (
     x: Parameters<typeof map>[0]
   ) => ReturnType<typeof map>;
-
-  return data[toSection(type)]?.map(convert).filter(truthy) || [];
+  return data.map(convert);
 }
-
-const block = type({
-  id: string(),
-  next_from: optional(string()),
-  layout: optional(type({ title: optional(string()) })),
-});
-
-const catalog = type({
-  sections: array(
-    type({
-      id: string(),
-      blocks: array(block),
-    })
-  ),
-});
-
-const album = type({
-  id: number(),
-  title: string(),
-  owner_id: number(),
-  access_key: string(),
-  thumb: optional(
-    type({
-      photo_68: string(),
-      photo_1200: string(),
-    })
-  ),
-});
 
 const artist = type({
   id: optional(string()),
   name: string(),
-});
-
-const audio = type({
-  id: number(),
-  artist: string(),
-  owner_id: number(),
-  title: string(),
-  subtitle: optional(string()),
-  duration: number(),
-  url: string(),
-  date: number(),
-  album: optional(album),
-  main_artists: optional(array(artist)),
-  has_lyrics: optional(boolean()),
-});
-
-const link = type({
-  url: string(),
-  title: string(),
-  meta: type({ content_type: string() }),
-  image: optional(
+  photo: optional(
     array(
       type({
         url: string(),
@@ -144,15 +89,21 @@ const link = type({
   ),
 });
 
-const playlist = type({
+const album = type({
   id: number(),
-  type: number(),
-  year: optional(number()),
   title: string(),
   owner_id: number(),
   access_key: string(),
+  year: optional(number()),
   main_artists: optional(array(artist)),
+  featured_artists: optional(array(artist)),
   photo: optional(
+    type({
+      photo_68: string(),
+      photo_1200: string(),
+    })
+  ),
+  thumb: optional(
     type({
       photo_68: string(),
       photo_1200: string(),
@@ -160,22 +111,23 @@ const playlist = type({
   ),
 });
 
-const responseCatalog = object({
-  response: type({
-    catalog: optional(catalog),
-    audios: optional(array(audio)),
-    links: optional(array(link)),
-    playlists: optional(array(playlist)),
-  }),
+const track = type({
+  id: number(),
+  url: string(),
+  date: number(),
+  title: string(),
+  artist: string(),
+  duration: number(),
+  owner_id: number(),
+  album: optional(album),
+  subtitle: optional(string()),
+  main_artists: optional(array(artist)),
+  featured_artists: optional(array(artist)),
 });
 
-const responseBlock = object({
-  response: type({
-    block,
-    audios: optional(array(audio)),
-    links: optional(array(link)),
-    playlists: optional(array(playlist)),
-  }),
-});
+const responseOf = <T extends Struct<any, any>>(response: T) =>
+  object({ response });
+const items = <T extends Struct<any, any>>(items: T) =>
+  object({ count: number(), items: array(items) });
 
-export { responseCatalog, responseBlock, convert };
+export { responseOf, items, track, artist, album, convert };
