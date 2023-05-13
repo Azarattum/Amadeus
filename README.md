@@ -9,7 +9,7 @@ Amadeus provides following 1st party plugins:
 | Plugin   | Purpose     | Capabilities                                 | Auth                                                              |
 | -------- | ----------- | -------------------------------------------- | ----------------------------------------------------------------- |
 | Yandex   | Provider    | Search, Recommendations, Lyrics, Recognition | [Token](https://yandex-music.readthedocs.io/en/latest/token.html) |
-| VK       | Provider    | Search                                       | [Token](https://vkhost.github.io/)                                |
+| VK       | Provider    | Search, Recommendations, Lyrics              | [Token](https://vkhost.github.io/)                                |
 | AudD     | Provider    | Recognition                                  | [Token](https://docs.audd.io/enterprise#where-to-get-a-token)     |
 | Telegram | Endpoint    | Bot                                          | [Token](https://core.telegram.org/bots/features#botfather)        |
 | tRPC     | Endpoint    | WebSocket API                                | -                                                                 |

@@ -1,6 +1,29 @@
-import { items, convert, responseOf, track, artist, album } from "./types";
-import { array, create, format, map, string } from "@amadeus-music/core";
-import { init, search, fetch, desource, expand, relate } from "./plugin";
+import {
+  transcribe,
+  desource,
+  search,
+  expand,
+  relate,
+  fetch,
+  init,
+} from "./plugin";
+import {
+  responseOf,
+  convert,
+  artist,
+  items,
+  track,
+  album,
+  lyrics,
+} from "./types";
+import {
+  array,
+  create,
+  format,
+  map,
+  optional,
+  string,
+} from "@amadeus-music/core";
 
 init(function* ({ vk: { token } }) {
   if (!token) throw "Plugin disabled! No token found!";
@@ -72,6 +95,18 @@ relate(function* (type, to, page) {
     params: { target_audio: id, count: page },
   }).as(responseOf(items(track)));
   yield* convert(response.items, type);
+});
+
+transcribe(function* (track) {
+  const id = yield* identify(track, "track");
+  if (!id) return;
+
+  const { response } = yield* fetch("audio.getLyrics", {
+    params: { audio_id: id },
+  }).as(responseOf(optional(lyrics)));
+
+  if (!response?.lyrics) return;
+  yield response.lyrics.timestamps.map((x) => x.line || "").join("\n");
 });
 
 function* identify(to: { source: string }, type: "track" | "artist" | "album") {

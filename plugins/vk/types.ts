@@ -125,9 +125,21 @@ const track = type({
   featured_artists: optional(array(artist)),
 });
 
+const lyrics = type({
+  lyrics: type({
+    timestamps: array(
+      type({
+        begin: number(),
+        end: number(),
+        line: optional(string()),
+      })
+    ),
+  }),
+});
+
 const responseOf = <T extends Struct<any, any>>(response: T) =>
-  object({ response });
+  type({ response });
 const items = <T extends Struct<any, any>>(items: T) =>
   object({ count: number(), items: array(items) });
 
-export { responseOf, items, track, artist, album, convert };
+export { responseOf, items, track, artist, album, lyrics, convert };
