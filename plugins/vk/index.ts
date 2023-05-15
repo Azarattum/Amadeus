@@ -85,7 +85,6 @@ expand(function* (type, source, page) {
 });
 
 relate(function* (type, to, page) {
-  /// Consider supporting other types
   if (type !== "track") return;
   const id = yield* identify(to, type);
   if (!id) return;
