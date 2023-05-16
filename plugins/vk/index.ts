@@ -27,7 +27,7 @@ import {
 import { handle } from "./captcha";
 
 init(function* ({ vk: { token } }) {
-  if (!token) throw "Plugin disabled! No token found!";
+  if (!token) throw "No token found!";
   this.fetch.baseURL = "https://api.vk.me/method/";
   this.fetch.params = { v: "5.190", access_token: token };
   this.fetch.headers = {

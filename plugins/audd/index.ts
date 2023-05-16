@@ -3,7 +3,7 @@ import { convert, error, success } from "./types";
 import { concat } from "./meta";
 
 init(function* ({ audd: { token } }) {
-  if (!token) throw "Plugin disabled! No token found!";
+  if (!token) throw "No token found!";
   this.connect.baseURL = "wss://api.audd.io/ws/";
   if (token.includes("/")) {
     const [key, value] = token.split("/");

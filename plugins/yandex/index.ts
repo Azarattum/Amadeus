@@ -26,7 +26,7 @@ import { auth, header, transform } from "./meta";
 import { createHash } from "node:crypto";
 
 init(function* ({ yandex: { token } }) {
-  if (!token) throw "Plugin disabled! No token found!";
+  if (!token) throw "No token found!";
   this.connect.baseURL = "wss://uniproxy.alice.yandex.net/uni.ws";
   this.fetch.baseURL = "https://api.music.yandex.net/";
   this.fetch.params = { page: "0" };
