@@ -11,6 +11,6 @@
     "@amadeus-music/crdata": "workspace:*"
   },
   "devDependencies": {
-    "vite": "4.3.5"
+    "vite": "4.3.6"
   }
 }
