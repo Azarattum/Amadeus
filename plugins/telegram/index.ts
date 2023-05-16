@@ -1,6 +1,7 @@
 import { deleteMessage, getMe, setMyCommands, setWebhook } from "./api/methods";
+import { init, stop, info, temp, users, persistence } from "./plugin";
 import { bright, reset } from "@amadeus-music/util/color";
-import { init, stop, info, temp } from "./plugin";
+import { handleChanges } from "./handlers/database";
 import { async, http } from "@amadeus-music/core";
 import { secret, request } from "./api/update";
 import { icon } from "./api/markup";
@@ -19,6 +20,11 @@ init(function* ({ telegram: { token, webhook } }) {
   info(`Logged in as ${bright}@${this.state.me.username}${reset}!`);
 
   http().on("request", request);
+
+  const tables = ["library", "feed"];
+  for (const user of Object.keys(yield* async(users()))) {
+    yield* persistence(user).subscribe(tables, handleChanges(user));
+  }
 });
 
 stop(function* () {

@@ -3,32 +3,30 @@ import { changed, persistence } from "../plugin";
 import { editor, replier } from "../api/reply";
 import { decode } from "crstore";
 
-persistence(function* (user = "shared") {
-  const storage = persistence(user);
-  yield {
-    async merge(changes) {
-      const parsed = parseChanges(changes);
-      const id = await storage.settings.extract("name", "settings");
-      const name = `${bright}${id}${reset}`;
-
-      for (const type in parsed) {
-        for (const [playlist, entries] of parsed[type as keyof typeof parsed]) {
-          try {
-            const chat = await storage.settings.extract(playlist);
-            const reply = replier(chat, name, true);
-            const edit = editor(chat);
-            changed.context({ chat, user, reply, name, edit });
-            await changed(type as keyof typeof parsed, [...entries]);
-          } catch {}
-        }
-      }
-    },
-  };
-});
-
 changed(function* (type, entries) {
   yield* this.reply(yield* persistence(this.user)[type].get(entries));
 });
+
+function handleChanges(user: string) {
+  const storage = persistence(user);
+  return async (changes: any[]) => {
+    const parsed = parseChanges(changes);
+    const id = await storage.settings.extract("name", "settings");
+    const name = `${bright}${id}${reset}`;
+
+    for (const type in parsed) {
+      for (const [playlist, entries] of parsed[type as keyof typeof parsed]) {
+        try {
+          const chat = await storage.settings.extract(playlist);
+          const reply = replier(chat, name, true);
+          const edit = editor(chat);
+          changed.context({ chat, user, reply, name, edit });
+          await changed(type as keyof typeof parsed, [...entries]);
+        } catch {}
+      }
+    }
+  };
+}
 
 function parseChanges(changes: any) {
   let target: string | null = null;
@@ -59,3 +57,5 @@ function parseChanges(changes: any) {
   }
   return { feed, library };
 }
+
+export { handleChanges };
