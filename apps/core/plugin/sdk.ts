@@ -9,6 +9,7 @@ import { command, usage, arg } from "../status/commands";
 import type { ConnectOptions } from "../network/socket";
 import type { FetchOptions } from "../network/fetch";
 import * as persistence from "../event/persistence";
+import { lookup } from "../event/aggregate";
 import { connect } from "../network/socket";
 import { format, plugins } from "./loader";
 import * as fetch from "../network/fetch";
@@ -25,6 +26,7 @@ const bound = {
   ...persistence,
   connect,
   command,
+  lookup,
 };
 
 function register<

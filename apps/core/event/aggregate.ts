@@ -3,18 +3,27 @@ import {
   albumDetails,
   trackDetails,
   artistDetails,
+  type TrackDetails,
+  format,
+  type ArtistDetails,
+  type AlbumDetails,
+  stringify,
+  identify,
+  type Uniqueified,
 } from "@amadeus-music/protocol";
+import { pages, type Page } from "../data/pagination";
 import stringSimilarity from "string-similarity-js";
 import { batch } from "@amadeus-music/util/object";
 import { clean } from "@amadeus-music/util/string";
+import type { Context } from "../plugin/types";
+import { map, merge, take } from "libfun/pool";
 import { cancel } from "libfun/utils/async";
 import { persistence } from "./persistence";
-import { pages } from "../data/pagination";
 import { inferTrack } from "../data/infer";
-import { merge, take } from "libfun/pool";
 import { array, is } from "superstruct";
 import { wrn } from "../status/log";
 import type { Task } from "libfun";
+import { search } from "./pool";
 
 async function* aggregate(
   generators: AsyncGenerator<any>[],
@@ -61,6 +70,38 @@ async function* aggregate(
   }
 }
 
+function* lookup<
+  T extends "track" | "artist" | "album",
+  U extends Record<string, any> = T extends "track"
+    ? TrackDetails
+    : T extends "artist"
+    ? ArtistDetails
+    : AlbumDetails
+>(this: Context, type: T, query: string | Partial<U>, filter?: string) {
+  const find = filter ? search.bind(this).where(filter) : search.bind(this);
+  if (typeof query === "object") query = { ...query, album: undefined };
+  const results = find(type as any, format(query), 1) as AsyncGenerator<
+    Page<U>
+  >;
+
+  const items = yield* map(results, function* (x) {
+    if (x.progress >= 1) x.close();
+    return x.items.filter(verify)[0];
+  });
+  return items.pop();
+
+  function verify(item: Uniqueified<U>) {
+    if (typeof query === "string") return true;
+    item = { ...item, album: undefined };
+    if (identify(item) === identify(query)) return true;
+    if (stringify(item) === stringify(query)) return true;
+    const inferredItem = inferTrack(stringify(item));
+    const inferredQuery = inferTrack(stringify(query));
+    if (stringify(inferredItem) === stringify(inferredQuery)) return true;
+    return false;
+  }
+}
+
 function match(query: string) {
   const track = normalize(inferTrack(query));
   query = clean(query);
@@ -88,4 +129,4 @@ function match(query: string) {
   };
 }
 
-export { aggregate };
+export { aggregate, lookup };
