@@ -11,6 +11,7 @@ export const {
   search,
   relate,
   expand,
+  lookup,
   command,
   connect,
   desource,

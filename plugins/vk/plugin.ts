@@ -9,6 +9,7 @@ export const {
   search,
   relate,
   expand,
+  lookup,
   desource,
   transcribe,
 } = register({

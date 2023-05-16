@@ -1,4 +1,16 @@
 import {
+  init,
+  search,
+  desource,
+  fetch,
+  relate,
+  transcribe,
+  expand,
+  recognize,
+  connect,
+  lookup,
+} from "./plugin";
+import {
   download,
   link,
   lyrics,
@@ -10,19 +22,8 @@ import {
   artist,
   album,
 } from "./types";
-import {
-  init,
-  search,
-  desource,
-  fetch,
-  relate,
-  transcribe,
-  expand,
-  recognize,
-  connect,
-} from "./plugin";
-import { array, format, map } from "@amadeus-music/core";
 import { auth, header, transform } from "./meta";
+import { array } from "@amadeus-music/core";
 import { createHash } from "node:crypto";
 
 init(function* ({ yandex: { token } }) {
@@ -130,16 +131,13 @@ recognize(function* (stream) {
   yield* connection.close();
 });
 
-function* identify(to: { source: string }, type: "track" | "artist" | "album") {
+function* identify(
+  data: { source?: string },
+  type: "track" | "artist" | "album"
+) {
   const regex = /yandex\/([0-9]+)/;
   return (
-    to.source?.match(regex)?.[1] ||
-    (yield* map(
-      search.where("yandex")(type as any, format(to), 1),
-      function* (x) {
-        if (x.progress >= 1) x.close();
-        return x.items[0]?.source.match(regex)?.[1];
-      }
-    )).find((x) => x)
+    data.source?.match(regex)?.[1] ||
+    (yield* lookup(type, data, "yandex"))?.source?.match(regex)?.[1]
   );
 }

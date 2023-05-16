@@ -6,6 +6,7 @@ import {
   relate,
   fetch,
   init,
+  lookup,
 } from "./plugin";
 import {
   responseOf,
@@ -16,14 +17,7 @@ import {
   album,
   lyrics,
 } from "./types";
-import {
-  array,
-  create,
-  format,
-  map,
-  optional,
-  string,
-} from "@amadeus-music/core";
+import { array, create, optional, string } from "@amadeus-music/core";
 import { handle } from "./captcha";
 
 init(function* ({ vk: { token } }) {
@@ -113,13 +107,13 @@ transcribe(function* (track) {
   yield response.lyrics.timestamps.map((x) => x.line || "").join("\n");
 });
 
-function* identify(to: { source: string }, type: "track" | "artist" | "album") {
+function* identify(
+  data: { source?: string },
+  type: "track" | "artist" | "album"
+) {
   const regex = /vk\/([0-9_-]+)/;
   return (
-    to.source?.match(regex)?.[1] ||
-    (yield* map(search.where("vk")(type as any, format(to), 1), function* (x) {
-      if (x.progress >= 1) x.close();
-      return x.items[0]?.source.match(regex)?.[1];
-    })).find((x) => x)
+    data.source?.match(regex)?.[1] ||
+    (yield* lookup(type, data, "vk"))?.source?.match(regex)?.[1]
   );
 }
