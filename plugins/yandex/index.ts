@@ -94,15 +94,17 @@ expand(function* (type, source, page) {
 });
 
 relate(function* (type, to, _) {
-  /// Properly support other `type`s!
-  if (type !== "track") return;
+  if (type === "album") return;
   const id = yield* identify(to, type);
   if (!id) return;
+  const collection = `${type}s` as const;
+  const struct = { track, artist, album }[type];
+  const upper = (x: string) => x[0].toUpperCase() + x.slice(1);
 
-  const { result } = yield* fetch(`tracks/${id}/similar`).as(
-    resultOf("similarTracks", track)
+  const { result } = yield* fetch(`${collection}/${id}/similar`).as(
+    resultOf(`similar${upper(collection)}`, struct)
   );
-  yield* convert(result.similarTracks, "track");
+  yield* convert(result[`similar${upper(collection)}`], type);
 });
 
 transcribe(function* (track) {
@@ -131,7 +133,7 @@ recognize(function* (stream) {
 function* identify(to: { source: string }, type: "track" | "artist" | "album") {
   const regex = /yandex\/([0-9]+)/;
   return (
-    to.source.match(regex)?.[1] ||
+    to.source?.match(regex)?.[1] ||
     (yield* map(
       search.where("yandex")(type as any, format(to), 1),
       function* (x) {

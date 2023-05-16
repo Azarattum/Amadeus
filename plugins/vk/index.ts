@@ -116,7 +116,7 @@ transcribe(function* (track) {
 function* identify(to: { source: string }, type: "track" | "artist" | "album") {
   const regex = /vk\/([0-9_-]+)/;
   return (
-    to.source.match(regex)?.[1] ||
+    to.source?.match(regex)?.[1] ||
     (yield* map(search.where("vk")(type as any, format(to), 1), function* (x) {
       if (x.progress >= 1) x.close();
       return x.items[0]?.source.match(regex)?.[1];
