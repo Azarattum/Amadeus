@@ -24,6 +24,7 @@ import {
   optional,
   string,
 } from "@amadeus-music/core";
+import { handle } from "./captcha";
 
 init(function* ({ vk: { token } }) {
   if (!token) throw "Plugin disabled! No token found!";
@@ -38,13 +39,17 @@ search(function* (type, query, page) {
   const method = { track: "", artist: "Artists", album: "Albums" }[type];
   const struct = { track, artist, album }[type];
 
-  for (let i = 0; ; i += page) {
-    const { response } = yield* fetch(`audio.search${method}`, {
-      params: { q: query, count: page, offset: i },
-    }).as(responseOf(items(struct)));
-
-    yield* convert(response.items, type);
-    if (response.items.length < page) break;
+  for (let i = 0; ; i += +page) {
+    try {
+      const { response } = yield* fetch(`audio.search${method}`, {
+        params: { q: query, count: page, offset: i },
+      }).as(responseOf(items(struct)));
+      yield* convert(response.items, type);
+      if (response.items.length < page) break;
+    } catch (error) {
+      yield* handle(error);
+      i -= page;
+    }
   }
 });
 
@@ -73,7 +78,7 @@ expand(function* (type, source, page) {
     .map((x) => x.slice(3));
 
   for (const src of ids) {
-    for (let i = 0, count = 1; i < count; i += page) {
+    for (let i = 0, count = 1; i < count; i += +page) {
       const { response } = yield* fetch(`audio.${method}`, {
         params: { ...args(src), count: page, offset: i },
       }).as(responseOf(items(track)));

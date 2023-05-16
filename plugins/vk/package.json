@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
-    "@amadeus-music/protocol": "workspace:*"
+    "@amadeus-music/protocol": "workspace:*",
+    "jpeg-js": "^0.4.4",
+    "onnxruntime-web": "^1.14.0"
   },
   "devDependencies": {
     "vite": "4.3.5"

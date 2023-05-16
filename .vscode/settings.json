@@ -37,6 +37,7 @@
     "IFNULL",
     "iframe",
     "keyframes",
+    "knmcp",
     "Kysely",
     "lcov",
     "libfun",
@@ -51,6 +52,8 @@
     "nocrr",
     "oneish",
     "onhold",
+    "onnx",
+    "onnxruntime",
     "paramify",
     "pcss",
     "pnpm",
@@ -96,7 +99,8 @@
     "vitest",
     "webp",
     "Wrappable",
-    "Xlekgb"
+    "Xlekgb",
+    "zshqdv"
   ],
   "eslint.validate": ["javascript", "typescript", "svelte"],
   "prettier.documentSelectors": ["**/*.svelte"],

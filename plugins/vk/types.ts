@@ -7,6 +7,7 @@ import {
   string,
   object,
   Struct,
+  literal,
 } from "@amadeus-music/core";
 
 const json = (strings: readonly string[], ...args: any[]) =>
@@ -137,9 +138,17 @@ const lyrics = type({
   }),
 });
 
+const captcha = type({
+  error: type({
+    error_code: literal(14),
+    captcha_sid: string(),
+    captcha_img: string(),
+  }),
+});
+
 const responseOf = <T extends Struct<any, any>>(response: T) =>
   type({ response });
 const items = <T extends Struct<any, any>>(items: T) =>
   object({ count: number(), items: array(items) });
 
-export { responseOf, items, track, artist, album, lyrics, convert };
+export { responseOf, items, track, artist, album, lyrics, captcha, convert };

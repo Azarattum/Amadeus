@@ -28,6 +28,7 @@ export default defineConfig({
   ],
   resolve: {
     conditions: ["import", "module", "node", "default"],
+    browserField: false,
     alias: [
       {
         find: "@amadeus-music/core",

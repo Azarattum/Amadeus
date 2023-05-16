@@ -10,6 +10,7 @@ import type { Config } from "../data/config";
 import { pools, type Mapped } from "libfun";
 import { aggregate } from "./aggregate";
 
+const rate = 180;
 const timeout = 1000 * 60 * 60;
 const all = pools({ group: "core" });
 const { pool } = all;
@@ -28,7 +29,7 @@ const search = pool<
   | ((type: "track", query: string, page: number) => Aggregated<TrackInfo>)
   | ((type: "album", query: string, page: number) => Aggregated<AlbumInfo>)
   | ((type: "artist", query: string, page: number) => Aggregated<ArtistInfo>)
->("search", { transform: aggregate, timeout });
+>("search", { transform: aggregate, timeout, rate });
 
 const expand = pool<
   | ((type: "album", source: string, page: number) => Aggregated<TrackInfo>)
@@ -39,7 +40,7 @@ const relate = pool<
   | ((type: "track", to: TrackInfo, page: number) => Aggregated<TrackInfo>)
   | ((type: "album", to: AlbumInfo, page: number) => Aggregated<AlbumInfo>)
   | ((type: "artist", to: ArtistInfo, page: number) => Aggregated<ArtistInfo>)
->("relate", { transform: aggregate, timeout });
+>("relate", { transform: aggregate, timeout, rate });
 
 const recognize = pool<
   (
@@ -51,6 +52,7 @@ const recognize = pool<
 const desource = pool<(source: string) => string>("desource");
 const transcribe = pool<(track: TrackInfo) => string>("transcribe", {
   cache: 5,
+  rate,
 });
 
 // Persistence events
