@@ -17,7 +17,10 @@
   style:width="{size}px"
   style:height="{size}px"
   class="grid shrink-0 grid-cols-2 gap-2 overflow-hidden shadow-lg contain-paint
-  {round ? 'rounded-full' : 'rounded-2xl'}"
+  {round ? 'rounded-full' : 'rounded-2xl'}
+  {href
+    ? 'outline outline-0 outline-highlight transition-[outline_transform] active:scale-95 hover:outline-8'
+    : ''}"
   class:bg-highlight={Array.isArray(of) && !of.length}
 >
   {#if Array.isArray(of)}

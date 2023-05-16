@@ -9,10 +9,10 @@
 
   export let selected = new Set<TrackDetails>();
   export let info: Partial<ArtistCollection> | undefined = undefined;
-  export let tracks = info?.tracks;
+  export let tracks: TrackDetails[] | undefined = undefined;
 
   $: href = info?.count != null ? `/explore/artist#${info?.id}` : undefined;
-  $: filtered = tracks?.filter(match($search));
+  $: filtered = (tracks || info?.tracks)?.filter(match($search));
   $: sources = [
     ...new Set<string>(
       JSON.parse(info?.source || "[]")
