@@ -3,13 +3,11 @@ import {
   albumDetails,
   trackDetails,
   artistDetails,
-  type TrackDetails,
   format,
-  type ArtistDetails,
-  type AlbumDetails,
   stringify,
   identify,
   type Uniqueified,
+  type ToDetail,
 } from "@amadeus-music/protocol";
 import { pages, type Page } from "../data/pagination";
 import stringSimilarity from "string-similarity-js";
@@ -70,18 +68,16 @@ async function* aggregate(
   }
 }
 
-function* lookup<
-  T extends "track" | "artist" | "album",
-  U extends Record<string, any> = T extends "track"
-    ? TrackDetails
-    : T extends "artist"
-    ? ArtistDetails
-    : AlbumDetails
->(this: Context, type: T, query: string | Partial<U>, filter?: string) {
+function* lookup<T extends "track" | "artist" | "album">(
+  this: Context,
+  type: T,
+  query: string | Partial<ToDetail<T>>,
+  filter?: string
+) {
   const find = filter ? search.bind(this).where(filter) : search.bind(this);
   if (typeof query === "object") query = { ...query, album: undefined };
   const results = find(type as any, format(query), 1) as AsyncGenerator<
-    Page<U>
+    Page<ToDetail<T>>
   >;
 
   const items = yield* map(results, function* (x) {
@@ -90,7 +86,7 @@ function* lookup<
   });
   return items.pop();
 
-  function verify(item: Uniqueified<U>) {
+  function verify(item: Uniqueified<ToDetail<T>>) {
     if (typeof query === "string") return true;
     item = { ...item, album: undefined };
     if (identify(item) === identify(query)) return true;

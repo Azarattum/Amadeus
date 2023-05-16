@@ -51,6 +51,14 @@ type PlaylistInfo = Infer<typeof playlistInfo>;
 type PlaylistDetails = Infer<typeof playlistDetails>;
 type PlaylistCollection = Infer<typeof playlistCollection>;
 
+type ToDetail<T extends string> = T extends "track"
+  ? TrackDetails
+  : T extends "artist"
+  ? ArtistDetails
+  : T extends "album"
+  ? AlbumDetails
+  : never;
+
 type PlaybackDirection = "forward" | "backward" | "shuffled";
 type PlaybackRepeat = "none" | "single" | "all";
 type FeedType = "listened" | "recommended" | "following";
@@ -71,6 +79,7 @@ export type {
   PlaybackDirection,
   PlaybackRepeat,
   FeedType,
+  ToDetail,
 };
 export {
   trackInfo,
