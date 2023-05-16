@@ -1,4 +1,16 @@
 import {
+  download,
+  link,
+  lyrics,
+  match,
+  convert,
+  resultsOf,
+  track,
+  resultOf,
+  artist,
+  album,
+} from "./types";
+import {
   init,
   search,
   desource,
@@ -9,16 +21,6 @@ import {
   recognize,
   connect,
 } from "./plugin";
-import {
-  download,
-  link,
-  lyrics,
-  match,
-  convert,
-  resultsOf,
-  track,
-  resultOf,
-} from "./types";
 import { array, format, map } from "@amadeus-music/core";
 import { auth, header, transform } from "./meta";
 import { createHash } from "node:crypto";
@@ -35,9 +37,8 @@ init(function* ({ yandex: { token } }) {
 });
 
 search(function* (type, query, page) {
-  /// Properly support other `type`s!
-  if (type !== "track") return;
-
+  const struct = { track, artist, album }[type];
+  const collection = `${type}s` as const;
   for (let i = 0; ; i++) {
     const params = {
       type,
@@ -48,11 +49,13 @@ search(function* (type, query, page) {
     };
 
     const { result } = yield* fetch("search", { params }).as(
-      resultsOf("tracks", track)
+      resultsOf(collection, struct)
     );
-    if (!result.tracks?.results) break;
-    yield* convert(result.tracks.results, "track");
-    if (result.tracks.results.length < page) break;
+
+    const items = result[collection];
+    if (!items?.results) break;
+    yield* convert(items.results, type);
+    if (items.results.length < page) break;
   }
 });
 
@@ -79,7 +82,7 @@ expand(function* (type, source, page) {
   } else if (type === "artist") {
     for (let i = 0; ; i++) {
       const url = `artists/${id}/tracks`;
-      const params = { page: i++, "page-size": page };
+      const params = { page: i, "page-size": page };
       const { result } = yield* fetch(url, { params }).as(
         resultOf("tracks", track)
       );
