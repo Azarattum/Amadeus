@@ -11,7 +11,6 @@ import {
 } from "./plugin";
 import {
   volumes,
-  toTrack,
   download,
   link,
   results,
@@ -19,6 +18,7 @@ import {
   similar,
   lyrics,
   match,
+  convert,
 } from "./types";
 import { format, map } from "@amadeus-music/core";
 import { auth, header, transform } from "./meta";
@@ -49,8 +49,9 @@ search(function* (type, query, page) {
     };
 
     const { result } = yield* fetch("search", { params }).as(results);
-    if (!result.tracks || result.tracks.results.length < page) break;
-    yield* result.tracks.results.map(toTrack);
+    if (!result.tracks) break;
+    yield* convert(result.tracks.results, "track");
+    if (result.tracks.results.length < page) break;
   }
 });
 
@@ -70,14 +71,15 @@ expand(function* (type, source, page) {
   if (!id) return;
   if (type === "album") {
     const { result } = yield* fetch(`albums/${id}/with-tracks`).as(volumes);
-    yield* result.volumes.flat().map(toTrack);
+    yield* convert(result.volumes.flat(), "track");
   } else if (type === "artist") {
     for (let i = 0; ; i++) {
       const url = `artists/${id}/tracks`;
       const params = { page: i++, "page-size": page };
       const { result } = yield* fetch(url, { params }).as(tracks);
-      if (!result.tracks || result.tracks.length < page) break;
-      yield* result.tracks.map(toTrack);
+      if (!result.tracks) break;
+      yield* convert(result.tracks, "track");
+      if (result.tracks.length < page) break;
     }
   }
 });
@@ -89,7 +91,7 @@ relate(function* (type, to, _) {
   if (!id) return;
 
   const { result } = yield* fetch(`tracks/${id}/similar`).as(similar);
-  yield* result.similarTracks.map(toTrack);
+  yield* convert(result.similarTracks, "track");
 });
 
 transcribe(function* (track) {
@@ -109,7 +111,9 @@ recognize(function* (stream) {
   yield* connection.send(init);
   yield* connection.send(stream().pipeThrough(transform(id)));
   const { directive } = yield* connection.recv(match);
-  if ("data" in directive.payload) yield toTrack(directive.payload.data.match);
+  if ("data" in directive.payload) {
+    yield* convert([directive.payload.data.match], "track");
+  }
   yield* connection.close();
 });
 
