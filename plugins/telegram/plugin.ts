@@ -24,6 +24,7 @@ export const {
   search,
   relate,
   expand,
+  lookup,
   desource,
   recognize,
   transcribe,

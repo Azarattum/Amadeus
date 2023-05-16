@@ -1,16 +1,17 @@
 import {
   persistence,
+  recognize,
   message,
   search,
+  lookup,
   voice,
   fetch,
   info,
   post,
-  recognize,
   wrn,
 } from "../plugin";
-import { async, first, map } from "@amadeus-music/core";
 import { format } from "@amadeus-music/protocol";
+import { map } from "@amadeus-music/core";
 import { icon } from "../api/markup";
 import { pages } from "../api/pages";
 
@@ -30,9 +31,7 @@ message(function* (text) {
 
 post(function* (text, chat) {
   const storage = persistence(this.user);
-  const page = yield* async(first(search("track", text, 1)));
-  yield* async(page.loaded);
-  const track = page.items[0];
+  const track = yield* lookup("track", text);
   if (!track) return wrn(`Unable to lookup track "${text}"!`);
   const playlist = +(yield* storage.settings.lookup(chat));
   yield* storage.library.push([track], playlist);
