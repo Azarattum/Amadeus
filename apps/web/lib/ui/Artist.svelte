@@ -11,6 +11,7 @@
   export let info: Partial<ArtistCollection> | undefined = undefined;
   export let tracks = info?.tracks;
 
+  $: href = info?.count != null ? `/explore/artist#${info?.id}` : undefined;
   $: filtered = tracks?.filter(match($search));
   $: sources = [
     ...new Set<string>(
@@ -23,7 +24,7 @@
 
 <Topbar title={info?.title || ""}>
   <Stack gap="lg" x center p>
-    <Avatar href="/explore/artist#{info?.id}" round of={info} />
+    <Avatar {href} round of={info} />
     <Stack gap>
       <Header loading={!info}>{info?.title}</Header>
       <Stack x gap="lg">
