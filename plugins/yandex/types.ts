@@ -6,6 +6,7 @@ import {
   optional,
   string,
   union,
+  type Struct,
 } from "@amadeus-music/core";
 
 const json = (strings: readonly string[], ...args: any[]) =>
@@ -37,26 +38,29 @@ function toTrack(data: Infer<typeof track>) {
   };
 }
 
-function convert<T extends "track">(data: Infer<typeof track>[], type: T) {
+function convert<T extends "track">(
+  data: Infer<typeof track>[] | undefined,
+  type: T
+) {
   const map = { track: toTrack }[type];
   const convert = map as (
     x: Parameters<typeof map>[0]
   ) => ReturnType<typeof map>;
-  return data.map(convert);
+  return data?.map(convert) || [];
 }
+
+const artist = type({
+  name: string(),
+  id: number(),
+  cover: optional(type({ uri: string() })),
+});
 
 const track = type({
   id: union([number(), string()]),
   coverUri: optional(string()),
   durationMs: number(),
   title: string(),
-  artists: array(
-    type({
-      name: string(),
-      id: number(),
-      cover: optional(type({ uri: string() })),
-    })
-  ),
+  artists: array(artist),
   albums: array(
     type({
       id: number(),
@@ -66,32 +70,8 @@ const track = type({
   ),
 });
 
-const results = type({
-  result: type({
-    tracks: optional(
-      type({
-        results: array(track),
-      })
-    ),
-  }),
-});
-
-const volumes = type({
-  result: type({ volumes: array(array(track)) }),
-});
-
-const similar = type({
-  result: type({ similarTracks: array(track) }),
-});
-
 const lyrics = type({
   result: type({ lyrics: optional(type({ fullLyrics: string() })) }),
-});
-
-const tracks = type({
-  result: type({
-    tracks: optional(array(track)),
-  }),
 });
 
 const link = type({
@@ -122,14 +102,27 @@ const match = type({
   }),
 });
 
-export {
-  download,
-  results,
-  volumes,
-  similar,
-  convert,
-  tracks,
-  lyrics,
-  match,
-  link,
-};
+const resultOf = <const K extends string, T extends Struct<any, any>>(
+  name: K,
+  item: T
+) =>
+  type({
+    result: type<{ [I in K]: Struct<Infer<T>[] | undefined, T> }>({
+      [name]: optional(array(item)),
+    } as any),
+  });
+
+const resultsOf = <const K extends string, T extends Struct<any, any>>(
+  name: K,
+  item: T
+) =>
+  type({
+    result: type<{
+      [I in K]: Struct<
+        { results: Infer<T>[] } | undefined,
+        { results: Struct<Infer<T>[], T> }
+      >;
+    }>({ [name]: optional(type({ results: array(item) })) } as any),
+  });
+
+export { resultOf, resultsOf, track, download, convert, lyrics, match, link };

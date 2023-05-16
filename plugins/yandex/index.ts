@@ -10,17 +10,16 @@ import {
   connect,
 } from "./plugin";
 import {
-  volumes,
   download,
   link,
-  results,
-  tracks,
-  similar,
   lyrics,
   match,
   convert,
+  resultsOf,
+  track,
+  resultOf,
 } from "./types";
-import { format, map } from "@amadeus-music/core";
+import { array, format, map } from "@amadeus-music/core";
 import { auth, header, transform } from "./meta";
 import { createHash } from "node:crypto";
 
@@ -48,8 +47,10 @@ search(function* (type, query, page) {
       "page-size": page,
     };
 
-    const { result } = yield* fetch("search", { params }).as(results);
-    if (!result.tracks) break;
+    const { result } = yield* fetch("search", { params }).as(
+      resultsOf("tracks", track)
+    );
+    if (!result.tracks?.results) break;
     yield* convert(result.tracks.results, "track");
     if (result.tracks.results.length < page) break;
   }
@@ -70,13 +71,18 @@ expand(function* (type, source, page) {
   const id = source?.match(/yandex\/([0-9]+)/)?.[1];
   if (!id) return;
   if (type === "album") {
-    const { result } = yield* fetch(`albums/${id}/with-tracks`).as(volumes);
-    yield* convert(result.volumes.flat(), "track");
+    const { result } = yield* fetch(`albums/${id}/with-tracks`).as(
+      resultOf("volumes", array(track))
+    );
+
+    yield* convert(result.volumes?.flat(), "track");
   } else if (type === "artist") {
     for (let i = 0; ; i++) {
       const url = `artists/${id}/tracks`;
       const params = { page: i++, "page-size": page };
-      const { result } = yield* fetch(url, { params }).as(tracks);
+      const { result } = yield* fetch(url, { params }).as(
+        resultOf("tracks", track)
+      );
       if (!result.tracks) break;
       yield* convert(result.tracks, "track");
       if (result.tracks.length < page) break;
@@ -90,7 +96,9 @@ relate(function* (type, to, _) {
   const id = yield* identify(to, type);
   if (!id) return;
 
-  const { result } = yield* fetch(`tracks/${id}/similar`).as(similar);
+  const { result } = yield* fetch(`tracks/${id}/similar`).as(
+    resultOf("similarTracks", track)
+  );
   yield* convert(result.similarTracks, "track");
 });
 
