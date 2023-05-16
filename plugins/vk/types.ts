@@ -38,9 +38,9 @@ function toAlbum(data: Infer<typeof album> | string) {
     return { title: data, year: 0, art: "[]", source: "[]" };
   }
 
-  const artists = data.main_artists
-    ?.map(toArtist)
-    .concat(data.featured_artists?.map(toArtist) || []);
+  const artists = (data.main_artists?.map(toArtist) || []).concat(
+    data.featured_artists?.map(toArtist) || []
+  );
 
   return {
     title: data.title,
@@ -52,16 +52,16 @@ function toAlbum(data: Infer<typeof album> | string) {
 }
 
 function toTrack(data: Infer<typeof track>) {
+  if (!data.main_artists && !data.featured_artists) return;
+  if (!data.url) return;
   return {
     length: data.duration,
     album: toAlbum(data.album || data.title),
     source: json`vk/${data.owner_id}_${data.id}`,
     title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
-    artists: data.main_artists
-      ?.map(toArtist)
-      .concat(data.featured_artists?.map(toArtist) || []) || [
-      toArtist(data.artist),
-    ],
+    artists: (data.main_artists?.map(toArtist) || []).concat(
+      data.featured_artists?.map(toArtist) || []
+    ),
   };
 }
 
@@ -70,10 +70,11 @@ function convert<T extends "track" | "artist" | "album">(
   type: T
 ) {
   const map = { track: toTrack, artist: toArtist, album: toAlbum }[type];
+  const truthy = <T>(x: T): x is NonNullable<T> => !!x;
   const convert = map as (
     x: Parameters<typeof map>[0]
   ) => ReturnType<typeof map>;
-  return data.map(convert);
+  return data.map(convert).filter(truthy);
 }
 
 const artist = type({
