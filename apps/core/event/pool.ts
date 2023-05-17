@@ -10,7 +10,7 @@ import type { Config } from "../data/config";
 import { pools, type Mapped } from "libfun";
 import { aggregate } from "./aggregate";
 
-const rate = 180;
+const rate = 90;
 const timeout = 1000 * 60 * 60;
 const all = pools({ group: "core" });
 const { pool } = all;

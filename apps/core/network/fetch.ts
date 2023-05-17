@@ -45,6 +45,7 @@ function fetch(this: Context, url: string, options: FetchOptions = {}) {
     : undefined;
 
   const request = gretch<unknown, unknown>(url, {
+    timeout: options.form ? 10 * 60 * 1000 : 10000,
     duplex: options.form ? "half" : undefined,
     method: options.form ? "POST" : "GET",
     body,
