@@ -99,9 +99,12 @@ callback(function* (action, message) {
     if (!page) return;
 
     this.signal.addEventListener("abort", page.close, { once: true });
-    yield* map(expand("album", track.album.source, 8), function* (state) {
-      yield* page.update(state);
-    });
+    yield* map(
+      expand("album", { ...track.album, artists: track.artists }, 8),
+      function* (state) {
+        yield* page.update(state);
+      }
+    );
   }
   if (type("similar").is(action)) {
     const track = yield* tracks.get(action.similar);
@@ -149,7 +152,7 @@ callback(function* (action, message) {
     if (!page) return;
 
     this.signal.addEventListener("abort", page.close, { once: true });
-    yield* map(expand("artist", artist.source, 8), function* (state) {
+    yield* map(expand("artist", artist, 8), function* (state) {
       yield* page.update(state);
     });
   }

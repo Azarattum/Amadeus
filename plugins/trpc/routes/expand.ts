@@ -18,14 +18,14 @@ export const expand = router({
     const artist = await ctx.cache().artists.get(id);
     info(`${ctx.name} requested artist "${artist.title}".`);
     return observable<Stream<TrackDetails, ArtistDetails>>(({ next }) => {
-      return stream(next, expandOf("artist", artist.source, page), artist);
+      return stream(next, expandOf("artist", artist, page), artist);
     });
   }),
   album: expandProcedure.subscription(async ({ input: { id, page }, ctx }) => {
     const album = await ctx.cache().albums.get(id);
     info(`${ctx.name} requested album "${album.title}".`);
     return observable<Stream<TrackDetails, Unique<Album>>>(({ next }) => {
-      return stream(next, expandOf("album", album.source, page), album);
+      return stream(next, expandOf("album", album, page), album);
     });
   }),
 });

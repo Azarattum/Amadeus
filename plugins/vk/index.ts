@@ -17,7 +17,7 @@ import {
   album,
   lyrics,
 } from "./types";
-import { array, create, optional, string } from "@amadeus-music/core";
+import { array, optional } from "@amadeus-music/core";
 import { handle } from "./captcha";
 
 init(function* ({ vk: { token } }) {
@@ -57,7 +57,7 @@ desource(function* (source) {
   yield* response.map((x) => x.url);
 });
 
-expand(function* (type, source, page) {
+expand(function* (type, what, page) {
   const method = { artist: "getAudiosByArtist", album: "get" }[type];
   const args = {
     artist: (src: string) => ({ artist_id: src }),
@@ -66,20 +66,16 @@ expand(function* (type, source, page) {
       return { owner_id, album_id, access_key };
     },
   }[type];
+  const id = yield* identify(what, type);
+  if (!id) return;
 
-  const ids = create(JSON.parse(source), array(string()))
-    .filter((x: string) => x.startsWith("vk/"))
-    .map((x) => x.slice(3));
+  for (let i = 0, count = 1; i < count; i += +page) {
+    const { response } = yield* fetch(`audio.${method}`, {
+      params: { ...args(id), count: page, offset: i },
+    }).as(responseOf(items(track)));
 
-  for (const src of ids) {
-    for (let i = 0, count = 1; i < count; i += +page) {
-      const { response } = yield* fetch(`audio.${method}`, {
-        params: { ...args(src), count: page, offset: i },
-      }).as(responseOf(items(track)));
-
-      yield* convert(response.items, "track");
-      count = response.count;
-    }
+    yield* convert(response.items, "track");
+    count = response.count;
   }
 });
 

@@ -32,8 +32,8 @@ const search = pool<
 >("search", { transform: aggregate, timeout, rate });
 
 const expand = pool<
-  | ((type: "album", source: string, page: number) => Aggregated<TrackInfo>)
-  | ((type: "artist", source: string, page: number) => Aggregated<TrackInfo>)
+  | ((type: "album", what: AlbumInfo, page: number) => Aggregated<TrackInfo>)
+  | ((type: "artist", what: ArtistInfo, page: number) => Aggregated<TrackInfo>)
 >("expand", { transform: aggregate, timeout });
 
 const relate = pool<

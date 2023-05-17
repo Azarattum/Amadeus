@@ -71,8 +71,8 @@ desource(function* (source) {
   yield `https://${info.host}/get-mp3/${sign}/${info.ts}${info.path}`;
 });
 
-expand(function* (type, source, page) {
-  const id = source?.match(/yandex\/([0-9]+)/)?.[1];
+expand(function* (type, what, page) {
+  const id = yield* identify(what, type);
   if (!id) return;
   if (type === "album") {
     const { result } = yield* fetch(`albums/${id}/with-tracks`).as(
