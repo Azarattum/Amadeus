@@ -64,6 +64,7 @@ export const path = (to = ".") =>
 export { register, usage, arg };
 export { http } from "../network/http";
 export { wss } from "../network/socket";
+export { reencode, resize } from "../data/ffmpeg";
 export { inferTrack, inferArtists } from "../data/infer";
 
 export * from "superstruct";

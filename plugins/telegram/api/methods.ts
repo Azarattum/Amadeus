@@ -1,3 +1,4 @@
+import { format, reencode, resize } from "@amadeus-music/core";
 import { Audio, Message, Text } from "../types/reply";
 import { file, me, sent } from "../types/core";
 import { fetch, wrn } from "../plugin";
@@ -24,13 +25,21 @@ export const answerCallbackQuery = (query: string) =>
     .request.text()
     .catch(wrn);
 
-export const sendAudio = (chat: number, message: Audio) =>
-  fetch("sendAudio", {
-    params: {
+export const sendAudio = (chat: number, message: Audio) => {
+  const filename = format(message.track).replace(/[/\\?%*:|"<>]/gi, "");
+  const art = JSON.parse(message.track.album.art)[0];
+  return fetch("sendAudio", {
+    form: {
       chat_id: chat,
+      title: message.track.title,
+      duration: message.track.length,
+      audio: [reencode(message.url, message.track), `./${filename}.opus`],
+      thumbnail: art ? [resize(art, 320), "./art.jpg"] : undefined,
+      performer: message.track.artists.map((x: any) => x.title).join(", "),
       ...paramify(message),
     },
   }).as(sent);
+};
 
 export const sendMessage = (chat: number, message: Text) =>
   fetch("sendMessage", {

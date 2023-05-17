@@ -4,7 +4,9 @@ import type { Context } from "../plugin/types";
 import { errorify } from "libfun/utils/error";
 import type { Struct } from "superstruct";
 import { async, context } from "libfun";
+import { Readable } from "node:stream";
 import { pools } from "../event/pool";
+import { Form } from "./form";
 
 type FetchOptions = {
   [K in keyof GretchOptions]: K extends "baseURL"
@@ -14,6 +16,10 @@ type FetchOptions = {
     : GretchOptions[K];
 } & {
   params?: Record<string, string | number | (string | number)[]>;
+  form?: Record<
+    string,
+    string | number | (string | number)[] | [Readable, string] | undefined
+  >;
 };
 
 function fetcher(this: Context, defaults: FetchOptions = {}) {
@@ -32,12 +38,23 @@ function fetch(this: Context, url: string, options: FetchOptions = {}) {
     if (url.includes("?")) url += "&" + params;
     else url += "?" + params;
   }
+  const body = options.form
+    ? (Readable.toWeb(
+        new Form(options.form)
+      ) as ReadableStream<ArrayBufferView>)
+    : undefined;
 
   const request = gretch<unknown, unknown>(url, {
+    duplex: options.form ? "half" : undefined,
+    method: options.form ? "POST" : "GET",
+    body,
     ...options,
-    headers: pick(options.headers),
-    baseURL: pick(options.baseURL),
     signal: context.signal || options.signal,
+    baseURL: pick(options.baseURL),
+    headers: {
+      ...(options.form ? Form.headers : {}),
+      ...pick(options.headers),
+    },
   });
 
   return {

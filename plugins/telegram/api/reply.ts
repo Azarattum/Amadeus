@@ -19,14 +19,16 @@ function notifier(chat: number) {
 }
 
 function paramify(params: Record<string, any>) {
-  const map: Record<string, string> = {
-    mode: "parse_mode",
+  const map: Record<string, string | null> = {
     to: "reply_to_message_id",
     markup: "reply_markup",
+    mode: "parse_mode",
+    track: null,
+    url: null,
   };
   const mapped: Record<string, any> = {};
   for (const key in params) {
-    if (key in params && params[key] !== undefined) {
+    if (key in params && params[key] !== undefined && map[key] !== null) {
       mapped[map[key] || key] = params[key];
     }
   }
@@ -50,12 +52,10 @@ function* queue(
     info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
     promises.push(
       pool({
-        audio: url,
-        title: track.title,
-        thumb: JSON.parse(track.album.art)?.[0],
-        performer: track.artists.map((x: any) => x.title).join(", "),
-        markup: !group ? menu(track.id) : undefined,
+        url,
+        track,
         mode: markdown(),
+        markup: !group ? menu(track.id) : undefined,
       }).then((x) => (setTimeout(() => done || notifier(), 10), x))
     );
   }
@@ -68,7 +68,7 @@ function* queue(
 }
 
 function* reply(chat: number, params: Message) {
-  const { result } = yield* "audio" in params
+  const { result } = yield* "track" in params
     ? sendAudio(chat, params)
     : "page" in params
     ? sendPage(chat, params)

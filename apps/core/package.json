@@ -14,6 +14,7 @@
   "dependencies": {
     "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/util": "workspace:*",
+    "fluent-ffmpeg": "^2.1.2",
     "gretchen": "^1.5.1",
     "libfun": "workspace:*",
     "string-similarity-js": "^2.1.4",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.2",
+    "@types/fluent-ffmpeg": "^2.1.21",
     "@types/ws": "^8.5.4",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-node-externals": "^6.0.1",
