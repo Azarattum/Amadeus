@@ -13,11 +13,11 @@ import {
   temp,
   persistence,
 } from "../plugin";
+import { async, inferArtists, map } from "@amadeus-music/core";
 import { answerCallbackQuery, deleteMessage } from "./methods";
 import { bright, reset } from "@amadeus-music/util/color";
 import { IncomingMessage, ServerResponse } from "http";
 import { pick } from "@amadeus-music/util/object";
-import { async, map } from "@amadeus-music/core";
 import { replier, editor } from "./reply";
 import { sender } from "../types/sender";
 import * as type from "../types/core";
@@ -121,15 +121,20 @@ async function* handle(update: unknown, me: string, url?: string) {
   }
   if (type.audio.is(update)) {
     const { performer, title } = update.message.audio;
-    const text = [performer, title].filter((x) => x).join(" - ");
-    if (text) yield* message(text);
+    yield* message({
+      artists: inferArtists(performer).map((x) => ({ title: x })),
+      title,
+    });
   }
   if (type.post.is(update)) {
     const { chat, audio, text } = update.channel_post;
     if (text?.includes(`@${me}`)) yield* mention(chat.id);
     if (audio) {
-      const text = [audio.performer, audio.title].filter((x) => x).join(" - ");
-      yield* post(text, chat.id);
+      const meta = {
+        artists: inferArtists(audio.performer).map((x) => ({ title: x })),
+        title: audio.title,
+      };
+      yield* post(meta, chat.id);
     }
   }
   if (type.callback.is(update)) {
