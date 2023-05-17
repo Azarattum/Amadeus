@@ -108,7 +108,7 @@ transcribe(function* (track) {
 });
 
 function* identify(
-  data: { source?: string },
+  data: { source?: string; title?: string },
   type: "track" | "artist" | "album"
 ) {
   const regex = /vk\/([0-9_-]+)/;
