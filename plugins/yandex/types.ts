@@ -42,7 +42,7 @@ function toAlbum(data: Infer<typeof album> | string, artistless = false) {
 
 function toTrack(data: Infer<typeof track>) {
   return {
-    title: data.title,
+    title: data.title + (data.version ? ` (${data.version})` : ""),
     length: data.durationMs / 1000,
     source: json`yandex/${data.id}`,
     album: toAlbum(data.albums[0] || data.title, true),
@@ -79,6 +79,7 @@ const track = type({
   id: union([number(), string()]),
   durationMs: number(),
   title: string(),
+  version: optional(string()),
   artists: array(artist),
   albums: array(album),
 });
