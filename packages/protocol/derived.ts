@@ -35,6 +35,11 @@ const playlistInfo = playlist;
 const playlistDetails = unique(playlistInfo);
 const playlistCollection = assign(playlistDetails, collection(trackEntry));
 
+type TrackMeta = {
+  title?: string;
+  album?: { title?: string };
+  artists?: { title?: string }[];
+};
 type TrackInfo = Infer<typeof trackInfo>;
 type TrackDetails = Infer<typeof trackDetails>;
 type TrackEntry = Infer<typeof trackEntry>;
@@ -64,6 +69,7 @@ type PlaybackRepeat = "none" | "single" | "all";
 type FeedType = "listened" | "recommended" | "following";
 
 export type {
+  TrackMeta,
   TrackInfo,
   TrackDetails,
   TrackEntry,

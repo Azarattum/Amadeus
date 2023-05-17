@@ -7,6 +7,7 @@ import {
   stringify,
   identify,
   type Uniqueified,
+  type TrackMeta,
   type ToDetail,
 } from "@amadeus-music/protocol";
 import { pages, type Page } from "../data/pagination";
@@ -71,7 +72,7 @@ async function* aggregate(
 function* lookup<T extends "track" | "artist" | "album">(
   this: Context,
   type: T,
-  query: string | Partial<ToDetail<T>>,
+  query: string | TrackMeta,
   filter?: string
 ) {
   const find = filter ? search.bind(this).where(filter) : search.bind(this);
