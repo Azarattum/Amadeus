@@ -33,7 +33,7 @@ function toArtist(data: Infer<typeof artist> | string) {
   };
 }
 
-function toAlbum(data: Infer<typeof album> | string) {
+function toAlbum(data: Infer<typeof album> | string, artistless = false) {
   if (typeof data === "string") {
     return { title: data, year: 0, art: "[]", source: "[]" };
   }
@@ -47,7 +47,7 @@ function toAlbum(data: Infer<typeof album> | string) {
     year: data.year || 0,
     art: json`${data.photo?.photo_1200 || data.thumb?.photo_1200}`,
     source: json`vk/${data.owner_id}/${data.id}/${data.access_key}`,
-    ...(artists ? { artists } : {}),
+    ...(artists && !artistless ? { artists } : {}),
   };
 }
 
@@ -56,7 +56,7 @@ function toTrack(data: Infer<typeof track>) {
   if (!data.url) return;
   return {
     length: data.duration,
-    album: toAlbum(data.album || data.title),
+    album: toAlbum(data.album || data.title, true),
     source: json`vk/${data.owner_id}_${data.id}`,
     title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
     artists: (data.main_artists?.map(toArtist) || []).concat(
@@ -74,7 +74,7 @@ function convert<T extends "track" | "artist" | "album">(
   const convert = map as (
     x: Parameters<typeof map>[0]
   ) => ReturnType<typeof map>;
-  return data.map(convert).filter(truthy);
+  return data.map((x) => convert(x)).filter(truthy);
 }
 
 const artist = type({
