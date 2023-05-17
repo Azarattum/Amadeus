@@ -32,9 +32,9 @@ export const sendAudio = (chat: number, message: Audio) => {
     form: {
       chat_id: chat,
       title: message.track.title,
-      duration: message.track.length,
-      audio: [reencode(message.url, message.track), `./${filename}.opus`],
-      thumbnail: art ? [resize(art, 320), "./art.jpg"] : undefined,
+      duration: Math.round(message.track.length),
+      audio: [reencode(message.url, message.track), `${filename}.ogm`],
+      thumbnail: art ? [resize(art, 320), "art.jpg"] : undefined,
       performer: message.track.artists.map((x: any) => x.title).join(", "),
       ...paramify(message),
     },
