@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PlaylistCollection } from "@amadeus-music/protocol";
+  import type { Collection, CollectionType } from "@amadeus-music/protocol";
   import { Icon, Virtual } from "@amadeus-music/ui";
   import type { EditEvent } from "./Tracks.svelte";
   import { createEventDispatcher } from "svelte";
@@ -12,29 +12,28 @@
     create: void;
   }>();
 
-  export let playlists: PlaylistCollection[] = [];
+  export let of: (Collection | undefined)[] | undefined = undefined;
+  export let style: CollectionType;
   export let expandable = false;
+  export let href = "/library";
   export let editable = false;
+  export let prerender = 3;
   export let filter = "";
 
-  function edit({ detail }: EditEvent<PlaylistCollection | undefined | null>) {
+  function edit({ detail }: EditEvent<Collection | undefined | null>) {
     if (!detail.item || detail.action !== "rearrange") return;
-    dispatch("rearrange", {
-      id: detail.item.id,
-      after: items[detail.index - 1]?.id,
-    });
+    dispatch("rearrange", { id: detail.item.id, after: detail.after?.id });
   }
 
-  const prerender = 3;
-  $: items = ready(playlists)
-    ? (expandable ? [...playlists, null] : playlists).filter(match(filter))
-    : Array.from<undefined>({ length: prerender });
+  $: items =
+    of && ready(of)
+      ? (expandable ? [...of, null] : of).filter(match(filter))
+      : Array.from<undefined>({ length: prerender });
 </script>
 
 <Virtual
-  sortable={editable}
+  sortable={editable && !!filter}
   key={(x) => x?.id}
-  fixed={!!filter}
   columns="20rem"
   on:edit={edit}
   {prerender}
@@ -42,9 +41,10 @@
   gap={16}
   animate
   {items}
+  on:end
 >
   {#if item}
-    <Card href="/library/playlist#{item.id}" playlist={item} />
+    <Card href="{href}/{style}#{item.id}" {...{ [style]: { item } }} />
   {:else if item === null}
     <button
       class="p flex w-full cursor-pointer justify-center rounded-2xl p-4 text-highlight ring-4 ring-inset ring-highlight"
@@ -53,6 +53,6 @@
       <Icon name="plus" xxl />
     </button>
   {:else}
-    <Card playlist />
+    <Card {...{ [style]: true }} />
   {/if}
 </Virtual>
