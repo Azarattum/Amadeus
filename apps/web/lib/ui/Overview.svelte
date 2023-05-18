@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Collection, CollectionType } from "@amadeus-music/protocol";
-  import { Icon, Virtual } from "@amadeus-music/ui";
-  import type { EditEvent } from "./Tracks.svelte";
+  import { Icon, Virtual, type EditEvent } from "@amadeus-music/ui";
   import { createEventDispatcher } from "svelte";
   import Card from "$lib/ui/Card.svelte";
   import { match } from "$lib/util";

@@ -1,12 +1,3 @@
-<script lang="ts" context="module">
-  export type EditEvent<T> = CustomEvent<{
-    action: "push" | "purge" | "rearrange";
-    after: T | undefined;
-    index: number;
-    item: T;
-  }>;
-</script>
-
 <script lang="ts">
   import {
     Swipeable,
@@ -19,38 +10,34 @@
     Icon,
     Panel,
     Stack,
+    type EditEvent,
   } from "@amadeus-music/ui";
-  import type { TrackInfo } from "@amadeus-music/protocol";
+  import type { Track } from "@amadeus-music/protocol";
   import { createEventDispatcher } from "svelte";
-  import Track from "./Track.svelte";
-  type T = $$Generic<TrackInfo & { entry?: number; id?: number }>;
+  import TrackUI from "./Track.svelte";
 
   const dispatch = createEventDispatcher<{
-    action: T;
-    click: T;
-    edit: {
-      action: "push" | "purge" | "rearrange";
-      item: T;
-      index: number;
-    };
+    edit: EditEvent<Track>["detail"];
+    action: Track;
+    click: Track;
   }>();
 
   export let sm = false;
   export let fixed = false;
-  export let selected = new Set<T>();
-  export let tracks: (T | undefined)[] | undefined = undefined;
+  export let selected = new Set<Track>();
+  export let tracks: (Track | undefined)[] | undefined = undefined;
 
   const prerender = 10;
   $: items = tracks || Array.from<undefined>({ length: prerender });
   $: if (!tracks?.length) clear();
 
-  function select(track: T) {
+  function select(track: Track) {
     if (selected.has(track)) selected.delete(track);
     else selected.add(track);
     selected = selected;
   }
 
-  function check(track: T, selection: Set<T>) {
+  function check(track: Track, selection: Set<Track>) {
     if (!selection.size) return false;
     if (selection.has(track)) return true;
     return "passive";
@@ -93,7 +80,7 @@
             on:after={() => select(track)}
           >
             <slot name="action" slot="before" />
-            <Track
+            <TrackUI
               {sm}
               {track}
               selected={check(track, selected)}
@@ -104,7 +91,7 @@
             <Icon name="list" slot="after" />
           </Swipeable>
         {:else}
-          <Track
+          <TrackUI
             {sm}
             {track}
             selected={check(track, selected)}
@@ -112,7 +99,7 @@
           />
         {/if}
       {:else}
-        <Track {sm} />
+        <TrackUI {sm} />
       {/if}
     </div>
   </Virtual>

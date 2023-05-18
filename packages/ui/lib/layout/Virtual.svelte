@@ -1,6 +1,13 @@
 <script lang="ts" context="module">
   import { writable } from "svelte/store";
 
+  export type EditEvent<T> = CustomEvent<{
+    action: "push" | "purge" | "rearrange";
+    after: T | undefined;
+    index: number;
+    item: T;
+  }>;
+
   type Transfer<T = any, K = any> = {
     group: string | HTMLElement;
     owner: HTMLElement;
@@ -27,12 +34,7 @@
   type $$Slots = { default: { item: T; index: number } };
 
   const dispatch = createEventDispatcher<{
-    edit: {
-      action: "rearrange" | "purge" | "push";
-      after: T | undefined;
-      index: number;
-      item: T;
-    };
+    edit: EditEvent<T>["detail"];
     end: void;
   }>();
 
