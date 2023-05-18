@@ -1,20 +1,20 @@
 <script lang="ts">
   import { artists, playlists, search } from "$lib/data";
-  import Playlists from "../../lib/ui/Playlists.svelte";
   import { Tab, Tabs, Stack } from "@amadeus-music/ui";
-  import Artists from "../../lib/ui/Artists.svelte";
+  import Overview from "$lib/ui/Overview.svelte";
 </script>
 
 <Tabs>
   <Tab name="Playlists">
     <Stack grow p>
-      <Playlists
+      <Overview
         on:rearrange={({ detail }) =>
           playlists.rearrange(detail.id, detail.after)}
         on:create={() =>
           playlists.create({ title: Math.random().toString(36).slice(2) })}
-        playlists={$playlists}
+        style="playlist"
         filter={$search}
+        of={$playlists}
         expandable
         editable
       />
@@ -22,7 +22,7 @@
   </Tab>
   <Tab name="Artists">
     <Stack grow p>
-      <Artists artists={$artists} filter={$search} />
+      <Overview style="artist" of={$artists} filter={$search} />
     </Stack>
   </Tab>
   <Tab name="Timeline">

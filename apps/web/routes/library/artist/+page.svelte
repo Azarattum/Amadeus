@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Artist from "$lib/ui/Artist.svelte";
+  import Collection from "$lib/ui/Collection.svelte";
   import { artists, extra } from "$lib/data";
   import { Icon } from "@amadeus-music/ui";
   import { page } from "$app/stores";
@@ -8,9 +8,9 @@
   $: $extra = info ? [info.title, "person"] : null;
 </script>
 
-<Artist {info}>
+<Collection of={info} style="artist">
   <Icon name="last" slot="action" />
-</Artist>
+</Collection>
 
 <svelte:head>
   <title>{info ? `${info.title} - ` : ""}Amadeus</title>

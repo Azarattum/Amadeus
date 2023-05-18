@@ -1,6 +1,6 @@
 <script lang="ts">
+  import Collection from "$lib/ui/Collection.svelte";
   import { expand, streams } from "$lib/trpc";
-  import Artist from "$lib/ui/Artist.svelte";
   import { Icon } from "@amadeus-music/ui";
   import { stream } from "$lib/stream";
   import { page } from "$app/stores";
@@ -13,9 +13,14 @@
   $: $extra = $remote?.detail ? [$remote.detail.title, "person"] : null;
 </script>
 
-<Artist info={$remote?.detail} tracks={$remote} on:end={() => remote.next()}>
+<Collection
+  style="artist"
+  tracks={$remote}
+  of={$remote?.detail}
+  on:end={() => remote.next()}
+>
   <Icon name="last" slot="action" />
-</Artist>
+</Collection>
 
 <svelte:head>
   <title>{$remote?.detail ? `${$remote.detail.title} - ` : ""}Amadeus</title>
