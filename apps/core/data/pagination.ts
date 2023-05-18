@@ -1,13 +1,9 @@
-import {
-  identify,
-  merge,
-  uniquify,
-  type Uniqueified,
-} from "@amadeus-music/protocol";
+import { identify, merge, uniquify } from "@amadeus-music/protocol";
+import type { FromInfo, MediaInfo } from "@amadeus-music/protocol";
 import { debounce, lock } from "@amadeus-music/util/async";
 import { combine } from "@amadeus-music/util/object";
 
-function page<T extends Record<string, any>>(
+function page<T extends MediaInfo>(
   number: number,
   groups: string[],
   completed: Set<number>,
@@ -43,7 +39,7 @@ function page<T extends Record<string, any>>(
       return map.has(identify(item));
     },
     get items() {
-      return items as Uniqueified<T>[];
+      return items as unknown as FromInfo<T>[];
     },
     get progress() {
       const part = 1 / progress.length;
@@ -63,7 +59,7 @@ function page<T extends Record<string, any>>(
   };
 }
 
-function pages<T extends Record<string, any>>(
+function pages<T extends MediaInfo>(
   groups: string[],
   options: PaginationOptions<T>
 ) {
@@ -154,9 +150,9 @@ type PaginationOptions<T> = {
   page: number;
 };
 
-type Page<T> = {
+type Page<T extends MediaInfo> = {
   pages: ReturnType<typeof page>[];
-  items: Uniqueified<T>[];
+  items: FromInfo<T>[];
   loaded: Promise<void>;
   completed: boolean;
   progress: number;

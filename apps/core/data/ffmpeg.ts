@@ -1,10 +1,10 @@
-import type { TrackMeta } from "@amadeus-music/protocol";
+import type { Meta } from "@amadeus-music/protocol";
 import { err } from "../status/log";
 import ffmpeg from "fluent-ffmpeg";
 
 function reencode(
   url: string,
-  metadata: TrackMeta,
+  metadata: Meta,
   format: "opus" | "ogg" | "caf" = "opus"
 ) {
   const artists = metadata.artists?.map((x) => x.title).join(", ");

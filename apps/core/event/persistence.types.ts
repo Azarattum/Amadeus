@@ -1,37 +1,37 @@
 import type {
   PlaybackDirection,
   PlaybackRepeat,
+  PlaybackPush,
+  PlaylistBase,
+  ArtistBase,
+  TrackBase,
+  AlbumBase,
+  FeedType,
   Playlist,
   Artist,
-  Album,
   Track,
-  PlaylistDetails,
-  ArtistDetails,
-  AlbumDetails,
-  TrackDetails,
-  FeedType,
-  Unique,
+  Album,
 } from "@amadeus-music/protocol";
 import type { IsNever } from "libfun/utils/types";
 import type { async } from "libfun";
 
 type Database = DeepPartial<{
   playlists: {
-    create(playlist: Partial<Playlist> & { title: string }): Promise<void>;
-    edit(id: number, playlist: Partial<Playlist>): Promise<void>;
+    create(playlist: Partial<PlaylistBase> & { title: string }): Promise<void>;
+    edit(id: number, playlist: Partial<PlaylistBase>): Promise<void>;
     rearrange(id: number, after?: number): Promise<void>;
-    get(id: number): Promise<PlaylistDetails>;
+    get(id: number): Promise<Playlist>;
     delete(id: number): Promise<void>;
   };
   feed: {
-    push(tracks: TrackDetails[], type: FeedType): Promise<void>;
-    get(entries: number[]): Promise<TrackDetails[]>;
+    push(tracks: Track[], type: FeedType): Promise<void>;
+    get(entries: number[]): Promise<Track[]>;
     clear(type: FeedType): Promise<void>;
   };
   library: {
-    push(tracks: TrackDetails[], playlist?: number): Promise<void>;
+    push(tracks: Track[], playlist?: number): Promise<void>;
     rearrange(entry: number, after?: number): Promise<void>;
-    get(entries: number[]): Promise<TrackDetails[]>;
+    get(entries: number[]): Promise<Track[]>;
     purge(entries: number[]): Promise<void>;
   };
   settings: {
@@ -45,28 +45,28 @@ type Database = DeepPartial<{
     clear(): Promise<void>;
   };
   tracks: {
-    edit(id: number, track: Partial<Track & { album: Album }>): Promise<void>;
-    search(query: string): Promise<TrackDetails[]>;
-    get(id: number): Promise<TrackDetails>;
+    edit(
+      id: number,
+      track: Partial<TrackBase & { album: AlbumBase }>
+    ): Promise<void>;
+    search(query: string): Promise<Track[]>;
+    get(id: number): Promise<Track>;
   };
   artists: {
-    edit(id: number, artist: Partial<Artist>): Promise<void>;
-    search(query: string): Promise<ArtistDetails[]>;
-    push(artists: ArtistDetails[]): Promise<void>;
-    get(id: number): Promise<ArtistDetails>;
+    edit(id: number, artist: Partial<ArtistBase>): Promise<void>;
+    search(query: string): Promise<Artist[]>;
+    push(artists: Artist[]): Promise<void>;
+    get(id: number): Promise<Artist>;
     unfollow(id: number): Promise<void>;
     follow(id: number): Promise<void>;
   };
   albums: {
-    search(query: string): Promise<AlbumDetails[]>;
-    push(albums: AlbumDetails[]): Promise<void>;
-    get(id: number): Promise<AlbumDetails>;
+    search(query: string): Promise<Album[]>;
+    push(albums: Album[]): Promise<void>;
+    get(id: number): Promise<Album>;
   };
   playback: {
-    push(
-      tracks: TrackDetails[],
-      at?: "first" | "next" | "last" | "random" | number
-    ): Promise<void>;
+    push(tracks: Track[], at?: PlaybackPush): Promise<void>;
     purge(entries: number[]): Promise<void>;
     clear(device?: Uint8Array): Promise<void>;
     sync(progress: number): Promise<void>;

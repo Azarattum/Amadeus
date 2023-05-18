@@ -1,15 +1,13 @@
 import {
   normalize,
-  albumDetails,
-  trackDetails,
-  artistDetails,
   format,
   stringify,
   identify,
-  type Uniqueified,
-  type TrackMeta,
-  type ToDetail,
+  track,
+  album,
+  artist,
 } from "@amadeus-music/protocol";
+import type { Meta, FromType, MediaType } from "@amadeus-music/protocol";
 import { pages, type Page } from "../data/pagination";
 import stringSimilarity from "string-similarity-js";
 import { batch } from "@amadeus-music/util/object";
@@ -58,36 +56,37 @@ async function* aggregate(
   take(merge(curated));
   const cache = persistence();
   for await (const state of page.values()) {
-    if (is(state.items, array(trackDetails))) {
+    if (is(state.items, array(track))) {
       await cache.library.push(state.items);
-    } else if (is(state.items, array(albumDetails))) {
+    } else if (is(state.items, array(album))) {
       await cache.albums.push(state.items);
-    } else if (is(state.items, array(artistDetails))) {
+    } else if (is(state.items, array(artist))) {
       await cache.artists.push(state.items);
     }
     yield state;
   }
 }
 
-function* lookup<T extends "track" | "artist" | "album">(
+function* lookup<T extends MediaType>(
   this: Context,
   type: T,
-  query: string | TrackMeta,
+  query: string | Meta,
   filter?: string
 ) {
   const find = filter ? search.bind(this).where(filter) : search.bind(this);
   if (typeof query === "object") query = { ...query, album: undefined };
   const results = find(type as any, format(query), 1) as AsyncGenerator<
-    Page<ToDetail<T>>
+    Page<FromType<T>>
   >;
 
   const items = yield* map(results, function* (x) {
     if (x.progress >= 1) x.close();
+    /// Fix types
     return x.items.filter(verify)[0];
   });
   return items.pop();
 
-  function verify(item: Uniqueified<ToDetail<T>>) {
+  function verify(item: FromType<T>) {
     if (typeof query === "string") return true;
     item = { ...item, album: undefined };
     if (identify(item) === identify(query)) return true;

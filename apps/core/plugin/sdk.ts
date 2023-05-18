@@ -72,7 +72,6 @@ export { map as dict } from "superstruct";
 export * from "libfun";
 export { map } from "libfun";
 export * from "@amadeus-music/util/color";
-
-export { identify, format } from "@amadeus-music/protocol";
+export * from "@amadeus-music/protocol";
 
 export type { Page } from "../data/pagination";
