@@ -31,7 +31,7 @@
 </script>
 
 <Virtual
-  sortable={editable && !!filter}
+  sortable={editable && !filter}
   key={(x) => x?.id}
   columns="20rem"
   on:edit={edit}
@@ -43,7 +43,7 @@
   on:end
 >
   {#if item}
-    <Card href="{href}/{style}#{item.id}" {...{ [style]: { item } }} />
+    <Card href="{href}/{style}#{item.id}" {...{ [style]: item }} />
   {:else if item === null}
     <button
       class="p flex w-full cursor-pointer justify-center rounded-2xl p-4 text-highlight ring-4 ring-inset ring-highlight"
