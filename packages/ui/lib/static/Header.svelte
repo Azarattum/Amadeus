@@ -18,7 +18,6 @@
   const tag = sm ? "h5" : lg ? "h3" : xl ? "h2" : "h4";
 </script>
 
-<div aria-hidden class="h-11" class:hidden={!xl} />
 <svelte:element
   this={tag}
   {id}
@@ -27,7 +26,7 @@
   {sm ? 'light py-2 text-xs uppercase text-content-200' : ''}
   {!sm && !lg && !xl ? 'text-lg' : ''}
   {lg ? 'text-xl' : ''}
-  {xl ? 'h-11 text-2xl' : ''}
+  {xl ? 'mt-11 h-11 text-2xl' : ''}
   {loading ? 'animate-pulse bg-highlight text-transparent' : 'bg-transparent'}
   "
   class:ml-4={indent}
