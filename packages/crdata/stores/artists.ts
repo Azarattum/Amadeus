@@ -1,7 +1,7 @@
 import { resource, artist, track, album } from "../operations/cte";
 import type { Artist, ArtistBase } from "@amadeus-music/protocol";
 import { pushArtist } from "../operations/push";
-import { sanitize } from "../data/operations";
+import { sanitize } from "../operations/utils";
 import { json, groupJSON } from "crstore";
 import type { DB } from "../data/schema";
 
@@ -71,11 +71,13 @@ export const artists = ({ store }: DB) =>
       async search(db, query: string) {
         if (!query) return [];
         return db
+          .with("resource", resource)
+          .with("artist", artist)
           .selectFrom("artists_fts" as any)
           .where("artists_fts", "match", sanitize(query))
           .orderBy("rank")
-          .innerJoin("artists", "artists.id", "artists_fts.rowid")
-          .select(["id", "artists.title", "following", "source", "art"])
+          .innerJoin("artist", "artist.id", "artists_fts.rowid")
+          .selectAll()
           .execute();
       },
       get(db, id: number) {

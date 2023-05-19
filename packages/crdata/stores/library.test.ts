@@ -10,7 +10,7 @@ const { close, playlists, artists, library, tracks } = connect({
 
 const makeArtist = (id: number): Artist => ({
   id: id,
-  title: id.toString(),
+  title: "artist" + id.toString(),
   sources: [id + "_0", id + "_1"],
   arts: [id + "_secondary", id + "_primary"],
   thumbnails: [null, id + "_primary"],
@@ -19,7 +19,7 @@ const makeArtist = (id: number): Artist => ({
 const makeAlbum = (id: number): Album => ({
   artists: [makeArtist(id)],
   id: (id += 100),
-  title: id.toString(),
+  title: "album" + id.toString(),
   year: 2042,
   sources: [id + "_0", id + "_1"],
   arts: [id + "_secondary", id + "_primary"],
@@ -30,7 +30,7 @@ const makeTrack = (id: number): Track => ({
   album: makeAlbum(id),
   artists: [makeArtist(id)],
   id: (id += 200),
-  title: id.toString(),
+  title: "track" + id.toString(),
   duration: 42 + id,
   sources: [id + "_0", id + "_1"],
 });
@@ -66,6 +66,11 @@ it("pushes artists", async () => {
     thumbnails: ["0_primary", null],
     collection: { size: 0, duration: 0, tracks: [] },
   });
+  expect((await artists.search("ist2"))[0]).toMatchObject({
+    ...makeArtist(2),
+    arts: ["2_primary", "2_secondary"],
+    thumbnails: ["2_primary", null],
+  });
 });
 
 it("pushes tracks", async () => {
@@ -94,7 +99,6 @@ it("deletes tracks", async () => {
   expect(await playlists).toHaveLength(1);
   expect((await playlists)[0].tracks).toHaveLength(1);
   expect(await artists).toHaveLength(1);
-
   await library.purge([tracks[1].entry]);
   expect(await library).toHaveLength(0);
   expect(await playlists).toHaveLength(1);

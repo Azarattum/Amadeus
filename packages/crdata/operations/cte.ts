@@ -101,7 +101,7 @@ const track = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE & AlbumCTE>) =>
     .$castTo<TrackCTE["track"]>();
 
 type ResourceCTE = { resource: MediaBase & { owner: number } };
-type ArtistCTE = { artist: Omit<Artist, "collection"> & { following: 0 | 1 } };
+type ArtistCTE = { artist: Omit<Artist, "collection"> };
 type AlbumCTE = { album: Omit<Album, "collection"> };
 type TrackCTE = { track: Omit<Track, "entry"> };
 
