@@ -1,40 +1,24 @@
+import { resource, artist, album, track } from "../operations/cte";
 import { identify, type Playlist } from "@amadeus-music/protocol";
-import { metadata, metafields } from "../data/operations";
-import { APPEND, groupJSON, sql } from "crstore";
+import { APPEND, groupJSON, json } from "crstore";
 import type { DB } from "../data/schema";
 
 export const playlists = ({ store }: DB) =>
   store(
     (db) =>
       db
-        .with("metadata", metadata)
-        .with("grouped", (qb) =>
-          qb
-            .selectFrom("playlists")
-            .leftJoin("library", "library.playlist", "playlists.id")
-            .innerJoin("metadata", "metadata.id", "library.track")
-            .select(metafields)
-            .select([
-              "library.id as entry",
-              "playlists.id as group",
-              sql`row_number() OVER(PARTITION BY playlists.id ORDER BY library."order",library.id)`.as(
-                "row"
-              ),
-              (qb) =>
-                qb.fn
-                  .count<number>("length")
-                  .over((qb) => qb.partitionBy("playlists.id"))
-                  .as("count"),
-              (qb) =>
-                qb.fn
-                  .sum<number>("length")
-                  .over((qb) => qb.partitionBy("playlists.id"))
-                  .as("duration"),
-            ])
-            .orderBy("row")
+        .with("resource", resource)
+        .with("artist", artist)
+        .with("album", album)
+        .with("track", (qb) =>
+          track(qb)
+            .innerJoin("library", "library.track", "tracks.id")
+            .select(["library.playlist", "library.id as entry"])
+            .orderBy("library.order")
+            .orderBy("library.id")
         )
-        .selectFrom("playlists")
-        .leftJoin("grouped", "grouped.group", "playlists.id")
+        .selectFrom("track")
+        .fullJoin("playlists", "playlists.id", "track.playlist")
         .select([
           "playlists.id",
           "playlists.title",
@@ -42,17 +26,22 @@ export const playlists = ({ store }: DB) =>
           "playlists.shared",
           "playlists.remote",
           (qb) =>
-            groupJSON(qb, {
-              id: "grouped.id",
-              entry: "entry",
-              title: "grouped.title",
-              length: "length",
-              source: "source",
-              album: "album",
-              artists: "artists",
-            }).as("tracks"),
-          (qb) => qb.fn.coalesce("duration", sql.lit(0)).as("length"),
-          (qb) => qb.fn.coalesce("count", sql.lit(0)).as("count"),
+            json(qb, {
+              size: qb.fn.count<number>("track.duration"),
+              duration: qb.fn.coalesce(
+                qb.fn.sum<number>("track.duration"),
+                qb.val(0)
+              ),
+              tracks: groupJSON(qb, {
+                id: "track.id",
+                entry: "track.entry",
+                title: "track.title",
+                duration: "track.duration",
+                album: "track.album",
+                artists: "track.artists",
+                sources: "track.sources",
+              }).filterWhere("track.id", "is not", null),
+            }).as("collection"),
         ])
         .groupBy("playlists.id")
         .orderBy("playlists.order")

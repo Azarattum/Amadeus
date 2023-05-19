@@ -35,47 +35,39 @@ const makeTrack = (id: number): Track => ({
   sources: [id + "_0", id + "_1"],
 });
 
+const fixSource = (media: Album | Artist) => ({
+  ...media,
+  thumbnails: media.thumbnails?.slice().reverse(),
+  arts: media.arts?.slice().reverse(),
+});
+
 it("pushes artists", async () => {
   expect(await artists).toHaveLength(0);
   await artists.push([makeArtist(0)]);
   expect(await artists).toHaveLength(1);
   expect((await artists)[0]).toMatchObject({
-    ...makeArtist(0),
-    arts: ["0_primary", "0_secondary"],
-    thumbnails: ["0_primary", null],
+    ...fixSource(makeArtist(0)),
     collection: { size: 0, duration: 0, tracks: [] },
   });
   await library.push([makeTrack(1), makeTrack(2)]);
   const results = await artists;
   expect(results).toHaveLength(3);
   expect(results[0]).toMatchObject({
-    ...makeArtist(1),
-    arts: ["1_primary", "1_secondary"],
-    thumbnails: ["1_primary", null],
+    ...fixSource(makeArtist(1)),
     collection: { size: 1, duration: 243, tracks: [expect.anything()] },
   });
   expect(results[1]).toMatchObject({
-    ...makeArtist(2),
-    arts: ["2_primary", "2_secondary"],
-    thumbnails: ["2_primary", null],
+    ...fixSource(makeArtist(2)),
     collection: { size: 1, duration: 244, tracks: [expect.anything()] },
   });
   expect(results[2]).toMatchObject({
-    ...makeArtist(0),
-    arts: ["0_primary", "0_secondary"],
-    thumbnails: ["0_primary", null],
+    ...fixSource(makeArtist(0)),
     collection: { size: 0, duration: 0, tracks: [] },
   });
-  expect((await artists.search("ist2"))[0]).toMatchObject({
-    ...makeArtist(2),
-    arts: ["2_primary", "2_secondary"],
-    thumbnails: ["2_primary", null],
-  });
-  expect(await artists.get(2)).toMatchObject({
-    ...makeArtist(2),
-    arts: ["2_primary", "2_secondary"],
-    thumbnails: ["2_primary", null],
-  });
+  expect((await artists.search("ist2"))[0]).toMatchObject(
+    fixSource(makeArtist(2))
+  );
+  expect(await artists.get(2)).toMatchObject(fixSource(makeArtist(2)));
 });
 
 it("pushes albums", async () => {
@@ -83,52 +75,64 @@ it("pushes albums", async () => {
   await albums.push([makeAlbum(3)]);
   const results = await albums;
   expect(results[0]).toMatchObject({
-    ...makeAlbum(1),
-    arts: ["101_primary", "101_secondary"],
-    thumbnails: ["101_primary", null],
+    ...fixSource(makeAlbum(1)),
+
     artists: [expect.anything()],
   });
   expect(results[1]).toMatchObject({
-    ...makeAlbum(2),
-    arts: ["102_primary", "102_secondary"],
-    thumbnails: ["102_primary", null],
+    ...fixSource(makeAlbum(2)),
     artists: [expect.anything()],
   });
   expect(results[2]).toMatchObject({
-    ...makeAlbum(3),
-    arts: ["103_primary", "103_secondary"],
-    thumbnails: ["103_primary", null],
-    artists: [
-      {
-        ...makeArtist(3),
-        arts: ["3_primary", "3_secondary"],
-        thumbnails: ["3_primary", null],
-      },
-      {
-        ...makeArtist(53),
-        arts: ["53_primary", "53_secondary"],
-        thumbnails: ["53_primary", null],
-      },
-    ],
+    ...fixSource(makeAlbum(3)),
+    artists: [fixSource(makeArtist(3)), fixSource(makeArtist(53))],
   });
   expect(await albums.search("103")).toEqual([results[2]]);
   expect(await albums.get(103)).toEqual(results[2]);
 });
 
 it("pushes tracks", async () => {
-  const t0 = makeTrack(0);
+  const track = makeTrack(0);
+  const fixedAlbum = fixSource(makeAlbum(0));
+  delete fixedAlbum["artists"];
+  const fixedTrack = {
+    ...track,
+    artists: [fixSource(makeArtist(0))],
+    album: fixedAlbum,
+  };
   await playlists.create({ title: "Test" });
-  await library.push([t0], identify("Test"));
+  await library.push([track], identify("Test"));
   expect(await library).toHaveLength(1);
-  expect(await tracks.get(0)).toEqual(t0);
-  expect(await playlists).toMatchObject([
-    {
+  expect(await tracks.get(200)).toEqual(fixedTrack);
+  expect(await tracks.search("k200")).toEqual([fixedTrack]);
+  await playlists.create({ title: "Test2" });
+
+  {
+    const results = await playlists;
+    expect(results[0]).toMatchObject({
+      collection: { size: 1, duration: 242, tracks: [fixedTrack] },
       id: identify("Test"),
       title: "Test",
-      tracks: [t0],
-    },
-  ]);
-  expect(await artists).toMatchObject([t0.artists[0]]);
+    });
+    expect(results[1]).toMatchObject({
+      collection: { size: 0, duration: 0, tracks: [] },
+      id: identify("Test2"),
+      title: "Test2",
+    });
+  }
+  {
+    await library.push([makeTrack(1)], identify("Test"));
+    const results = (await playlists)[0];
+    expect(results.collection.tracks).toHaveLength(2);
+    expect(results.collection.tracks[0]).toMatchObject(fixedTrack);
+    await library.rearrange(results.collection.tracks[1].entry);
+    expect((await playlists)[0].collection.tracks[1]).toMatchObject(fixedTrack);
+    expect(
+      await library.get([results.collection.tracks[0].entry])
+    ).toMatchObject([fixedTrack]);
+  }
+
+  expect((await tracks)[1]).toMatchObject(fixedTrack);
 });
 
 it("deletes tracks", async () => {

@@ -1,11 +1,13 @@
-import { metadata, metafields, pushTrack, uuid } from "../data/operations";
-import type { TrackDetails } from "@amadeus-music/protocol";
+import { album, artist, resource, track } from "../operations/cte";
+import type { Track } from "@amadeus-music/protocol";
+import { pushTrack } from "../operations/push";
+import { uuid } from "../operations/utils";
 import type { DB } from "../data/schema";
 import { APPEND } from "crstore";
 
 export const library = ({ store }: DB) =>
   store((db) => db.selectFrom("library").selectAll(), {
-    async push(db, tracks: TrackDetails[], playlist?: number) {
+    async push(db, tracks: Track[], playlist?: number) {
       const promises = tracks.map(async (track) => {
         await pushTrack(db, track);
         if (playlist == null) return;
@@ -39,10 +41,21 @@ export const library = ({ store }: DB) =>
     async get(db, entries: number[]) {
       if (!entries.length) return [];
       return db
-        .with("metadata", metadata)
+        .with("resource", resource)
+        .with("artist", artist)
+        .with("album", album)
+        .with("track", track)
         .selectFrom("library")
-        .innerJoin("metadata", "metadata.id", "library.track")
-        .select(metafields)
+        .leftJoin("track", "track.id", "library.track")
+        .select([
+          "track.id",
+          "track.title",
+          "track.duration",
+          "track.album",
+          "track.artists",
+          "track.sources",
+          "library.id as entry",
+        ])
         .where("library.id", "in", entries)
         .execute();
     },

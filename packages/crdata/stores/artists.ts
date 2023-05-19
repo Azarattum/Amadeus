@@ -40,7 +40,7 @@ export const artists = ({ store }: DB) =>
                 album: "track.album",
                 artists: "track.artists",
                 sources: "track.sources",
-              }).filterWhere("tracks.id", "is not", null),
+              }).filterWhere("track.id", "is not", null),
             }).as("collection"),
         ])
         .groupBy("artist.id")
