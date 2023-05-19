@@ -41,7 +41,7 @@ const meta = type({
 const media = object({
   sources: array(string()),
   arts: optional(array(string())),
-  thumbnails: optional(array(string())),
+  thumbnails: optional(array(nullable(string()))),
 });
 
 const collection = <T extends Struct<any, any>>(item: T) =>
@@ -58,7 +58,9 @@ type PlaylistBase = Infer<typeof playlist>;
 
 type Meta = Infer<typeof meta>;
 type MediaBase = Infer<typeof media>;
-type CollectionBase = Infer<ReturnType<typeof collection<Struct<unknown>>>>;
+type CollectionBase<T = unknown> = Infer<
+  ReturnType<typeof collection<Struct<T>>>
+>;
 
 export type {
   Meta,

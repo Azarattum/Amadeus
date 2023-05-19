@@ -6,7 +6,16 @@ import {
   playlistBase,
   collectionBase,
 } from "./base";
-import { array, assign, number, object, omit, optional } from "superstruct";
+import {
+  array,
+  assign,
+  literal,
+  number,
+  object,
+  omit,
+  optional,
+  union,
+} from "superstruct";
 import type { Infer } from "superstruct";
 import { unique } from "./modifiers";
 
@@ -37,13 +46,16 @@ const track = assign(
 const album = assign(
   unique(albumInfo),
   object({
-    collection: optional(collectionBase(track)),
     artists: array(unique(albumInfo.schema.artists.schema)),
+    collection: optional(collectionBase(track)),
   })
 );
 const artist = assign(
   unique(artistInfo),
-  object({ collection: optional(collectionBase(track)) })
+  object({
+    following: optional(union([literal(0), literal(1)])),
+    collection: optional(collectionBase(track)),
+  })
 );
 const playlist = assign(
   unique(playlistInfo),
