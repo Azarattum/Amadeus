@@ -10,30 +10,28 @@ import {
   any,
 } from "superstruct";
 import {
-  album,
-  artist,
-  playlist,
-  track,
   unique,
+  albumBase,
+  trackBase,
+  artistBase,
+  playlistBase,
 } from "@amadeus-music/protocol";
 import { primary, crr, ordered, index, type Database } from "crstore";
 import type { Struct } from "superstruct";
 
 const id = integer;
+const boolean = integer as () => Struct<0 | 1, null>;
 
-const tracks = assign(unique(track), object({ album: id() }));
+const tracks = assign(unique(trackBase), object({ album: id() }));
 crr(tracks);
 index(tracks, "album");
 primary(tracks, "id");
 
-const albums = unique(album);
+const albums = unique(albumBase);
 crr(albums);
 primary(albums, "id");
 
-const artists = assign(
-  unique(artist),
-  object({ following: integer() as Struct<0 | 1, null> })
-);
+const artists = assign(unique(artistBase), object({ following: boolean() }));
 crr(artists);
 primary(artists, "id");
 
@@ -45,7 +43,26 @@ crr(attribution);
 index(attribution, "artist");
 primary(attribution, "album", "artist");
 
-const playlists = assign(unique(playlist), object({ order: string() }));
+const sources = object({
+  source: string(),
+  owner: id(),
+  primary: boolean(),
+});
+crr(sources);
+index(sources, "owner");
+primary(sources, "source");
+
+const assets = object({
+  art: string(),
+  thumbnail: nullable(string()),
+  owner: id(),
+  primary: boolean(),
+});
+crr(assets);
+index(assets, "owner");
+primary(assets, "art");
+
+const playlists = assign(unique(playlistBase), object({ order: string() }));
 crr(playlists);
 primary(playlists, "id");
 ordered(playlists, "order");
@@ -129,6 +146,8 @@ export const schema = object({
   albums,
   attribution,
   artists,
+  sources,
+  assets,
   library,
   feed,
   playlists,
