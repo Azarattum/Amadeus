@@ -82,8 +82,10 @@ export const artists = ({ store }: DB) =>
       },
       get(db, id: number) {
         return db
-          .selectFrom("artists")
-          .where("artists.id", "=", id)
+          .with("resource", resource)
+          .with("artist", artist)
+          .selectFrom("artist")
+          .where("artist.id", "=", id)
           .selectAll()
           .executeTakeFirstOrThrow();
       },
