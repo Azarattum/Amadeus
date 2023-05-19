@@ -1,69 +1,57 @@
-import { metadata, metafields, pushArtist, sanitize } from "../data/operations";
-import type { Artist, ArtistDetails } from "@amadeus-music/protocol";
+import { resource, artist, track, album } from "../operations/cte";
+import type { Artist, ArtistBase } from "@amadeus-music/protocol";
+import { pushArtist } from "../operations/push";
+import { sanitize } from "../data/operations";
+import { json, groupJSON } from "crstore";
 import type { DB } from "../data/schema";
-import { groupJSON, sql } from "crstore";
 
 export const artists = ({ store }: DB) =>
   store(
     (db) =>
       db
-        .with("metadata", metadata)
-        .selectFrom((qb) =>
-          qb
-            .selectFrom("artists")
-            .leftJoin("attribution", "attribution.artist", "artists.id")
-            .leftJoin("albums", "albums.id", "attribution.album")
-            .leftJoin("tracks", "tracks.album", "albums.id")
-            .innerJoin("metadata", "metadata.id", "tracks.id")
-            .select(metafields)
-            .select([
-              "metadata.id as entry",
-              "artists.title as artist",
-              "artists.source as src",
-              "artists.id as group",
-              "artists.following",
-              "artists.art",
-              (qb) =>
-                qb.fn
-                  .count<number>("metadata.length")
-                  .over((qb) => qb.partitionBy("artists.id"))
-                  .as("count"),
-              (qb) =>
-                qb.fn
-                  .sum<number>("metadata.length")
-                  .over((qb) => qb.partitionBy("artists.id"))
-                  .as("duration"),
-            ])
-            .orderBy("tracks.title")
-            .as("grouped")
-        )
+        .with("resource", resource)
+        .with("artist", artist)
+        .with("album", album)
+        .with("track", track)
+        .selectFrom("artist")
+        .leftJoin("attribution", "attribution.artist", "artist.id")
+        .leftJoin("albums", "albums.id", "attribution.album")
+        .leftJoin("tracks", "tracks.album", "albums.id")
+        .leftJoin("track", "track.id", "tracks.id")
         .select([
-          "group as id",
-          "artist as title",
-          "following",
-          "src as source",
-          "art",
+          "artist.id",
+          "artist.title",
+          "artist.following",
+          "artist.arts",
+          "artist.thumbnails",
+          "artist.sources",
           (qb) =>
-            groupJSON(qb, {
-              id: "id",
-              entry: "entry",
-              title: "title",
-              length: "length",
-              source: "source",
-              album: "album",
-              artists: "artists",
-            }).as("tracks"),
-          (qb) => qb.fn.coalesce("duration", sql.lit(0)).as("length"),
-          (qb) => qb.fn.coalesce("count", sql.lit(0)).as("count"),
+            json(qb, {
+              size: qb.fn.count<number>("track.duration"),
+              duration: qb.fn.coalesce(
+                qb.fn.sum<number>("track.duration"),
+                qb.val(0)
+              ),
+              tracks: groupJSON(qb, {
+                id: "track.id",
+                entry: "track.id",
+                title: "track.title",
+                duration: "track.duration",
+                album: "track.album",
+                artists: "track.artists",
+                sources: "track.sources",
+              }).filterWhere("tracks.id", "is not", null),
+            }).as("collection"),
         ])
-        .groupBy("group")
-        .orderBy("count", "desc")
-        .orderBy("artist"),
+        .groupBy("artist.id")
+        .orderBy((qb) => qb.fn.count("track.duration"), "desc")
+        .orderBy("artist.title")
+        .$castTo<Artist>(),
     {
-      async push(db, artists: ArtistDetails[]) {
+      async push(db, artists: Artist[]) {
         await Promise.all(artists.map((x) => pushArtist(db, x)));
       },
-      async edit(db, id: number, artist: Partial<Artist>) {
+      async edit(db, id: number, artist: Partial<ArtistBase>) {
         await db.updateTable("artists").where("id", "=", id).set(artist);
       },
       async follow(db, id: number) {
