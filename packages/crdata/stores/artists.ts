@@ -46,7 +46,7 @@ export const artists = ({ store }: DB) =>
         .groupBy("artist.id")
         .orderBy((qb) => qb.fn.count("track.duration"), "desc")
         .orderBy("artist.title")
-        .$castTo<Artist>(),
+        .$castTo<Artist & { collection: { tracks: { entry: number }[] } }>(),
     {
       async push(db, artists: Artist[]) {
         await Promise.all(artists.map((x) => pushArtist(db, x)));

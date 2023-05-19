@@ -45,7 +45,8 @@ export const playlists = ({ store }: DB) =>
         ])
         .groupBy("playlists.id")
         .orderBy("playlists.order")
-        .orderBy("playlists.id"),
+        .orderBy("playlists.id")
+        .$castTo<Playlist & { collection: { tracks: { entry: number }[] } }>(),
     {
       async create(db, playlist: Partial<Playlist> & { title: string }) {
         await db

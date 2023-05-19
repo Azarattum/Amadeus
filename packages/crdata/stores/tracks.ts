@@ -24,7 +24,8 @@ export const tracks = ({ store }: DB) =>
           "library.date",
         ])
         .orderBy("library.date", "desc")
-        .orderBy("library.id"),
+        .orderBy("library.id")
+        .$castTo<Track & { entry: number; date: number }>(),
     {
       async edit(db, id: number, track: Partial<Track & { album: Album }>) {
         const result = await db
