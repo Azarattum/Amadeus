@@ -135,21 +135,23 @@ it("pushes tracks", async () => {
   expect((await tracks)[1]).toMatchObject(fixedTrack);
 });
 
-it("deletes tracks", async () => {
-  await library.push([makeTrack(1)], identify("Test"));
-  const [{ tracks }] = await playlists;
-  expect(tracks).toHaveLength(2);
+it("purges tracks", async () => {
+  const [{ collection }] = await playlists;
+  expect(collection.tracks).toHaveLength(2);
   expect(await library).toHaveLength(2);
-  await library.purge([tracks[0].entry]);
+  expect(await albums).toHaveLength(4);
+  await library.purge([collection.tracks[0].entry]);
+  expect(await albums).toHaveLength(3);
   expect(await library).toHaveLength(1);
-  expect(await playlists).toHaveLength(1);
-  expect((await playlists)[0].tracks).toHaveLength(1);
-  expect(await artists).toHaveLength(1);
-  await library.purge([tracks[1].entry]);
+  expect(await playlists).toHaveLength(2);
+  expect((await playlists)[0].collection.tracks).toHaveLength(1);
+  expect(await artists).toHaveLength(4);
+  await library.purge([collection.tracks[1].entry]);
+  expect(await albums).toHaveLength(2);
   expect(await library).toHaveLength(0);
-  expect(await playlists).toHaveLength(1);
-  expect((await playlists)[0].tracks).toHaveLength(0);
-  expect(await artists).toHaveLength(0);
+  expect(await playlists).toHaveLength(2);
+  expect((await playlists)[0].collection.tracks).toHaveLength(0);
+  expect(await artists).toHaveLength(3);
 });
 
 afterAll(async () => {
