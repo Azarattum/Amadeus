@@ -94,10 +94,10 @@ type FromType<T extends MediaType> = T extends "track"
 
 type FromInfo<T extends MediaInfo> = T extends TrackInfo
   ? Track
-  : T extends ArtistInfo
-  ? Artist
   : T extends AlbumInfo
   ? Album
+  : T extends ArtistInfo
+  ? Artist
   : never;
 
 export { trackInfo, albumInfo, artistInfo, playlistInfo };
