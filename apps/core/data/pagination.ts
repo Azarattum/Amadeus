@@ -78,7 +78,7 @@ function pages<T extends Media>(
       if (!batch.length) return;
       if (!pages[number]) pages[number] = create(number);
       batch = batch.filter((x) =>
-        pages.slice(0, number).every((y) => !y.has(x))
+        pages.every((y) => !(y.has(x) && y.append(id, [x])))
       );
       pages[number].append(id, batch).forEach((batch, id) => {
         this.append(id, batch, number + 1);
