@@ -6,6 +6,7 @@ import type {
   ArtistBase,
   TrackBase,
   AlbumBase,
+  MediaBase,
   FeedType,
   Playlist,
   Artist,
@@ -75,6 +76,10 @@ type Database = DeepPartial<{
     repeat(type: PlaybackRepeat): Promise<void>;
     infinite(toggle?: boolean): Promise<void>;
     replicate(device: Uint8Array): Promise<void>;
+  };
+  resources: {
+    prioritize(type: "art" | "source", resource: string): Promise<void>;
+    get(owner: number): Promise<MediaBase>;
   };
   merge(changes: any[]): Promise<void>;
   subscribe(

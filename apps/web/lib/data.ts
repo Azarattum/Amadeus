@@ -4,6 +4,7 @@ import { sync } from "./trpc";
 
 export const {
   playlists,
+  resources,
   preceding,
   playback,
   upcoming,
