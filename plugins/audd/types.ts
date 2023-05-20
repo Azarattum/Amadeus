@@ -31,21 +31,16 @@ function convert(data: Infer<typeof track>) {
 
   return {
     title: inferred.artists.length ? inferred.title : data.title,
-    length: 0,
-    source: "[]",
+    duration: 0,
+    sources: [],
     album: {
       title: data.album,
       year: +(
         data.release_date.match(/([0-9]{4})-[0-9]{2}-[0-9]{2}/)?.[1] || 0
       ),
-      art: "[]",
-      source: "[]",
+      sources: [],
     },
-    artists: artists.map((title) => ({
-      title,
-      art: "[]",
-      source: "[]",
-    })),
+    artists: artists.map((title) => ({ title, sources: [] })),
   };
 }
 
