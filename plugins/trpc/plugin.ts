@@ -15,9 +15,9 @@ export const {
   info,
   init,
   stop,
-  search,
   users,
   expand,
+  search,
   command,
   persistence,
 } = register({
