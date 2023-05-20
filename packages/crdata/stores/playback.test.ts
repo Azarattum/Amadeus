@@ -1,5 +1,5 @@
 import { afterAll, it, afterEach, expect } from "vitest";
-import { TrackDetails } from "@amadeus-music/protocol";
+import type { Track } from "@amadeus-music/protocol";
 import { connect } from "../data";
 import { rm } from "fs/promises";
 
@@ -7,13 +7,20 @@ const { playback, preceding, upcoming, close, feed } = connect({
   name: "playback.test.db",
 });
 
-const track = (id: number): TrackDetails => ({
+const track = (id: number): Track => ({
   id,
   title: id.toString(),
-  length: 42,
-  source: "[]",
-  album: { id: 0, title: "Album", source: "[]", year: 2042, art: "[]" },
-  artists: [{ id: 0, title: "Artist", art: "[]", source: "[]" }],
+  duration: 42,
+  sources: [],
+  album: {
+    id: 0,
+    title: "Album",
+    sources: [],
+    year: 2042,
+    arts: [],
+    thumbnails: [],
+  },
+  artists: [{ id: 0, title: "Artist", arts: [], sources: [], thumbnails: [] }],
 });
 
 const t0 = track(0);
@@ -183,7 +190,7 @@ it("syncs progress", async () => {
   await playback.sync(-1);
   expect(await playback).toMatchObject([t0]);
 
-  expect((await feed)[0].tracks).toMatchObject([t1, t0]);
+  expect((await feed)[0].collection.tracks).toMatchObject([t1, t0]);
 });
 
 it("skips with repeat all", async () => {

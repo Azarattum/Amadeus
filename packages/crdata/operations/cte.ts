@@ -44,9 +44,10 @@ const artist = (qc: QueryCreator<Schema & ResourceCTE>) =>
       "artists.id",
       "artists.title",
       "artists.following",
-      "resource.arts",
-      "resource.thumbnails",
-      "resource.sources",
+      (qb) => qb.fn.coalesce("resource.arts", qb.val("[]")).as("arts"),
+      (qb) =>
+        qb.fn.coalesce("resource.thumbnails", qb.val("[]")).as("thumbnails"),
+      (qb) => qb.fn.coalesce("resource.sources", qb.val("[]")).as("sources"),
     ])
     .$castTo<ArtistCTE["artist"]>();
 
@@ -60,9 +61,10 @@ const album = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE>) =>
       "albums.id",
       "albums.title",
       "albums.year",
-      "resource.arts",
-      "resource.thumbnails",
-      "resource.sources",
+      (qb) => qb.fn.coalesce("resource.arts", qb.val("[]")).as("arts"),
+      (qb) =>
+        qb.fn.coalesce("resource.thumbnails", qb.val("[]")).as("thumbnails"),
+      (qb) => qb.fn.coalesce("resource.sources", qb.val("[]")).as("sources"),
       (qb) =>
         groupJSON(qb, {
           id: "artist.id",
@@ -86,8 +88,8 @@ const track = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE & AlbumCTE>) =>
       "tracks.id",
       "tracks.title",
       "tracks.duration",
-      "resource.sources",
       "album.artists",
+      (qb) => qb.fn.coalesce("resource.sources", qb.val("[]")).as("sources"),
       (qb) =>
         json(qb, {
           id: "album.id",

@@ -1,57 +1,64 @@
-import {
-  metadata,
-  pushTrack,
-  uuid,
-  localDevice,
-  metafields,
-  position,
-} from "../data/operations";
 import type {
-  TrackDetails,
+  Track,
   PlaybackRepeat,
   PlaybackDirection,
 } from "@amadeus-music/protocol";
+import { resource, artist, album, track } from "../operations/cte";
+import { uuid, localDevice, position } from "../operations/utils";
+import { pushTrack } from "../operations/push";
 import type { DB } from "../data/schema";
 import { sql } from "crstore";
 
 export const preceding = ({ store }: DB) =>
   store((db) =>
     db
-      .with("metadata", metadata)
+      .with("resource", resource)
+      .with("artist", artist)
+      .with("album", album)
+      .with("track", track)
       .selectFrom("queue")
-      .innerJoin("metadata", "metadata.id", "queue.track")
+      .innerJoin("track", "track.id", "queue.track")
       .where("position", "<", 0)
       .select("queue.id as entry")
-      .select(metafields)
+      .select(fields)
+      .$castTo<Track & { entry: number }>()
   );
 
 export const upcoming = ({ store }: DB) =>
   store((db) =>
     db
-      .with("metadata", metadata)
+      .with("resource", resource)
+      .with("artist", artist)
+      .with("album", album)
+      .with("track", track)
       .selectFrom("queue")
-      .innerJoin("metadata", "metadata.id", "queue.track")
+      .innerJoin("track", "track.id", "queue.track")
       .where("position", ">", 0)
       .select("queue.id as entry")
-      .select(metafields)
+      .select(fields)
+      .$castTo<Track & { entry: number }>()
   );
 
 export const playback = ({ store }: DB) =>
   store(
     (db) =>
       db
-        .with("metadata", metadata)
+        .with("resource", resource)
+        .with("artist", artist)
+        .with("album", album)
+        .with("track", track)
         .selectFrom("devices")
         .innerJoin("playback", "playback.id", "devices.playback")
-        .innerJoin("metadata", "metadata.id", "playback.track")
+        .innerJoin("track", "track.id", "playback.track")
         .select(["direction", "repeat", "infinite", "device", "progress"])
         .select("playback.id as entry")
         .select(sql<boolean>`device = crsql_siteid()`.as("local"))
-        .select(metafields),
+        .select(fields)
+        .$castTo<Track & Playback>(),
     {
       async push(
         db,
-        tracks: TrackDetails[],
+        tracks: Track[],
         at: "first" | "next" | "last" | "random" | number = "next"
       ) {
         await Promise.all(tracks.map((x) => pushTrack(db, x)));
@@ -215,3 +222,22 @@ export const playback = ({ store }: DB) =>
       },
     }
   );
+
+const fields = [
+  "track.id",
+  "track.title",
+  "track.duration",
+  "track.album",
+  "track.artists",
+  "track.sources",
+] as const;
+
+type Playback = {
+  device: Uint8Array;
+  progress: number;
+  direction: 0 | 1;
+  infinite: 0 | 1;
+  repeat: 0 | 1;
+  local: 0 | 1;
+  entry: number;
+};

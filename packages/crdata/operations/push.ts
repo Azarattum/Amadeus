@@ -60,19 +60,21 @@ async function pushResource(
   resource: MediaBase,
   owner: number
 ) {
-  await db
-    .insertInto("sources")
-    .onConflict((x) => x.doNothing())
-    .values(
-      resource.sources.map((source, i) => ({
-        owner,
-        source,
-        primary:
-          +!i &&
-          sql`NOT EXISTS (SELECT 1 FROM sources WHERE owner = ${owner} AND "primary" = 1)`,
-      }))
-    )
-    .execute();
+  if (resource.sources.length) {
+    await db
+      .insertInto("sources")
+      .onConflict((x) => x.doNothing())
+      .values(
+        resource.sources.map((source, i) => ({
+          owner,
+          source,
+          primary:
+            +!i &&
+            sql`NOT EXISTS (SELECT 1 FROM sources WHERE owner = ${owner} AND "primary" = 1)`,
+        }))
+      )
+      .execute();
+  }
   if (!resource.arts?.length) return;
   const primaryAsset =
     resource.arts?.find((_, i) => !!resource.thumbnails?.[i]) ||
