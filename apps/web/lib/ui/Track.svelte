@@ -11,7 +11,11 @@
 </script>
 
 <Card sm flat flow={!sm} interactive on:contextmenu on:click {selected}>
-  <Image src={track?.album.arts?.[0]} slot="before">
+  <Image
+    src={track ? track.album.arts?.[0] || "" : undefined}
+    thumbnail={track ? track.album.thumbnails?.[0] || "" : undefined}
+    slot="before"
+  >
     <div
       class="flex h-full w-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
       style:filter="hue-rotate({track?.id || 0}deg)"

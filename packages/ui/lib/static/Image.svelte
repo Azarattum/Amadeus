@@ -1,89 +1,41 @@
-<script lang="ts" context="module">
-  const canvas = globalThis.document?.createElement("canvas");
-  const ctx = canvas?.getContext("2d");
-  if (ctx) ctx.imageSmoothingQuality = "high";
-  /// TODO: Do some actual persistent caching
-  const cache = new Map<string, string>();
-</script>
-
 <script lang="ts">
-  import { fade } from "svelte/transition";
+  import { onMount } from "svelte";
 
-  export let src: string | undefined = undefined;
+  export let thumbnail: string | null | undefined = undefined;
+  export let src: string | null | undefined = undefined;
   export let size = 48;
   export let alt = "";
 
-  $: resized = cache.has(desource(src) + size)
-    ? cache.get(desource(src) + size)
-    : resize(desource(src));
-  $: loaded = typeof resized === "string";
-  $: Promise.resolve(resized).then(() => (loaded = true));
+  $: state =
+    src === "" || src === null
+      ? "error"
+      : ("loading" as "loading" | "ok" | "error");
 
-  function desource(src?: string) {
-    if (!src) return src;
-    try {
-      return JSON.parse(src)[0] || "";
-    } catch {}
-    return src;
-  }
-
-  function resize(src?: string) {
-    if (src === "") return src;
-    if (!("Image" in globalThis) || !src) return new Promise<string>(() => {});
-    return new Promise<string>((resolve) => {
-      const image = new Image();
-      image.crossOrigin = "anonymous";
-      image.src = src;
-      image.onload = () => {
-        canvas.height = size * devicePixelRatio;
-        canvas.width = size * devicePixelRatio;
-        ctx?.drawImage(
-          image,
-          0,
-          0,
-          image.height,
-          image.height,
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-        const url = canvas.toDataURL("image/webp");
-        cache.set(src + size, url);
-        resolve(url);
-      };
-    });
-  }
+  let image: HTMLImageElement;
+  onMount(() => image?.complete && (image.style.opacity = "1"));
 </script>
 
 <div
   class="overflow-hidden rounded bg-highlight-100"
-  class:animate-pulse={!loaded}
+  class:animate-pulse={state === "loading"}
   style:height="{size}px"
   style:width="{size}px"
 >
-  {#if resized && typeof resized === "string"}
+  {#if src && state !== "error"}
     <img
       {alt}
-      src={resized}
+      src={size < 100 / devicePixelRatio ? thumbnail : src}
+      class="opacity-0 transition-opacity duration-500"
+      class:opacity-100={state === "ok"}
+      loading="lazy"
       width="{size}px"
       height="{size}px"
       draggable="false"
+      bind:this={image}
+      on:load={() => (state = "ok")}
+      on:error={() => (state = "error")}
     />
-  {:else if resized === ""}
+  {:else if state === "error"}
     <slot />
-  {:else}
-    {#await resized then src}
-      <img
-        {src}
-        {alt}
-        in:fade
-        width="{size}px"
-        height="{size}px"
-        draggable="false"
-      />
-    {:catch}
-      <slot />
-    {/await}
   {/if}
 </div>

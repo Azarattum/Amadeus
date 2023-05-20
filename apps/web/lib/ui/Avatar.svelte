@@ -1,9 +1,14 @@
 <script lang="ts">
+  import type { Track } from "@amadeus-music/protocol";
   import { Icon, Image } from "@amadeus-music/ui";
 
   export let of:
-    | { art?: string; id?: number }
-    | { album: { art?: string } }[]
+    | {
+        id?: number;
+        arts?: string[];
+        thumbnails?: (string | null)[];
+        collection?: { tracks: Track[] };
+      }
     | undefined = undefined;
   export let round = false;
   export let href: string | undefined = undefined;
@@ -23,14 +28,18 @@
     : ''}"
   class:bg-highlight={Array.isArray(of) && !of.length}
 >
-  {#if Array.isArray(of)}
-    {#each of
-      .filter((x) => x.album.art && x.album.art !== "[]")
-      .slice(0, 4) as { album: { art } }}
-      <Image src={art} />
+  {#if of?.collection && !of.arts}
+    {#each of.collection.tracks
+      .filter((x) => x.album.arts?.length)
+      .slice(0, 4) as { album: { arts, thumbnails } }}
+      <Image src={arts?.[0] || ""} thumbnail={thumbnails?.[0] || ""} />
     {/each}
   {:else}
-    <Image {size} src={of?.art}>
+    <Image
+      {size}
+      src={of ? of.arts?.[0] || "" : undefined}
+      thumbnail={of ? of.thumbnails?.[0] || "" : undefined}
+    >
       <div
         class="flex h-full w-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
         style:filter="hue-rotate({of?.id || 0}deg)"
