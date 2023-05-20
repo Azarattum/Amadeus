@@ -77,7 +77,7 @@ export const feed = ({ store }: DB) =>
           .with("album", album)
           .with("track", track)
           .selectFrom("feed")
-          .leftJoin("track", "track.id", "feed.track")
+          .innerJoin("track", "track.id", "feed.track")
           .select([
             "track.id",
             "track.title",
@@ -88,6 +88,7 @@ export const feed = ({ store }: DB) =>
             "feed.id as entry",
           ])
           .where("feed.id", "in", entries)
+          .$castTo<Track & { entry: number }>()
           .execute();
       },
     }

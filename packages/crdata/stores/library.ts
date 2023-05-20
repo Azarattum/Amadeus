@@ -46,7 +46,7 @@ export const library = ({ store }: DB) =>
         .with("album", album)
         .with("track", track)
         .selectFrom("library")
-        .leftJoin("track", "track.id", "library.track")
+        .innerJoin("track", "track.id", "library.track")
         .select([
           "track.id",
           "track.title",
@@ -57,6 +57,7 @@ export const library = ({ store }: DB) =>
           "library.id as entry",
         ])
         .where("library.id", "in", entries)
+        .$castTo<Track & { entry: number }>()
         .execute();
     },
   });

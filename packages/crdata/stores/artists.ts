@@ -78,6 +78,7 @@ export const artists = ({ store }: DB) =>
           .orderBy("rank")
           .innerJoin("artist", "artist.id", "artists_fts.rowid")
           .selectAll()
+          .$castTo<Artist>()
           .execute();
       },
       get(db, id: number) {
@@ -87,6 +88,7 @@ export const artists = ({ store }: DB) =>
           .selectFrom("artist")
           .where("artist.id", "=", id)
           .selectAll()
+          .$castTo<Artist>()
           .executeTakeFirstOrThrow();
       },
     }

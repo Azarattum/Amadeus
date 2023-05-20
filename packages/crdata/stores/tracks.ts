@@ -1,5 +1,5 @@
+import type { Album, Track, TrackBase } from "@amadeus-music/protocol";
 import { resource, track, album, artist } from "../operations/cte";
-import type { Album, Track } from "@amadeus-music/protocol";
 import { sanitize } from "../operations/utils";
 import type { DB } from "../data/schema";
 
@@ -27,7 +27,7 @@ export const tracks = ({ store }: DB) =>
         .orderBy("library.id")
         .$castTo<Track & { entry: number; date: number }>(),
     {
-      async edit(db, id: number, track: Partial<Track & { album: Album }>) {
+      async edit(db, id: number, track: Partial<TrackBase & { album: Album }>) {
         const result = await db
           .updateTable("tracks")
           .where("id", "=", id)
@@ -54,6 +54,7 @@ export const tracks = ({ store }: DB) =>
           .orderBy("rank")
           .innerJoin("track", "track.id", "rowid")
           .selectAll()
+          .$castTo<Track>()
           .execute();
       },
       get(db, id: number) {
@@ -65,6 +66,7 @@ export const tracks = ({ store }: DB) =>
           .selectFrom("track")
           .selectAll()
           .where("id", "=", id)
+          .$castTo<Track>()
           .executeTakeFirstOrThrow();
       },
     }

@@ -29,6 +29,7 @@ export const albums = ({ store }: DB) =>
           .orderBy("rank")
           .innerJoin("album", "album.id", "albums_fts.rowid")
           .selectAll()
+          .$castTo<Album>()
           .execute();
       },
       get(db, id: number) {
@@ -39,6 +40,7 @@ export const albums = ({ store }: DB) =>
           .selectFrom("album")
           .selectAll()
           .where("album.id", "=", id)
+          .$castTo<Album>()
           .executeTakeFirstOrThrow();
       },
     }
