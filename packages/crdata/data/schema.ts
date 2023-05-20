@@ -49,8 +49,7 @@ const sources = object({
   primary: boolean(),
 });
 crr(sources);
-index(sources, "owner");
-primary(sources, "source");
+primary(sources, "owner", "source");
 
 const assets = object({
   art: string(),
@@ -59,8 +58,7 @@ const assets = object({
   primary: boolean(),
 });
 crr(assets);
-index(assets, "owner");
-primary(assets, "art");
+primary(assets, "owner", "art");
 
 const playlists = assign(unique(playlistBase), object({ order: string() }));
 crr(playlists);
