@@ -6,6 +6,7 @@ import {
   track,
   album,
   artist,
+  type MediaInfo,
 } from "@amadeus-music/protocol";
 import type { Meta, FromType, MediaType } from "@amadeus-music/protocol";
 import { pages, type Page } from "../data/pagination";
@@ -37,19 +38,19 @@ async function* aggregate(
   const limit = Number.isInteger(+last) ? +last : 10;
   const page = pages<any>(groups, { page: limit, controller, compare });
   controller.signal.addEventListener("abort", page.close, { once: true });
-  const curated = generators.map((generator, id) => {
+  const curated = generators.map((generator, i) => {
     return (async function* () {
       let empty = true;
       for await (const batch of generator) {
         if (batch.length) empty = false;
         try {
-          await cancel(page.append(id, batch), controller.signal);
+          await cancel(page.append(i, batch), controller.signal);
         } catch {
           return page.close();
         }
       }
-      page.complete(id);
-      if (empty) wrn.bind({ group: groups[id] })("No results aggregated!");
+      page.complete(i);
+      if (empty) wrn.bind({ group: groups[i] })(`No ${id} results aggregated!`);
     })();
   });
 
@@ -81,7 +82,6 @@ function* lookup<T extends MediaType>(
 
   const items = yield* map(results, function* (x) {
     if (x.progress >= 1) x.close();
-    /// Fix types
     return x.items.filter(verify)[0];
   });
   return items.pop();
@@ -102,9 +102,8 @@ function match(query: string) {
   const track = normalize(inferTrack(query));
   query = clean(query);
 
-  type Media = Partial<Record<keyof typeof track, any>>;
-  const compare = (x: Media, key: keyof typeof track) => {
-    const target = x[key]?.toString();
+  const compare = (x: MediaInfo, key: keyof typeof track) => {
+    const target = (x as any)[key]?.toString();
     const source = track[key]?.toString();
     if (!target) return 0;
     const withQuery = stringSimilarity(target, query);
@@ -112,15 +111,19 @@ function match(query: string) {
     return Math.max(withQuery, stringSimilarity(target, source));
   };
 
-  return (a: Media, b: Media) => {
+  return (a: MediaInfo, b: MediaInfo) => {
+    // Don't sort items from the same source
+    const sameSource = a.sources.find((x) =>
+      b.sources.find((y) => y.startsWith(x.split("/")[0]))
+    );
+    if (sameSource) return 0;
+
+    // Perform query comparison
     a = normalize(a);
     b = normalize(b);
-
     const keys = ["title", "artists", "album"] as const;
     const weights = [4, 2, 1];
-
     const scores = keys.map((key) => [compare(a, key), compare(b, key)]);
-    if (scores.find((x) => x[0] === x[1] && x[0] === 1)) return 0;
     return scores.reduce((acc, [a, b], i) => acc + (b - a) * weights[i], 0);
   };
 }

@@ -1,6 +1,6 @@
+import type { FromInfo, MediaBase, MediaInfo } from ".";
 import { clean } from "@amadeus-music/util/string";
 import { has } from "@amadeus-music/util/object";
-import type { Unique } from ".";
 import hash from "murmurhash";
 
 function titled(data: any) {
@@ -70,23 +70,20 @@ function merge<T extends Record<string, any>>(target: T, source: T) {
   }
 
   for (const key in target) {
-    const json =
-      ["art", "source"].includes(key) &&
-      typeof target[key] === "string" &&
-      typeof source[key] === "string";
-    const a = json ? JSON.parse(target[key]) : target[key];
-    const b = json ? JSON.parse(source[key]) : source[key];
+    const a = target[key];
+    const b = source[key];
     let c = a;
 
     if (typeof a !== typeof b) continue;
     if (typeof a === "string") c = caseEntropy(a) >= caseEntropy(b) ? a : b;
     if (Array.isArray(a) && Array.isArray(b)) {
-      const sorted = [...a, ...b].sort(compare);
-      const identified = sorted.map(identify);
-      c = sorted.filter((x, i) => identified.indexOf(identify(x)) === i);
+      const both = [...a, ...b];
+      if (has(a[0], "title") || has(b[0], "title")) both.sort();
+      const identified = both.map(identify);
+      c = both.filter((x, i) => identified.indexOf(identify(x)) === i) as any;
     } else if (typeof a === "object") c = merge(a, b);
     if (typeof a === "number") c = a > b ? a : b;
-    target[key] = json ? JSON.stringify(c) : c;
+    target[key] = c;
   }
 
   for (const key in source) {
@@ -95,18 +92,32 @@ function merge<T extends Record<string, any>>(target: T, source: T) {
   return target;
 }
 
-function uniquify<T>(target: T): Uniqueified<T> {
-  if (typeof target !== "object" || !target) return target as any;
-  if (Array.isArray(target)) return target.slice().sort().map(uniquify) as any;
-
-  const copy: Record<string, any> = { ...target, id: identify(target) };
-  for (const key in copy) {
-    if (key === "album" && typeof copy[key] === "object" && "artists" in copy) {
-      const id = identify({ ...copy[key], artists: copy["artists"] });
-      copy[key] = { ...copy[key], id };
-    } else copy[key] = uniquify(copy[key]);
+function uniquify<T extends MediaInfo>(item: T) {
+  const result = { id: identify(item), ...fix(item) } as any as T;
+  if ("album" in result) {
+    result.album = {
+      id: identify({ ...result.album, artists: result["artists"] }),
+      ...fix(result.album),
+    } as any;
   }
-  return copy as any;
+  if ("artists" in result) {
+    result.artists = result.artists
+      .slice()
+      .sort(compare)
+      .map((x) => ({ id: identify(x), ...fix(x) })) as any;
+  }
+  return result as unknown as FromInfo<T>;
+}
+
+function fix(assets: MediaBase) {
+  if ("duration" in assets) return assets;
+  if (!assets.arts) assets.arts = [];
+  if (!assets.thumbnails) assets.thumbnails = [];
+  assets.thumbnails = assets.thumbnails.slice(0, assets.arts.length);
+  assets.thumbnails = assets.thumbnails.concat(
+    Array(assets.arts.length - assets.thumbnails.length).fill(null)
+  );
+  return assets;
 }
 
 function format(data: any): string {
@@ -117,13 +128,4 @@ function format(data: any): string {
     : String(data);
 }
 
-type Uniqueified<T> = T extends Record<any, any>
-  ? Unique<{
-      [K in keyof T]: T[K] extends (infer I)[]
-        ? Uniqueified<I>[]
-        : Uniqueified<T[K]>;
-    }>
-  : T;
-
-export type { Uniqueified };
 export { identify, stringify, normalize, uniquify, merge, format };
