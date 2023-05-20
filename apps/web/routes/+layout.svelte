@@ -50,7 +50,7 @@
     Library: ["Playlists", "Artists", "Timeline"],
     Explore: ["Tracks", "Artists", "Albums"],
   };
-  $: section = capitalize($page.route.id?.split("/")?.[1] || "home");
+  $: section = capitalize($page.route.id?.split("/")?.[1] || "home") as string;
 
   function toURL(target: string): string | undefined {
     if (target in urls) return urls[target];
