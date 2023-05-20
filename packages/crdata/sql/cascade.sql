@@ -80,3 +80,26 @@ WHEN NOT EXISTS (
 BEGIN
   DELETE FROM artists WHERE id = OLD.artist;
 END;
+
+CREATE TRIGGER IF NOT EXISTS cascade_tracks_resources
+AFTER DELETE ON tracks
+FOR EACH ROW
+BEGIN
+  DELETE FROM sources WHERE owner = OLD.id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS cascade_albums_resources
+AFTER DELETE ON albums
+FOR EACH ROW
+BEGIN
+  DELETE FROM sources WHERE owner = OLD.id;
+  DELETE FROM assets WHERE owner = OLD.id;
+END;
+
+CREATE TRIGGER IF NOT EXISTS cascade_artists_resources
+AFTER DELETE ON artists
+FOR EACH ROW
+BEGIN
+  DELETE FROM sources WHERE owner = OLD.id;
+  DELETE FROM assets WHERE owner = OLD.id;
+END;
