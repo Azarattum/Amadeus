@@ -10,34 +10,40 @@ import {
   literal,
 } from "@amadeus-music/core";
 
-const json = (strings: readonly string[], ...args: any[]) =>
-  args.every((x) => x != null)
-    ? JSON.stringify([
-        strings.reduce((a, b, i) => a + b + (i in args ? args[i] : ""), ""),
-      ])
-    : "[]";
+function toAssets(art?: string, thumbnail?: string) {
+  if (!art) return { arts: [], thumbnails: [] };
+  return { arts: [art], thumbnails: [thumbnail || null] };
+}
 
 function toArtist(data: Infer<typeof artist> | string) {
-  if (typeof data === "string") return { title: data, source: "[]", art: "[]" };
+  if (typeof data === "string") return { title: data, sources: [] };
 
   const art = data.photo?.length
     ? data.photo?.reduce((a, b) =>
         a.width * a.height > b.width * b.height ? a : b
       ).url
     : undefined;
+  const thumbnail = data.photo?.length
+    ? data.photo?.reduce((a, b) =>
+        a.width > 100 &&
+        a.height > 100 &&
+        a.width * a.height < b.width * b.height
+          ? a
+          : b
+      ).url
+    : undefined;
 
   return {
     title: data.name,
-    art: json`${art}`,
-    source: json`vk/${data.id}`,
+    sources: data.id ? [`vk/${data.id}`] : [],
+    ...toAssets(art, thumbnail),
   };
 }
 
 function toAlbum(data: Infer<typeof album> | string, artistless = false) {
-  if (typeof data === "string") {
-    return { title: data, year: 0, art: "[]", source: "[]" };
-  }
+  if (typeof data === "string") return { title: data, year: 0, sources: [] };
 
+  const assets = data.photo || data.thumb;
   const artists = (data.main_artists?.map(toArtist) || []).concat(
     data.featured_artists?.map(toArtist) || []
   );
@@ -45,8 +51,8 @@ function toAlbum(data: Infer<typeof album> | string, artistless = false) {
   return {
     title: data.title,
     year: data.year || 0,
-    art: json`${data.photo?.photo_1200 || data.thumb?.photo_1200}`,
-    source: json`vk/${data.owner_id}/${data.id}/${data.access_key}`,
+    sources: [`vk/${data.owner_id}/${data.id}/${data.access_key}`],
+    ...toAssets(assets?.photo_1200, assets?.photo_135),
     ...(artists && !artistless ? { artists } : {}),
   };
 }
@@ -55,9 +61,9 @@ function toTrack(data: Infer<typeof track>) {
   if (!data.main_artists && !data.featured_artists) return;
   if (!data.url) return;
   return {
-    length: data.duration,
+    duration: data.duration,
     album: toAlbum(data.album || data.title, true),
-    source: json`vk/${data.owner_id}_${data.id}`,
+    sources: [`vk/${data.owner_id}_${data.id}`],
     title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
     artists: (data.main_artists?.map(toArtist) || []).concat(
       data.featured_artists?.map(toArtist) || []
@@ -101,13 +107,13 @@ const album = type({
   featured_artists: optional(array(artist)),
   photo: optional(
     type({
-      photo_68: string(),
+      photo_135: string(),
       photo_1200: string(),
     })
   ),
   thumb: optional(
     type({
-      photo_68: string(),
+      photo_135: string(),
       photo_1200: string(),
     })
   ),

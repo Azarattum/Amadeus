@@ -132,12 +132,13 @@ recognize(function* (stream) {
 });
 
 function* identify(
-  data: { source?: string; title?: string },
+  data: { sources?: string[]; title?: string },
   type: "track" | "artist" | "album"
 ) {
-  const regex = /yandex\/([0-9]+)/;
   return (
-    data.source?.match(regex)?.[1] ||
-    (yield* lookup(type, data, "yandex"))?.source?.match(regex)?.[1]
+    data.sources?.find((x) => x.startsWith("yandex/"))?.slice(7) ||
+    (yield* lookup(type, data, "yandex"))?.sources
+      .find((x) => x.startsWith("yandex/"))
+      ?.slice(7)
   );
 }

@@ -9,33 +9,30 @@ import {
   type Struct,
 } from "@amadeus-music/core";
 
-const json = (strings: readonly string[], ...args: any[]) =>
-  args.every((x) => x != null)
-    ? JSON.stringify([
-        strings.reduce((a, b, i) => a + b + (i in args ? args[i] : ""), ""),
-      ])
-    : "[]";
-
-const toArt = (cover?: string) => json`https://${cover?.slice(0, -2)}800x800`;
+function toAssets(x?: string) {
+  if (!x) return { arts: [], thumbnails: [] };
+  const url = `https://${x.slice(0, -2)}`;
+  return { arts: [url + "800x800"], thumbnails: [url + "100x100"] };
+}
 
 function toArtist(data: Infer<typeof artist>) {
   return {
     title: data.name,
-    art: toArt(data.cover?.uri),
-    source: json`yandex/${data.id}`,
+    sources: [`yandex/${data.id}`],
+    ...toAssets(data.cover?.uri),
   };
 }
 
 function toAlbum(data: Infer<typeof album> | string, artistless = false) {
   if (typeof data === "string") {
-    return { title: data, year: 0, art: "[]", source: "[]" };
+    return { title: data, year: 0, art: "[]", sources: "[]" } as never;
   }
 
   return {
     title: data.title,
     year: data.year || 0,
-    source: json`yandex/${data.id}`,
-    art: toArt(data.coverUri),
+    sources: [`yandex/${data.id}`],
+    ...toAssets(data.coverUri),
     ...(artistless ? {} : { artists: data.artists?.map(toArtist) || [] }),
   };
 }
@@ -43,8 +40,8 @@ function toAlbum(data: Infer<typeof album> | string, artistless = false) {
 function toTrack(data: Infer<typeof track>) {
   return {
     title: data.title + (data.version ? ` (${data.version})` : ""),
-    length: data.durationMs / 1000,
-    source: json`yandex/${data.id}`,
+    duration: data.durationMs / 1000,
+    sources: [`yandex/${data.id}`],
     album: toAlbum(data.albums[0] || data.title, true),
     artists: data.artists.map(toArtist),
   };

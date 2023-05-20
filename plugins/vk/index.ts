@@ -104,12 +104,13 @@ transcribe(function* (track) {
 });
 
 function* identify(
-  data: { source?: string; title?: string },
+  data: { sources?: string[]; title?: string },
   type: "track" | "artist" | "album"
 ) {
-  const regex = /vk\/([0-9_-]+)/;
   return (
-    data.source?.match(regex)?.[1] ||
-    (yield* lookup(type, data, "vk"))?.source?.match(regex)?.[1]
+    data.sources?.find((x) => x.startsWith("vk/"))?.slice(3) ||
+    (yield* lookup(type, data, "vk"))?.sources
+      .find((x) => x.startsWith("vk/"))
+      ?.slice(3)
   );
 }
