@@ -3,6 +3,7 @@ import type {
   AlbumInfo,
   ArtistInfo,
   MediaInfo,
+  FromInfo,
 } from "@amadeus-music/protocol";
 import type { Database, User } from "./persistence.types";
 import type { Page } from "../data/pagination";
@@ -23,7 +24,7 @@ const init = pool<(config: Config) => void>("init");
 const stop = pool("stop");
 
 // Aggregator events
-type Aggregated<T extends MediaInfo> = Mapped<T, Page<T>>;
+type Aggregated<T extends MediaInfo> = Mapped<T, Page<FromInfo<T>>>;
 
 const search = pool<
   | ((type: "track", query: string, page: number) => Aggregated<TrackInfo>)
