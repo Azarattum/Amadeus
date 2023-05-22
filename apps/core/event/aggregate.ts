@@ -113,7 +113,7 @@ function match(query: string) {
 
   return (a: MediaInfo, b: MediaInfo) => {
     // Don't sort items from the same source
-    const sameSource = a.sources.find((x) =>
+    const sameSource = a.sources?.find((x) =>
       b.sources.find((y) => y.startsWith(x.split("/")[0]))
     );
     if (sameSource) return 0;

@@ -8,7 +8,7 @@ const err = async () => {
 
 persistence(() => ({
   settings: { lookup: async (a, b) => `${b}.${a}`, extract: err },
-  tracks: { get: async () => ({ title: "aaa", source: '["b"]' } as any) },
+  tracks: { get: async () => ({ title: "aaa", sources: ["b"] } as any) },
   history: { get: async () => [{ query: "a", date: 1 }] },
   artists: { get: async () => ({ title: "Test" } as any) },
   subscribe: () => spy,
@@ -16,7 +16,7 @@ persistence(() => ({
 persistence(() => ({
   playlists: { create: async () => 123 as any },
   settings: { lookup: () => Promise.resolve("never") },
-  tracks: { get: async () => ({ title: "Aaa", source: '["a"]' } as any) },
+  tracks: { get: async () => ({ title: "Aaa", sources: ["a"] } as any) },
   history: { get: async () => [{ query: "b", date: 2 }] },
   artists: { get: async () => err() },
   subscribe: () => spy,
@@ -34,7 +34,7 @@ it("processes raced", async () => {
 
 it("processes merged", async () => {
   const result = await persistence().tracks.get(123);
-  expect(result).toEqual({ title: "Aaa", source: '["a","b"]' });
+  expect(result).toEqual({ title: "Aaa", sources: ["b", "a"] });
 });
 
 it("processes dated", async () => {
