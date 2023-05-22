@@ -1,5 +1,5 @@
 import { album, resource, artist } from "../operations/cte";
-import { Album } from "@amadeus-music/protocol";
+import type { Album } from "@amadeus-music/protocol";
 import { sanitize } from "../operations/utils";
 import { pushAlbum } from "../operations/push";
 import type { DB } from "../data/schema";

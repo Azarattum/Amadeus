@@ -1,8 +1,8 @@
 import { info, procedure, router, expand as expandOf } from "../plugin";
-import { Album, Artist, Track } from "@amadeus-music/protocol";
+import type { Album, Artist, Track } from "@amadeus-music/protocol";
 import { observable } from "@trpc/server/observable";
+import { type Stream, stream } from "./stream";
 import { number, object } from "superstruct";
-import { Stream, stream } from "./stream";
 
 const expandProcedure = procedure.input(
   object({ id: number(), page: number() })

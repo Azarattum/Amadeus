@@ -1,5 +1,5 @@
+import type { ExpressionBuilder } from "crstore";
 import type { Schema } from "../data/schema";
-import { ExpressionBuilder } from "crstore";
 import { sql } from "crstore";
 
 const localDevice = sql<Uint8Array>`crsql_siteid()`;

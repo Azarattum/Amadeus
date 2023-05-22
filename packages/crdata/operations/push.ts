@@ -1,5 +1,5 @@
 import type { MediaBase, Track, Album, Artist } from "@amadeus-music/protocol";
-import { Schema } from "../data/schema";
+import type { Schema } from "../data/schema";
 import { Kysely, sql } from "crstore";
 
 async function pushTrack(db: Kysely<Schema>, track: Track) {

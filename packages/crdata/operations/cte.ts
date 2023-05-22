@@ -1,4 +1,4 @@
-import { Album, Artist, MediaBase, Track } from "@amadeus-music/protocol";
+import type { Album, Artist, MediaBase, Track } from "@amadeus-music/protocol";
 import { group, json, groupJSON } from "crstore";
 import type { Schema } from "../data/schema";
 import type { QueryCreator } from "crstore";

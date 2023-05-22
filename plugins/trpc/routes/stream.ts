@@ -1,4 +1,4 @@
-import { Page, number } from "@amadeus-music/core";
+import { type Page, number } from "@amadeus-music/core";
 import { procedure, router } from "../plugin";
 
 const streams = new Map<number, () => void>();

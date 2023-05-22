@@ -1,6 +1,6 @@
-import { MediaBase } from "@amadeus-music/protocol";
+import type { MediaBase } from "@amadeus-music/protocol";
 import { resource } from "../operations/cte";
-import { DB } from "../data/schema";
+import type { DB } from "../data/schema";
 import { sql } from "crstore";
 
 export const resources = ({ store }: DB) =>
