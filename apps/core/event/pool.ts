@@ -50,7 +50,7 @@ const recognize = pool<
   ) => Aggregated<TrackInfo>
 >("recognize", { transform: aggregate, timeout });
 
-const desource = pool<(source: string) => string>("desource");
+const desource = pool<(sources: string[]) => string>("desource");
 const transcribe = pool<(track: TrackInfo) => string>("transcribe", {
   cache: 5,
   rate,

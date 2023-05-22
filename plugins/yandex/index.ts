@@ -60,9 +60,10 @@ search(function* (type, query, page) {
   }
 });
 
-desource(function* (source) {
-  const id = source?.match(/yandex\/([0-9]+)/)?.[1];
+desource(function* (sources) {
+  const id = sources.find?.((x: string) => x.startsWith("yandex/"))?.slice(7);
   if (!id) return;
+
   const { result } = yield* fetch(`tracks/${id}/download-info`).as(link);
   const url = result[0].downloadInfoUrl + "&format=json";
   const info = yield* fetch(url).as(download);

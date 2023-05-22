@@ -47,12 +47,12 @@ search(function* (type, query, page) {
   }
 });
 
-desource(function* (source) {
-  source = JSON.parse(source)?.find?.((x: string) => x.startsWith("vk/"));
-  if (!source) return;
+desource(function* (sources) {
+  const id = sources.find?.((x: string) => x.startsWith("vk/"))?.slice(3);
+  if (!id) return;
 
   const { response } = yield* fetch("audio.getById", {
-    params: { audios: source.slice(3) },
+    params: { audios: id },
   }).as(responseOf(array(track)));
   yield* response.map((x) => x.url);
 });
