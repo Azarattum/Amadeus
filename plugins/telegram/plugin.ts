@@ -6,7 +6,7 @@ import {
   string,
   Infer,
 } from "@amadeus-music/core";
-import { TrackMeta } from "@amadeus-music/protocol";
+import { Meta } from "@amadeus-music/protocol";
 import { name, version } from "./package.json";
 import { Reply, Edit } from "./types/reply";
 import { query } from "./types/action";
@@ -58,13 +58,14 @@ export const {
 });
 
 const temp = new Map<number, Set<number>>();
-const update = pool<(data: string) => void>("update");
-const message = pool<(text: string | TrackMeta) => void>("message");
-const command = pool<(command: string, replied?: number) => void>("command");
-const mention = pool<(chat: number) => void>("mention");
+
 const voice = pool<(url: string) => void>("voice");
-const post = pool<(text: TrackMeta, chat: number) => void>("post");
+const update = pool<(data: string) => void>("update");
+const mention = pool<(chat: number) => void>("mention");
+const post = pool<(text: Meta, chat: number) => void>("post");
+const message = pool<(text: string | Meta) => void>("message");
 const invite = pool<(chat: number, title: string) => void>("invite");
+const command = pool<(command: string, replied?: number) => void>("command");
 const changed =
   pool<(type: "library" | "feed", entries: number[]) => void>("changed");
 const callback =

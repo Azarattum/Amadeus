@@ -27,12 +27,12 @@ export const answerCallbackQuery = (query: string) =>
 
 export const sendAudio = (chat: number, message: Audio) => {
   const filename = format(message.track).replace(/[/\\?%*:|"<>]/gi, "");
-  const art = JSON.parse(message.track.album.art)[0];
+  const art = message.track.album.arts?.[0];
   return fetch("sendAudio", {
     form: {
       chat_id: chat,
       title: message.track.title,
-      duration: Math.round(message.track.length),
+      duration: Math.round(message.track.duration),
       audio: [reencode(message.url, message.track), `${filename}.ogm`],
       thumbnail: art ? [resize(art, 320), "art.jpg"] : undefined,
       performer: message.track.artists.map((x: any) => x.title).join(", "),

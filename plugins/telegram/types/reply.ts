@@ -1,14 +1,14 @@
-import { TrackDetails, TrackInfo } from "@amadeus-music/protocol";
+import { Track } from "@amadeus-music/protocol";
 import { editor, replier } from "../api/reply";
 
-type Queue = (tracks: TrackDetails[]) => number;
+type Queue = (tracks: Track[]) => number;
 type Replier = (message: Message) => number;
 type Reply = ReturnType<typeof replier>;
 type Edit = ReturnType<typeof editor>;
 
 type Audio = {
   url: string;
-  track: TrackInfo;
+  track: Track;
   mode?: string;
   markup?: string;
   caption?: string;

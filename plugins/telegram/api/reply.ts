@@ -5,9 +5,9 @@ import {
   sendAudio,
 } from "./methods";
 import { async, first, map, Pool } from "@amadeus-music/core";
-import type { TrackDetails } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
 import { Message, Queue, Replier } from "../types/reply";
+import type { Track } from "@amadeus-music/protocol";
 import { pretty } from "@amadeus-music/util/object";
 import { format } from "@amadeus-music/protocol";
 import { desource, info, pool } from "../plugin";
@@ -40,7 +40,7 @@ function* queue(
   pool: Pool<Replier, any>,
   notifier: () => void,
   name: string,
-  tracks: TrackDetails[],
+  tracks: Track[],
   group = true
 ) {
   let done = false;
@@ -48,7 +48,7 @@ function* queue(
   this.signal.addEventListener("abort", () => clearInterval(ping));
   const promises: PromiseLike<any>[] = [];
   for (const track of tracks) {
-    const url = yield* async(first(desource(track.source)));
+    const url = yield* async(first(desource(track.sources)));
     info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
     promises.push(
       pool({
@@ -84,12 +84,12 @@ function replier(chat: number, name: string, group = true) {
   });
   if (!target.status().listeners.size) target(reply.bind(null, chat));
 
-  return function* (message: Message | TrackDetails[]) {
+  return function* (message: Message | Track[]) {
     let ids: number[] = [];
     if (Array.isArray(message)) {
       const send = pool<Queue>(`queue/${chat}`, { concurrency: 1 });
       if (!send.status().listeners.size) {
-        send(function (tracks: TrackDetails[]) {
+        send(function (tracks: Track[]) {
           return queue.bind(this)(target, notifier(chat), name, tracks, group);
         });
       }
