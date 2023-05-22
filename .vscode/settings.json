@@ -113,6 +113,7 @@
     "**/coverage": true,
     "**/.vscode": true,
     "**/.turbo": true,
+    ".github/": true,
     "*pnpm*": true
   },
   "editor.formatOnSave": true,
