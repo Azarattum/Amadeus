@@ -14,6 +14,9 @@ const config = defineConfig(
         external: /..\/..\/..\/plugins/,
       },
     },
+    resolve: {
+      alias: { "./lib-cov/fluent-ffmpeg": "./lib/fluent-ffmpeg" },
+    },
   })
 );
 
