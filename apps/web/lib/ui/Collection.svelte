@@ -58,7 +58,7 @@
               <Icon name="clock" sm />
               {format(of.collection.duration)}
             </Text>
-            {#if "remote" in of}
+            {#if "remote" in of && of.remote}
               <Spacer />
               <Text secondary><Icon name="share" sm /> {of.remote}</Text>
             {/if}
