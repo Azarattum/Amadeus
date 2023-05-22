@@ -42,6 +42,15 @@ function monad<F extends Transform = Identity>(
     catch(reject): any {
       return this.then((x) => x, reject);
     },
+    finally(handler): any {
+      return this.then(
+        (x) => (queueMicrotask(handler || (() => {})), x),
+        (x) => {
+          queueMicrotask(handler || (() => {}));
+          throw x;
+        }
+      );
+    },
     unwrap(fallback) {
       return unwrap(this[state], fallback);
     },

@@ -47,6 +47,8 @@ interface Base<T = any, F extends Transforms = [Identity]> {
     rejected?: Reject<Result1>
   ): Resolved<T | Wrapped<F, Result1>, T, F>;
 
+  finally(handler?: (() => void) | undefined | null): Base<T, F>;
+
   unwrap<U = never>(fallback?: U): Unwrapped<F, T> | Promised<F, U>;
 
   expose(): Promised<
