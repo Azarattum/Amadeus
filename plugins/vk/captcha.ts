@@ -64,6 +64,7 @@ async function recognize(bytes: ArrayBuffer) {
 }
 
 async function solve(url: string, accuracy = 0.9, limit = 25) {
+  url = url.replace("resized=1", "resized=0");
   for (let i = 0; i < limit; i++) {
     const image = await fetch(url).then((x) => x.arrayBuffer());
     const { confidence, answer } = await recognize(image);
