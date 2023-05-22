@@ -254,3 +254,33 @@ type Picked<T> = T extends (infer U)[]
   : T extends Record<string, any>
   ? { [key in keyof T]: T[key] extends infer U | (infer U)[] ? U : T[key] }
   : T;
+
+/**
+ * Merges already sorted arrays keeping the new one sorted as well
+ * @param arrays Arrays to merge
+ * @param compare Item comparison function
+ */
+export function mergeSorted<T>(arrays: T[][], compare: (a: T, B: T) => number) {
+  function mergePair(a: T[], b: T[]) {
+    const result = [];
+    let ai = 0;
+    let bi = 0;
+    while (ai < a.length && bi < b.length) {
+      if (compare(a[ai], b[bi]) < 0) result.push(a[ai++]);
+      else result.push(b[bi++]);
+    }
+    return result.concat(a.slice(ai)).concat(b.slice(bi));
+  }
+
+  while (arrays.length > 1) {
+    const result = [];
+    for (let i = 0; i < arrays.length; i += 2) {
+      const a1 = arrays[i];
+      const a2 = arrays[i + 1];
+      const mergedPair = a2 ? mergePair(a1, a2) : a1;
+      result.push(mergedPair);
+    }
+    arrays = result;
+  }
+  return arrays.length === 1 ? arrays[0] : [];
+}

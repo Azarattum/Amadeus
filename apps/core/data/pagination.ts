@@ -1,6 +1,5 @@
-import { identify, merge, uniquify, type Media } from "@amadeus-music/protocol";
+import { collection, type Media, type ToInfo } from "@amadeus-music/protocol";
 import { debounce, lock } from "@amadeus-music/util/async";
-import { combine } from "@amadeus-music/util/object";
 
 function page<T extends Media>(
   number: number,
@@ -10,35 +9,29 @@ function page<T extends Media>(
 ) {
   const { wait, resolve } = lock();
   const progress = groups.map(() => new Set());
-  const map = new Map<number, T>();
-  const convert = uniquify as any;
+  const items = collection(options.compare);
   const size = options.page;
-  const items: T[] = [];
-
-  const params = { compare: options.compare, map, identify, convert, merge };
 
   return {
     number,
-    append(id: number, batch: T[]) {
+    append(id: number, batch: (ToInfo<T> | T)[]) {
       if (this.satisfied(id)) {
         return progress.map((_, i) => (i === id ? batch : []));
       }
 
-      batch.forEach((x) => progress[id].add(identify(x)));
-      combine(items, batch, params);
-      const overshoot = items.splice(size);
-      overshoot.forEach((x) => map.delete(identify(x)));
+      batch.forEach((x) => progress[id].add(items.push(x, id).id));
+      const overshoot = items.prune(size);
       if (this.progress >= 1) resolve();
-      return progress.map((x) => overshoot.filter((y) => x.has(identify(y))));
+      return progress.map((x) => overshoot.filter((y) => x.has(y.id)));
     },
     satisfied(id: number) {
       return progress[id].size >= size;
     },
-    has(item: T) {
-      return map.has(identify(item));
+    has(item: ToInfo<T> | T) {
+      return items.has(item);
     },
     get items() {
-      return items;
+      return items.items;
     },
     get progress() {
       const part = 1 / progress.length;
@@ -74,11 +67,11 @@ function pages<T extends Media>(
   let active = true;
 
   return {
-    async append(id: number, batch: T[], number = last()) {
+    async append(id: number, batch: (ToInfo<T> | T)[], number = last()) {
       if (!batch.length) return;
       if (!pages[number]) pages[number] = create(number);
       batch = batch.filter((x) =>
-        pages.every((y) => !(y.has(x) && y.append(id, [x])))
+        pages.every((y, i) => i === number || !(y.has(x) && y.append(id, [x])))
       );
       pages[number].append(id, batch).forEach((batch, id) => {
         this.append(id, batch, number + 1);

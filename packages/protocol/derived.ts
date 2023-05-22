@@ -100,11 +100,19 @@ type FromInfo<T extends MediaInfo> = T extends TrackInfo
   ? Artist
   : never;
 
+type ToInfo<T extends MediaInfo> = T extends Track
+  ? TrackInfo
+  : T extends Album
+  ? AlbumInfo
+  : T extends Artist
+  ? ArtistInfo
+  : never;
+
 export { trackInfo, albumInfo, artistInfo, playlistInfo };
 export { track, album, artist, playlist };
 
 export type { Track, Album, Artist, Playlist, Media, Collection };
-export type { FromType, FromInfo };
+export type { FromType, FromInfo, ToInfo };
 export type {
   PlaybackDirection,
   PlaybackRepeat,

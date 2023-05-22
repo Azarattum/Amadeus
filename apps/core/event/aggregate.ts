@@ -7,6 +7,7 @@ import {
   album,
   artist,
   type MediaInfo,
+  type Media,
 } from "@amadeus-music/protocol";
 import type { Meta, FromType, MediaType } from "@amadeus-music/protocol";
 import { pages, type Page } from "../data/pagination";
@@ -111,20 +112,17 @@ function match(query: string) {
     return Math.max(withQuery, stringSimilarity(target, source));
   };
 
-  return (a: MediaInfo, b: MediaInfo) => {
-    // Don't sort items from the same source
-    const sameSource = a.sources?.find((x) =>
-      b.sources.find((y) => y.startsWith(x.split("/")[0]))
-    );
-    if (sameSource) return 0;
-
+  return (a: Media, b: Media) => {
     // Perform query comparison
     a = normalize(a);
     b = normalize(b);
     const keys = ["title", "artists", "album"] as const;
     const weights = [4, 2, 1];
     const scores = keys.map((key) => [compare(a, key), compare(b, key)]);
-    return scores.reduce((acc, [a, b], i) => acc + (b - a) * weights[i], 0);
+    return (
+      scores.reduce((acc, [a, b], i) => acc + (b - a) * weights[i], 0) ||
+      b.id - a.id
+    );
   };
 }
 

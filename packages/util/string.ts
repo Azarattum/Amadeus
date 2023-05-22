@@ -140,3 +140,18 @@ export function dedupe(
     }, "") + (count > 1 ? format(lines.pop()!, count) : lines.pop())
   );
 }
+
+/**
+ * Removes all the contents between parentheses in a string
+ * @param string String to process
+ */
+export function unbrace(string: string) {
+  let bracketCount = 0;
+  let output = "";
+  for (const letter of string) {
+    if (letter === "(") bracketCount += 1;
+    else if (letter === ")") bracketCount -= 1;
+    else if (bracketCount === 0) output += letter;
+  }
+  return bracketCount === 0 ? output.trim() : "";
+}
