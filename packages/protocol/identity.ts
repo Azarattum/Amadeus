@@ -78,7 +78,7 @@ function merge<T extends Record<string, any>>(target: T, source: T) {
     if (typeof a === "string") c = caseEntropy(a) >= caseEntropy(b) ? a : b;
     if (Array.isArray(a) && Array.isArray(b)) {
       const both = [...a, ...b];
-      if (has(a[0], "title") || has(b[0], "title")) both.sort();
+      if (has(a[0], "title") || has(b[0], "title")) both.sort(compare);
       const identified = both.map(identify);
       c = both.filter((x, i) => identified.indexOf(identify(x)) === i) as any;
     } else if (typeof a === "object") c = merge(a, b);
@@ -110,7 +110,7 @@ function uniquify<T extends MediaInfo>(item: T) {
 }
 
 function fix(assets: MediaBase) {
-  if ("duration" in assets) return assets;
+  if ("duration" in assets || "album" in assets) return assets;
   if (!assets.arts) assets.arts = [];
   if (!assets.thumbnails) assets.thumbnails = [];
   assets.thumbnails = assets.thumbnails.slice(0, assets.arts.length);
