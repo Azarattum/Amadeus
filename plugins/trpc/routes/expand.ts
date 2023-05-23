@@ -10,19 +10,25 @@ const expandProcedure = procedure.input(
 
 export const expand = router({
   artist: expandProcedure.subscription(async ({ input: { id, page }, ctx }) => {
-    const getArtist = async () => ctx.cache().artists.get(id);
+    const fallback = async () => ctx.cache().artists.get(id);
+    const getArtist = async () =>
+      ctx.persistence().artists.get(id).then(null, fallback);
+
     const artist = await getArtist();
     info(`${ctx.name} requested artist "${artist.title}".`);
     return observable<Stream<Track, Artist>>(({ next }) => {
-      return stream(next, expandOf("artist", artist, page), getArtist);
+      return stream(next, expandOf("artist", artist, page), fallback);
     });
   }),
   album: expandProcedure.subscription(async ({ input: { id, page }, ctx }) => {
-    const getAlbum = async () => ctx.cache().albums.get(id);
+    const fallback = async () => ctx.cache().albums.get(id);
+    const getAlbum = async () =>
+      ctx.persistence().albums.get(id).then(null, fallback);
+
     const album = await getAlbum();
     info(`${ctx.name} requested album "${album.title}".`);
     return observable<Stream<Track, Album>>(({ next }) => {
-      return stream(next, expandOf("album", album, page), getAlbum);
+      return stream(next, expandOf("album", album, page), fallback);
     });
   }),
 });
