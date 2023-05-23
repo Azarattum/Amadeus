@@ -9,6 +9,7 @@ type Edit = ReturnType<typeof editor>;
 type Audio = {
   url: string;
   track: Track;
+  file?: string;
   mode?: string;
   markup?: string;
   caption?: string;

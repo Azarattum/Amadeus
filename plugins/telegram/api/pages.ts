@@ -5,9 +5,10 @@ import {
   sendMessage,
 } from "./methods";
 import { icon as icons, markdown, pager, escape, menu } from "./markup";
-import { Page as State } from "@amadeus-music/core";
+import { Infer, Page as State } from "@amadeus-music/core";
 import { format } from "@amadeus-music/protocol";
 import { Page as Options } from "../types/reply";
+import { sent } from "../types/core";
 
 const pages = new Map<number, Page>();
 
@@ -63,7 +64,7 @@ function* sendPage(chat: number, { page, icon, message, reset }: Options) {
     prev: () => lastState?.prev(),
   });
 
-  return { result: { message_id: id } };
+  return { result: { message_id: id } } as Infer<typeof sent>;
 }
 
 type Page<T = any> = {

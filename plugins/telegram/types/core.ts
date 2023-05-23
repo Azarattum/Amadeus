@@ -79,6 +79,7 @@ const sent = type({
   ok: literal(true),
   result: type({
     message_id: number(),
+    audio: optional(type({ file_id: string() })),
   }),
 });
 

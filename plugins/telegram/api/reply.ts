@@ -5,12 +5,12 @@ import {
   sendAudio,
 } from "./methods";
 import { async, first, map, Pool } from "@amadeus-music/core";
+import { desource, info, persistence, pool } from "../plugin";
 import { bright, reset } from "@amadeus-music/util/color";
 import { Message, Queue, Replier } from "../types/reply";
 import type { Track } from "@amadeus-music/protocol";
 import { pretty } from "@amadeus-music/util/object";
 import { format } from "@amadeus-music/protocol";
-import { desource, info, pool } from "../plugin";
 import { menu, markdown } from "./markup";
 import { sendPage } from "./pages";
 
@@ -68,11 +68,28 @@ function* queue(
 }
 
 function* reply(chat: number, params: Message) {
+  // Try to get cached audio
+  if ("track" in params) {
+    params.file = yield* async(
+      persistence()
+        .settings.extract(params.track.id.toString())
+        .then(null, () => undefined)
+    );
+  }
+
   const { result } = yield* "track" in params
     ? sendAudio(chat, params)
     : "page" in params
     ? sendPage(chat, params)
     : sendMessage(chat, params);
+
+  // Cache audio if any
+  if ("track" in params && result.audio?.file_id) {
+    yield* persistence().settings.store(
+      params.track.id.toString(),
+      result.audio.file_id
+    );
+  }
 
   yield result.message_id;
 }
