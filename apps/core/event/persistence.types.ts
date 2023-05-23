@@ -50,19 +50,19 @@ type Database = DeepPartial<{
       id: number,
       track: Partial<TrackBase & { album: AlbumBase }>
     ): Promise<void>;
-    search(query: string): Promise<Track[]>;
+    search(query: string, limit?: number, offset?: number): Promise<Track[]>;
     get(id: number): Promise<Track>;
   };
   artists: {
+    search(query: string, limit?: number, offset?: number): Promise<Artist[]>;
     edit(id: number, artist: Partial<ArtistBase>): Promise<void>;
-    search(query: string): Promise<Artist[]>;
     push(artists: Artist[]): Promise<void>;
     get(id: number): Promise<Artist>;
     unfollow(id: number): Promise<void>;
     follow(id: number): Promise<void>;
   };
   albums: {
-    search(query: string): Promise<Album[]>;
+    search(query: string, limit?: number, offset?: number): Promise<Album[]>;
     push(albums: Album[]): Promise<void>;
     get(id: number): Promise<Album>;
   };

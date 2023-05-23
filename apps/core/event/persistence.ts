@@ -28,6 +28,7 @@ const strategies: { [K in Method]?: Strategy } = {
   "settings.extract": raced,
   "artists.search": flatten,
   "tracks.search": flatten,
+  "albums.search": flatten,
   "settings.lookup": raced,
   "playlists.get": merged,
   "resources.get": merged,

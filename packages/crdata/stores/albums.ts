@@ -19,7 +19,7 @@ export const albums = ({ store }: DB) =>
       async push(db, albums: Album[]) {
         await Promise.all(albums.map((x) => pushAlbum(db, x)));
       },
-      async search(db, query: string) {
+      async search(db, query: string, limit = 10, offset = 0) {
         if (!query) return [];
         return db
           .with("source", source)
@@ -31,6 +31,8 @@ export const albums = ({ store }: DB) =>
           .orderBy("rank")
           .innerJoin("album", "album.id", "albums_fts.rowid")
           .selectAll()
+          .limit(limit)
+          .offset(offset)
           .$castTo<Album>()
           .execute();
       },

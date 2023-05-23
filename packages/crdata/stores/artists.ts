@@ -69,7 +69,7 @@ export const artists = ({ store }: DB) =>
           .where("id", "=", id)
           .execute();
       },
-      async search(db, query: string) {
+      async search(db, query: string, limit = 10, offset = 0) {
         if (!query) return [];
         return db
           .with("source", source)
@@ -80,6 +80,8 @@ export const artists = ({ store }: DB) =>
           .orderBy("rank")
           .innerJoin("artist", "artist.id", "artists_fts.rowid")
           .selectAll()
+          .limit(limit)
+          .offset(offset)
           .$castTo<Artist>()
           .execute();
       },

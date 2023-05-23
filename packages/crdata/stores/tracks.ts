@@ -43,7 +43,7 @@ export const tracks = ({ store }: DB) =>
             .execute();
         }
       },
-      async search(db, query: string) {
+      async search(db, query: string, limit = 10, offset = 0) {
         if (!query) return [];
         return db
           .with("source", source)
@@ -56,6 +56,8 @@ export const tracks = ({ store }: DB) =>
           .orderBy("rank")
           .innerJoin("track", "track.id", "rowid")
           .selectAll()
+          .limit(limit)
+          .offset(offset)
           .$castTo<Track>()
           .execute();
       },
