@@ -6,7 +6,7 @@
     "coverage": "vitest run --coverage -c ../../vite.web.js",
     "dev": "vite dev -c ../../vite.web.js --port 5173",
     "preview": "vite preview -c ../../vite.web.js",
-    "test": "svelte-check"
+    "test": "svelte-kit sync && svelte-check"
   },
   "dependencies": {
     "@amadeus-music/crdata": "workspace:*",
