@@ -1,11 +1,23 @@
 import type { MediaBase } from "@amadeus-music/protocol";
-import { resource } from "../operations/cte";
+import { source, asset } from "../operations/cte";
 import type { DB } from "../data/schema";
 import { sql } from "crstore";
 
 export const resources = ({ store }: DB) =>
   store(
-    (db) => db.with("resource", resource).selectFrom("resource").selectAll(),
+    (db) =>
+      db
+        .with("source", source)
+        .with("asset", asset)
+        .selectFrom("source")
+        .leftJoin("asset", "asset.owner", "source.owner")
+        .select([
+          (qb) => qb.fn.coalesce("asset.arts", qb.val("[]")).as("arts"),
+          (qb) =>
+            qb.fn.coalesce("asset.thumbnails", qb.val("[]")).as("thumbnails"),
+          (qb) => qb.fn.coalesce("source.sources", qb.val("[]")).as("sources"),
+        ])
+        .$castTo<MediaBase>(),
     {
       async prioritize(db, type: "art" | "source", resource: string) {
         const table = type === "art" ? "assets" : "sources";
@@ -19,10 +31,18 @@ export const resources = ({ store }: DB) =>
       },
       get(db, owner: number) {
         return db
-          .with("resource", resource)
-          .selectFrom("resource")
-          .select(["sources", "arts", "thumbnails"])
-          .where("owner", "=", owner)
+          .with("source", source)
+          .with("asset", asset)
+          .selectFrom("source")
+          .leftJoin("asset", "asset.owner", "source.owner")
+          .select([
+            (qb) => qb.fn.coalesce("asset.arts", qb.val("[]")).as("arts"),
+            (qb) =>
+              qb.fn.coalesce("asset.thumbnails", qb.val("[]")).as("thumbnails"),
+            (qb) =>
+              qb.fn.coalesce("source.sources", qb.val("[]")).as("sources"),
+          ])
+          .where("source.owner", "=", owner)
           .$castTo<MediaBase>()
           .executeTakeFirstOrThrow();
       },

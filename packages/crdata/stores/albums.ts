@@ -1,4 +1,4 @@
-import { album, resource, artist } from "../operations/cte";
+import { album, source, asset, artist } from "../operations/cte";
 import type { Album } from "@amadeus-music/protocol";
 import { sanitize } from "../operations/utils";
 import { pushAlbum } from "../operations/push";
@@ -8,7 +8,8 @@ export const albums = ({ store }: DB) =>
   store(
     (db) =>
       db
-        .with("resource", resource)
+        .with("source", source)
+        .with("asset", asset)
         .with("artist", artist)
         .with("album", album)
         .selectFrom("album")
@@ -21,7 +22,8 @@ export const albums = ({ store }: DB) =>
       async search(db, query: string) {
         if (!query) return [];
         return db
-          .with("resource", resource)
+          .with("source", source)
+          .with("asset", asset)
           .with("artist", artist)
           .with("album", album)
           .selectFrom("albums_fts" as any)
@@ -34,7 +36,8 @@ export const albums = ({ store }: DB) =>
       },
       get(db, id: number) {
         return db
-          .with("resource", resource)
+          .with("source", source)
+          .with("asset", asset)
           .with("artist", artist)
           .with("album", album)
           .selectFrom("album")

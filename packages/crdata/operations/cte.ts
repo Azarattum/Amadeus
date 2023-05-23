@@ -1,70 +1,67 @@
-import type { Album, Artist, MediaBase, Track } from "@amadeus-music/protocol";
+import type { Album, Artist, Track } from "@amadeus-music/protocol";
 import { group, json, groupJSON } from "crstore";
 import type { Schema } from "../data/schema";
 import type { QueryCreator } from "crstore";
 
-const resource = (qc: QueryCreator<Schema>) =>
+const source = (qc: QueryCreator<Schema>) =>
   qc
     .selectFrom((qb) =>
       qb
         .selectFrom("sources")
-        .fullJoin("assets", "assets.owner", "sources.owner")
-        .select([
-          (qb) => qb.fn.coalesce("sources.owner", "assets.owner").as("owner"),
-          "source",
-          "art",
-          "thumbnail",
-        ])
-        .orderBy("assets.primary", "desc")
+        .select(["owner", "source"])
         .orderBy("sources.primary", "desc")
-        .as("resource")
+        .as("ordered")
+    )
+    .select(["owner", (qb) => group(qb, "source").as("sources")])
+    .groupBy("owner")
+    .$castTo<SourceCTE["source"]>();
+
+const asset = (qc: QueryCreator<Schema>) =>
+  qc
+    .selectFrom((qb) =>
+      qb
+        .selectFrom("assets")
+        .select(["owner", "art", "thumbnail"])
+        .orderBy("assets.primary", "desc")
+        .as("ordered")
     )
     .select([
       "owner",
-      (qb) =>
-        group(qb, "source")
-          .distinct()
-          .filterWhere("source", "is not", null)
-          .as("sources"),
-      (qb) =>
-        group(qb, "art")
-          .distinct()
-          .filterWhere("art", "is not", null)
-          .as("arts"),
-      (qb) => group(qb, "thumbnail").distinct().as("thumbnails"),
+      (qb) => group(qb, "art").as("arts"),
+      (qb) => group(qb, "thumbnail").as("thumbnails"),
     ])
     .groupBy("owner")
-    .$castTo<ResourceCTE["resource"]>();
+    .$castTo<AssetCTE["asset"]>();
 
 const artist = (qc: QueryCreator<Schema & ResourceCTE>) =>
   qc
     .selectFrom("artists")
-    .leftJoin("resource", "resource.owner", "artists.id")
+    .leftJoin("source", "source.owner", "artists.id")
+    .leftJoin("asset", "asset.owner", "artists.id")
     .select([
       "artists.id",
       "artists.title",
       "artists.following",
-      (qb) => qb.fn.coalesce("resource.arts", qb.val("[]")).as("arts"),
-      (qb) =>
-        qb.fn.coalesce("resource.thumbnails", qb.val("[]")).as("thumbnails"),
-      (qb) => qb.fn.coalesce("resource.sources", qb.val("[]")).as("sources"),
+      (qb) => qb.fn.coalesce("asset.arts", qb.val("[]")).as("arts"),
+      (qb) => qb.fn.coalesce("asset.thumbnails", qb.val("[]")).as("thumbnails"),
+      (qb) => qb.fn.coalesce("source.sources", qb.val("[]")).as("sources"),
     ])
     .$castTo<ArtistCTE["artist"]>();
 
 const album = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE>) =>
   qc
     .selectFrom("albums")
-    .leftJoin("resource", "resource.owner", "albums.id")
+    .leftJoin("source", "source.owner", "albums.id")
+    .leftJoin("asset", "asset.owner", "albums.id")
     .leftJoin("attribution", "attribution.album", "albums.id")
     .leftJoin("artist", "artist.id", "attribution.artist")
     .select([
       "albums.id",
       "albums.title",
       "albums.year",
-      (qb) => qb.fn.coalesce("resource.arts", qb.val("[]")).as("arts"),
-      (qb) =>
-        qb.fn.coalesce("resource.thumbnails", qb.val("[]")).as("thumbnails"),
-      (qb) => qb.fn.coalesce("resource.sources", qb.val("[]")).as("sources"),
+      (qb) => qb.fn.coalesce("asset.arts", qb.val("[]")).as("arts"),
+      (qb) => qb.fn.coalesce("asset.thumbnails", qb.val("[]")).as("thumbnails"),
+      (qb) => qb.fn.coalesce("source.sources", qb.val("[]")).as("sources"),
       (qb) =>
         groupJSON(qb, {
           id: "artist.id",
@@ -82,14 +79,14 @@ const album = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE>) =>
 const track = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE & AlbumCTE>) =>
   qc
     .selectFrom("tracks")
-    .leftJoin("resource", "resource.owner", "tracks.id")
+    .leftJoin("source", "source.owner", "tracks.id")
     .leftJoin("album", "album.id", "tracks.album")
     .select([
       "tracks.id",
       "tracks.title",
       "tracks.duration",
       "album.artists",
-      (qb) => qb.fn.coalesce("resource.sources", qb.val("[]")).as("sources"),
+      (qb) => qb.fn.coalesce("source.sources", qb.val("[]")).as("sources"),
       (qb) =>
         json(qb, {
           id: "album.id",
@@ -102,9 +99,13 @@ const track = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE & AlbumCTE>) =>
     ])
     .$castTo<TrackCTE["track"]>();
 
-type ResourceCTE = { resource: MediaBase & { owner: number } };
+type AssetCTE = {
+  asset: { owner: number; arts: string[]; thumbnails: string[] };
+};
+type SourceCTE = { source: { owner: number; sources: string[] } };
+type ResourceCTE = AssetCTE & SourceCTE;
 type ArtistCTE = { artist: Omit<Artist, "collection"> };
 type AlbumCTE = { album: Omit<Album, "collection"> };
 type TrackCTE = { track: Omit<Track, "entry"> };
 
-export { resource, artist, album, track };
+export { source, asset, artist, album, track };

@@ -1,4 +1,4 @@
-import { resource, artist, album, track } from "../operations/cte";
+import { source, asset, artist, album, track } from "../operations/cte";
 import { identify, type Playlist } from "@amadeus-music/protocol";
 import { APPEND, groupJSON, json } from "crstore";
 import type { DB } from "../data/schema";
@@ -7,7 +7,8 @@ export const playlists = ({ store }: DB) =>
   store(
     (db) =>
       db
-        .with("resource", resource)
+        .with("source", source)
+        .with("asset", asset)
         .with("artist", artist)
         .with("album", album)
         .with("track", (qb) =>

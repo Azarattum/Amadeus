@@ -1,4 +1,4 @@
-import { album, artist, resource, track } from "../operations/cte";
+import { album, artist, source, asset, track } from "../operations/cte";
 import type { Track } from "@amadeus-music/protocol";
 import { pushTrack } from "../operations/push";
 import { uuid } from "../operations/utils";
@@ -41,7 +41,8 @@ export const library = ({ store }: DB) =>
     async get(db, entries: number[]) {
       if (!entries.length) return [];
       return db
-        .with("resource", resource)
+        .with("source", source)
+        .with("asset", asset)
         .with("artist", artist)
         .with("album", album)
         .with("track", track)

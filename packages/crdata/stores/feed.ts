@@ -1,5 +1,5 @@
 import type { CollectionBase, FeedType, Track } from "@amadeus-music/protocol";
-import { resource, artist, album, track } from "../operations/cte";
+import { source, asset, artist, album, track } from "../operations/cte";
 import { groupJSON, APPEND, json } from "crstore";
 import { pushTrack } from "../operations/push";
 import { uuid } from "../operations/utils";
@@ -15,7 +15,8 @@ export const feed = ({ store }: DB) =>
   store(
     (db) =>
       db
-        .with("resource", resource)
+        .with("source", source)
+        .with("asset", asset)
         .with("artist", artist)
         .with("album", album)
         .with("track", (qb) =>
@@ -72,7 +73,8 @@ export const feed = ({ store }: DB) =>
       async get(db, entries: number[]) {
         if (!entries.length) return [];
         return db
-          .with("resource", resource)
+          .with("source", source)
+          .with("asset", asset)
           .with("artist", artist)
           .with("album", album)
           .with("track", track)

@@ -47,7 +47,7 @@ it("prioritizes resources", async () => {
   expect(await resources.get(200)).toEqual({
     sources: ["200_0", "200_1"],
     arts: [],
-    thumbnails: [null],
+    thumbnails: [],
   });
   await resources.prioritize("source", "0_1");
   await resources.prioritize("source", "200_1");
@@ -59,7 +59,7 @@ it("prioritizes resources", async () => {
   expect(await resources.get(200)).toEqual({
     sources: ["200_1", "200_0"],
     arts: [],
-    thumbnails: [null],
+    thumbnails: [],
   });
   await resources.prioritize("art", "0_secondary");
   expect(await resources.get(0)).toEqual({
