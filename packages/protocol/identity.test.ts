@@ -1,4 +1,4 @@
-import { merge, stringify, uniquify } from "./identity";
+import { merge, stringify, convert } from ".";
 import { expect, it } from "vitest";
 
 it("stringifies track", () => {
@@ -20,7 +20,7 @@ it("uniquifies track", () => {
     artists: [{ title: "First" }, { title: "A Second " }],
     album: { title: "Music", year: null },
   };
-  expect(uniquify(track as any)).toEqual({
+  expect(convert(track as any)).toEqual({
     id: 4180209679,
     title: "The Test",
     artists: [
