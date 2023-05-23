@@ -35,9 +35,10 @@ function connect(options: Options) {
       options
     ) as any as DB;
     connections.set(options.name, { ...db, ...stores(db) });
-    const statements = Object.values(
-      import.meta.glob("../sql/*", { eager: true, as: "raw" })
-    )
+    const files = import.meta.glob("../sql/*", { eager: true, as: "raw" });
+    // Disable indexing on the shared DB
+    if (options.local) delete files["../sql/fts.sql"];
+    const statements = Object.values(files)
       .flatMap((x) => x.split(/\r?\n\r?\n/))
       .map((x) => sql.raw(x));
     db.update((db) => Promise.all(statements.map((x) => x.execute(db))));
