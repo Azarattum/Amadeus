@@ -57,7 +57,7 @@ interface HoldOptions {
 }
 
 declare global {
-  namespace svelteHtml {
+  namespace svelteHTML {
     interface HTMLAttributes {
       "on:hold"?: (event: TouchEvent | MouseEvent) => void;
     }
