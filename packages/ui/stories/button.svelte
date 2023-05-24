@@ -6,6 +6,7 @@
     compact: false,
     stretch: false,
     round: false,
+    slim: false,
     air: false,
   };
 </script>

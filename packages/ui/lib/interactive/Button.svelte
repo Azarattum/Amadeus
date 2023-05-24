@@ -27,7 +27,10 @@
   export let slim = false;
   export let air = !!group;
 
-  const tag = group || to ? "label" : href ? "a" : "button";
+  $: tag = (group || to ? "label" : href ? "a" : "button") as
+    | "label"
+    | "a"
+    | "button";
   const uid = group ? uuid() : id || uuid();
 
   $: background = air
