@@ -44,9 +44,6 @@ importers:
       postcss-import:
         specifier: ^15.1.0
         version: 15.1.0(postcss@8.4.23)
-      postcss-nested:
-        specifier: ^6.0.1
-        version: 6.0.1(postcss@8.4.23)
       prettier:
         specifier: ^2.8.8
         version: 2.8.8
@@ -125,7 +122,7 @@ importers:
     devDependencies:
       '@rollup/plugin-replace':
         specifier: ^5.0.2
-        version: 5.0.2(rollup@3.22.0)
+        version: 5.0.2(rollup@3.23.0)
       '@types/fluent-ffmpeg':
         specifier: ^2.1.21
         version: 2.1.21
@@ -137,13 +134,13 @@ importers:
         version: 3.4.0
       rollup-plugin-node-externals:
         specifier: ^6.0.1
-        version: 6.0.1(rollup@3.22.0)
+        version: 6.0.1(rollup@3.23.0)
       vite:
         specifier: 4.3.8
-        version: 4.3.8(@types/node@20.1.5)
+        version: 4.3.8(@types/node@20.2.3)
       vite-node:
         specifier: 0.31.1
-        version: 0.31.1(@types/node@20.1.5)
+        version: 0.31.1(@types/node@20.2.3)
 
   apps/ios:
     dependencies:
@@ -231,7 +228,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.3.8
-        version: 4.3.8(@types/node@20.1.5)
+        version: 4.3.8(@types/node@20.2.3)
 
   plugins/sqlite:
     dependencies:
@@ -244,7 +241,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.3.8
-        version: 4.3.8(@types/node@20.1.5)
+        version: 4.3.8(@types/node@20.2.3)
 
   plugins/telegram:
     dependencies:
@@ -263,7 +260,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.3.8
-        version: 4.3.8(@types/node@20.1.5)
+        version: 4.3.8(@types/node@20.2.3)
 
   plugins/trpc:
     dependencies:
@@ -301,7 +298,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.3.8
-        version: 4.3.8(@types/node@20.1.5)
+        version: 4.3.8(@types/node@20.2.3)
 
   plugins/yandex:
     dependencies:
@@ -311,7 +308,7 @@ importers:
     devDependencies:
       vite:
         specifier: 4.3.8
-        version: 4.3.8(@types/node@20.1.5)
+        version: 4.3.8(@types/node@20.2.3)
 
 packages:
 
@@ -853,7 +850,7 @@ packages:
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
     dev: false
 
-  /@rollup/plugin-replace@5.0.2(rollup@3.22.0):
+  /@rollup/plugin-replace@5.0.2(rollup@3.23.0):
     resolution: {integrity: sha512-M9YXNekv/C/iHHK+cvORzfRYfPbq0RDD8r0G+bMiTXjNGKulPnCT9O3Ss46WfhI6ZOCgApOP7xAdmCQJ+U2LAA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -862,12 +859,12 @@ packages:
       rollup:
         optional: true
     dependencies:
-      '@rollup/pluginutils': 5.0.2(rollup@3.22.0)
+      '@rollup/pluginutils': 5.0.2(rollup@3.23.0)
       magic-string: 0.27.0
-      rollup: 3.22.0
+      rollup: 3.23.0
     dev: true
 
-  /@rollup/pluginutils@5.0.2(rollup@3.22.0):
+  /@rollup/pluginutils@5.0.2(rollup@3.23.0):
     resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -879,7 +876,7 @@ packages:
       '@types/estree': 1.0.0
       estree-walker: 2.0.2
       picomatch: 2.3.1
-      rollup: 3.22.0
+      rollup: 3.23.0
     dev: true
 
   /@sveltejs/adapter-static@2.0.2(@sveltejs/kit@1.18.0):
@@ -2559,7 +2556,7 @@ packages:
   /jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
     optionalDependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
     dev: true
 
   /jsonfile@6.1.0:
@@ -3671,15 +3668,6 @@ packages:
       is-plain-object: 3.0.1
     dev: true
 
-  /rollup-plugin-node-externals@6.0.1(rollup@3.22.0):
-    resolution: {integrity: sha512-PIZKc0j44MAzEz9XqWfZ8vbjavWbs9fehh3LHsSB1WF5bdTjz5B8qVuaWiAzdd0tKOjjR/lh8f9Qv6bpLUTllg==}
-    engines: {node: '>=16.0.0'}
-    peerDependencies:
-      rollup: ^3.0.0
-    dependencies:
-      rollup: 3.22.0
-    dev: true
-
   /rollup-plugin-node-externals@6.0.1(rollup@3.23.0):
     resolution: {integrity: sha512-PIZKc0j44MAzEz9XqWfZ8vbjavWbs9fehh3LHsSB1WF5bdTjz5B8qVuaWiAzdd0tKOjjR/lh8f9Qv6bpLUTllg==}
     engines: {node: '>=16.0.0'}
@@ -3691,14 +3679,6 @@ packages:
 
   /rollup@3.21.8:
     resolution: {integrity: sha512-SSFV2T2fWtQ/vvBip85u2Nr0GNKireabH9d7nXswBg+XSH+jbVDSYptRAEbCEsquhs503rpPA9POYAp0/Jhasw==}
-    engines: {node: '>=14.18.0', npm: '>=8.0.0'}
-    hasBin: true
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
-  /rollup@3.22.0:
-    resolution: {integrity: sha512-imsigcWor5Y/dC0rz2q0bBt9PabcL3TORry2hAa6O6BuMvY71bqHyfReAz5qyAqiQATD1m70qdntqBfBQjVWpQ==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
@@ -4384,27 +4364,6 @@ packages:
       convert-source-map: 1.9.0
     dev: true
 
-  /vite-node@0.31.1(@types/node@20.1.5):
-    resolution: {integrity: sha512-BajE/IsNQ6JyizPzu9zRgHrBwczkAs0erQf/JRpgTIESpKvNj9/Gd0vxX905klLkb0I0SJVCKbdrl5c6FnqYKA==}
-    engines: {node: '>=v14.18.0'}
-    hasBin: true
-    dependencies:
-      cac: 6.7.14
-      debug: 4.3.4
-      mlly: 1.2.1
-      pathe: 1.1.0
-      picocolors: 1.0.0
-      vite: 4.3.8(@types/node@20.1.5)
-    transitivePeerDependencies:
-      - '@types/node'
-      - less
-      - sass
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-    dev: true
-
   /vite-node@0.31.1(@types/node@20.2.3):
     resolution: {integrity: sha512-BajE/IsNQ6JyizPzu9zRgHrBwczkAs0erQf/JRpgTIESpKvNj9/Gd0vxX905klLkb0I0SJVCKbdrl5c6FnqYKA==}
     engines: {node: '>=v14.18.0'}
@@ -4424,39 +4383,6 @@ packages:
       - sugarss
       - supports-color
       - terser
-    dev: true
-
-  /vite@4.3.8(@types/node@20.1.5):
-    resolution: {integrity: sha512-uYB8PwN7hbMrf4j1xzGDk/lqjsZvCDbt/JC5dyfxc19Pg8kRm14LinK/uq+HSLNswZEoKmweGdtpbnxRtrAXiQ==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      '@types/node': 20.1.5
-      esbuild: 0.17.19
-      postcss: 8.4.23
-      rollup: 3.21.8
-    optionalDependencies:
-      fsevents: 2.3.2
     dev: true
 
   /vite@4.3.8(@types/node@20.2.3):
@@ -4487,7 +4413,7 @@ packages:
       '@types/node': 20.2.3
       esbuild: 0.17.19
       postcss: 8.4.23
-      rollup: 3.23.0
+      rollup: 3.21.8
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
