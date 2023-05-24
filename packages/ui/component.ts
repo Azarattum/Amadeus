@@ -16,6 +16,7 @@ export { default as Separator } from "./lib/layout/Separator.svelte";
 export { default as Swipeable } from "./lib/layout/Swipeable.svelte";
 
 export { default as Input } from "./lib/interactive/Input.svelte";
+export { default as Range } from "./lib/interactive/Range.svelte";
 export { default as Group } from "./lib/interactive/Group.svelte";
 export { default as Button } from "./lib/interactive/Button.svelte";
 export { default as Checkbox } from "./lib/interactive/Checkbox.svelte";

@@ -23,7 +23,7 @@
 <div class={p ? "px-4 pt-8" : ""}>
   <div class="px-2">
     <input
-      class="relative w-full cursor-pointer appearance-none bg-transparent outline-2 outline-primary-600"
+      class="relative w-full cursor-pointer appearance-none rounded bg-transparent outline-2 outline-offset-2 outline-primary-600 focus-visible:outline"
       style="--progress:{((value - min) / (max - min)) * 100}%"
       type="range"
       bind:value
@@ -43,7 +43,7 @@
           holding
             ? ((holding = false), dispatch("reset"))
             : (value = Math.max(value - skip, min))}
-        class="group rounded-lg p-2 text-content-200 outline-2 outline-primary-600 transition-paint focus-visible:bg-highlight active:scale-95 hover:bg-highlight"
+        class="group rounded-lg p-2 text-content-200 outline-2 outline-primary-600 transition-paint focus-visible:bg-highlight focus-visible:outline active:scale-95 hover:bg-highlight"
       >
         {format(value)}
         <div
@@ -73,7 +73,7 @@
           holding
             ? ((holding = false), dispatch("reset"))
             : (value = Math.min(value + skip, max))}
-        class="group rounded-lg p-2 text-content-200 outline-2 outline-primary-600 transition-paint focus-visible:bg-highlight active:scale-95 hover:bg-highlight"
+        class="group rounded-lg p-2 text-content-200 outline-2 outline-primary-600 transition-paint focus-visible:bg-highlight focus-visible:outline active:scale-95 hover:bg-highlight"
       >
         {format(max - value)}
         <div
