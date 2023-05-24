@@ -24,6 +24,7 @@
   export let compact = false;
   export let square = false;
   export let round = false;
+  export let slim = false;
   export let air = !!group;
 
   const tag = group || to ? "label" : href ? "a" : "button";
@@ -67,7 +68,8 @@
   id={uid}
   {href}
   on:click
-  class="relative flex h-11 min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white {text} {background}
+  class="relative flex min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white {text} {background}
+  {slim ? '' : 'h-11'}
   {compact ? 'flex-col text-2xs' : 'gap-[0.625rem]'}
   {round ? 'rounded-full' : 'rounded-lg'}
   "

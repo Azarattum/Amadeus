@@ -16,7 +16,9 @@
 </script>
 
 <div
-  class="overflow-hidden rounded bg-highlight-100"
+  class="overflow-hidden {size > 200
+    ? 'rounded-2xl'
+    : 'rounded'} bg-highlight-100"
   class:animate-pulse={state === "loading"}
   style:height="{size}px"
   style:width="{size}px"
