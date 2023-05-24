@@ -19,6 +19,8 @@ export const {
   expand,
   search,
   command,
+  desource,
+  transcribe,
   persistence,
 } = register({
   name,
