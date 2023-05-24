@@ -99,30 +99,30 @@ it("pushes with direction", async () => {
   do {
     await playback.clear();
     await playback.push([t2, t3, t4, t5], "random");
-  } while ((await playback)[0].id === 2);
+  } while ((await playback)[0].track.id === 2);
 });
 
 it("pushes after index", async () => {
   await playback.push([t0, t1, t2]);
-  const [{ entry: current }] = await playback;
+  const [{ track: current }] = await playback;
   const [{ entry: next }] = await upcoming;
   expect(next).toBeTypeOf("number");
 
   expect(await upcoming).toMatchObject([t1, t2]);
   await playback.push([t3, t4], next);
   expect(await upcoming).toMatchObject([t1, t3, t4, t2]);
-  await playback.push([t5, t0], current);
+  await playback.push([t5, t0], current.entry);
   expect(await upcoming).toMatchObject([t5, t0, t1, t3, t4, t2]);
   await playback.sync(1);
   await playback.sync(1);
   await playback.redirect("backward");
   expect(await upcoming).toMatchObject([t5, t0]);
   const [{ entry: after2 }] = await preceding;
-  const [{ entry: after0 }] = await playback;
+  const [{ track: after0 }] = await playback;
   const [{ entry: after5 }] = await upcoming;
   await playback.push([t3, t4], after5);
   expect(await upcoming).toMatchObject([t5, t3, t4, t0]);
-  await playback.push([t1, t2], after0);
+  await playback.push([t1, t2], after0.entry);
   expect(await upcoming).toMatchObject([t1, t2, t5, t3, t4, t0]);
   await playback.push([t5, t0], after2);
   expect(await preceding).toMatchObject([t2, t5, t0, t4, t3, t1]);
@@ -148,24 +148,24 @@ it("pushes randomly", async () => {
   const next = tracks[0];
   await playback.sync(1);
   expect(await preceding).toMatchObject([t2]);
-  expect(await playback).toMatchObject([next]);
+  expect(await playback).toMatchObject([{ track: next }]);
   expect(await upcoming).not.toEqual(
     expect.arrayContaining([expect.objectContaining(next)])
   );
 
   await playback.redirect("forward");
   (await preceding).forEach((x) => expect(x.id < next.id));
-  expect(await playback).toMatchObject([next]);
+  expect(await playback).toMatchObject([{ track: next }]);
   (await upcoming).forEach((x) => expect(x.id > next.id));
 });
 
 it("purges tracks", async () => {
   await playback.push([t0, t1, t2]);
-  const [{ entry: current }] = await playback;
+  const [{ track: current }] = await playback;
   const [{ entry: next }] = await upcoming;
   expect(next).toBeTypeOf("number");
   await playback.sync(0.5);
-  await playback.purge([current, next as number]);
+  await playback.purge([current.entry, next as number]);
 
   expect(await playback).toMatchObject([{ ...t2, progress: 0 }]);
   expect(await upcoming).toHaveLength(0);
@@ -220,7 +220,7 @@ it("clears tracks", async () => {
 
 it("rearranges tracks", async () => {
   await playback.push([t0, t1, t2, t3, t4, t5]);
-  let tracks = [...(await playback), ...(await upcoming)];
+  let tracks = [...(await playback).map((x) => x.track), ...(await upcoming)];
 
   expect(tracks).toMatchObject([t0, t1, t2, t3, t4, t5]);
   await playback.rearrange(tracks[5].entry, tracks[1].entry);

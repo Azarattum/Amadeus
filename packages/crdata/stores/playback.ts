@@ -7,7 +7,7 @@ import { source, asset, artist, album, track } from "../operations/cte";
 import { uuid, localDevice, position } from "../operations/utils";
 import { pushTrack } from "../operations/push";
 import type { DB } from "../data/schema";
-import { sql } from "crstore";
+import { json, sql } from "crstore";
 
 export const preceding = ({ store }: DB) =>
   store((db) =>
@@ -56,10 +56,20 @@ export const playback = ({ store }: DB) =>
         .innerJoin("playback", "playback.id", "devices.playback")
         .innerJoin("track", "track.id", "playback.track")
         .select(["direction", "repeat", "infinite", "device", "progress"])
-        .select("playback.id as entry")
+        .select((qb) =>
+          json(qb, {
+            entry: "playback.id",
+            id: "track.id",
+            title: "track.title",
+            duration: "track.duration",
+            album: "track.album",
+            artists: "track.artists",
+            sources: "track.sources",
+          }).as("track")
+        )
         .select(sql<boolean>`device = crsql_siteid()`.as("local"))
         .select(fields)
-        .$castTo<Track & Playback>(),
+        .$castTo<Playback>(),
     {
       async push(
         db,
@@ -246,5 +256,5 @@ type Playback = {
   infinite: 0 | 1;
   repeat: 0 | 1;
   local: 0 | 1;
-  entry: number;
+  track: Track & { entry: number };
 };
