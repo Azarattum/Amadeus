@@ -16,7 +16,8 @@ export const preceding = ({ store }: DB) =>
       .with("asset", asset)
       .with("artist", artist)
       .with("album", album)
-      .with("track", track)
+      .with("track", track) // ↓ We need this to trigger updates from `playback`
+      .with("update", (qb) => qb.selectFrom("playback").select("id"))
       .selectFrom("queue")
       .innerJoin("track", "track.id", "queue.track")
       .where("position", "<", 0)
@@ -32,7 +33,8 @@ export const upcoming = ({ store }: DB) =>
       .with("asset", asset)
       .with("artist", artist)
       .with("album", album)
-      .with("track", track)
+      .with("track", track) // ↓ We need this to trigger updates from `playback`
+      .with("update", (qb) => qb.selectFrom("playback").select("id"))
       .selectFrom("queue")
       .innerJoin("track", "track.id", "queue.track")
       .where("position", ">", 0)
@@ -64,6 +66,7 @@ export const playback = ({ store }: DB) =>
         tracks: Track[],
         at: "first" | "next" | "last" | "random" | number = "next"
       ) {
+        if (!tracks.length) return;
         await Promise.all(tracks.map((x) => pushTrack(db, x)));
         const { direction, playback } = await db
           .selectFrom("devices")
@@ -123,6 +126,7 @@ export const playback = ({ store }: DB) =>
         }
       },
       async purge(db, entries: number[]) {
+        if (!entries.length) return;
         await db.deleteFrom("playback").where("id", "in", entries).execute();
       },
       async clear(db, device: Uint8Array = localDevice as any) {

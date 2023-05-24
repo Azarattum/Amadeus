@@ -38,9 +38,7 @@ async function pushAlbum(db: Kysely<Schema>, album: Album) {
   }
   await db
     .insertInto("albums")
-    .onConflict((x) =>
-      x.doUpdateSet({ id: album.id, title: album.title, year: album.year })
-    )
+    .onConflict((x) => x.doUpdateSet({ title: album.title, year: album.year }))
     .values({ id: album.id, title: album.title, year: album.year })
     .execute();
   await pushResource(db, album, album.id);
@@ -49,7 +47,7 @@ async function pushAlbum(db: Kysely<Schema>, album: Album) {
 async function pushArtist(db: Kysely<Schema>, artist: Artist) {
   await db
     .insertInto("artists")
-    .onConflict((x) => x.doUpdateSet({ id: artist.id, title: artist.title }))
+    .onConflict((x) => x.doUpdateSet({ title: artist.title }))
     .values({ id: artist.id, title: artist.title, following: 0 })
     .execute();
   await pushResource(db, artist, artist.id);
