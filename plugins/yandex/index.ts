@@ -60,8 +60,8 @@ search(function* (type, query, page) {
   }
 });
 
-desource(function* (sources) {
-  const id = sources.find?.((x: string) => x.startsWith("yandex/"))?.slice(7);
+desource(function* (target) {
+  const id = yield* identify(target, "track");
   if (!id) return;
 
   const { result } = yield* fetch(`tracks/${id}/download-info`).as(link);

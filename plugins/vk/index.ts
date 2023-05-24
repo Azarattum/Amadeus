@@ -47,8 +47,8 @@ search(function* (type, query, page) {
   }
 });
 
-desource(function* (sources) {
-  const id = sources.find?.((x: string) => x.startsWith("vk/"))?.slice(3);
+desource(function* (target) {
+  const id = yield* identify(target, "track");
   if (!id) return;
 
   const { response } = yield* fetch("audio.getById", {

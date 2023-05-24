@@ -48,7 +48,7 @@ function* queue(
   this.signal.addEventListener("abort", () => clearInterval(ping));
   const promises: PromiseLike<any>[] = [];
   for (const track of tracks) {
-    const url = yield* async(first(desource(track.sources)));
+    const url = yield* async(first(desource(track)));
     info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
     promises.push(
       pool({
