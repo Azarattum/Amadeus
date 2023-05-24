@@ -75,8 +75,7 @@ export function format(date: Date | number, relative = false) {
 
     const pad = (x: number) => x.toString().padStart(2, "0");
     if (hours) return `${hours}:${pad(minutes)}:${pad(seconds)}`;
-    if (minutes) return `${minutes}:${pad(seconds)}`;
-    return seconds;
+    return `${minutes}:${pad(seconds)}`;
   }
 
   const intl = new Intl.RelativeTimeFormat("en");
