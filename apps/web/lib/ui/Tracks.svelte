@@ -13,8 +13,10 @@
     type EditEvent,
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
+  import { play as resume } from "./Player.svelte";
   import { createEventDispatcher } from "svelte";
   import TrackUI from "./Track.svelte";
+  import { playback } from "$lib/data";
 
   const dispatch = createEventDispatcher<{
     edit: EditEvent<Track>["detail"];
@@ -46,6 +48,16 @@
   function clear() {
     selected.clear();
     selected = selected;
+  }
+
+  async function play(track: Track) {
+    if (!dispatch("click", track, { cancelable: true })) return;
+    const id = tracks?.indexOf(track);
+    if (!tracks || !tracks[0] || id == null || id === -1) return;
+    playback.clear();
+    playback.push(tracks.slice(id) as any);
+    await playback.push(tracks.slice(0, id) as any, "first");
+    resume();
   }
 </script>
 
@@ -84,8 +96,7 @@
               {sm}
               {track}
               selected={check(track, selected)}
-              on:click={() =>
-                selected.size ? select(track) : dispatch("click", track)}
+              on:click={() => (selected.size ? select(track) : play(track))}
               on:contextmenu={(e) => (e.preventDefault(), select(track))}
             />
             <Icon name="list" slot="after" />
@@ -95,7 +106,7 @@
             {sm}
             {track}
             selected={check(track, selected)}
-            on:click={() => dispatch("click", track)}
+            on:click={() => play(track)}
           />
         {/if}
       {:else}

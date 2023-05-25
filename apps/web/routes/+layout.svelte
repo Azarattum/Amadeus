@@ -12,7 +12,9 @@
   import { beforeNavigate, preloadData } from "$app/navigation";
   import { capitalize } from "@amadeus-music/util/string";
   import { autoscroll } from "@amadeus-music/ui/action";
-  import { extra, search } from "$lib/data";
+  import { extra, search, update } from "$lib/data";
+  import { sql } from "@amadeus-music/crdata";
+  import Player from "$lib/ui/Player.svelte";
   import { page } from "$app/stores";
   import { base } from "$app/paths";
   import { onMount } from "svelte";
@@ -77,6 +79,21 @@
     preloadData("/library/playlist");
     preloadData("/library/artist");
     preloadData("/explore");
+
+    // Utilities to inspect the database during development
+    if (import.meta.env.DEV) {
+      (globalThis as any).db = {
+        exec: (query: any) =>
+          update((db) =>
+            sql
+              .raw(query)
+              .execute(db)
+              .then((x) => x.rows)
+          ),
+        show: (table: any) =>
+          update((db) => db.selectFrom(table).selectAll().execute()),
+      };
+    }
   });
 </script>
 
@@ -101,7 +118,7 @@
     <Button air compact stretch slot="bottom" href="/settings">
       <Icon md name="settings" />Settings
     </Button>
-  </Nav><Stack screen grow>
+  </Nav><Player /><Stack screen grow>
     <div class="hidden gap-16 p-[21px] pb-0 sm:flex">
       <Input bind:value={$search} stretch resettable placeholder="Search">
         <Icon name="search" />
