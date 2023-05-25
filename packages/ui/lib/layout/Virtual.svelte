@@ -77,7 +77,7 @@
 
   function reflow(rect = wrapper?.firstElementChild?.getBoundingClientRect()) {
     if (!viewHeight || !rect) return;
-    active -= Math.round(rect.y / viewHeight);
+    active -= Math.round((rect.y - outer.y) / viewHeight);
     if (!ended && active >= max - 1) dispatch("end"), (ended = true);
   }
 
