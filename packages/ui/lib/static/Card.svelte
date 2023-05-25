@@ -34,7 +34,9 @@
     : sm
     ? 'rounded-lg py-1 focus-visible:z-50'
     : 'rounded-2xl py-4'}
-  {flat ? 'bg-surface' : 'bg-surface-100 shadow-2xl  dark:shadow-none'}
+  {flat
+    ? 'bg-surface'
+    : 'bg-surface-100 shadow-[0_0_20px_-4px] shadow-black/20 dark:shadow-none'}
   "
 >
   <div

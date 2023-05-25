@@ -65,7 +65,7 @@
   on:ended={() => playback.sync(1)}
 />
 <Portal to="right">
-  <div class="flex h-screen flex-col">
+  <div class="flex h-screen flex-col border-l border-highlight">
     <div>
       <Playback
         {track}

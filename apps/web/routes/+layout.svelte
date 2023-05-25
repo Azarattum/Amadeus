@@ -125,7 +125,11 @@
       </Input>
       <LightSwitch />
     </div>
-    <div use:autoscroll class="relative h-full overflow-y-scroll scroll-smooth">
+    <div
+      use:autoscroll
+      class="relative h-full scroll-smooth
+      {section == 'Library' ? 'overflow-hidden' : 'overflow-y-auto'}"
+    >
       <slot />
     </div>
   </Stack>
