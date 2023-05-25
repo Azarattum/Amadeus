@@ -9,7 +9,7 @@
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
     "@amadeus-music/protocol": "workspace:*",
-    "@trpc/server": "^10.27.1",
+    "@trpc/server": "^10.28.0",
     "superstruct": "^1.0.3"
   },
   "devDependencies": {
