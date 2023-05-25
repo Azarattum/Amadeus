@@ -128,7 +128,7 @@
     <div
       use:autoscroll
       class="relative h-full scroll-smooth
-      {section == 'Library' ? 'overflow-hidden' : 'overflow-y-auto'}"
+      {$page.route.id == '/library' ? 'overflow-hidden' : 'overflow-y-auto'}"
     >
       <slot />
     </div>
