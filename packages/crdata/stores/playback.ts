@@ -16,8 +16,12 @@ export const preceding = ({ store }: DB) =>
       .with("asset", asset)
       .with("artist", artist)
       .with("album", album)
-      .with("track", track) // ↓ We need this to trigger updates from `playback`
-      .with("update", (qb) => qb.selectFrom("playback").select("id"))
+      .with("track", track)
+      .with("update", (qb) =>
+        qb
+          .selectFrom("playback") // ↓ We need this to trigger updates from `playback` & `devices`
+          .select((qb) => qb.selectFrom("devices").select("id").as("_"))
+      )
       .selectFrom("queue")
       .innerJoin("track", "track.id", "queue.track")
       .where("position", "<", 0)
@@ -33,8 +37,12 @@ export const upcoming = ({ store }: DB) =>
       .with("asset", asset)
       .with("artist", artist)
       .with("album", album)
-      .with("track", track) // ↓ We need this to trigger updates from `playback`
-      .with("update", (qb) => qb.selectFrom("playback").select("id"))
+      .with("track", track)
+      .with("update", (qb) =>
+        qb
+          .selectFrom("playback") // ↓ We need this to trigger updates from `playback` & `devices`
+          .select((qb) => qb.selectFrom("devices").select("id").as("_"))
+      )
       .selectFrom("queue")
       .innerJoin("track", "track.id", "queue.track")
       .where("position", ">", 0)
