@@ -16,7 +16,9 @@
   import { tick } from "svelte";
 
   const sync = throttle(async () => {
-    if (track) playback.sync(currentTime / track.duration);
+    if (!track) return;
+    const progress = currentTime / track.duration;
+    if (progress < 1) playback.sync(progress);
   }, 3000);
 
   let track: Track | undefined = undefined;
@@ -35,6 +37,7 @@
     if (target?.id === track?.id) return;
     track = target;
     if (!track) return;
+    readyState = 0;
     const url = await desource.query(track);
     if (url === src) return;
     src = url;
@@ -52,6 +55,12 @@
     );
     selected.clear();
     selected = selected;
+  }
+
+  async function skip(to?: Track) {
+    if (to?.entry) playback.rearrange(to.entry, track?.entry);
+    await playback.sync(1);
+    play();
   }
 </script>
 
@@ -80,7 +89,12 @@
       <Separator />
     </div>
     <div class="grow overflow-y-scroll contain-strict">
-      <Tracks tracks={$upcoming} sm bind:selected>
+      <Tracks
+        tracks={$upcoming}
+        sm
+        bind:selected
+        on:click={(e) => (e.preventDefault(), skip(e.detail))}
+      >
         <Button air stretch on:click={purge}><Icon name="trash" /></Button>
       </Tracks>
     </div>
