@@ -1,6 +1,6 @@
 import { source, asset, artist, track, album } from "../operations/cte";
 import type { Artist, ArtistBase } from "@amadeus-music/protocol";
-import { pushArtist } from "../operations/push";
+import { pushArtists } from "../operations/push";
 import { sanitize } from "../operations/utils";
 import { json, groupJSON } from "crstore";
 import type { DB } from "../data/schema";
@@ -50,7 +50,7 @@ export const artists = ({ store }: DB) =>
         .$castTo<Artist & { collection: { tracks: { entry: number }[] } }>(),
     {
       async push(db, artists: Artist[]) {
-        await Promise.all(artists.map((x) => pushArtist(db, x)));
+        await pushArtists(db, artists);
       },
       async edit(db, id: number, artist: Partial<ArtistBase>) {
         await db.updateTable("artists").where("id", "=", id).set(artist);

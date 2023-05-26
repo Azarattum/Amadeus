@@ -5,7 +5,7 @@ import type {
 } from "@amadeus-music/protocol";
 import { source, asset, artist, album, track } from "../operations/cte";
 import { uuid, localDevice, position } from "../operations/utils";
-import { pushTrack } from "../operations/push";
+import { pushTracks } from "../operations/push";
 import type { DB } from "../data/schema";
 import { json, sql } from "crstore";
 
@@ -85,7 +85,7 @@ export const playback = ({ store }: DB) =>
         at: "first" | "next" | "last" | "random" | number = "next"
       ) {
         if (!tracks.length) return;
-        await Promise.all(tracks.map((x) => pushTrack(db, x)));
+        await pushTracks(db, tracks);
         const { direction, playback } = await db
           .selectFrom("devices")
           .where("id", "=", localDevice)

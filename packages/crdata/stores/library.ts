@@ -1,6 +1,6 @@
 import { album, artist, source, asset, track } from "../operations/cte";
 import type { Track } from "@amadeus-music/protocol";
-import { pushTrack } from "../operations/push";
+import { pushTracks } from "../operations/push";
 import { uuid } from "../operations/utils";
 import type { DB } from "../data/schema";
 import { APPEND } from "crstore";
@@ -8,22 +8,21 @@ import { APPEND } from "crstore";
 export const library = ({ store }: DB) =>
   store((db) => db.selectFrom("library").selectAll(), {
     async push(db, tracks: Track[], playlist?: number) {
-      const promises = tracks.map(async (track) => {
-        await pushTrack(db, track);
-        if (playlist == null) return;
-        await db
-          .insertInto("library")
-          .onConflict((x) => x.doNothing())
-          .values({
+      await pushTracks(db, tracks);
+      if (playlist == null) return;
+      await db
+        .insertInto("library")
+        .onConflict((x) => x.doNothing())
+        .values(
+          tracks.map(({ id }) => ({
             id: uuid(),
             order: APPEND,
             date: Date.now(),
-            track: track.id,
+            track: id,
             playlist,
-          })
-          .execute();
-      });
-      await Promise.all(promises);
+          }))
+        )
+        .execute();
     },
     async rearrange(db, entry: number, after?: number) {
       await db

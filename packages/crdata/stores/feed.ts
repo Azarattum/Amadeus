@@ -1,7 +1,7 @@
 import type { CollectionBase, FeedType, Track } from "@amadeus-music/protocol";
 import { source, asset, artist, album, track } from "../operations/cte";
 import { groupJSON, APPEND, json } from "crstore";
-import { pushTrack } from "../operations/push";
+import { pushTracks } from "../operations/push";
 import { uuid } from "../operations/utils";
 import type { DB } from "../data/schema";
 
@@ -55,20 +55,19 @@ export const feed = ({ store }: DB) =>
         await db.deleteFrom("feed").where("type", "=", typeId[type]).execute();
       },
       async push(db, tracks: Track[], type: FeedType) {
-        const promises = tracks.map(async (track) => {
-          await pushTrack(db, track);
-          await db
-            .insertInto("feed")
-            .onConflict((x) => x.doNothing())
-            .values({
+        await pushTracks(db, tracks);
+        await db
+          .insertInto("feed")
+          .onConflict((x) => x.doNothing())
+          .values(
+            tracks.map(({ id }) => ({
               id: uuid(),
-              track: track.id,
+              track: id,
               type: typeId[type],
               order: APPEND,
-            })
-            .execute();
-        });
-        await Promise.all(promises);
+            }))
+          )
+          .execute();
       },
       async get(db, entries: number[]) {
         if (!entries.length) return [];

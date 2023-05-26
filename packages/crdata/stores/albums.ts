@@ -1,7 +1,7 @@
 import { album, source, asset, artist } from "../operations/cte";
 import type { Album } from "@amadeus-music/protocol";
+import { pushAlbums } from "../operations/push";
 import { sanitize } from "../operations/utils";
-import { pushAlbum } from "../operations/push";
 import type { DB } from "../data/schema";
 
 export const albums = ({ store }: DB) =>
@@ -17,7 +17,7 @@ export const albums = ({ store }: DB) =>
         .orderBy("album.title"),
     {
       async push(db, albums: Album[]) {
-        await Promise.all(albums.map((x) => pushAlbum(db, x)));
+        await pushAlbums(db, albums);
       },
       async search(db, query: string, limit = 10, offset = 0) {
         if (!query) return [];
