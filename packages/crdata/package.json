@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@amadeus-music/protocol": "workspace:*",
-    "crstore": "^0.15.2",
+    "crstore": "^0.16.1",
     "superstruct": "^1.0.3"
   }
 }

@@ -16,8 +16,8 @@
     "test": "turbo run test --parallel --no-daemon"
   },
   "devDependencies": {
-    "@sveltejs/kit": "1.18.0",
-    "@types/node": "20.2.3",
+    "@sveltejs/kit": "1.19.0",
+    "@types/node": "20.2.4",
     "@typescript-eslint/eslint-plugin": "^5.59.7",
     "@typescript-eslint/parser": "^5.59.7",
     "@vitest/coverage-c8": "^0.31.1",
@@ -42,7 +42,7 @@
     "tslib": "^2.5.2",
     "turbo": "^1.9.9",
     "typescript": "^5.0.4",
-    "vite": "4.3.8",
+    "vite": "4.3.9",
     "vitest": "0.31.1"
   },
   "dependencies": {
