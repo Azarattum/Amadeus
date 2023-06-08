@@ -6,7 +6,14 @@
 </script>
 
 <script lang="ts">
-  import { Button, Header, Icon, Portal, Separator } from "@amadeus-music/ui";
+  import {
+    Button,
+    Header,
+    Icon,
+    Portal,
+    Separator,
+    When,
+  } from "@amadeus-music/ui";
   import { throttle } from "@amadeus-music/util/async";
   import type { Track } from "@amadeus-music/protocol";
   import Playback from "$lib/ui/Playback.svelte";
@@ -74,29 +81,31 @@
   on:ended={() => playback.sync(1)}
 />
 <Portal to="right">
-  <div class="flex h-screen flex-col border-l border-highlight">
-    <div>
-      <Playback
-        {track}
-        loading={readyState <= 2 && !!src}
-        on:forward={() => (playbackRate = 5)}
-        on:rewind={() => (playbackRate = -5)}
-        on:reset={() => (playbackRate = 1)}
-        bind:currentTime
-        bind:paused
-      />
-      <Header indent sm>Playing Next</Header>
-      <Separator />
+  <When lg>
+    <div class="flex h-screen flex-col border-l border-highlight">
+      <div>
+        <Playback
+          {track}
+          loading={readyState <= 2 && !!src}
+          on:forward={() => (playbackRate = 5)}
+          on:rewind={() => (playbackRate = -5)}
+          on:reset={() => (playbackRate = 1)}
+          bind:currentTime
+          bind:paused
+        />
+        <Header indent sm>Playing Next</Header>
+        <Separator />
+      </div>
+      <div class="grow overflow-y-scroll contain-strict">
+        <Tracks
+          tracks={$upcoming}
+          sm
+          bind:selected
+          on:click={(e) => (e.preventDefault(), skip(e.detail))}
+        >
+          <Button air stretch on:click={purge}><Icon name="trash" /></Button>
+        </Tracks>
+      </div>
     </div>
-    <div class="grow overflow-y-scroll contain-strict">
-      <Tracks
-        tracks={$upcoming}
-        sm
-        bind:selected
-        on:click={(e) => (e.preventDefault(), skip(e.detail))}
-      >
-        <Button air stretch on:click={purge}><Icon name="trash" /></Button>
-      </Tracks>
-    </div>
-  </div>
+  </When>
 </Portal>
