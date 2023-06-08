@@ -13,8 +13,8 @@
     "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/ui": "workspace:*",
     "@amadeus-music/util": "workspace:*",
-    "@trpc/client": "^10.28.0",
-    "@trpc/server": "^10.28.0",
+    "@trpc/client": "^10.29.1",
+    "@trpc/server": "^10.29.1",
     "sha1-browser": "^1.1.1"
   },
   "devDependencies": {
