@@ -10,10 +10,14 @@ import {
   yellow,
   type Color,
 } from "@amadeus-music/util/color";
+import { WriteStream, createWriteStream } from "node:fs";
+import { access, mkdir } from "node:fs/promises";
 import type { Context } from "../plugin/types";
 import { log as logged } from "../event/pool";
 import { stderr, stdout } from "node:process";
 import { format } from "../data/error";
+import { path } from "../data/path";
+import { resolve } from "node:path";
 import { pipeline } from "libfun";
 import { inspect } from "util";
 
@@ -27,7 +31,7 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
   color ??= reset;
 
   const group = this?.group?.toUpperCase() || "CORE";
-  const save = pipeline(clean, logged, () => {});
+  const save = pipeline(clean, (x) => (logged(x), x), store);
   const log = console[level];
 
   if (level === "info") stdout.write(clear);
@@ -95,6 +99,23 @@ function divide(title = "") {
   const divider = "=".repeat(30 - title.length / 2);
   const data = [divider + title + divider + (title.length % 2 ? "=" : "")];
   log({ data, pure: true });
+}
+
+let logFile: string | undefined;
+let stream: WriteStream | undefined;
+
+/** Stores log line on the disk */
+async function store(line: string) {
+  const folder = path("logs");
+  const file = new Date().toISOString().slice(0, 10) + ".txt";
+  await access(folder).catch(() => mkdir(folder));
+  if (!stream || file !== logFile) {
+    stream?.end();
+    stream = createWriteStream(resolve(folder, file), { flags: "a" });
+    logFile = file;
+  }
+
+  stream.write(line + "\n");
 }
 
 type LogInfo = {

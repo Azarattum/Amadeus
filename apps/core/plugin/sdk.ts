@@ -58,10 +58,8 @@ function register<
   ) as Configure<typeof bound, T, S, C & NativeContext>;
 }
 
-export const path = (to = ".") =>
-  import.meta.env.DEV ? resolve(__dirname, "..", to) : resolve(__dirname, to);
-
 export { register, usage, arg };
+export { path } from "../data/path";
 export { http } from "../network/http";
 export { wss } from "../network/socket";
 export { reencode, resize } from "../data/ffmpeg";

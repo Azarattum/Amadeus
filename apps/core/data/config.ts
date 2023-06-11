@@ -13,7 +13,7 @@ import { merge } from "@amadeus-music/util/object";
 import type { Plugin } from "../plugin/types";
 import { plugins } from "../plugin/loader";
 import { fallback, pipe } from "libfun";
-import { resolve } from "node:path";
+import { path } from "./path";
 
 type Config = Infer<typeof baseConfig>;
 const baseConfig = type({
@@ -26,9 +26,7 @@ const baseSetting = type({
 async function configure(plugins: Map<string, Plugin>, overrides = {}) {
   const configs = [...plugins.values()].map((x) => type(x.config || {}));
   const config = intersection([baseConfig, ...configs]);
-  const file = import.meta.env.DEV
-    ? "./config.json"
-    : resolve(__dirname, "./config.json");
+  const file = path("config.json");
 
   return pipe(file)(
     (x) => readFile(x, "utf8"),

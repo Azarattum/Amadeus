@@ -65,6 +65,7 @@ async function stop(restart = false) {
     plugins.clear();
   }
   ok("Successfully stopped!");
+  divide();
 }
 
 export { start, complete, stop, launch };

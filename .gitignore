@@ -8,3 +8,4 @@ build
 config.json
 *.acebase
 apps/core/users
+apps/core/logs
