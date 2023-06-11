@@ -6,10 +6,16 @@
   let password = "";
   async function login() {
     const token = await hash(password);
-    const protocol = globalThis.location?.protocol === "http:" ? "ws:" : "wss:";
-    const url = `${protocol}//${hostname}/trpc/${username}/${token}`;
+    const protocols = ["ws:", "wss:", "http:", "https:"];
+    const provided =
+      protocols.find((x) => hostname.startsWith(x)) ||
+      globalThis.location?.protocol;
+    const protocol = ["ws:", "http:"].includes(provided) ? "ws:" : "wss:";
+    const base = hostname.replace(/^\w+:\/\//, "");
+
+    const url = `${protocol}//${base}/trpc/${username}/${token}`;
     localStorage.setItem("remote", url);
-    location.reload();
+    location.href = "/home";
   }
 
   function hash(text: string) {
