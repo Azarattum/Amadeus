@@ -1,8 +1,9 @@
 import { deleteMessage, getMe, setMyCommands, setWebhook } from "./api/methods";
-import { init, stop, info, temp, users, persistence } from "./plugin";
+import { cli, init, stop, info, temp, users, persistence } from "./plugin";
 import { bright, reset } from "@amadeus-music/util/color";
+import { arg, async, http } from "@amadeus-music/core";
 import { handleChanges } from "./handlers/database";
-import { async, http } from "@amadeus-music/core";
+import { delay } from "@amadeus-music/util/async";
 import { secret, request } from "./api/update";
 import { icon } from "./api/markup";
 
@@ -34,6 +35,13 @@ stop(function* () {
   yield* async(Promise.allSettled(promises));
   temp.clear();
   http(false).off("request", request);
+});
+
+cli("register", [arg.text])(function* (user) {
+  user = user?.toLowerCase() || "";
+  yield* async(delay(5));
+  if (!(yield* async(users()))[user]) return;
+  yield* persistence(user).subscribe(["library", "feed"], handleChanges(user));
 });
 
 const commands = [

@@ -30,6 +30,7 @@ export const {
   recognize,
   transcribe,
   persistence,
+  command: cli,
 } = register({
   name,
   version,
