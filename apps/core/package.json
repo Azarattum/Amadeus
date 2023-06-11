@@ -24,10 +24,10 @@
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.2",
     "@types/fluent-ffmpeg": "^2.1.21",
-    "@types/ws": "^8.5.4",
+    "@types/ws": "^8.5.5",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-node-externals": "^6.1.1",
     "vite": "4.3.9",
-    "vite-node": "0.31.1"
+    "vite-node": "0.32.0"
   }
 }

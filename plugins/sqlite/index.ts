@@ -1,6 +1,6 @@
+import { persistence, stop, users, err } from "./plugin";
 import { existsSync, mkdirSync, readdirSync } from "fs";
 import { close, connect } from "@amadeus-music/crdata";
-import { persistence, stop, users } from "./plugin";
 import { async, path } from "@amadeus-music/core";
 
 persistence(function* (user = "shared") {
@@ -8,6 +8,7 @@ persistence(function* (user = "shared") {
   yield connect({
     name: path(`users/${user}.db`),
     local: user === "shared",
+    error: err,
     paths,
   });
 });

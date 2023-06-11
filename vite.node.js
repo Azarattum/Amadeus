@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [{ ...externals({ deps: false }), enforce: "pre" }],
+  define: { "import.meta.env.SSR": false },
   resolve: {
     conditions: ["import", "module", "node", "default"],
     browserField: false,

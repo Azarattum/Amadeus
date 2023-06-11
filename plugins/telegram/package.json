@@ -10,7 +10,7 @@
     "@amadeus-music/core": "workspace:*",
     "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/util": "workspace:*",
-    "crstore": "^0.16.1"
+    "crstore": "^0.17.1"
   },
   "devDependencies": {
     "vite": "4.3.9"
