@@ -74,9 +74,6 @@
     {/if}
   </div>
   <div class="z-20 grid items-center [&>*]:col-start-1 [&>*]:row-start-1">
-    <div class="opacity-0 transition-opacity" class:opacity-100={!selected}>
-      <slot name="after" />
-    </div>
     <div
       class="flex justify-center text-primary-600 opacity-0 transition-opacity"
       class:opacity-100={selected}
@@ -88,6 +85,9 @@
       class:scale-100={selected === true}
     >
       <Icon name="target" />
+    </div>
+    <div class="opacity-0 transition-opacity" class:opacity-100={!selected}>
+      <slot name="after" />
     </div>
   </div>
 </svelte:element>

@@ -48,7 +48,7 @@
   async function load(target?: Track) {
     if (target?.id === track?.id) return;
     track = target;
-    if (!track) return;
+    if (!track) return (paused = true), (currentTime = 0);
     readyState = 0;
     const url = await desource.query(track);
     if (url === src) return;

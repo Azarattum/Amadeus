@@ -1,4 +1,4 @@
-INSERT OR IGNORE INTO devices VALUES (crsql_siteid(), NULL, 0, 0, 0, 0);
+INSERT OR IGNORE INTO devices VALUES (crsql_siteid(), -1, 0, 0, 0, 0);
 
 CREATE VIEW IF NOT EXISTS queue AS
   WITH ordered AS
@@ -17,11 +17,11 @@ CREATE VIEW IF NOT EXISTS queue AS
   FROM ordered;
 
 CREATE TRIGGER IF NOT EXISTS playback_started
-AFTER INSERT ON playback
+BEFORE INSERT ON playback
 FOR EACH ROW
 WHEN NEW.device = crsql_siteid()
 BEGIN
-  UPDATE devices SET playback = NEW.id WHERE id = NEW.device AND playback IS NULL;
+  UPDATE devices SET playback = NEW.id WHERE id = NEW.device AND playback IS -1;
 END;
 
 CREATE TRIGGER IF NOT EXISTS playback_finised

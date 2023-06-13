@@ -3,6 +3,7 @@
   import type { Track } from "@amadeus-music/protocol";
 
   export let sm = false;
+  export let progress = 0;
   export let selected: boolean | "passive" = false;
   export let track: Track | undefined = undefined;
 
@@ -36,4 +37,8 @@
     </When>
   {/if}
   <slot slot="after" />
+  <div
+    class="absolute bottom-0 left-0 h-0.5 w-full origin-left transform-gpu bg-highlight-200 transition-transform duration-1000"
+    style:transform="scaleX({progress})"
+  />
 </Card>

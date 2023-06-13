@@ -96,7 +96,7 @@ ordered(playback, "order", "device");
 
 const devices = object({
   id: instance(Uint8Array),
-  playback: nullable(id()),
+  playback: id(),
   direction: integer(),
   infinite: integer(),
   progress: number(),

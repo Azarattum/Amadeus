@@ -126,7 +126,7 @@ export const playback = ({ store }: DB) =>
             }))
           )
           .execute();
-        if (!playback && at === "random") {
+        if (!~playback && at === "random") {
           await db
             .updateTable("devices")
             .set({
@@ -148,10 +148,11 @@ export const playback = ({ store }: DB) =>
         await db.deleteFrom("playback").where("id", "in", entries).execute();
       },
       async clear(db, device: Uint8Array = localDevice as any) {
+        console.trace("clear", device);
         await db.deleteFrom("playback").where("device", "=", device).execute();
         await db
           .updateTable("devices")
-          .set({ playback: null, progress: 0 })
+          .set({ playback: -1, progress: 0 })
           .where("id", "=", device)
           .execute();
       },
@@ -213,6 +214,19 @@ export const playback = ({ store }: DB) =>
           .execute();
       },
       async replicate(db, device: Uint8Array) {
+        const id = uuid();
+        await db
+          .updateTable("devices")
+          .where("id", "=", localDevice)
+          .set({
+            playback: id,
+            progress: (qb) =>
+              qb
+                .selectFrom("devices")
+                .where("id", "=", device)
+                .select("progress"),
+          })
+          .execute();
         await db
           .deleteFrom("playback")
           .where("device", "=", localDevice)
@@ -222,26 +236,26 @@ export const playback = ({ store }: DB) =>
           .expression((qb) =>
             qb
               .selectFrom("playback")
+              .select((qb) =>
+                qb
+                  .case()
+                  .when(
+                    (qb) =>
+                      qb
+                        .selectFrom("devices")
+                        .whereRef("id", "=", "playback.device")
+                        .select("devices.playback"),
+                    "=",
+                    qb.ref("playback.id")
+                  )
+                  .then(id)
+                  .else(sql`ABS(RANDOM() % 4294967296)`)
+                  .end()
+                  .as("id")
+              )
               .select(sql`${localDevice}`.as("device"))
-              .select(["id", "order", "temp", "track"])
+              .select(["track", "order", "temp"])
               .where("device", "=", device)
-          )
-          .execute();
-        await db.deleteFrom("devices").where("id", "=", localDevice).execute();
-        await db
-          .insertInto("devices")
-          .expression((qb) =>
-            qb
-              .selectFrom("devices")
-              .select(sql`${localDevice}`.as("id"))
-              .select([
-                "direction",
-                "repeat",
-                "infinite",
-                "playback",
-                "progress",
-              ])
-              .where("id", "=", device)
           )
           .execute();
       },
