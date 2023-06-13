@@ -11,6 +11,7 @@
   import { search } from "$lib/data";
   import { match } from "$lib/util";
 
+  export let fixed = false;
   export let style: CollectionType;
   export let selected = new Set<Track>();
   export let of: Collection | undefined = undefined;
@@ -77,7 +78,7 @@
   <!-- /// TODO: albums -->
 
   <Tracks
-    fixed={style === "playlist" ? !!$search : true}
+    fixed={fixed || (style === "playlist" ? !!$search : true)}
     tracks={filtered}
     on:edit
     on:click

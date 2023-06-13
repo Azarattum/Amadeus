@@ -43,8 +43,8 @@
   };
 
   const urls: Record<string, string> = {
-    Recommended: "/home/feed#recommended",
-    Listened: "/home/feed#listened",
+    Recommended: "/home/playlist#-2",
+    Listened: "/home/playlist#-1",
   };
 
   const sections: Record<string, string[]> = {
@@ -74,7 +74,7 @@
 
   onMount(() => {
     preloadData("/home");
-    preloadData("/home/feed");
+    preloadData("/home/playlist");
     preloadData("/library");
     preloadData("/library/playlist");
     preloadData("/library/artist");
