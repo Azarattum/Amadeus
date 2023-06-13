@@ -148,7 +148,6 @@ export const playback = ({ store }: DB) =>
         await db.deleteFrom("playback").where("id", "in", entries).execute();
       },
       async clear(db, device: Uint8Array = localDevice as any) {
-        console.trace("clear", device);
         await db.deleteFrom("playback").where("device", "=", device).execute();
         await db
           .updateTable("devices")
