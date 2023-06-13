@@ -33,10 +33,11 @@
   let currentTime = 0;
   let readyState = 0;
   let paused = true;
+  let ended = false;
   let src = "";
 
   $: load($playback.find((x) => x.local)?.track);
-  $: currentTime, sync();
+  $: currentTime, sync(), (ended = false);
 
   let selected = new Set<Track>();
 
@@ -78,7 +79,7 @@
   bind:readyState
   bind:currentTime
   bind:playbackRate
-  on:ended={() => playback.sync(1)}
+  on:ended={() => ended || (playback.sync(1), (ended = true))}
 />
 <Portal to="right">
   <When lg>
