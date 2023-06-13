@@ -13,6 +13,7 @@ export const tracks = ({ store }: DB) =>
         .with("album", album)
         .with("track", track)
         .selectFrom("library")
+        .where("playlist", ">=", 0)
         .leftJoin("track", "track.id", "library.track")
         .select([
           "track.id",

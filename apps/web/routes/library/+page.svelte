@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { artists, playlists, search } from "$lib/data";
+  import { artists, playlists, tracks, search } from "$lib/data";
   import { Tab, Tabs, Stack } from "@amadeus-music/ui";
   import Overview from "$lib/ui/Overview.svelte";
+  import Tracks from "$lib/ui/Tracks.svelte";
 </script>
 
 <Tabs>
@@ -26,13 +27,9 @@
     </Stack>
   </Tab>
   <Tab name="Timeline">
-    <Stack grow p>
-      <div
-        class="animate-bounce text-center text-xl font-extralight opacity-50"
-      >
-        Coming soon...
-      </div>
-    </Stack>
+    <Tracks tracks={$tracks} timeline fixed>
+      <div><!-- /// TODO: add actions --></div>
+    </Tracks>
   </Tab>
 </Tabs>
 
