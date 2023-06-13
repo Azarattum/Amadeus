@@ -54,7 +54,7 @@ const album = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE>) =>
     .leftJoin("source", "source.owner", "albums.id")
     .leftJoin("asset", "asset.owner", "albums.id")
     .leftJoin("attribution", "attribution.album", "albums.id")
-    .leftJoin("artist", "artist.id", "attribution.artist")
+    .innerJoin("artist", "artist.id", "attribution.artist")
     .select([
       "albums.id",
       "albums.title",
@@ -80,7 +80,7 @@ const track = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE & AlbumCTE>) =>
   qc
     .selectFrom("tracks")
     .leftJoin("source", "source.owner", "tracks.id")
-    .leftJoin("album", "album.id", "tracks.album")
+    .innerJoin("album", "album.id", "tracks.album")
     .select([
       "tracks.id",
       "tracks.title",
