@@ -38,6 +38,7 @@
 
   $: load($playback.find((x) => x.local)?.track);
   $: currentTime, sync(), (ended = false);
+  $: state = $playback.find((x) => x.local);
 
   let selected = new Set<Track>();
 
@@ -67,7 +68,11 @@
 
   async function skip(to?: Track) {
     if (to?.entry) playback.rearrange(to.entry, track?.entry);
-    await playback.sync(1);
+    if (state?.repeat === 1) {
+      playback.repeat("none");
+      playback.sync(1);
+      await playback.repeat("single");
+    } else await playback.sync(1);
     play();
   }
 </script>
