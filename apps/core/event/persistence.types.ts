@@ -7,11 +7,11 @@ import type {
   TrackBase,
   AlbumBase,
   MediaBase,
-  FeedType,
   Playlist,
   Artist,
   Track,
   Album,
+  Feed,
 } from "@amadeus-music/protocol";
 import type { IsNever } from "libfun/utils/types";
 import type { async } from "libfun";
@@ -25,9 +25,8 @@ type Database = DeepPartial<{
     delete(id: number): Promise<void>;
   };
   feed: {
-    push(tracks: Track[], type: FeedType): Promise<void>;
-    get(entries: number[]): Promise<Track[]>;
-    clear(type: FeedType): Promise<void>;
+    get(type: Feed, limit?: number): Promise<number[]>;
+    clear(type: Feed): Promise<void>;
   };
   library: {
     push(tracks: Track[], playlist?: number): Promise<void>;

@@ -1,5 +1,5 @@
+import { Feed, type Track } from "@amadeus-music/protocol";
 import { afterAll, it, afterEach, expect } from "vitest";
-import type { Track } from "@amadeus-music/protocol";
 import { connect } from "../data";
 import { rm } from "fs/promises";
 
@@ -289,5 +289,5 @@ afterEach(async () => {
   await playback.clear();
   await playback.repeat("none");
   await playback.redirect("forward");
-  await feed.clear("listened");
+  await feed.clear(Feed.Listened);
 });

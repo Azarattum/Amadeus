@@ -20,6 +20,7 @@ export const playlists = ({ store }: DB) =>
         )
         .selectFrom("track")
         .fullJoin("playlists", "playlists.id", "track.playlist")
+        .where("playlists.id", ">=", 0)
         .select([
           "playlists.id",
           "playlists.title",

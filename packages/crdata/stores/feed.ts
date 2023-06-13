@@ -1,15 +1,7 @@
-import type { CollectionBase, FeedType, Track } from "@amadeus-music/protocol";
 import { source, asset, artist, album, track } from "../operations/cte";
-import { groupJSON, APPEND, json } from "crstore";
-import { pushTracks } from "../operations/push";
-import { uuid } from "../operations/utils";
+import type { Feed, Playlist } from "@amadeus-music/protocol";
+import { groupJSON, json } from "crstore";
 import type { DB } from "../data/schema";
-
-const typeId = {
-  listened: 0,
-  recommended: 1,
-  following: 2,
-} as const satisfies Record<FeedType, number>;
 
 export const feed = ({ store }: DB) =>
   store(
@@ -21,14 +13,20 @@ export const feed = ({ store }: DB) =>
         .with("album", album)
         .with("track", (qb) =>
           track(qb)
-            .innerJoin("feed", "feed.track", "tracks.id")
-            .select(["feed.type", "feed.id as entry"])
-            .orderBy("feed.order", "desc")
-            .orderBy("feed.id", "desc")
+            .innerJoin("library", "library.track", "tracks.id")
+            .select(["library.playlist", "library.id as entry"])
+            .orderBy("library.order")
+            .orderBy("library.id")
         )
         .selectFrom("track")
+        .fullJoin("playlists", "playlists.id", "track.playlist")
+        .where("playlists.id", "<", 0)
         .select([
-          "type",
+          "playlists.id",
+          "playlists.title",
+          "playlists.relevancy",
+          "playlists.shared",
+          "playlists.remote",
           (qb) =>
             json(qb, {
               size: qb.fn.count<number>("track.duration"),
@@ -47,50 +45,22 @@ export const feed = ({ store }: DB) =>
               }).filterWhere("track.id", "is not", null),
             }).as("collection"),
         ])
-        .groupBy("type")
-        .orderBy("type")
-        .$castTo<{ type: number; collection: CollectionBase<Track> }>(),
+        .groupBy("playlists.id")
+        .orderBy("playlists.order")
+        .orderBy("playlists.id")
+        .$castTo<Playlist & { collection: { tracks: { entry: number }[] } }>(),
     {
-      async clear(db, type: FeedType) {
-        await db.deleteFrom("feed").where("type", "=", typeId[type]).execute();
+      async clear(db, type: Feed) {
+        await db.deleteFrom("library").where("playlist", "=", type).execute();
       },
-      async push(db, tracks: Track[], type: FeedType) {
-        await pushTracks(db, tracks);
-        await db
-          .insertInto("feed")
-          .onConflict((x) => x.doNothing())
-          .values(
-            tracks.map(({ id }) => ({
-              id: uuid(),
-              track: id,
-              type: typeId[type],
-              order: APPEND,
-            }))
-          )
-          .execute();
-      },
-      async get(db, entries: number[]) {
-        if (!entries.length) return [];
+      async get(db, type: Feed, limit = -1) {
         return db
-          .with("source", source)
-          .with("asset", asset)
-          .with("artist", artist)
-          .with("album", album)
-          .with("track", track)
-          .selectFrom("feed")
-          .innerJoin("track", "track.id", "feed.track")
-          .select([
-            "track.id",
-            "track.title",
-            "track.duration",
-            "track.album",
-            "track.artists",
-            "track.sources",
-            "feed.id as entry",
-          ])
-          .where("feed.id", "in", entries)
-          .$castTo<Track & { entry: number }>()
-          .execute();
+          .selectFrom("library")
+          .where("playlist", "=", type)
+          .select("id")
+          .limit(limit)
+          .execute()
+          .then((x) => x.map((y) => y.id as number));
       },
     }
   );

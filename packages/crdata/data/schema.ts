@@ -81,18 +81,6 @@ index(library, "playlist");
 index(library, "order", "id");
 ordered(library, "order", "playlist");
 
-const feed = object({
-  id: id(),
-  type: number(),
-  track: id(),
-  order: string(),
-});
-crr(feed);
-primary(feed, "id");
-index(feed, "type");
-index(feed, "order", "id");
-ordered(feed, "order", "type");
-
 const playback = object({
   id: id(),
   device: instance(Uint8Array),
@@ -147,7 +135,6 @@ export const schema = object({
   sources,
   assets,
   library,
-  feed,
   playlists,
   playback,
   devices,

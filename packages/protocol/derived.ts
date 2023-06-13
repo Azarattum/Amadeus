@@ -62,13 +62,19 @@ const playlist = assign(
   object({ collection: optional(collectionBase(track)) })
 );
 
+enum Feed {
+  Listened = -1,
+  Recommended = -2,
+  Blocked = -3,
+  Followed = -4,
+}
+
 // ======================= Types ========================
 type PlaybackPush = "first" | "next" | "last" | "random" | number;
 type PlaybackDirection = "forward" | "backward" | "shuffled";
 type PlaybackRepeat = "none" | "single" | "all";
 type MediaType = "track" | "album" | "artist";
 type CollectionType = "album" | "artist" | "playlist";
-type FeedType = "listened" | "recommended" | "following";
 
 type TrackInfo = Infer<typeof trackInfo>;
 type AlbumInfo = Infer<typeof albumInfo>;
@@ -110,6 +116,7 @@ type ToInfo<T extends MediaInfo> = T extends Track
 
 export { trackInfo, albumInfo, artistInfo, playlistInfo };
 export { track, album, artist, playlist };
+export { Feed };
 
 export type { Track, Album, Artist, Playlist, Media, Collection };
 export type { FromType, FromInfo, ToInfo };
@@ -119,7 +126,6 @@ export type {
   PlaybackPush,
   CollectionType,
   MediaType,
-  FeedType,
 };
 export type {
   TrackInfo,

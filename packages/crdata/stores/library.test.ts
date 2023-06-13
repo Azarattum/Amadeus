@@ -121,6 +121,7 @@ it("pushes tracks", async () => {
     });
   }
   {
+    await new Promise((r) => setTimeout(r, 1000));
     await library.push([makeTrack(1)], identify("Test"));
     const results = (await playlists)[0];
     expect(results.collection.tracks).toHaveLength(2);

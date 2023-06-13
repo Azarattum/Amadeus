@@ -17,7 +17,7 @@ export const library = ({ store }: DB) =>
           tracks.map(({ id }) => ({
             id: uuid(),
             order: APPEND,
-            date: Date.now(),
+            date: ~~(Date.now() / 1000),
             track: id,
             playlist,
           }))

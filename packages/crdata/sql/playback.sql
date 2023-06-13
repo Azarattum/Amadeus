@@ -29,11 +29,15 @@ BEFORE UPDATE OF progress ON devices
 FOR EACH ROW
 WHEN NEW.progress >= 1 AND NEW.id = crsql_siteid()
 BEGIN
+  INSERT INTO library SELECT ABS(RANDOM() % 4294967296), -1, track, UNIXEPOCH(), -1 FROM playback WHERE id = NEW.playback;
   UPDATE devices SET 
-    playback = IFNULL((SELECT id FROM queue WHERE position = 1), playback),
+    playback = CASE WHEN NEW.repeat = 2 AND NOT EXISTS (SELECT 1 FROM queue WHERE position > 0)
+      THEN IFNULL((SELECT id FROM queue LIMIT 1), playback)
+      WHEN NEW.repeat = 1 THEN playback
+      ELSE IFNULL((SELECT id FROM queue WHERE position = 1), playback)
+    END,
     progress = 0
   WHERE id = NEW.id;
-  INSERT INTO feed SELECT ABS(RANDOM() % 4294967296), 0, track, 1 FROM playback WHERE id = NEW.playback;
   SELECT RAISE(IGNORE);
 END;
 
@@ -44,19 +48,6 @@ WHEN NEW.progress < 0 AND NEW.id = crsql_siteid()
 BEGIN
   UPDATE devices SET 
     playback = IFNULL((SELECT id FROM queue WHERE position = -1), playback),
-    progress = 0
-  WHERE id = NEW.id;
-  SELECT RAISE(IGNORE);
-END;
-
-CREATE TRIGGER IF NOT EXISTS playback_looped
-BEFORE UPDATE OF progress ON devices
-FOR EACH ROW
-WHEN NEW.progress >= 1 AND NEW.repeat = 2 AND NEW.id = crsql_siteid() AND
-  NOT EXISTS (SELECT 1 FROM queue WHERE position > 0)
-BEGIN
-  UPDATE devices SET 
-    playback = (SELECT id FROM queue LIMIT 1),
     progress = 0
   WHERE id = NEW.id;
   SELECT RAISE(IGNORE);
