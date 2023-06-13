@@ -5,7 +5,8 @@
     Track,
   } from "@amadeus-music/protocol";
   import { Icon, Stack, Header, Text, Topbar, Spacer } from "@amadeus-music/ui";
-  import { capitalize, format } from "@amadeus-music/util/string";
+  import { capitalize } from "@amadeus-music/util/string";
+  import { format } from "@amadeus-music/util/time";
   import Tracks from "$lib/ui/Tracks.svelte";
   import Avatar from "./Avatar.svelte";
   import { search } from "$lib/data";

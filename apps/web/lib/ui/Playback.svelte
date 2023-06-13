@@ -9,7 +9,7 @@
     Range,
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
-  import { format } from "@amadeus-music/util/string";
+  import { format } from "@amadeus-music/util/time";
   import { scale } from "svelte/transition";
 
   export let track: Track | undefined = undefined;

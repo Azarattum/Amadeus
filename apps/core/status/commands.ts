@@ -6,11 +6,12 @@ import {
   reset,
   yellow,
 } from "@amadeus-music/util/color";
-import { capitalize, dedupe, format } from "@amadeus-music/util/string";
 import { format as formatPlugin, plugins } from "../plugin/loader";
+import { capitalize, dedupe } from "@amadeus-music/util/string";
 import { persistence, users } from "../event/persistence";
 import { pretty } from "@amadeus-music/util/object";
 import { register, settings } from "../data/config";
+import { format } from "@amadeus-music/util/time";
 import { log, pool, pools } from "../event/pool";
 import type { Context } from "../plugin/types";
 import { async, map, take } from "libfun";

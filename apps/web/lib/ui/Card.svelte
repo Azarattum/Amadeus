@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Album, Artist, Playlist } from "@amadeus-music/protocol";
   import { Card, Header, Stack, Text, Icon } from "@amadeus-music/ui";
-  import { format } from "@amadeus-music/util/string";
+  import { format } from "@amadeus-music/util/time";
   import Avatar from "./Avatar.svelte";
 
   export let playlist: Playlist | undefined | true = undefined;

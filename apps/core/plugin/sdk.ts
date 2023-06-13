@@ -17,7 +17,6 @@ import * as events from "../event/pool";
 import * as log from "../status/log";
 import { info } from "../status/log";
 import { assert } from "superstruct";
-import { resolve } from "node:path";
 
 const bound = {
   ...events,
