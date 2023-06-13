@@ -36,9 +36,12 @@
   let ended = false;
   let src = "";
 
-  $: load($playback.find((x) => x.local)?.track);
-  $: currentTime, sync(), (ended = false);
   $: state = $playback.find((x) => x.local);
+  $: load(state?.track);
+  $: currentTime, sync(), (ended = false);
+  $: if (state && track && !currentTime) {
+    currentTime = state.progress * track.duration;
+  }
 
   let selected = new Set<Track>();
 
