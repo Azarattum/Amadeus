@@ -67,8 +67,7 @@ const post = pool<(text: Meta, chat: number) => void>("post");
 const message = pool<(text: string | Meta) => void>("message");
 const invite = pool<(chat: number, title: string) => void>("invite");
 const command = pool<(command: string, replied?: number) => void>("command");
-const changed =
-  pool<(type: "library" | "feed", entries: number[]) => void>("changed");
+const changed = pool<(entries: number[]) => void>("changed");
 const callback =
   pool<(request: Infer<typeof query>, message: number, chat: number) => void>(
     "callback"

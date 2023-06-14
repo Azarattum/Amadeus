@@ -22,9 +22,8 @@ init(function* ({ telegram: { token, webhook } }) {
 
   http().on("request", request);
 
-  const tables = ["library", "feed"];
   for (const user of Object.keys(yield* async(users()))) {
-    yield* persistence(user).subscribe(tables, handleChanges(user));
+    yield* persistence(user).subscribe(["library"], handleChanges(user));
   }
 });
 
@@ -41,7 +40,7 @@ cli("register", [arg.text])(function* (user) {
   user = user?.toLowerCase() || "";
   yield* async(delay(5));
   if (!(yield* async(users()))[user]) return;
-  yield* persistence(user).subscribe(["library", "feed"], handleChanges(user));
+  yield* persistence(user).subscribe(["library"], handleChanges(user));
 });
 
 const commands = [
