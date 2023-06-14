@@ -1,5 +1,7 @@
 # Amadeus
 
+[![Watch the video](https://img.youtube.com/vi/c6TdBs1JCI8/maxresdefault.jpg)](https://www.youtube.com/watch?v=c6TdBs1JCI8)
+
 This is a rewrite of [AmadeusCore](https://github.com/Azarattum/AmadeusCore) and [AmadeusUI](https://github.com/Azarattum/AmadeusUI) in one monorepo. Currently it is heavy work in progress (not in a usable state yet). If you are looking for LibFun, check it [here](https://github.com/Azarattum/Amadeus/tree/main/packages/libfun).
 
 ## Plugins
