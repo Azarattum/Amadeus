@@ -54,9 +54,8 @@ search(function* (type, query, page) {
     );
 
     const items = result[collection];
-    if (!items?.results) break;
+    if (!items?.results || !items.results.length) break;
     yield* convert(items.results, type);
-    if (items.results.length < page) break;
   }
 });
 
