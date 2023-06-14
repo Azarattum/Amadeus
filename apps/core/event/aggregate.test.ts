@@ -18,9 +18,9 @@ it("aggregates pool", async () => {
     yield { title: (+a + 2).toString() };
   });
   event.bind({ group: "b" })(function* (a) {
-    yield* async(delay(1));
+    yield* async(delay(10));
     yield { title: (+a * 1).toString() };
-    yield* async(delay(30));
+    yield* async(delay(300));
     yield { title: (+a * 2).toString() };
     yield { title: (+a * 3).toString() };
   });
