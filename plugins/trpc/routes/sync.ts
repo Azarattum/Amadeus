@@ -4,7 +4,6 @@ import { info, procedure, router } from "../plugin";
 
 export const sync = router({
   push: procedure.input(array(any())).mutation(async ({ input, ctx }) => {
-    info(`${ctx.name} pushed new changes.`);
     return ctx.persistence().merge(input).then();
   }),
   pull: procedure
