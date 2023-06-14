@@ -87,14 +87,20 @@ function* lookup<T extends MediaType>(
   });
   return items.pop();
 
+  function equal(a: any, b: any) {
+    const clean = (text: string) =>
+      text.replace(/[.,/#!$%^&*;:{}=_`~()]/g, "").replace(/\s{2,}/g, " ");
+    return clean(stringify(a)) === clean(stringify(b));
+  }
+
   function verify(item: FromType<T>) {
     if (typeof query === "string") return true;
     item = { ...item, album: undefined };
     if (identify(item) === identify(query)) return true;
-    if (stringify(item) === stringify(query)) return true;
+    if (equal(item, query)) return true;
     const inferredItem = inferTrack(stringify(item));
     const inferredQuery = inferTrack(stringify(query));
-    if (stringify(inferredItem) === stringify(inferredQuery)) return true;
+    if (equal(inferredItem, inferredQuery)) return true;
     return false;
   }
 }
