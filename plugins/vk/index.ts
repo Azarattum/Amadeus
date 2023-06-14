@@ -32,6 +32,7 @@ init(function* ({ vk: { token } }) {
 search(function* (type, query, page) {
   const method = { track: "", artist: "Artists", album: "Albums" }[type];
   const struct = { track, artist, album }[type];
+  let empty = 0;
 
   for (let i = 0; ; i += +page) {
     const { response } = yield* safeFetch(
@@ -40,7 +41,11 @@ search(function* (type, query, page) {
       responseOf(items(struct))
     );
     if (!response.items.length) break;
-    yield* convert(response.items, type);
+    const results = convert(response.items, type);
+    // Don't search through empty pages
+    if (!results.length) empty += 1;
+    else (empty = 0), yield* results;
+    if (empty > 2) break;
   }
 });
 
