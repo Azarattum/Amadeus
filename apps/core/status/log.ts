@@ -108,7 +108,7 @@ let stream: WriteStream | undefined;
 async function store(line: string) {
   const folder = path("logs");
   const file = new Date().toISOString().slice(0, 10) + ".txt";
-  await access(folder).catch(() => mkdir(folder));
+  await access(folder).catch(() => mkdir(folder).catch(() => {}));
   if (!stream || file !== logFile) {
     stream?.end();
     stream = createWriteStream(resolve(folder, file), { flags: "a" });
