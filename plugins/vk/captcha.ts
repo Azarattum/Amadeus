@@ -1,11 +1,23 @@
-import { StructError, async, path } from "@amadeus-music/core";
-import { fetch as call, ok, wrn } from "./plugin";
+import {
+  type Struct,
+  StructError,
+  async,
+  path,
+  first,
+} from "@amadeus-music/core";
+import { FetchOptions } from "@amadeus-music/core/network/fetch";
+import { fetch as call, ok, pool, wrn } from "./plugin";
 // @ts-ignore Exports on `onnxruntime-web` are a bit broken
 import onnx from "onnxruntime-web";
 import { captcha } from "./types";
 import { readFileSync } from "fs";
 import { decode } from "jpeg-js";
 import { resolve } from "path";
+
+// Throttles expensive API calls
+const safeCall = pool<
+  (url: string, options: FetchOptions, type: Struct<any, any>) => unknown
+>("fetch", { concurrency: 1, rate: 90 });
 
 async function recognize(bytes: ArrayBuffer) {
   const image = decode(bytes, { formatAsRGBA: false, useTArray: true });
@@ -67,27 +79,56 @@ async function solve(url: string, accuracy = 0.9, limit = 25) {
   url = url.replace("resized=1", "resized=0");
   for (let i = 0; i < limit; i++) {
     const image = await fetch(url).then((x) => x.arrayBuffer());
-    const { confidence, answer } = await recognize(image);
-    if (confidence >= accuracy) return answer;
+    try {
+      const { confidence, answer } = await recognize(image);
+      if (confidence >= accuracy) return answer;
+    } catch (error) {
+      wrn("Captcha recognition failed with: ", error);
+    }
   }
 }
 
-function* handle(error: unknown) {
-  if (error instanceof StructError && captcha.is(error.branch[0])) {
-    wrn("Got captcha! Solving...");
-    const err = new Error("Unable to solve captcha!");
-    const { captcha_img: url, captcha_sid } = error.branch[0].error;
-    const captcha_key = yield* async(solve(url));
-    if (!captcha_key) throw err;
+safeCall(function* (url, options, type) {
+  const err = new Error("Unable to solve captcha!");
+  const retries = 5;
 
-    // VK doesn't allow to solve captchas faster that 2.5s
-    yield* async(new Promise((r) => setTimeout(r, 2500)));
-    const data = yield* call(`audio.search`, {
-      params: { q: "", captcha_sid, captcha_key },
-    }).json();
-    if (typeof data !== "object" || !data || "error" in data) throw err;
-    ok("Successfully solved captcha!");
-  } else throw error;
+  let captcha_sid = "";
+  let captcha_key = "";
+
+  for (let i = 0; i < retries; i++) {
+    const merged = {
+      ...options,
+      params: { ...options.params, captcha_sid, captcha_key },
+    };
+
+    try {
+      yield yield* call(url, merged).as(type);
+      if (captcha_sid) ok("Successfully solved captcha!");
+      return;
+    } catch (error) {
+      if (error instanceof StructError && captcha.is(error.branch[0])) {
+        if (!captcha_sid) wrn("Got captcha! Solving...");
+        const details = error.branch[0].error;
+        const key = yield* async(solve(details["captcha_img"]));
+        if (!key) throw err;
+
+        // VK doesn't allow to solve captchas fast
+        const delay = 3500 + Math.random() * 500;
+        yield* async(new Promise((r) => setTimeout(r, delay)));
+        captcha_sid = details["captcha_sid"];
+        captcha_key = key;
+      } else throw error;
+    }
+  }
+  throw err;
+});
+
+function* safeFetch<T>(
+  url: string,
+  options: FetchOptions,
+  type: Struct<T, any>
+) {
+  return (yield* async(first(safeCall(url, options, type)))) as T;
 }
 
 const paths = {
@@ -99,4 +140,4 @@ const paths = {
     : path(`plugins/vk/onnx.wasm`),
 };
 
-export { solve, handle };
+export { safeFetch };

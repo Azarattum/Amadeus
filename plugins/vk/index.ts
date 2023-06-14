@@ -18,7 +18,7 @@ import {
   lyrics,
 } from "./types";
 import { array, optional } from "@amadeus-music/core";
-import { handle } from "./captcha";
+import { safeFetch } from "./captcha";
 
 init(function* ({ vk: { token } }) {
   if (!token) throw "No token found!";
@@ -34,16 +34,13 @@ search(function* (type, query, page) {
   const struct = { track, artist, album }[type];
 
   for (let i = 0; ; i += +page) {
-    try {
-      const { response } = yield* fetch(`audio.search${method}`, {
-        params: { q: query, count: page, offset: i },
-      }).as(responseOf(items(struct)));
-      yield* convert(response.items, type);
-      if (response.items.length < page) break;
-    } catch (error) {
-      yield* handle(error);
-      i -= page;
-    }
+    const { response } = yield* safeFetch(
+      `audio.search${method}`,
+      { params: { q: query, count: page, offset: i } },
+      responseOf(items(struct))
+    );
+    if (!response.items.length) break;
+    yield* convert(response.items, type);
   }
 });
 

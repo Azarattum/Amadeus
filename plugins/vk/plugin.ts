@@ -5,6 +5,7 @@ export const {
   ok,
   wrn,
   init,
+  pool,
   fetch,
   search,
   relate,
