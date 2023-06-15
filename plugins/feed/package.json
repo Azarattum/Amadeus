@@ -1,0 +1,16 @@
+{
+  "name": "@amadeus-music/plugin-feed",
+  "description": "Recommendations and subscriptions for Amadeus.",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.js"
+  },
+  "dependencies": {
+    "@amadeus-music/core": "workspace:*",
+    "@amadeus-music/util": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "4.3.9"
+  }
+}
