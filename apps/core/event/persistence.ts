@@ -11,22 +11,28 @@ import type { Handler } from "libfun/pool/pool.types";
 import { all } from "@amadeus-music/util/async";
 import { merge } from "@amadeus-music/protocol";
 import type { Context } from "../plugin/types";
+import { wrn } from "../status/log";
 import { wrap } from "libfun/pool";
 import { async } from "libfun";
 
-const flatten: Strategy = (x) => all(x).then((x) => x.flat());
-const voided: Strategy = (x) => all(x).then(() => undefined);
+const rejected = (reason: unknown) =>
+  wrn("Persistence provider has failed.", reason || "");
+
+const flatten: Strategy = (x) => all(x, rejected).then((x) => x.flat());
+const voided: Strategy = (x) => all(x, rejected).then(() => undefined);
 const raced: Strategy = (x) => Promise.any(x);
 const merged: Strategy = (x) =>
-  all(x).then((x) => x.reduce((a, b) => merge(a, b)));
+  all(x, rejected).then((x) => x.reduce((a, b) => merge(a, b)));
 const dated: Strategy = (x) =>
-  all(x).then((x) => x.flat().sort((a, b) => b.date - a.date));
+  all(x, rejected).then((x) => x.flat().sort((a, b) => b.date - a.date));
 const composed: Strategy = (x) =>
-  all(x).then((x) => () => x.forEach((fn) => fn()));
+  all(x, rejected).then((x) => () => x.forEach((fn) => fn()));
 
 const strategies: { [K in Method]?: Strategy } = {
+  "library.banned": flatten,
   "settings.extract": raced,
   "artists.search": flatten,
+  "library.sample": flatten,
   "tracks.search": flatten,
   "albums.search": flatten,
   "settings.lookup": raced,

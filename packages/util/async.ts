@@ -98,8 +98,13 @@ export function lock<T = void>() {
  * Similar to `Promise.all`, but ignores all the rejected promises.
  * @param promises Promises to process
  */
-export function all<T>(promises: Promise<T>[]) {
+export function all<T>(
+  promises: Promise<T>[],
+  reject?: (reason: unknown) => void
+) {
   return Promise.allSettled(promises).then((x) =>
-    x.filter((y) => y.status === "fulfilled").map((y: any) => y.value as T)
+    x
+      .filter((y) => y.status === "fulfilled" || (reject?.(y.reason), false))
+      .map((y: any) => y.value as T)
   );
 }

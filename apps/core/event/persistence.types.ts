@@ -33,6 +33,8 @@ type Database = DeepPartial<{
     rearrange(entry: number, after?: number): Promise<void>;
     get(entries: number[]): Promise<Track[]>;
     purge(entries: number[]): Promise<void>;
+    sample(size: number): Promise<Track[]>;
+    banned(): Promise<number[]>;
   };
   settings: {
     store(key: string, value: unknown, collection?: string): Promise<void>;
