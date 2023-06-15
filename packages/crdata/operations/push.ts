@@ -3,6 +3,7 @@ import type { Schema } from "../data/schema";
 import { Kysely, sql } from "crstore";
 
 async function pushTracks(db: Kysely<Schema>, tracks: Track[]) {
+  if (!tracks.length) return;
   await pushAlbums(
     db,
     tracks.map((x) => ({ ...x.album, artists: x.artists }))
@@ -23,6 +24,7 @@ async function pushTracks(db: Kysely<Schema>, tracks: Track[]) {
 }
 
 async function pushAlbums(db: Kysely<Schema>, albums: Album[]) {
+  if (!albums.length) return;
   await pushArtists(
     db,
     albums.flatMap((x) => x.artists)
@@ -56,6 +58,7 @@ async function pushAlbums(db: Kysely<Schema>, albums: Album[]) {
 }
 
 async function pushArtists(db: Kysely<Schema>, artists: Artist[]) {
+  if (!artists.length) return;
   await db
     .insertInto("artists")
     .onConflict((x) => x.doNothing())
@@ -74,6 +77,7 @@ async function pushResources(
   db: Kysely<Schema>,
   resources: (MediaBase & { id: number })[]
 ) {
+  if (!resources.length) return;
   if (resources.find((x) => x.sources.length)) {
     await db
       .insertInto("sources")
