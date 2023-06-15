@@ -497,7 +497,7 @@ it("schedules events", async () => {
   expect(await take(event.schedule({ relative: 10 })())).toEqual([0]);
   const repeating = event.schedule({
     absolute: Date.now() + 30,
-    interval: 100,
+    interval: 300,
   });
 
   expect(take(repeating())).resolves.toEqual([1, 2]);
@@ -505,7 +505,7 @@ it("schedules events", async () => {
   await delay(31);
   expect(counter).toBeGreaterThan(1);
   let last = counter;
-  await delay(101);
+  await delay(301);
   expect(counter).toBeGreaterThan(last);
   last = counter;
   event.close();
