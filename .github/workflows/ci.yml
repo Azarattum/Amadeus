@@ -30,8 +30,19 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Deploy
+      - name: Deploy Web
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/public
+
+      - name: Deploy Core
+        env:
+          REMOTE_SSH_KEY: ${{ secrets.REMOTE_SSH_KEY }}
+          REMOTE_IP: ${{ secrets.REMOTE_IP }}
+        run: |
+          eval $(ssh-agent -s)
+          ssh-add <(echo "$REMOTE_SSH_KEY")
+          scp -r -o "StrictHostKeyChecking no" build/* "$REMOTE_IP":/home/beta_amadeus
+          ssh -o "StrictHostKeyChecking no" "$REMOTE_IP" "rm -rf /home/beta_amadeus/public"
+          ssh-agent -k
