@@ -20,9 +20,10 @@ import { IncomingMessage, ServerResponse } from "http";
 import { pick } from "@amadeus-music/util/object";
 import { replier, editor } from "./reply";
 import { sender } from "../types/sender";
+import { randomUUID } from "node:crypto";
 import * as type from "../types/core";
 
-const secret = crypto.randomUUID();
+const secret = randomUUID();
 
 update(function* (body) {
   const data = JSON.parse(body);
