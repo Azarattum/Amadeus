@@ -5,8 +5,9 @@ import {
   string,
   type,
 } from "@amadeus-music/core";
+import { chat } from "./core";
 
-const from = type({
+const fromUser = type({
   message_id: optional(number()),
   from: type({
     id: number(),
@@ -14,20 +15,18 @@ const from = type({
   }),
 });
 
-const chat = type({
+const fromChat = type({
   message_id: optional(number()),
-  chat: type({
-    id: number(),
-    type: string(),
-    title: optional(string()),
-  }),
+  chat,
 });
 
 const sender = type({
-  message: optional(intersection([from, chat])),
-  my_chat_member: optional(intersection([from, chat])),
-  callback_query: optional(intersection([from, type({ message: chat })])),
-  channel_post: optional(chat),
+  message: optional(intersection([fromUser, fromChat])),
+  my_chat_member: optional(intersection([fromUser, fromChat])),
+  callback_query: optional(
+    intersection([fromUser, type({ message: fromChat })])
+  ),
+  channel_post: optional(fromChat),
 });
 
 export { sender };

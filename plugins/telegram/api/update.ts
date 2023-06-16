@@ -106,7 +106,9 @@ async function* handle(update: unknown, me: string, url?: string) {
     const { data } = await fetch("getFile", {
       params: { file_id: id },
     }).request.json();
-    if (!type.file.is(data)) throw "Unable to get voice file data!";
+    if (!type.responseOf(type.file).is(data)) {
+      throw "Unable to get voice file data!";
+    }
     yield* voice(
       new URL(
         data.result.file_path,

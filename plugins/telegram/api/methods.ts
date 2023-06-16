@@ -1,6 +1,6 @@
+import { chat, file, me, responseOf, sent } from "../types/core";
 import { format, reencode, resize } from "@amadeus-music/core";
 import { Audio, Message, Text } from "../types/reply";
-import { file, me, sent } from "../types/core";
 import { fetch, wrn } from "../plugin";
 import { paramify } from "./reply";
 
@@ -41,7 +41,7 @@ export const sendAudio = (chat: number, message: Audio) => {
       performer: message.track.artists.map((x: any) => x.title).join(", "),
       ...paramify(message),
     },
-  }).as(sent);
+  }).as(responseOf(sent));
 };
 
 export const sendMessage = (chat: number, message: Text) =>
@@ -50,7 +50,7 @@ export const sendMessage = (chat: number, message: Text) =>
       chat_id: chat,
       ...paramify(message),
     },
-  }).as(sent);
+  }).as(responseOf(sent));
 
 export const setWebhook = (url: URL | string, secret: string) =>
   fetch("setWebhook", {
@@ -95,6 +95,13 @@ export const getFile = (id: string) =>
     params: {
       file_id: id,
     },
-  }).as(file);
+  }).as(responseOf(file));
 
-export const getMe = () => fetch("getMe").as(me);
+export const getChat = (id: number) =>
+  fetch("getChat", {
+    params: {
+      chat_id: id,
+    },
+  }).as(responseOf(chat));
+
+export const getMe = () => fetch("getMe").as(responseOf(me));

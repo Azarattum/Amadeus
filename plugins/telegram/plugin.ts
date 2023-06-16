@@ -53,7 +53,7 @@ export const {
     reply: null as any as Reply,
     user: undefined as string | undefined,
     state: {
-      me: {} as Infer<typeof me>["result"],
+      me: {} as Infer<typeof me>,
     },
   },
 });
