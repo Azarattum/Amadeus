@@ -17,6 +17,9 @@ import { bright, reset } from "@amadeus-music/util/color";
 import { artist, action as type } from "../types/action";
 import { async, first, map } from "@amadeus-music/core";
 import { shuffle } from "@amadeus-music/util/object";
+import { finitify } from "@amadeus-music/util/math";
+import { delay } from "@amadeus-music/util/async";
+import { getChat } from "../api/methods";
 import { pages } from "../api/pages";
 
 callback(function* (action, message) {
@@ -159,10 +162,30 @@ callback(function* (action, message) {
 });
 
 invite(function* (chat, title) {
+  // Wait to avoid race conditions with telegram banned users
+  yield* async(delay(500));
+
+  const { result: meta } = yield* getChat(chat);
+  const special = ["listened", "recommended", "blocked", "followed"];
+  const id = -special.findIndex((x) => meta.description?.includes("#" + x)) - 1;
+  const relevancy: number = finitify(
+    +(meta.description?.match(/#relevancy:([0-9.]+)/)?.[1] || NaN),
+    1
+  );
+
   const storage = persistence(this.user);
-  yield* storage.playlists.create({ title });
-  yield* storage.settings.store(identify(title).toString(), chat);
-  info(`${this.name} registered playlist "${title}".`);
+  const existing = yield* async(
+    storage.settings.lookup(chat).then(null, () => undefined)
+  );
+
+  if (existing) {
+    if (!id) yield* storage.playlists.edit(+existing, { title, relevancy });
+    info(`${this.name} updated playlist "${title}".`);
+  } else {
+    if (!id) yield* storage.playlists.create({ title, relevancy });
+    yield* storage.settings.store((id || identify(title)).toString(), chat);
+    info(`${this.name} registered playlist "${title}".`);
+  }
 });
 
 mention((chat) => {
