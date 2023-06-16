@@ -180,8 +180,8 @@ importers:
         specifier: 2.0.2
         version: 2.0.2(@sveltejs/kit@1.20.2)
       crstore:
-        specifier: ^0.17.2
-        version: 0.17.2
+        specifier: ^0.17.5
+        version: 0.17.5
       murmurhash:
         specifier: ^2.0.1
         version: 2.0.1
@@ -192,8 +192,8 @@ importers:
         specifier: workspace:*
         version: link:../protocol
       crstore:
-        specifier: ^0.17.2
-        version: 0.17.2
+        specifier: ^0.17.5
+        version: 0.17.5
       superstruct:
         specifier: ^1.0.3
         version: 1.0.3
@@ -268,12 +268,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/util
       crstore:
-        specifier: ^0.17.2
-        version: 0.17.2
+        specifier: ^0.17.5
+        version: 0.17.5
     devDependencies:
       vite:
         specifier: 4.3.9
-        version: 4.3.9(@types/node@20.3.1)
+        version: 4.3.9
 
   plugins/trpc:
     dependencies:
@@ -923,7 +923,7 @@ packages:
       svelte: 3.59.1
       tiny-glob: 0.2.9
       undici: 5.22.1
-      vite: 4.3.9(@types/node@20.3.1)
+      vite: 4.3.9
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -939,7 +939,7 @@ packages:
       '@sveltejs/vite-plugin-svelte': 2.4.1(svelte@3.59.1)(vite@4.3.9)
       debug: 4.3.4
       svelte: 3.59.1
-      vite: 4.3.9(@types/node@20.3.1)
+      vite: 4.3.9
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -958,7 +958,7 @@ packages:
       magic-string: 0.30.0
       svelte: 3.59.1
       svelte-hmr: 0.15.2(svelte@3.59.1)
-      vite: 4.3.9(@types/node@20.3.1)
+      vite: 4.3.9
       vitefu: 0.2.4(vite@4.3.9)
     transitivePeerDependencies:
       - supports-color
@@ -1246,22 +1246,22 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@vlcn.io/crsqlite-wasm@0.12.0:
-    resolution: {integrity: sha512-biY5vnw01O4h712UsOsFgwALl1qxTT1BpwzO+Tw+UzILrCpmiRtgQ/DmkrjWYEy0iBLeA44nfAtgXFjDzTIBiA==}
+  /@vlcn.io/crsqlite-wasm@0.13.0:
+    resolution: {integrity: sha512-Hnm6bewwAP4gcm4nCYZFLvqb+I2FjljpiNZAlDoBFLpV32MTLk5v67Vwf13YD0HsvzqLJswAs1JPg3WuSxTofg==}
     dependencies:
-      '@vlcn.io/wa-sqlite': 0.18.0
-      '@vlcn.io/xplat-api': 0.11.0
+      '@vlcn.io/wa-sqlite': 0.19.0
+      '@vlcn.io/xplat-api': 0.12.0
       async-mutex: 0.4.0
 
-  /@vlcn.io/crsqlite@0.12.0:
-    resolution: {integrity: sha512-8uOtHeNAwg0sr6K/RKpJ2Iph1fsD8JxcyeYDvnzrCmay39XXZy9wKZ/b9fso9ksOMl32UvT0REjPv8plTR4NJA==}
+  /@vlcn.io/crsqlite@0.13.0:
+    resolution: {integrity: sha512-PfR9sP923W8rMhckrf/8WDccsbJg3vmI363xhW2AlbVvRMzH6PfiXBQz4sAmUmYLokHwzQnOr5nKOLYS0SHIYQ==}
     requiresBuild: true
 
-  /@vlcn.io/wa-sqlite@0.18.0:
-    resolution: {integrity: sha512-0BkblUrb67FbSR21vuluoe1oM4Va/xViwB1HebHlbAXp8sTjejIezXWKSsiEssRYeJgt90aWuyw4xEzddqu/Yw==}
+  /@vlcn.io/wa-sqlite@0.19.0:
+    resolution: {integrity: sha512-Rzu4d1zdnfjVkMMXV0YE7aiMRz2ro6eJ1SM94Fpt7NLDGOt69U7t50lBxaEogSDwMvGG1PpPcd4wapGnA6zKIA==}
 
-  /@vlcn.io/xplat-api@0.11.0:
-    resolution: {integrity: sha512-ZcJZcu8Z8KdORAbqM6rfc8OGMF+9nTNYysXrzd36FsWFNNuN7+mwWyK2zmDcilxaqqm+FyK9+B1O8q3oRGXm9w==}
+  /@vlcn.io/xplat-api@0.12.0:
+    resolution: {integrity: sha512-6MKe6RWSDXeql2iZ2fskske/dVHiqFmBciNv4s8czcGSmyvVNfP4Fz1r5lzCxHjCslP0lVSu3DAtWfD+2YKuoA==}
     dependencies:
       comlink: 4.4.1
 
@@ -1663,11 +1663,11 @@ packages:
       which: 2.0.2
     dev: true
 
-  /crstore@0.17.2:
-    resolution: {integrity: sha512-TQ04SLsoEOZgcziS212VJw8IU0EybdeUTXRYa+irJbDzmIFsvJHhAK94kf13fop22s5BuNIiGw3KMusiTuGmWA==}
+  /crstore@0.17.5:
+    resolution: {integrity: sha512-y7C5HwOjIRD2UPOlhw/BLxExtJJDhmWMM7Kt1Bzh1bRN3hikDFuBCMW2XqgdRUAMieeTzAIYG5egiyCAV93FCQ==}
     dependencies:
-      '@vlcn.io/crsqlite': 0.12.0
-      '@vlcn.io/crsqlite-wasm': 0.12.0
+      '@vlcn.io/crsqlite': 0.13.0
+      '@vlcn.io/crsqlite-wasm': 0.13.0
       better-sqlite3: 8.4.0
       kysely: 0.25.0
       navigator.locks: 0.8.6
@@ -2893,7 +2893,7 @@ packages:
     resolution: {integrity: sha512-iwXuFrMAcFVi/ZoZiqq8BzAdsLw9kxDfTC0HMyjXfSL/6CSDAGD5UmR7azrAgWV1zKYq7dUUMj4owusBWKLsiQ==}
     engines: {node: '>=10'}
     dependencies:
-      semver: 7.5.1
+      semver: 7.5.2
 
   /node-releases@2.0.10:
     resolution: {integrity: sha512-5GFldHPXVG/YZmFzJvKK2zDSzPKhEp0+ZR5SVaoSag9fsL5YgHbUHDfnG5494ISANDcK4KwPXAx2xqVEydmd7w==}
@@ -3751,6 +3751,14 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
+    dev: true
+
+  /semver@7.5.2:
+    resolution: {integrity: sha512-SoftuTROv/cRjCze/scjGyiDtcUyxw1rgYQSZY7XTmtR5hX+dm76iDbTH8TkLPHCQmlbQVSSbNZCPM2hb0knnQ==}
+    engines: {node: '>=10'}
+    hasBin: true
+    dependencies:
+      lru-cache: 6.0.0
 
   /set-cookie-parser@2.6.0:
     resolution: {integrity: sha512-RVnVQxTXuerk653XfuliOxBP81Sf0+qfQE73LIYKcyMYHG94AuH0kgrQpRDuTZnSmjpysHmzxJXKNfa6PjFhyQ==}
@@ -4395,6 +4403,38 @@ packages:
       - terser
     dev: true
 
+  /vite@4.3.9:
+    resolution: {integrity: sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': '>= 14'
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.17.19
+      postcss: 8.4.24
+      rollup: 3.25.1
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
+
   /vite@4.3.9(@types/node@20.3.1):
     resolution: {integrity: sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -4436,7 +4476,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.3.9(@types/node@20.3.1)
+      vite: 4.3.9
     dev: true
 
   /vitest@0.32.0:
