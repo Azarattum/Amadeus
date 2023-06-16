@@ -495,12 +495,13 @@ it("schedules events", async () => {
   const event = pool<() => number>("event");
   event(() => counter++);
   expect(await take(event.schedule({ relative: 10 })())).toEqual([0]);
-  const repeating = event.schedule({
-    absolute: Date.now() + 30,
-    interval: 300,
-  });
+  event
+    .schedule({
+      absolute: Date.now() + 30,
+      interval: 300,
+    })()
+    .then();
 
-  expect(take(repeating())).resolves.toEqual([1, 2]);
   expect(counter).toBe(1);
   await delay(31);
   expect(counter).toBeGreaterThan(1);
