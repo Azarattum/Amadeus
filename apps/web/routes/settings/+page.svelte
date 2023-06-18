@@ -19,9 +19,6 @@
   }
 
   function hash(text: string) {
-    if (!isSecureContext) {
-      return import("sha1-browser" as any).then((x) => x.default(text));
-    }
     return crypto.subtle
       .digest("SHA-1", new TextEncoder().encode(text))
       .then((x) => Array.from(new Uint8Array(x)))
