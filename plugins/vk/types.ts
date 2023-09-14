@@ -41,17 +41,18 @@ function toArtist(data: Infer<typeof artist> | string) {
 }
 
 function toAlbum(data: Infer<typeof album> | string, artistless = false) {
-  if (typeof data === "string") return { title: data, year: 0, sources: [] };
-
-  const assets = data.photo || data.thumb;
-  const artists = (data.main_artists?.map(toArtist) || []).concat(
-    data.featured_artists?.map(toArtist) || []
-  );
+  const meta = typeof data !== "string";
+  const assets = meta ? data.photo || data.thumb : undefined;
+  const artists = meta
+    ? (data.main_artists?.map(toArtist) || []).concat(
+        data.featured_artists?.map(toArtist) || []
+      )
+    : [];
 
   return {
-    title: data.title,
-    year: data.year || 0,
-    sources: [`vk/${data.owner_id}/${data.id}/${data.access_key}`],
+    title: meta ? data.title : data,
+    year: meta ? data.year || 0 : 0,
+    sources: meta ? [`vk/${data.owner_id}/${data.id}/${data.access_key}`] : [],
     ...toAssets(assets?.photo_1200, assets?.photo_135),
     ...(artists && !artistless ? { artists } : {}),
   };

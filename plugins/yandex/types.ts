@@ -24,16 +24,16 @@ function toArtist(data: Infer<typeof artist>) {
 }
 
 function toAlbum(data: Infer<typeof album> | string, artistless = false) {
-  if (typeof data === "string") {
-    return { title: data, year: 0, art: "[]", sources: "[]" } as never;
-  }
+  const meta = typeof data !== "string";
 
   return {
-    title: data.title,
-    year: data.year || 0,
-    sources: [`yandex/${data.id}`],
-    ...toAssets(data.coverUri),
-    ...(artistless ? {} : { artists: data.artists?.map(toArtist) || [] }),
+    title: meta ? data.title : data,
+    year: meta ? data.year || 0 : 0,
+    sources: meta ? [`yandex/${data.id}`] : [],
+    ...toAssets(meta ? data.coverUri : undefined),
+    ...(artistless
+      ? {}
+      : { artists: meta ? data.artists?.map(toArtist) || [] : [] }),
   };
 }
 
