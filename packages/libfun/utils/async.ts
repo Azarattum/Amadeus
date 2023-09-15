@@ -38,7 +38,7 @@ async function* cleanup<T>(
 function derive(parent?: AbortController | AbortSignal) {
   const signal = parent instanceof AbortSignal ? parent : parent?.signal;
   const derived = new AbortController();
-  if ("process" in globalThis) {
+  if ("process" in globalThis && !("Bun" in globalThis)) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("node:events").setMaxListeners(Infinity, derived.signal);
   }
