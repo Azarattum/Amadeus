@@ -36,6 +36,7 @@
     "icial",
     "IFNULL",
     "iframe",
+    "Innertube",
     "keyframes",
     "knmcp",
     "Kysely",
@@ -103,6 +104,7 @@
     "webp",
     "Wrappable",
     "Xlekgb",
+    "youtubei",
     "zshqdv"
   ],
   "eslint.validate": ["javascript", "typescript", "svelte"],

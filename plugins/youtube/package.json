@@ -1,0 +1,16 @@
+{
+  "name": "@amadeus-music/plugin-youtube",
+  "description": "Aggregate data from Youtube Music for Amadeus.",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.js"
+  },
+  "dependencies": {
+    "@amadeus-music/core": "workspace:*",
+    "youtubei.js": "^6.4.0"
+  },
+  "devDependencies": {
+    "vite": "4.3.9"
+  }
+}
