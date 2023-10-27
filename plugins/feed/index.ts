@@ -64,7 +64,7 @@ recommend(function* (user) {
     const pick = minmax(
       Math.ceil(((count - recommendations.length) / left) * bias),
       0,
-      count
+      count,
     );
 
     // Search for similar tracks
@@ -73,7 +73,7 @@ recommend(function* (user) {
       function* (x) {
         if (x.progress >= 1) x.close();
         return shuffle(x.items.filter((x) => !banned.has(x.id))).slice(0, pick);
-      }
+      },
     )).pop();
     if (!similar) continue;
 
@@ -89,7 +89,10 @@ recommend(function* (user) {
 
     // Save recommendations
     recommendations.push(
-      ...similar.filter(<T>(x: T): x is NonNullable<T> => !!x).slice(0, left)
+      ...similar
+        .filter(<T>(x: T): x is NonNullable<T> => !!x)
+        .filter((x) => !banned.has(x.id))
+        .slice(0, left),
     );
     if (recommendations.length >= count) break;
   }
