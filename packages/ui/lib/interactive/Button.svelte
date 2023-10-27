@@ -65,6 +65,8 @@
 
 <svelte:element
   this={tag}
+  role="button"
+  tabindex="0"
   for={to || undefined}
   draggable="false"
   {disabled}

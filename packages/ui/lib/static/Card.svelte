@@ -20,6 +20,8 @@
 
 <svelte:element
   this={interactive ? (href ? "a" : "button") : "article"}
+  role={href ? "link" : "button"}
+  tabindex="0"
   {href}
   on:click
   on:contextmenu

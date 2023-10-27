@@ -3,10 +3,11 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   extends: [
     "eslint:recommended",
+    "plugin:svelte/recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier",
   ],
-  plugins: ["@typescript-eslint"],
+  plugins: ["eslint-plugin-svelte", "@typescript-eslint"],
   ignorePatterns: ["*.cjs"],
   overrides: [
     {
@@ -36,7 +37,10 @@ module.exports = {
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-unused-vars": ["warn", { 
+      argsIgnorePattern: "^_",
+      varsIgnorePattern: "^\\$\\$(Props|Events|Slots)$"
+    }],
     "spaced-comment": ["warn", "always", { markers: ["/"] }],
     "@typescript-eslint/ban-types": [
       "error",
@@ -47,4 +51,5 @@ module.exports = {
       },
     ],
   },
+  globals: {$$Generic: "readable"},
 };

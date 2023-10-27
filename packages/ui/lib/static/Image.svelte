@@ -12,7 +12,7 @@
       : ("loading" as "loading" | "ok" | "error");
 
   let image: HTMLImageElement;
-  onMount(() => image?.complete && (image.style.opacity = "1"));
+  onMount(() => (image?.complete && (image.style.opacity = "1"), false));
 </script>
 
 <div
