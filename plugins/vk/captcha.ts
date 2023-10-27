@@ -13,6 +13,11 @@ import { readFileSync } from "fs";
 import { decode } from "jpeg-js";
 import { resolve } from "path";
 
+// Use constant sid to avoid cyrillic captchas.
+//   This does seem to work, but is there a better way?..
+const CAPTCHA_SID = "625944628258";
+const CAPTCHA_URL = `https://vk.com/captcha.php?sid=${CAPTCHA_SID}&s=1`;
+
 // Throttles expensive API calls
 const safeCall = pool<
   (url: string, options: FetchOptions, type: Struct<any, any>) => unknown
@@ -74,16 +79,17 @@ async function recognize(bytes: ArrayBuffer) {
   }
 }
 
-async function solve(url: string, accuracy = 0.9, limit = 25) {
-  url = url.replace("resized=1", "resized=0");
+async function solve(url: string, accuracy = 0.8, limit = 4) {
+  url = CAPTCHA_URL; // url.replace("resized=1", "resized=0")
   for (let i = 0; i < limit; i++) {
     const image = await fetch(url).then((x) => x.arrayBuffer());
     try {
       const { confidence, answer } = await recognize(image);
-      if (confidence >= accuracy) return answer;
+      if (confidence >= accuracy || i === limit - 1) return answer;
     } catch (error) {
       wrn("Captcha recognition failed with: ", error);
     }
+    await new Promise((r) => setTimeout(r, i * i * 500));
   }
 }
 
@@ -114,7 +120,7 @@ safeCall(function* (url, options, type) {
         // VK doesn't allow to solve captchas fast
         const delay = 3500 + Math.random() * 500;
         yield* async(new Promise((r) => setTimeout(r, delay)));
-        captcha_sid = details["captcha_sid"];
+        captcha_sid = CAPTCHA_SID; // details["captcha_sid"];
         captcha_key = key;
       } else throw error;
     }
