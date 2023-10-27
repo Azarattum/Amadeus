@@ -66,7 +66,7 @@
     <Tracks
       remote={$remote.data}
       local={localTracks}
-      on:end={() => (console.log("next"), remote.next())}
+      on:end={remote.next}
     />
   {:else if $remote.type === "artists"}
     <Overview
