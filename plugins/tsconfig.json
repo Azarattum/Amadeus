@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "types": ["node", "vite/client"],
+    "verbatimModuleSyntax": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,

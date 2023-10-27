@@ -1,6 +1,5 @@
 import {
   array,
-  Infer,
   number,
   type,
   optional,
@@ -8,6 +7,7 @@ import {
   object,
   Struct,
   literal,
+  type Infer,
 } from "@amadeus-music/core";
 
 function toAssets(art?: string, thumbnail?: string) {

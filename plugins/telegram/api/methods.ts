@@ -1,6 +1,6 @@
 import { chat, file, me, responseOf, sent } from "../types/core";
 import { format, reencode, resize } from "@amadeus-music/core";
-import { Audio, Message, Text } from "../types/reply";
+import type { Audio, Message, Text } from "../types/reply";
 import { fetch, wrn } from "../plugin";
 import { paramify } from "./reply";
 

@@ -1,11 +1,11 @@
 import {
   array,
-  Infer,
   number,
   type,
   optional,
   string,
   union,
+  type Infer,
   type Struct,
 } from "@amadeus-music/core";
 

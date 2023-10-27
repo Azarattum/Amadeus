@@ -4,11 +4,11 @@ import {
   number,
   object,
   string,
-  Infer,
+  type Infer,
 } from "@amadeus-music/core";
-import { Meta } from "@amadeus-music/protocol";
+import type { Meta } from "@amadeus-music/protocol";
+import type { Reply, Edit } from "./types/reply";
 import { name, version } from "./package.json";
-import { Reply, Edit } from "./types/reply";
 import { query } from "./types/action";
 import { me } from "./types/core";
 

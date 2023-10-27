@@ -5,9 +5,9 @@ import {
   sendMessage,
 } from "./methods";
 import { icon as icons, markdown, pager, escape, menu } from "./markup";
-import { Infer, Page as State } from "@amadeus-music/core";
+import type { Infer, Page as State } from "@amadeus-music/core";
+import type { Page as Options } from "../types/reply";
 import { format } from "@amadeus-music/protocol";
-import { Page as Options } from "../types/reply";
 import { sent } from "../types/core";
 
 const pages = new Map<number, Page>();

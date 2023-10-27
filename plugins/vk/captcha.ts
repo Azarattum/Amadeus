@@ -5,7 +5,7 @@ import {
   path,
   first,
 } from "@amadeus-music/core";
-import { FetchOptions } from "@amadeus-music/core/network/fetch";
+import type { FetchOptions } from "@amadeus-music/core/network/fetch";
 import { fetch as call, ok, pool, wrn } from "./plugin";
 // @ts-ignore Exports on `onnxruntime-web` are a bit broken
 import onnx from "onnxruntime-web";

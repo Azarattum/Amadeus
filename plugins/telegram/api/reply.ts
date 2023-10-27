@@ -4,10 +4,10 @@ import {
   sendMessage,
   sendAudio,
 } from "./methods";
-import { async, first, map, Pool } from "@amadeus-music/core";
+import { async, first, map, type Pool } from "@amadeus-music/core";
+import type { Message, Queue, Replier } from "../types/reply";
 import { desource, info, persistence, pool } from "../plugin";
 import { bright, reset } from "@amadeus-music/util/color";
-import { Message, Queue, Replier } from "../types/reply";
 import type { Track } from "@amadeus-music/protocol";
 import { pretty } from "@amadeus-music/util/object";
 import { format } from "@amadeus-music/protocol";

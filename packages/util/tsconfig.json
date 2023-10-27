@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "importsNotUsedAsValues": "error",
     "types": ["node", "vite/client"],
-    "preserveValueImports": true,
+    "verbatimModuleSyntax": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,

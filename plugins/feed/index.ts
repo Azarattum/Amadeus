@@ -11,12 +11,12 @@ import {
 } from "./plugin";
 import {
   Feed,
-  Track,
   arg,
   async,
   bright,
   map,
   reset,
+  type Track,
 } from "@amadeus-music/core";
 import { shuffle } from "@amadeus-music/util/object";
 import { delay } from "@amadeus-music/util/async";

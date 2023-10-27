@@ -1,10 +1,10 @@
 import {
-  Infer,
   inferTrack,
   literal,
   nullable,
   string,
   type,
+  type Infer,
 } from "@amadeus-music/core";
 
 const track = type({

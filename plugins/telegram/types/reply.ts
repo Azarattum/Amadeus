@@ -1,4 +1,4 @@
-import { Track } from "@amadeus-music/protocol";
+import type { Track } from "@amadeus-music/protocol";
 import { editor, replier } from "../api/reply";
 
 type Queue = (tracks: Track[]) => number;
