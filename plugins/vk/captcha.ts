@@ -7,8 +7,7 @@ import {
 } from "@amadeus-music/core";
 import type { FetchOptions } from "@amadeus-music/core/network/fetch";
 import { fetch as call, ok, pool, wrn } from "./plugin";
-// @ts-ignore Exports on `onnxruntime-web` are a bit broken
-import onnx from "onnxruntime-web";
+import * as onnx from "onnxruntime-web";
 import { captcha } from "./types";
 import { readFileSync } from "fs";
 import { decode } from "jpeg-js";
@@ -29,7 +28,7 @@ async function recognize(bytes: ArrayBuffer) {
   const session = await onnx.InferenceSession.create(readFileSync(paths.model));
   const result = await session.run({ image: tensor });
 
-  return interpret(result.dense2.data);
+  return interpret(result.dense2.data as Uint8Array);
 
   function preprocess({
     width,
@@ -126,7 +125,7 @@ safeCall(function* (url, options, type) {
 function* safeFetch<T>(
   url: string,
   options: FetchOptions,
-  type: Struct<T, any>
+  type: Struct<T, any>,
 ) {
   return (yield* async(first(safeCall(url, options, type)))) as T;
 }
