@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ts-ignore Svelte 4 has no typings for `svelte/internal`
   import { comment, detach, insert_hydration, tick } from "svelte/internal";
   import { initRealm, type Realm } from "./Realm.svelte";
   import { getContext } from "svelte";

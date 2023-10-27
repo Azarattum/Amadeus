@@ -50,7 +50,7 @@
 
 <aside
   bind:this={panel}
-  transition:slide|local
+  transition:slide
   class="-z-20 mx-2 mb-2 flex min-h-[1px] w-[calc(100%-1rem)] max-w-xl flex-wrap rounded-lg bg-surface-200 ring-1 ring-highlight backdrop-blur-md will-change-transform"
 >
   <slot />
