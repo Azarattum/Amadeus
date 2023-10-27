@@ -13,8 +13,8 @@
     "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/ui": "workspace:*",
     "@amadeus-music/util": "workspace:*",
-    "@trpc/client": "^10.30.0",
-    "@trpc/server": "^10.30.0"
+    "@trpc/client": "^10.43.0",
+    "@trpc/server": "^10.43.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "2.0.3",

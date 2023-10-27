@@ -8,9 +8,9 @@
   },
   "keywords": [],
   "dependencies": {
-    "@capacitor/ios": "^5.0.5"
+    "@capacitor/ios": "^5.5.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "^5.0.5"
+    "@capacitor/cli": "^5.5.1"
   }
 }
