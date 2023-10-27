@@ -6,7 +6,7 @@
   import { page } from "$app/stores";
   import { extra } from "$lib/data";
 
-  const estimate = ~~((globalThis.innerHeight / 56) * 2.5);
+  const estimate = ~~((globalThis.innerHeight / 56) * 2);
 
   $: remote = stream(expand.album, streams.next);
   $: remote.update({ id: +$page.url.hash.slice(1), page: estimate });

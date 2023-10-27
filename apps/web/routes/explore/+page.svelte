@@ -24,7 +24,7 @@
 
   const types = ["tracks", "artists", "albums"] as const;
   const log = debounce((x: string) => history.log(x), 2000);
-  const estimate = ~~((globalThis.innerHeight / 56) * 2.5);
+  const estimate = ~~((globalThis.innerHeight / 56) * 2);
   const remote = multistream(
     { tracks: search.tracks, artists: search.artists, albums: search.albums },
     streams.next,
@@ -63,7 +63,11 @@
 
 {#if $query}
   {#if $remote.type === "tracks"}
-    <Tracks remote={$remote.data} local={localTracks} on:end={remote.next} />
+    <Tracks
+      remote={$remote.data}
+      local={localTracks}
+      on:end={() => (console.log("next"), remote.next())}
+    />
   {:else if $remote.type === "artists"}
     <Overview
       style="artist"
