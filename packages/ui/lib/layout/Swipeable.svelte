@@ -24,7 +24,7 @@
 </script>
 
 <div
-  class="grid w-full snap-x snap-mandatory overflow-y-hidden overflow-x-scroll rounded-lg transition-colors duration-300 ease-linear"
+  class="grid w-full snap-x snap-mandatory overflow-y-hidden overflow-x-scroll rounded-lg transition-colors duration-300 ease-linear will-change-transform"
   style="grid: auto / auto-flow {$$slots.before ? '1fr ' : ''}100%{$$slots.after
     ? ' 1fr'
     : ''};"
