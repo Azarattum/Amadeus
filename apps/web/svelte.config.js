@@ -17,6 +17,9 @@ const config = {
       handleMissingId: "warn",
     },
   },
+  vitePlugin: {
+    inspector: true,
+  },
 };
 
 export default config;

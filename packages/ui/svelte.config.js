@@ -15,6 +15,9 @@ const config = {
       "@amadeus-music/ui": "./component.ts",
     },
   },
+  vitePlugin: {
+    inspector: true,
+  },
 };
 
 export default config;
