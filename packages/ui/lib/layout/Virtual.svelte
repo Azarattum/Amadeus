@@ -20,12 +20,11 @@
 </script>
 
 <script lang="ts">
-  import { drag, hold, intersection, resize } from "../../action";
   import { createEventDispatcher, onMount, tick } from "svelte";
   import { getScrollParent } from "../../internal/util";
-  import { debounce } from "@amadeus-music/util/async";
   import { minmax } from "@amadeus-music/util/math";
   import { position } from "../../internal/pointer";
+  import { drag, hold, resize } from "../../action";
   import { Portal } from "../../component";
   type T = $$Generic;
   type K = $$Generic;
@@ -52,66 +51,79 @@
 
   /* === Virtual Logic === */
   let wrapper: HTMLElement | null = null;
+  let scroll = { x: 0, y: 0 };
   let outer = new DOMRect();
   let inner = new DOMRect();
-  let visible = false;
-  let ended = false;
+  let ended = true;
   let rowHeight = 1;
   let perRow = 0;
-  let active = 0;
+  let offset = 0;
 
-  $: perView = Math.ceil(outer.height / rowHeight) * perRow;
-  $: from = Math.max(active - overthrow, 0) * perView;
-  $: to = Math.max((active + overthrow + 1) * perView, prerender);
-  $: max = ~~(items.length / perView);
+  $: pageSize = Math.ceil(outer.height / rowHeight) * perRow;
+  $: pageHeight = (pageSize / perRow) * rowHeight;
+  $: pageMax = Math.max(Math.ceil(items.length / pageSize) - 2, 1);
+  $: page = minmax(~~((scroll.y - offset) / pageHeight), 1, pageMax);
+
+  $: from = Math.max(page - overthrow, 0) * pageSize;
+  $: to = Math.max((page + overthrow + 1) * pageSize, prerender);
   $: slice = items.slice(from, to);
+
+  $: window = (overthrow * 2 + 1) * pageSize;
+  $: order = Array.from({ length: window }).map((_, i) => i);
   $: index = reindex(items);
 
   $: duration = animate === true ? 300 : animate || 0;
   $: totalHeight = Math.ceil(items.length / perRow) * rowHeight - gap;
-  $: viewHeight = (perView / perRow) * rowHeight;
   $: template = Number.isInteger(columns)
     ? `repeat(${columns},1fr)`
     : `repeat(auto-fill,minmax(min(100%,${columns}),1fr))`;
-  $: if (Number.isFinite(totalHeight)) tick().then(measure), (ended = false);
-
-  function reflow(rect = wrapper?.firstElementChild?.getBoundingClientRect()) {
-    if (!viewHeight || !rect) return;
-    active -= Math.round((rect.y - outer.y) / viewHeight);
-    if (!ended && active >= max - 1) dispatch("end"), (ended = true);
+  $: if (Number.isFinite(totalHeight)) {
+    requestAnimationFrame(measure);
+    ended = false;
+  }
+  $: if (!ended && page === pageMax) {
+    dispatch("end");
+    ended = true;
   }
 
   function reindex(items: T[]) {
     if (!index && items.length) tick().then(measure);
-    if (!animate || !items.length) return;
     const reindexed = new Map<K, number>();
+    const reordered = Array.from<number>({ length: window });
+    const unused = new Set(order);
 
     for (let i = 0; i < items.length; i++) {
       const id = key(items[i]);
       if (id == null) continue;
       reindexed.set(id, i);
 
-      if ($transfer?.owner === wrapper && id === $transfer?.key) continue;
       if (i < from || i >= to) continue;
       const before = index?.get(id);
-      if (before == null) continue;
+
+      if (before == null || before < from || before >= to) continue;
+      reordered[i % window] = order[before % window];
+      unused.delete(order[before % window]);
+
+      if (before === i || !animate) continue;
+      if ($transfer?.owner === wrapper && id === $transfer?.key) continue;
       const y = ~~(before / perRow) - ~~(i / perRow);
       const x = ~~(before % perRow) - ~~(i % perRow);
-      if (y || x) transform(before, x, y);
+      transform(before, x, y);
     }
+    const unusedArray = [...unused];
+    order = reordered.map((x) => x ?? unusedArray.shift());
     return reindexed;
   }
 
   function transform(id: number, x: number, y: number) {
-    const target = wrapper?.children.item(id - from + 1) as HTMLElement;
-    if (!target || target.style.visibility === "hidden") return;
+    const target = wrapper?.children.item(id - from);
     const transform = [
       `translate3d(${x * 100}%,${y * 100}%,0)`,
       `translate3d(0,0,0)`,
     ];
-    target.animate(
+    target?.animate(
       { transform, zIndex: ["100", "100"] },
-      { easing: "ease", composite: "accumulate", duration }
+      { easing: "ease", composite: "accumulate", duration },
     );
   }
 
@@ -119,9 +131,10 @@
     if (!container || !wrapper) return;
     inner = wrapper.parentElement?.getBoundingClientRect() as DOMRect;
     outer = container.getBoundingClientRect();
-    inner.y += container.scrollTop;
+    inner.y += scroll.y;
+    offset = inner.y - outer.y - outer.height / 2;
     inner.width += gap;
-    const target = wrapper.firstElementChild?.nextElementSibling;
+    const target = wrapper.firstElementChild;
     if (!target) return;
     const { width, height } = target.getBoundingClientRect();
     if (!width || !height) return;
@@ -133,7 +146,6 @@
   let rollback: number | undefined;
   let original: number | undefined;
   let cursor = { x: 0, y: 0 };
-  let scroll = { x: 0, y: 0 };
 
   $: id = sortable === true ? wrapper : sortable;
   $: pointerY =
@@ -197,7 +209,7 @@
     const index = items.findIndex((x) => key(x) === $transfer?.key);
     if ($transfer.owner === wrapper) {
       if (~index) {
-        const target = wrapper.children.item(index - from + 1) as HTMLElement;
+        const target = wrapper.children.item(index - from) as HTMLElement;
         if (target) {
           $transfer.back = target.getBoundingClientRect();
           $transfer.group = Math.random().toString();
@@ -218,19 +230,18 @@
   }
 
   onMount(() => {
-    const fixFlow = debounce(() => visible || reflow(), 100);
-    function scroller() {
-      fixFlow();
-      if (!sortable) return;
-      scroll.x = container?.scrollLeft || 0;
-      scroll.y = container?.scrollTop || 0;
+    function scroller(event: Event) {
+      const target = event.currentTarget as HTMLElement;
+      scroll.x = target.scrollLeft;
+      scroll.y = target.scrollTop;
     }
 
     if (!container) container = getScrollParent(wrapper);
     const unsubscribe = sortable && position.subscribe((x) => (cursor = x));
-    container.addEventListener("scroll", scroller);
+    container.addEventListener("scroll", scroller, { passive: true });
     container.addEventListener("resize", measure);
     const { destroy } = resize(container);
+    ended = false;
     return () => {
       container?.removeEventListener("scroll", scroller);
       container?.removeEventListener("resize", measure);
@@ -251,16 +262,7 @@
     use:drag={"hold"}
     use:hold
   >
-    <div
-      style:transform="translateY({+!!active * overthrow * 100}%)"
-      on:intersect={(x) => (visible = x.detail.isIntersecting)}
-      on:viewleave={(x) => reflow(x.detail.boundingClientRect)}
-      style:height="{viewHeight}px"
-      use:intersection
-      class="absolute z-50 w-0.5"
-      aria-hidden
-    />
-    {#each slice as item, i (key(item) == null ? i : key(item))}
+    {#each slice as item, i (order[(from + i) % window] ?? i)}
       <div
         class:invisible={$transfer?.owner === wrapper &&
           $transfer?.key === key(item)}
