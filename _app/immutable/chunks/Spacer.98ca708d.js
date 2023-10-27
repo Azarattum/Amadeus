@@ -1,1 +1,0 @@
-import{S as i,i as l,s as o,k as c,l as h,m,h as a,n as d,b as f,O as t}from"./index.84a1bd3e.js";function p(n){let e;return{c(){e=c("div"),this.h()},l(s){e=h(s,"DIV",{class:!0}),m(e).forEach(a),this.h()},h(){d(e,"class","flex-grow")},m(s,r){f(s,e,r)},p:t,i:t,o:t,d(s){s&&a(e)}}}class _ extends i{constructor(e){super(),l(this,e,null,p,o,{})}}export{_ as S};
