@@ -1,21 +1,22 @@
 <script lang="ts">
-  import { intersection, type IntersectionEvent } from "../../action";
+  import { onMount } from "svelte";
+  import { getScrollParent } from "../../internal/util";
 
   export let stuck = false;
   export let title = "";
 
-  let trigger: HTMLDivElement | undefined;
+  let trigger: HTMLDivElement;
 
-  const scrollUp = () => trigger?.scrollIntoView({ behavior: "smooth" });
+  const scrollUp = () => trigger.scrollIntoView({ behavior: "smooth" });
 
-  function scrolled({ detail }: IntersectionEvent) {
-    const rect = detail.boundingClientRect;
-    const root = detail.rootBounds;
-    if (rect.x < detail.intersectionRect.x - 1) return;
-    const right = (root?.x || 0) + (root?.width || 0);
-    if (rect.x + rect.width - right > 5) return;
-    stuck = detail.intersectionRatio < 0.8;
-  }
+  onMount(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => (stuck = entry.intersectionRatio < 0.8),
+      { root: getScrollParent(trigger), threshold: 0.8 },
+    );
+    observer.observe(trigger);
+    return () => observer.disconnect();
+  });
 </script>
 
 <aside class="absolute left-0 top-0">
@@ -30,13 +31,7 @@
   </button>
 </aside>
 
-<div
-  bind:this={trigger}
-  use:intersection={0.8}
-  on:intersect={scrolled}
-  class:opacity-0={stuck}
-  class="transition-composite"
->
+<div bind:this={trigger} class:opacity-0={stuck} class="transition-composite">
   <slot />
 </div>
 
