@@ -1,0 +1,24 @@
+{
+  "name": "illusify",
+  "version": "0.0.1",
+  "description": "Breathe magic into your UI components!",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Azarattum/Amadeus/tree/main/packages/illusify"
+  },
+  "author": {
+    "name": "Azarattum",
+    "homepage": "https://github.com/Azarattum"
+  },
+  "scripts": {},
+  "keywords": [
+    "ui",
+    "ui-components",
+    "svelte",
+    "virtual",
+    "virtual-list",
+    "portal",
+    "router"
+  ],
+  "type": "module"
+}
