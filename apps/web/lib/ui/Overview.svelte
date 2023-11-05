@@ -46,7 +46,7 @@
     <Card href="{href}/{style}#{item.id}" {...{ [style]: item }} />
   {:else if item === null}
     <button
-      class="p flex w-full cursor-pointer justify-center rounded-2xl p-4 text-highlight ring-4 ring-inset ring-highlight focus-within:outline-none focus-within:ring-primary-600"
+      class="p flex w-full cursor-pointer justify-center rounded-2xl p-4 text-highlight ring-4 ring-inset ring-highlight focus-visible:outline-none focus-visible:ring-primary-600"
       on:click={() => dispatch("create")}
     >
       <Icon name="plus" xxl />

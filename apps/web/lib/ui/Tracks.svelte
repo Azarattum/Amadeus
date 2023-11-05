@@ -25,6 +25,8 @@
     click: Track;
   }>();
 
+  let classes = "";
+  export { classes as class };
   export let sm = false;
   export let fixed = false;
   export let timeline = false;
@@ -80,7 +82,7 @@
   }
 </script>
 
-<div>
+<div class={classes}>
   {#if !sm}
     <When lg>
       <div

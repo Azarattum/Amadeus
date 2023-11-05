@@ -27,7 +27,7 @@
     </Stack>
   </Tab>
   <Tab name="Timeline">
-    <Tracks tracks={$tracks} timeline fixed>
+    <Tracks tracks={$tracks} timeline fixed class="pt-4">
       <div><!-- /// TODO: add actions --></div>
     </Tracks>
   </Tab>
