@@ -2,12 +2,12 @@ const observers = new Map<string, [IntersectionObserver, number]>();
 const dispatch = (entries: IntersectionObserverEntry[]) =>
   entries.forEach((entry) => {
     entry.target?.dispatchEvent(
-      new CustomEvent("intersect", { detail: entry })
+      new CustomEvent("intersect", { detail: entry }),
     );
     entry.target?.dispatchEvent(
       new CustomEvent(entry.isIntersecting ? "viewenter" : "viewleave", {
         detail: entry,
-      })
+      }),
     );
   });
 

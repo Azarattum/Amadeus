@@ -2,7 +2,7 @@
   import { Swipeable, Stack, Icon, Card, Text } from "@amadeus-music/ui";
 </script>
 
-<Stack screen p>
+<Stack class="p-4">
   <Swipeable>
     <Icon name="sun" slot="before" />
     <Card interactive sm flat>

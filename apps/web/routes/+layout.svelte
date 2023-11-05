@@ -88,7 +88,7 @@
             sql
               .raw(query)
               .execute(db)
-              .then((x) => x.rows)
+              .then((x) => x.rows),
           ),
         show: (table: any) =>
           update((db) => db.selectFrom(table).selectAll().execute()),
@@ -118,7 +118,7 @@
     <Button air compact stretch slot="bottom" href="/settings">
       <Icon md name="settings" />Settings
     </Button>
-  </Nav><Player /><Stack screen grow>
+  </Nav><Player /><Stack class="h-[100dvh] max-h-[100dvh] max-w-[100dvw]">
     <div class="hidden gap-16 p-[21px] pb-0 sm:flex">
       <Input bind:value={$search} stretch resettable placeholder="Search">
         <Icon name="search" />

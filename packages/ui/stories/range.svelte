@@ -8,8 +8,8 @@
   let controls = false;
 </script>
 
-<Stack gap grow>
-  <Stack x gap>
+<Stack class="gap-2">
+  <Stack x class="gap-2">
     <Input bind:value={min}>Min:</Input>
     <Input bind:value={max}>Max:</Input>
     <Checkbox bind:checked={hints}>Hints</Checkbox>

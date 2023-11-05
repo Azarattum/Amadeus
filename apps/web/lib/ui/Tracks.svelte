@@ -160,7 +160,7 @@
   <Portal to="bottom">
     {#if selected.size}
       <Panel>
-        <Stack x grow>
+        <Stack x>
           <slot />
           <Separator />
           <Button air square on:click={clear}><Icon name="close" /></Button>

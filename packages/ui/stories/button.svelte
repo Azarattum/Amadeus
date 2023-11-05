@@ -11,13 +11,13 @@
   };
 </script>
 
-<Stack gap grow>
-  <Stack x gap>
+<Stack class="gap-2">
+  <Stack x class="gap-2">
     {#each Object.keys(props) as prop}
       <Checkbox bind:checked={props[prop]}>{prop}</Checkbox>
     {/each}
   </Stack>
-  <Stack x gap grow>
+  <Stack x class="gap-2">
     <Button {...props}><Icon name="book" />Button With Icon</Button>
     <Button {...props}>Just A Button</Button>
     <Button {...props}><Icon name="last" /></Button>

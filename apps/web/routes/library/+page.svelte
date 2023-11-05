@@ -7,7 +7,7 @@
 
 <Tabs>
   <Tab name="Playlists">
-    <Stack grow p>
+    <Stack class="p-4">
       <Overview
         on:rearrange={({ detail }) =>
           playlists.rearrange(detail.id, detail.after)}
@@ -22,7 +22,7 @@
     </Stack>
   </Tab>
   <Tab name="Artists">
-    <Stack grow p>
+    <Stack class="p-4">
       <Overview style="artist" of={$artists} filter={$search} />
     </Stack>
   </Tab>

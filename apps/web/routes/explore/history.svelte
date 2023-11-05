@@ -14,7 +14,7 @@
 
 {#if $history.length}
   <div class="m-auto max-w-xl p-8 [&>*:first-child]:opacity-50">
-    <Stack x baseline>
+    <Stack x class="place-items-baseline">
       <Header center sm>History</Header>
       <Spacer />
       <Button air on:click={() => history.clear()}>

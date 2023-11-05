@@ -25,7 +25,7 @@
       {item.artists.map((x) => x.title).join(", ")}
     </Text>
   {:else if ok(item) && item.collection}
-    <Stack justify x gap="lg">
+    <Stack x class="justify-center gap-4">
       <Text secondary {loading}>
         <Icon name="note" sm />
         {item.collection.size}

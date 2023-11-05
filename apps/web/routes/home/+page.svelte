@@ -22,9 +22,9 @@
     </When>
   </Header>
 </Topbar>
-<Stack p grow gap="lg">
+<Stack class="gap-4 p-4">
   {#if devices.length}
-    <Stack grow gap="sm">
+    <Stack class="gap-1">
       <Header sm>Other Devices</Header>
       <div
         class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,40rem),1fr))] gap-1"
@@ -52,7 +52,7 @@
     </Stack>
   {/if}
 
-  <Stack grow gap="sm">
+  <Stack class="gap-1">
     <Header sm>You Might Like</Header>
     <Overview
       style="playlist"

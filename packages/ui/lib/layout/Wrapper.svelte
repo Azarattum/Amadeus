@@ -16,7 +16,7 @@
 
 <Realm>
   <Gateway name="start" />
-  <div class="flex">
+  <div class="flex h-full">
     <aside><Gateway name="left" /></aside>
     <div class="grow contain-layout">
       <slot />

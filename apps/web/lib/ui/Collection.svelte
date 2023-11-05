@@ -18,7 +18,7 @@
   export let of: Collection | undefined = undefined;
   export let tracks: Track[] | undefined = undefined;
 
-  const unique = <T>(x: T[]) => [...new Set(x)];
+  const unique = <T,>(x: T[]) => [...new Set(x)];
 
   $: filtered = (tracks || of?.collection?.tracks)?.filter(match($search));
   $: href =
@@ -33,24 +33,27 @@
           ? of?.sources
               .map((x: string) => capitalize(x.split("/")[0]))
               .filter((x): x is string => !!x)
-          : []
+          : [],
       ).join(", ")
     : "Loading";
 </script>
 
-<Stack gap={style === "playlist" ? "lg" : undefined} grow>
+<Stack class={style === "playlist" ? "gap-4" : ""}>
   <Topbar title={of?.title || ""}>
-    <Stack gap="lg" x center p={style !== "playlist"}>
+    <Stack
+      x
+      class={`place-items-center gap-4 ${style !== "playlist" ? "p-4" : ""}`}
+    >
       {#if style !== "playlist"}
         <Avatar {href} round={style === "artist"} {of} />
       {/if}
-      <Stack gap>
+      <Stack class="gap-2">
         <Header
           xl={style === "playlist"}
           indent={style === "playlist"}
           loading={!of}>{of?.title}</Header
         >
-        <Stack x gap="lg">
+        <Stack x class="gap-4">
           {#if of?.collection}
             <Text secondary indent={style === "playlist"}>
               <Icon name="note" sm />

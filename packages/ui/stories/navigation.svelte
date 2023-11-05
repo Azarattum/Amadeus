@@ -3,21 +3,21 @@
 
   const icons: Record<string, string> = {
     Home: "house",
+    Feed: "activity",
     Library: "note",
     Explore: "compass",
-    Added: "last",
     Playlists: "last",
-    Artists: "artists",
+    Artists: "people",
     Timeline: "clock",
     Tracks: "note",
-    Albums: "album",
+    Albums: "disk",
     Listened: "history",
     Recommended: "stars",
-    Following: "artists",
+    Following: "people",
   };
 
   const sections: Record<string, string[]> = {
-    Home: ["Added", "Listened", "Recommended", "Following"],
+    Home: ["Feed", "Listened", "Recommended", "Following"],
     Library: ["Playlists", "Artists", "Timeline"],
     Explore: ["Tracks", "Artists", "Albums"],
   };

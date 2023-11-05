@@ -18,7 +18,7 @@
   export let paused = true;
 </script>
 
-<Stack p gap="sm" center>
+<Stack class="place-items-center gap-1 p-4">
   <Text accent>{track?.title || "Not Playing"}</Text>
   <Button
     air

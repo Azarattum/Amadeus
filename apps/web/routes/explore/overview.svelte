@@ -8,7 +8,7 @@
   export let remote: Collection[] | undefined;
 </script>
 
-<Stack p grow gap="lg">
+<Stack class="gap-4 p-4">
   {#if local.length}
     <div>
       <Header sm>Library</Header>

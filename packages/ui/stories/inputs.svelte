@@ -10,7 +10,7 @@
   } from "@amadeus-music/ui";
 </script>
 
-<Stack gap>
+<Stack class="gap-2">
   <Checkbox><Icon name="sun" /><Icon name="moon" slot="after" /></Checkbox>
   <Checkbox>
     Search?
@@ -19,7 +19,7 @@
   </Checkbox>
   <Input placeholder="Just Input"><Tooltip>This is an input!</Tooltip></Input>
   <Input placeholder="Search" resettable><Icon name="search" /></Input>
-  <Stack x gap>
+  <Stack x class="gap-2">
     <Button><Icon name="sun" /></Button>
     <Button primary><Icon name="moon" /></Button>
     <Button primary round><Icon name="search" /></Button>
@@ -29,7 +29,7 @@
     <Button compact air><Icon md name="moon" />Moon</Button>
     <Button compact air><Icon md name="sun" />Sun</Button>
   </Stack>
-  <Stack x gap>
+  <Stack x class="gap-2">
     <Group size={4} value={1}>
       <Button><Icon name="last" /></Button>
       <Button><Icon name="history" /></Button>

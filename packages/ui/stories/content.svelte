@@ -4,7 +4,7 @@
   export let i = 5;
 </script>
 
-<Stack center gap p>
+<Stack class="place-items-center gap-2 p-4">
   <p class="max-w-lg rounded-lg bg-slate-200 p-2 shadow-xl dark:bg-slate-500">
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis assumenda
     corrupti repellat tempora consequatur veniam ea, quae, vero non, repellendus

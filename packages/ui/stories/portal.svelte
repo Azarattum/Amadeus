@@ -18,7 +18,7 @@
 
 <Realm>
   Gateway 0: <Gateway name="0" />
-  <Stack gap>
+  <Stack class="gap-2">
     {#if shown}
       <Portal to={to.toString()} unique="busy">
         <b id="glow" class="target:text-primary-600">Portal says {value}!</b>

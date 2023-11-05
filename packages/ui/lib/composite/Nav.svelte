@@ -27,9 +27,9 @@
         <Logo sm={pane ? "auto" : false} />
         <Separator />
       </div>
-      <Stack x grow>
+      <Stack x>
         {#if pane}
-          <Stack gap="xl" p>
+          <Stack class="gap-8 p-4">
             <slot />
             <Spacer />
             <slot name="bottom" />
@@ -39,11 +39,11 @@
           {#if pane}
             <Separator />
           {/if}
-          <Stack gap="sm" p grow>
+          <Stack class="gap-1 p-4">
             <Header sm>{section}</Header>
             <slot name="section" />
             <Spacer />
-            <Stack center>
+            <Stack class="place-items-center">
               <slot name="bottom-section" />
             </Stack>
           </Stack>
@@ -59,7 +59,7 @@
     {pane ? 'flex sm:hidden' : 'hidden'}"
   >
     <Separator vertical={false} />
-    <Stack x>
+    <Stack x class="max-h-11">
       <slot />
     </Stack>
   </nav>

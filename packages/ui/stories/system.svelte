@@ -2,12 +2,12 @@
   import { Stack, Header } from "@amadeus-music/ui";
 </script>
 
-<Stack screen>
-  <Stack gap="lg">
+<Stack class="h-full overflow-auto">
+  <Stack class="gap-4">
     <Header xl>Colors</Header>
-    <Stack gap>
+    <Stack class="gap-2">
       <Header lg>Primary</Header>
-      <Stack x gap>
+      <Stack x class="gap-2">
         <div class="h-16 w-16 rounded-md bg-primary-100" />
         <div class="h-16 w-16 rounded-md bg-primary-200" />
         <div class="h-16 w-16 rounded-md bg-primary-300" />
@@ -19,9 +19,9 @@
         <div class="h-16 w-16 rounded-md bg-primary-900" />
       </Stack>
     </Stack>
-    <Stack gap>
+    <Stack class="gap-2">
       <Header lg>Surface</Header>
-      <Stack z center>
+      <Stack z class="place-items-center">
         <Stack x>
           <Stack>
             <div class="h-16 w-32 rounded-tl-md bg-primary-400" />
@@ -32,7 +32,7 @@
             <div class="h-16 w-32 rounded-br-md bg-primary-900" />
           </Stack>
         </Stack>
-        <Stack x gap>
+        <Stack x class="gap-2">
           <div class="h-16 w-16 rounded-md bg-surface" />
           <div
             class="h-16 w-16 rounded-md bg-surface-100 shadow-lg dark:shadow-none"
@@ -43,17 +43,17 @@
         </Stack>
       </Stack>
     </Stack>
-    <Stack gap>
+    <Stack class="gap-2">
       <Header lg>Content</Header>
-      <Stack x gap>
+      <Stack x class="gap-2">
         <div class="h-16 w-16 rounded-md bg-content" />
         <div class="h-16 w-16 rounded-md bg-content-100" />
         <div class="h-16 w-16 rounded-md bg-content-200" />
       </Stack>
     </Stack>
-    <Stack gap>
+    <Stack class="gap-2">
       <Header lg>Highlight</Header>
-      <Stack x gap>
+      <Stack x class="gap-2">
         <div class="h-16 w-16 rounded-md bg-highlight" />
         <div class="h-16 w-16 rounded-md bg-highlight-100" />
         <div class="h-16 w-16 rounded-md bg-highlight-200" />
@@ -61,9 +61,9 @@
     </Stack>
   </Stack>
 
-  <Stack gap>
+  <Stack class="gap-2">
     <Header xl>Typography</Header>
-    <Stack x baseline gap>
+    <Stack x class="place-items-baseline gap-2">
       <div class="text-2xl">Header 1</div>
       <div class="text-xl">Header 2</div>
       <div class="text-lg">Header 3</div>

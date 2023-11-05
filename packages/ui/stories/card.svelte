@@ -2,12 +2,12 @@
   import { Icon, Stack, Text, Card, Header, When } from "@amadeus-music/ui";
 </script>
 
-<Stack screen p grow gap="xl">
+<Stack class="h-full gap-8 p-4">
   <Header xl>Cards</Header>
-  <Stack x gap="lg">
+  <Stack x class="grow-0 gap-4">
     <Card interactive>
-      <Header>Epic Music</Header>
-      <Stack x gap="lg">
+      <Header center>Epic Music</Header>
+      <Stack x class="gap-4">
         <Text secondary><Icon name="note" sm /> 754</Text>
         <Text secondary><Icon name="clock" sm /> 32:14</Text>
       </Stack>
@@ -17,8 +17,8 @@
       />
     </Card>
     <Card interactive>
-      <Header>Calm Music</Header>
-      <Stack x gap="lg">
+      <Header center>Calm Music</Header>
+      <Stack x class="gap-4">
         <Text secondary><Icon name="note" sm /> 754</Text>
         <Text secondary><Icon name="clock" sm /> 32:14</Text>
       </Stack>
@@ -28,8 +28,8 @@
       />
     </Card>
     <Card interactive>
-      <Header>Energy Music</Header>
-      <Stack x gap="lg">
+      <Header center>Energy Music</Header>
+      <Stack x class="gap-4">
         <Text secondary><Icon name="note" sm /> 754</Text>
         <Text secondary><Icon name="clock" sm /> 32:14</Text>
       </Stack>
@@ -40,7 +40,7 @@
     </Card>
   </Stack>
 
-  <Stack grow>
+  <Stack>
     <When lg>
       <Card xs flat flow>
         <div class="w-[48px]" slot="before" />
