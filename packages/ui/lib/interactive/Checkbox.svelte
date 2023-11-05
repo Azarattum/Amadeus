@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { HTMLProps } from "@amadeus-music/ui/internal/types";
+  import type { HTMLProps } from "../../internal/types";
   import { tw } from "../../internal/tailwind";
   import { uuid } from "../../internal/util";
 
