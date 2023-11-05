@@ -13,6 +13,7 @@
     "test": "svelte-kit sync && svelte-check"
   },
   "dependencies": {
-    "@amadeus-music/util": "workspace:*"
+    "@amadeus-music/util": "workspace:*",
+    "tailwind-merge": "^2.0.0"
   }
 }

@@ -2,6 +2,8 @@
 import "./internal/polyfill";
 import "./lib/tailwind.pcss";
 
+export * from "./internal/tailwind";
+
 export { default as Tab } from "./lib/layout/Tab.svelte";
 export { default as Tabs } from "./lib/layout/Tabs.svelte";
 export { default as When } from "./lib/layout/When.svelte";
