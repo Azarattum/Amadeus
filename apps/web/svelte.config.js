@@ -1,5 +1,6 @@
 import { vitePreprocess } from "@sveltejs/kit/vite";
 import adapter from "@sveltejs/adapter-static";
+import { platform } from "os";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -18,7 +19,9 @@ const config = {
     },
   },
   vitePlugin: {
-    inspector: true,
+    inspector: {
+      toggleKeyCombo: platform() === "darwin" ? "meta-shift-x" : "control-shift-x",
+    },
   },
 };
 
