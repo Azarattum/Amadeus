@@ -10,6 +10,9 @@
   const isStored = () => "localStorage" in globalThis && "dark" in localStorage;
   const media = globalThis.matchMedia?.("(prefers-color-scheme: dark)");
 
+  let classes = "";
+  export { classes as class };
+
   export let preference = media?.matches;
   let checked = isStored() && (localStorage.dark === "true") !== preference;
   $: dark = !!(+preference ^ +checked);
@@ -43,10 +46,10 @@
   });
 </script>
 
-<Checkbox target="light-switch">
+<Checkbox target="light-switch" class={classes}>
   <Icon name="sun" />
   <Icon name="moon" slot="after" />
 </Checkbox>
-<Portal to="start" unique="light-switch">
+<Portal to="root" unique="light-switch">
   <input class="absolute appearance-none" id="light-switch" type="checkbox" />
 </Portal>

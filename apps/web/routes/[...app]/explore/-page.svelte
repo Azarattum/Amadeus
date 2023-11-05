@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    Projection,
     Button,
     Portal,
     Header,
@@ -8,17 +9,20 @@
     Input,
     Panel,
     Icon,
-    When,
   } from "@amadeus-music/ui";
   import { albums, artists, history, search as query, tracks } from "$lib/data";
   import type { Artist, Album, Track } from "@amadeus-music/protocol";
   import { debounce } from "@amadeus-music/util/async";
   import { navigating, page } from "$app/stores";
+  import ArtistPage from "./artist/-page.svelte";
+  import AlbumPage from "./album/-page.svelte";
   import { search, streams } from "$lib/trpc";
   import { multistream } from "$lib/stream";
   import Overview from "./overview.svelte";
   import History from "./history.svelte";
   import Tracks from "./tracks.svelte";
+
+  export let target = false;
 
   let type = 0;
 
@@ -28,11 +32,11 @@
   const remote = multistream(
     { tracks: search.tracks, artists: search.artists, albums: search.albums },
     streams.next,
-    types[type]
+    types[type],
   );
 
-  $: navigate($page.url.hash.slice(1));
-  $: if (!$navigating) {
+  $: target && navigate($page.url.hash.slice(1));
+  $: if (target && !$navigating) {
     globalThis.history?.replaceState(null, "", `#${types[type]}/${$query}`);
   }
 
@@ -63,11 +67,7 @@
 
 {#if $query}
   {#if $remote.type === "tracks"}
-    <Tracks
-      remote={$remote.data}
-      local={localTracks}
-      on:end={remote.next}
-    />
+    <Tracks remote={$remote.data} local={localTracks} on:end={remote.next} />
   {:else if $remote.type === "artists"}
     <Overview
       style="artist"
@@ -87,13 +87,23 @@
   <History type={types[type]} />
 {/if}
 
-<Portal to="bottom">
-  <Panel>
-    <When not sm>
-      <Input bind:value={$query} stretch resettable placeholder="Search">
-        <Icon name="search" />
-      </Input>
-    </When>
+<Projection at="album" class="bg-surface" ephemeral>
+  <AlbumPage />
+</Projection>
+<Projection at="artist" class="bg-surface" ephemeral>
+  <ArtistPage />
+</Projection>
+
+<Portal to="panel">
+  <Panel class={target ? "flex" : "hidden"}>
+    <Input
+      resettable
+      bind:value={$query}
+      placeholder="Search"
+      class="w-full sm:hidden"
+    >
+      <Icon name="search" />
+    </Input>
     <Group size={3} stretch bind:value={type}>
       <Button id="tracks">Tracks</Button>
       <Button id="artists">Artists</Button>

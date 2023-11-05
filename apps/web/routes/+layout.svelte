@@ -1,21 +1,5 @@
 <script lang="ts">
-  import {
-    Wrapper,
-    Stack,
-    Nav,
-    Button,
-    Icon,
-    Input,
-    Separator,
-    LightSwitch,
-  } from "@amadeus-music/ui";
-  import { beforeNavigate, preloadData } from "$app/navigation";
-  import { capitalize } from "@amadeus-music/util/string";
-  import { autoscroll } from "@amadeus-music/ui/action";
-  import { extra, search, update } from "$lib/data";
   import { sql } from "@amadeus-music/crdata";
-  import Player from "$lib/ui/Player.svelte";
-  import { page } from "$app/stores";
   import { base } from "$app/paths";
   import { onMount } from "svelte";
   import "@amadeus-music/ui";
@@ -27,61 +11,10 @@
     [414, 736, 3, "plus"],
   ];
 
-  const icons: Record<string, string> = {
-    Home: "house",
-    Feed: "activity",
-    Library: "note",
-    Explore: "compass",
-    Playlists: "last",
-    Artists: "people",
-    Timeline: "clock",
-    Tracks: "note",
-    Albums: "disk",
-    Listened: "history",
-    Recommended: "stars",
-    Following: "people",
-  };
-
-  const urls: Record<string, string> = {
-    Recommended: "/home/playlist#-2",
-    Listened: "/home/playlist#-1",
-  };
-
-  const sections: Record<string, string[]> = {
-    Home: ["Feed", "Following", "Listened", "Recommended"],
-    Library: ["Playlists", "Artists", "Timeline"],
-    Explore: ["Tracks", "Artists", "Albums"],
-  };
-  $: section = capitalize($page.route.id?.split("/")?.[1] || "home") as string;
-
-  function toURL(target: string): string | undefined {
-    if (target in urls) return urls[target];
-    if (target in sections) return `/${target.toLowerCase()}`;
-    if (section === "Explore") return undefined;
-    return `${toURL(section)}#${target.toLowerCase()}`;
-  }
-
-  function toTarget(target: string) {
-    if (section !== "Explore") return undefined;
-    return target.toLowerCase();
-  }
-
-  beforeNavigate(({ from, to }) => {
-    if (from?.url.pathname === to?.url.pathname) return;
-    $extra = null;
-    $search = "";
-  });
-
-  onMount(() => {
-    preloadData("/home");
-    preloadData("/home/playlist");
-    preloadData("/library");
-    preloadData("/library/playlist");
-    preloadData("/library/artist");
-    preloadData("/explore");
-
+  onMount(async () => {
     // Utilities to inspect the database during development
     if (import.meta.env.DEV) {
+      const { update } = await import("$lib/data");
       (globalThis as any).db = {
         exec: (query: any) =>
           update((db) =>
@@ -97,44 +30,6 @@
   });
 </script>
 
-<Wrapper>
-  <Nav {section}>
-    {#each Object.keys(sections) as x}
-      <Button air compact stretch primary={x === section} href={toURL(x)}>
-        <Icon md name={icons[x]} />{x}
-      </Button>
-    {/each}
-    <svelte:fragment slot="section">
-      {#each sections[section] || [] as x (section + x)}
-        <Button air href={toURL(x)} to={toTarget(x)}>
-          <Icon name={icons[x]} />{x}
-        </Button>
-      {/each}
-      {#if $extra}
-        <Separator />
-        <Button air primary><Icon name={$extra[1]} />{$extra[0]}</Button>
-      {/if}
-    </svelte:fragment>
-    <Button air compact stretch slot="bottom" href="/settings">
-      <Icon md name="settings" />Settings
-    </Button>
-  </Nav><Player /><Stack class="h-[100dvh] max-h-[100dvh] max-w-[100dvw]">
-    <div class="hidden gap-16 p-[21px] pb-0 sm:flex">
-      <Input bind:value={$search} stretch resettable placeholder="Search">
-        <Icon name="search" />
-      </Input>
-      <LightSwitch />
-    </div>
-    <div
-      use:autoscroll
-      class="relative h-full scroll-smooth
-      {$page.route.id == '/library' ? 'overflow-hidden' : 'overflow-y-auto'}"
-    >
-      <slot />
-    </div>
-  </Stack>
-</Wrapper>
-
 <svelte:head>
   <meta name="description" content="Listen to your music with Amadeus!" />
   <link rel="apple-touch-icon" href="{base}/images/logo-180.webp" />
@@ -147,3 +42,5 @@
     />
   {/each}
 </svelte:head>
+
+<slot />

@@ -1,7 +1,11 @@
 <script lang="ts">
   import { onMount, setContext } from "svelte";
+  import { tw } from "../../internal/tailwind";
   import { isiOS } from "../../internal/util";
   import { slide } from "svelte/transition";
+
+  let classes = "";
+  export { classes as class };
 
   setContext("panel", true);
 
@@ -37,7 +41,7 @@
         fill: "forwards",
         composite: "replace",
         easing: "ease-in-out",
-      }
+      },
     );
   }
 
@@ -51,7 +55,7 @@
 <aside
   bind:this={panel}
   transition:slide
-  class="-z-20 mx-2 mb-2 flex min-h-[1px] w-[calc(100%-1rem)] max-w-xl flex-wrap rounded-lg bg-surface-200 ring-1 ring-highlight backdrop-blur-md will-change-transform"
+  class={tw`-z-20 mx-2 mb-2 flex min-h-[1px] w-[calc(100%-1rem)] max-w-xl flex-wrap rounded-lg bg-surface-200 ring-1 ring-highlight backdrop-blur-md will-change-transform ${classes}`}
 >
   <slot />
 </aside>

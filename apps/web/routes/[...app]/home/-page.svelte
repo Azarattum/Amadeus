@@ -1,17 +1,28 @@
 <script lang="ts">
-  import { Header, Icon, Stack, Topbar, Button, When } from "@amadeus-music/ui";
+  import {
+    Projection,
+    Header,
+    Topbar,
+    Button,
+    Stack,
+    Icon,
+    When,
+  } from "@amadeus-music/ui";
   import { feed, playback, search } from "$lib/data";
   import Overview from "$lib/ui/Overview.svelte";
+  import Playlist from "./playlist/-page.svelte";
   import Track from "$lib/ui/Track.svelte";
-  import { onMount } from "svelte";
+  import { navigating } from "$app/stores";
+  import { goto } from "$app/navigation";
 
   const hidden = new Set([-3, -4]);
 
-  $: devices = $playback.filter((x) => !x.local);
+  export let target = false;
 
-  onMount(() => {
-    if (!location.hash) location.replace("#feed");
-  });
+  $: devices = $playback.filter((x) => !x.local);
+  $: if (target && !$navigating && globalThis.location && !location?.hash) {
+    goto("#feed", { replaceState: true });
+  }
 </script>
 
 <Topbar title="Home">
@@ -65,6 +76,10 @@
   <!-- <Header id="following" sm>New for You</Header> -->
   <!-- /// TODO add artists cards -->
 </Stack>
+
+<Projection at="playlist" class="bg-surface" ephemeral>
+  <Playlist />
+</Projection>
 
 <svelte:head>
   <title>Amadeus</title>

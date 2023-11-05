@@ -1,6 +1,16 @@
-<script>
+<script lang="ts">
+  import type { HTMLProps } from "@amadeus-music/ui/internal/types";
+  import { tw } from "../../internal/tailwind";
   import { uuid } from "../../internal/util";
 
+  type $$Props = {
+    checked?: boolean;
+    target?: string;
+    class?: string;
+  } & HTMLProps["input"];
+
+  let classes = "";
+  export { classes as class };
   export let checked = false;
   export let target = "";
 
@@ -8,7 +18,7 @@
 </script>
 
 <label
-  class="group relative flex w-max cursor-pointer select-none items-center gap-2 p-[6px] text-content-200"
+  class={tw`group relative flex w-max cursor-pointer select-none items-center gap-2 p-[6px] text-content-200 ${classes}`}
   for={id}
 >
   <slot />
@@ -17,6 +27,7 @@
       <input
         type="checkbox"
         class="peer pointer-events-none absolute h-full w-full appearance-none rounded-2xl outline-2 outline-primary-600 focus-visible:outline"
+        {...$$restProps}
         {id}
         bind:checked
       />

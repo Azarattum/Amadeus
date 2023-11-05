@@ -17,7 +17,7 @@
 
   function purge() {
     library.purge(
-      [...selected].map((x) => x.entry).filter((x): x is number => !!x)
+      [...selected].map((x) => x.entry).filter((x): x is number => !!x),
     );
     selected.clear();
     selected = selected;

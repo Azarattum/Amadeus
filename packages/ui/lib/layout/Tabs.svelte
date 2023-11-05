@@ -5,15 +5,15 @@
   const tabs: string[] = [];
   setContext("tabs", tabs);
 
-  let main: HTMLElement;
-  let container = 0;
+  let container: HTMLElement;
+  let width = 0;
 
   $: offsets = elements.map((x) => x.offsetLeft);
   $: compact =
-    offsets.slice(-1)[0] + elements.slice(-1)[0]?.clientWidth >= container;
+    offsets.slice(-1)[0] + elements.slice(-1)[0]?.clientWidth >= width;
   $: transforms = offsets.map((offset, i) => {
     if (!compact) return "";
-    const ratio = (container * i) / offset || 1;
+    const ratio = (width * i) / offset || 1;
     return `
       translate3d(${-offset}px,-2.75rem,${-ratio + 1}px)
       scale(${ratio})
@@ -35,15 +35,15 @@
           `color:hsl(var(--color-content));` +
           `pointer-events:none;` +
           `font-weight:bold;` +
-          `}`
+          `}`,
       )
       .join("");
   }
 </script>
 
-<main
-  bind:this={main}
-  bind:clientWidth={container}
+<section
+  bind:this={container}
+  bind:clientWidth={width}
   class:scroll-smooth={compact}
   class="grid h-full max-h-[100dvh] snap-x snap-mandatory overflow-y-hidden overflow-x-scroll"
   style="grid: auto / auto-flow 100%; perspective: 1px; perspective-origin: top left;"
@@ -72,7 +72,7 @@
       </div>
     {/each}
   </nav>
-</main>
+</section>
 
 <svelte:head>
   {#await style() then css}
@@ -81,10 +81,10 @@
 </svelte:head>
 
 <style>
-  main::-webkit-scrollbar {
+  section::-webkit-scrollbar {
     display: none;
   }
-  main {
+  section {
     scrollbar-width: none;
   }
   div::after {

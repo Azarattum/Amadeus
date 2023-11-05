@@ -15,21 +15,31 @@
 </script>
 
 <Realm>
-  <Gateway name="start" />
-  <div class="flex h-full">
-    <aside><Gateway name="left" /></aside>
-    <div class="grow contain-layout">
-      <slot />
+  <Gateway name="root" />
+  <div class="flex h-[100dvh] max-h-[100dvh] w-[100dvw] max-w-[100dvw]">
+    <aside>
+      <slot name="panel-left" />
+    </aside>
+    <div class="flex grow flex-col contain-strict">
+      <header>
+        <slot name="panel-top" />
+      </header>
+      <main class="relative h-full w-full">
+        <slot />
+      </main>
       <footer
         class="fixed bottom-0 z-50 flex w-full touch-none flex-col-reverse items-center"
       >
-        <Gateway name="bottom" />
+        <slot name="panel-bottom" />
+        <Gateway name="panel" />
       </footer>
     </div>
-    <aside><Gateway name="right" /></aside>
-  </div>
-  <div class="pointer-events-none fixed inset-0 contain-strict">
-    <Gateway name="overlay" />
+    <aside>
+      <slot name="panel-right" />
+    </aside>
+    <div class="pointer-events-none fixed inset-0 contain-strict">
+      <Gateway name="overlay" />
+    </div>
   </div>
 </Realm>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Writable } from "svelte/store";
+  import type { Readable, Writable } from "svelte/store";
+  import { getContext, onDestroy } from "svelte";
   import { uuid } from "../../internal/util";
-  import { getContext } from "svelte";
 
   type Group = {
     id: string;
@@ -15,7 +15,7 @@
   const index = group ? group.i++ % group.size : undefined;
   const value = group?.value;
 
-  export let href: string | undefined = undefined;
+  export let href: string | Readable<string> | undefined = undefined;
   export let id: string | undefined = undefined;
   export let to: string | undefined = undefined;
   export let stretch = !!group;
@@ -26,6 +26,10 @@
   export let round = false;
   export let slim = false;
   export let air = !!group;
+
+  let url: string | undefined;
+  $: if (!href || typeof href === "string") url = href;
+  else onDestroy(href.subscribe((x) => (url = x)));
 
   $: tag = (group || to ? "label" : href ? "a" : "button") as
     | "label"
@@ -48,7 +52,8 @@
     ? "text-white"
     : "text-content-100 hover:text-content";
 
-  $: target = href?.includes("#") ? href?.split("#").pop() : to;
+  $: target =
+    typeof href === "string" && href.includes("#") ? href.split("#").pop() : to;
   $: style = !target
     ? ""
     : `body:has(#${target}:is(:target,:checked)) #${uid}{` +
@@ -65,13 +70,13 @@
 
 <svelte:element
   this={tag}
+  href={url}
   role="button"
   tabindex="0"
   for={to || undefined}
   draggable="false"
   {disabled}
   id={uid}
-  {href}
   on:click
   class="relative flex min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white {text} {background}
   {slim ? '' : 'h-11'}

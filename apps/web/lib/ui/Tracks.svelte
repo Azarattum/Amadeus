@@ -159,7 +159,7 @@
 </div>
 
 {#if $$slots.default || $$slots.action}
-  <Portal to="bottom">
+  <Portal to="panel">
     {#if selected.size}
       <Panel>
         <Stack x>
