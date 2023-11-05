@@ -3,12 +3,13 @@
   import type { IntersectionEvent } from "../../action";
   import { getContext, onMount } from "svelte";
   import { Topbar } from "../../component";
+  import { goto } from "$app/navigation";
 
   export let name: string;
   const tabs = getContext<string[]>("tabs");
   tabs.push(name);
 
-  let section: HTMLElement;
+  let article: HTMLElement;
   let current = false;
   let stuck = false;
 
@@ -16,19 +17,19 @@
     if (tabs.length <= 1) return (current = true);
     current = detail.intersectionRatio > 0.5;
     if (detail.intersectionRatio >= 0.999) {
-      location.replace(`#${name.toLowerCase()}`);
+      goto(`#${name.toLowerCase()}`, { replaceState: true });
     }
   }
 
   onMount(() => {
-    if (location.hash === `#${name.toLowerCase()}`) section.scrollIntoView();
+    if (location.hash === `#${name.toLowerCase()}`) article.scrollIntoView();
   });
 </script>
 
-<section
+<article
   use:intersection={[0, 0.5, 0.999]}
   on:intersect={changed}
-  bind:this={section}
+  bind:this={article}
   use:autoscroll
   id={name.toLowerCase()}
   class="relative z-10 h-full w-full snap-start snap-always overflow-x-hidden overflow-y-scroll"
@@ -39,4 +40,4 @@
 >
   <Topbar title={name} bind:stuck><div class="py-11" /></Topbar>
   <slot />
-</section>
+</article>

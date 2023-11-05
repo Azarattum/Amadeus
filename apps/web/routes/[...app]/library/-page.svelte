@@ -1,8 +1,18 @@
 <script lang="ts">
+  import { Tab, Tabs, Stack, Projection } from "@amadeus-music/ui";
   import { artists, playlists, tracks, search } from "$lib/data";
-  import { Tab, Tabs, Stack } from "@amadeus-music/ui";
   import Overview from "$lib/ui/Overview.svelte";
+  import Playlist from "./playlist/-page.svelte";
+  import Artist from "./artist/-page.svelte";
   import Tracks from "$lib/ui/Tracks.svelte";
+  import { navigating } from "$app/stores";
+  import { goto } from "$app/navigation";
+
+  export let target = false;
+
+  $: if (target && !$navigating && globalThis.location && !location?.hash) {
+    goto("#playlists", { replaceState: true });
+  }
 </script>
 
 <Tabs>
@@ -32,6 +42,14 @@
     </Tracks>
   </Tab>
 </Tabs>
+
+<Projection at="playlist" class="bg-surface" ephemeral>
+  <Playlist />
+</Projection>
+
+<Projection at="artist" class="bg-surface" ephemeral>
+  <Artist />
+</Projection>
 
 <svelte:head>
   <title>Library - Amadeus</title>

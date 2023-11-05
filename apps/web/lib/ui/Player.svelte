@@ -6,14 +6,7 @@
 </script>
 
 <script lang="ts">
-  import {
-    Button,
-    Header,
-    Icon,
-    Portal,
-    Separator,
-    When,
-  } from "@amadeus-music/ui";
+  import { Button, Header, Icon, Separator, tw } from "@amadeus-music/ui";
   import { throttle } from "@amadeus-music/util/async";
   import type { Track } from "@amadeus-music/protocol";
   import Playback from "$lib/ui/Playback.svelte";
@@ -27,6 +20,9 @@
     const progress = currentTime / track.duration;
     if (progress < 1) playback.sync(progress);
   }, 3000);
+
+  let classes = "";
+  export { classes as class };
 
   let track: Track | undefined = undefined;
   let playbackRate = 1;
@@ -63,7 +59,7 @@
 
   function purge() {
     playback.purge(
-      [...selected].map((x) => x.entry).filter((x): x is number => !!x)
+      [...selected].map((x) => x.entry).filter((x): x is number => !!x),
     );
     selected.clear();
     selected = selected;
@@ -89,32 +85,28 @@
   bind:playbackRate
   on:ended={() => ended || (playback.sync(1), (ended = true))}
 />
-<Portal to="right">
-  <When lg>
-    <div class="flex h-screen flex-col border-l border-highlight">
-      <div>
-        <Playback
-          {track}
-          loading={readyState <= 2 && !!src}
-          on:forward={() => (playbackRate = 5)}
-          on:rewind={() => (playbackRate = -5)}
-          on:reset={() => (playbackRate = 1)}
-          bind:currentTime
-          bind:paused
-        />
-        <Header indent sm>Playing Next</Header>
-        <Separator />
-      </div>
-      <div class="grow overflow-y-scroll contain-strict">
-        <Tracks
-          tracks={$upcoming}
-          sm
-          bind:selected
-          on:click={(e) => (e.preventDefault(), skip(e.detail))}
-        >
-          <Button air stretch on:click={purge}><Icon name="trash" /></Button>
-        </Tracks>
-      </div>
-    </div>
-  </When>
-</Portal>
+<div class={tw`flex h-screen flex-col border-l border-highlight ${classes}`}>
+  <div>
+    <Playback
+      {track}
+      loading={readyState <= 2 && !!src}
+      on:forward={() => (playbackRate = 5)}
+      on:rewind={() => (playbackRate = -5)}
+      on:reset={() => (playbackRate = 1)}
+      bind:currentTime
+      bind:paused
+    />
+    <Header indent sm>Playing Next</Header>
+    <Separator />
+  </div>
+  <div class="grow overflow-y-scroll contain-strict">
+    <Tracks
+      tracks={$upcoming}
+      sm
+      bind:selected
+      on:click={(e) => (e.preventDefault(), skip(e.detail))}
+    >
+      <Button air stretch on:click={purge}><Icon name="trash" /></Button>
+    </Tracks>
+  </div>
+</div>

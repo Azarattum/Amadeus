@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { Nav, Button, Icon } from "@amadeus-music/ui";
+  import {
+    Sidenav,
+    Navbar,
+    Spacer,
+    Header,
+    Button,
+    Icon,
+  } from "@amadeus-music/ui";
 
   const icons: Record<string, string> = {
     Home: "house",
@@ -27,7 +34,7 @@
   $: subsection = sections[section][0];
 </script>
 
-<Nav {section}>
+<Sidenav class="hidden sm:flex">
   {#each Object.keys(sections) as x}
     <Button
       air
@@ -39,14 +46,29 @@
       <Icon md name={icons[x]} />{x}
     </Button>
   {/each}
-  <svelte:fragment slot="section">
+  <Spacer />
+  <Button air compact stretch>
+    <Icon md name="settings" />Settings
+  </Button>
+  <svelte:fragment slot="secondary">
+    <Header sm>{section}</Header>
     {#each sections[section] as x}
       <Button air primary={x === subsection} on:click={() => (subsection = x)}>
         <Icon name={icons[x]} />{x}
       </Button>
     {/each}
   </svelte:fragment>
-  <Button air compact stretch slot="bottom">
-    <Icon md name="settings" />Settings
-  </Button>
-</Nav>
+</Sidenav>
+<Navbar class="absolute bottom-0 sm:hidden">
+  {#each Object.keys(sections) as x}
+    <Button
+      air
+      compact
+      stretch
+      primary={x === section}
+      on:click={() => (section = x)}
+    >
+      <Icon md name={icons[x]} />{x}
+    </Button>
+  {/each}
+</Navbar>
