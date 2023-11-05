@@ -21,14 +21,15 @@
     default: fallback,
     class: classes,
     ...props
-  } = $$restProps as Record<string, any> & { default: boolean };
+  } = $$restProps;
 
   const { route, parent } = makeRoute(at);
   const current = getActive();
 
   $: inDOM = keep($current);
-  $: target = $current === $route || (fallback && $current === $parent);
-  $: active = $current.startsWith($route) || (fallback && $current === $parent);
+  $: target = $current === $route || (!!fallback && $current === $parent);
+  $: active =
+    $current.startsWith($route) || (!!fallback && $current === $parent);
 
   /**
    * Defer removing page from DOM when switched to a sibling branch.
