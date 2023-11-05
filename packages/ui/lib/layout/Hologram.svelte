@@ -30,7 +30,7 @@
         if (!nested) nested = `${root}/${target}`;
         if (active.startsWith(target)) {
           nested = `${root}/${active}${hash}`;
-          return root + target;
+          return `${root}/${target}`;
         } else {
           return nested;
         }

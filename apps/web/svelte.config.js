@@ -16,6 +16,13 @@ const config = {
     adapter: adapter({ pages: "../../build/public" }),
     prerender: {
       handleMissingId: "warn",
+      entries: [
+        "/explore/album",
+        "/explore/artist",
+        "/library/artist",
+        "/library/playlist",
+        "*",
+      ],
     },
   },
   vitePlugin: {
