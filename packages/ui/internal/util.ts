@@ -20,7 +20,7 @@ export function isScrollable(element?: HTMLElement | null) {
   if (!element) return false;
   const styles = getComputedStyle(element);
   return /(auto|scroll)/.test(
-    styles.overflow + styles.overflowX + styles.overflowY
+    styles.overflow + styles.overflowX + styles.overflowY,
   );
 }
 
@@ -29,7 +29,7 @@ export function isScrollable(element?: HTMLElement | null) {
  * If none found returns `document.body`.
  */
 export function getScrollParent(element?: HTMLElement | null) {
-  while (!isScrollable(element) && element !== document.body) {
+  while (element && !isScrollable(element) && element !== document.body) {
     element = element?.parentElement;
   }
   return element || document.body;
