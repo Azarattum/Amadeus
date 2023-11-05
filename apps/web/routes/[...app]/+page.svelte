@@ -79,9 +79,15 @@
         </Button>
       {/if} -->
     </svelte:fragment>
-    <Projection at="home" let:target><Home {target} /></Projection>
-    <Projection at="library" let:target><Library {target} /></Projection>
-    <Projection at="explore" let:target><Explore {target} /></Projection>
+    <Projection at="home" let:target>
+      <Home visible={target} />
+    </Projection>
+    <Projection at="library" let:target>
+      <Library visible={target} />
+    </Projection>
+    <Projection at="explore" let:target>
+      <Explore visible={target} />
+    </Projection>
     <Projection at="settings"><Settings /></Projection>
   </Shell>
 </Hologram>

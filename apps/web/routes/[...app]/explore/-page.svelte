@@ -22,7 +22,7 @@
   import History from "./history.svelte";
   import Tracks from "./tracks.svelte";
 
-  export let target = false;
+  export let visible = true;
 
   let type = 0;
 
@@ -35,8 +35,8 @@
     types[type],
   );
 
-  $: target && navigate($page.url.hash.slice(1));
-  $: if (target && !$navigating) {
+  $: visible && navigate($page.url.hash.slice(1));
+  $: if (visible && !$navigating) {
     globalThis.history?.replaceState(null, "", `#${types[type]}/${$query}`);
   }
 
@@ -95,7 +95,7 @@
 </Projection>
 
 <Portal to="panel">
-  <Panel class={target ? "flex" : "hidden"}>
+  <Panel class={visible ? "flex" : "hidden"}>
     <Input
       resettable
       bind:value={$query}

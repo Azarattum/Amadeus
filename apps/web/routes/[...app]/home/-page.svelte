@@ -17,10 +17,10 @@
 
   const hidden = new Set([-3, -4]);
 
-  export let target = false;
+  export let visible = true;
 
   $: devices = $playback.filter((x) => !x.local);
-  $: if (target && !$navigating && globalThis.location && !location?.hash) {
+  $: if (visible && !$navigating && globalThis.location && !location?.hash) {
     goto("#feed", { replaceState: true });
   }
 </script>

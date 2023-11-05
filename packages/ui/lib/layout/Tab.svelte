@@ -5,6 +5,7 @@
   import { Topbar } from "../../component";
   import { goto } from "$app/navigation";
 
+  export let visible = true;
   export let name: string;
   const tabs = getContext<string[]>("tabs");
   tabs.push(name);
@@ -16,7 +17,7 @@
   function changed({ detail }: IntersectionEvent) {
     if (tabs.length <= 1) return (current = true);
     current = detail.intersectionRatio > 0.5;
-    if (detail.intersectionRatio >= 0.999) {
+    if (visible && detail.intersectionRatio >= 0.999) {
       goto(`#${name.toLowerCase()}`, { replaceState: true });
     }
   }

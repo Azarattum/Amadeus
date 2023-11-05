@@ -47,7 +47,7 @@
       {#if style !== "playlist"}
         <Avatar {href} round={style === "artist"} {of} />
       {/if}
-      <Stack class="gap-2">
+      <Stack class="grow-0 gap-2">
         <Header
           xl={style === "playlist"}
           indent={style === "playlist"}

@@ -8,15 +8,15 @@
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
 
-  export let target = false;
+  export let visible = true;
 
-  $: if (target && !$navigating && globalThis.location && !location?.hash) {
+  $: if (visible && !$navigating && globalThis.location && !location?.hash) {
     goto("#playlists", { replaceState: true });
   }
 </script>
 
 <Tabs>
-  <Tab name="Playlists">
+  <Tab name="Playlists" {visible}>
     <Stack class="p-4">
       <Overview
         on:rearrange={({ detail }) =>
@@ -31,12 +31,12 @@
       />
     </Stack>
   </Tab>
-  <Tab name="Artists">
+  <Tab name="Artists" {visible}>
     <Stack class="p-4">
       <Overview style="artist" of={$artists} filter={$search} />
     </Stack>
   </Tab>
-  <Tab name="Timeline">
+  <Tab name="Timeline" {visible}>
     <Tracks tracks={$tracks} timeline fixed class="pt-4">
       <div><!-- /// TODO: add actions --></div>
     </Tracks>
