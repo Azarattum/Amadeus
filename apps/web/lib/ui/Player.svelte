@@ -106,7 +106,7 @@
       on:click={(e) => (e.preventDefault(), skip(e.detail))}
       bind:selected
     >
-      <Button stretch air on:click={purge}><Icon of="trash" /></Button>
+      <Button air on:click={purge}><Icon of="trash" /></Button>
     </Tracks>
   </div>
 </div>

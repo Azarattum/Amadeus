@@ -26,7 +26,7 @@
 
 <Collection of={info} style="playlist" on:edit={edit} bind:selected>
   <Icon of="last" slot="action" />
-  <Button stretch air on:click={purge}><Icon of="trash" /></Button>
+  <Button air on:click={purge}><Icon of="trash" /></Button>
 </Collection>
 
 <svelte:head>

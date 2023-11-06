@@ -31,7 +31,7 @@
   <Input placeholder="Hostname" bind:value={hostname} />
   <Input placeholder="Username" bind:value={username} />
   <Input placeholder="Password" bind:value={password} />
-  <Button primary stretch on:click={login}>Login</Button>
+  <Button primary class="place-content-center" on:click={login}>Login</Button>
 </Stack>
 
 <svelte:head>

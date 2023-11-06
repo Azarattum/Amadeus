@@ -23,7 +23,9 @@
     </Stack>
     <Separator />
     {#each $history.slice(0, 6) as entry}
-      <Button stretch air href="#{type}/{entry.query}">{entry.query}</Button>
+      <Button air href="#{type}/{entry.query}" class="place-content-center">
+        {entry.query}
+      </Button>
     {/each}
   </div>
 {/if}

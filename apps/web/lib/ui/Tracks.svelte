@@ -163,7 +163,9 @@
     {#if selected.size}
       <Panel>
         <Stack x>
-          <slot />
+          <Stack x class="[&>*]:grow">
+            <slot />
+          </Stack>
           <Separator />
           <Button square air on:click={clear}><Icon of="close" /></Button>
         </Stack>

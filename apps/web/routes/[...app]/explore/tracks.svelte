@@ -34,7 +34,7 @@
     on:end
   >
     <Icon of="save" slot="action" />
-    <Button stretch air on:click={() => save(selected)}>
+    <Button air on:click={() => save(selected)}>
       <Icon of="save" />
     </Button>
   </Tracks>
