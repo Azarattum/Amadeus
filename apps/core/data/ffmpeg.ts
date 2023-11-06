@@ -1,4 +1,5 @@
 import type { Meta } from "@amadeus-music/protocol";
+import type { Readable } from "stream";
 import { err } from "../status/log";
 import ffmpeg from "fluent-ffmpeg";
 import { context } from "libfun";
@@ -6,7 +7,7 @@ import { context } from "libfun";
 function reencode(
   url: string,
   metadata: Meta,
-  format: "opus" | "ogg" | "caf" = "opus"
+  format: "opus" | "ogg" | "caf" = "opus",
 ) {
   const artists = metadata.artists?.map((x) => x.title).join(", ");
   let stream = ffmpeg(url).on("error", error);
@@ -23,7 +24,7 @@ function reencode(
   context?.signal?.addEventListener("abort", () => stream.kill("SIGINT"), {
     once: true,
   });
-  return stream.audioCodec("libopus").toFormat(format).pipe();
+  return stream.audioCodec("libopus").toFormat(format).pipe() as Readable;
 }
 
 function resize(url: string, size: number) {
@@ -36,7 +37,7 @@ function resize(url: string, size: number) {
   context?.signal?.addEventListener("abort", () => stream.kill("SIGINT"), {
     once: true,
   });
-  return stream.pipe();
+  return stream.pipe() as Readable;
 }
 
 function error(reason: unknown) {

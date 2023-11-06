@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Checkbox, Icon, Stack } from "@amadeus-music/ui";
+  import { Checkbox, Button, Stack, Icon } from "@amadeus-music/ui";
 
   const props: Record<string, boolean> = {
     primary: false,
@@ -18,8 +18,8 @@
     {/each}
   </Stack>
   <Stack x class="gap-2">
-    <Button {...props}><Icon name="book" />Button With Icon</Button>
+    <Button {...props}><Icon of="book" />Button With Icon</Button>
     <Button {...props}>Just A Button</Button>
-    <Button {...props}><Icon name="last" /></Button>
+    <Button {...props}><Icon of="last" /></Button>
   </Stack>
 </Stack>

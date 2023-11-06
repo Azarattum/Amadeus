@@ -1,4 +1,4 @@
-import type { MediaBase, Track, Album, Artist } from "@amadeus-music/protocol";
+import type { MediaBase, Artist, Track, Album } from "@amadeus-music/protocol";
 import type { Schema } from "../data/schema";
 import { Kysely, sql } from "crstore";
 
@@ -6,18 +6,18 @@ async function pushTracks(db: Kysely<Schema>, tracks: Track[]) {
   if (!tracks.length) return;
   await pushAlbums(
     db,
-    tracks.map((x) => ({ ...x.album, artists: x.artists }))
+    tracks.map((x) => ({ ...x.album, artists: x.artists })),
   );
   await db
     .insertInto("tracks")
     .onConflict((x) => x.doNothing())
     .values(
       tracks.map((x) => ({
-        id: x.id,
-        title: x.title,
         duration: x.duration,
         album: x.album.id,
-      }))
+        title: x.title,
+        id: x.id,
+      })),
     )
     .execute();
   await pushResources(db, tracks);
@@ -27,7 +27,7 @@ async function pushAlbums(db: Kysely<Schema>, albums: Album[]) {
   if (!albums.length) return;
   await pushArtists(
     db,
-    albums.flatMap((x) => x.artists)
+    albums.flatMap((x) => x.artists),
   );
   if (albums.find((x) => x.artists.length)) {
     await db
@@ -38,8 +38,8 @@ async function pushAlbums(db: Kysely<Schema>, albums: Album[]) {
           x.artists.map(({ id }) => ({
             album: x.id,
             artist: id,
-          }))
-        )
+          })),
+        ),
       )
       .execute();
   }
@@ -48,10 +48,10 @@ async function pushAlbums(db: Kysely<Schema>, albums: Album[]) {
     .onConflict((x) => x.doNothing())
     .values(
       albums.map((x) => ({
-        id: x.id,
         title: x.title,
         year: x.year,
-      }))
+        id: x.id,
+      })),
     )
     .execute();
   await pushResources(db, albums);
@@ -64,10 +64,10 @@ async function pushArtists(db: Kysely<Schema>, artists: Artist[]) {
     .onConflict((x) => x.doNothing())
     .values(
       artists.map((artist) => ({
-        id: artist.id,
         title: artist.title,
+        id: artist.id,
         following: 0,
-      }))
+      })),
     )
     .execute();
   await pushResources(db, artists);
@@ -75,7 +75,7 @@ async function pushArtists(db: Kysely<Schema>, artists: Artist[]) {
 
 async function pushResources(
   db: Kysely<Schema>,
-  resources: (MediaBase & { id: number })[]
+  resources: (MediaBase & { id: number })[],
 ) {
   if (!resources.length) return;
   if (resources.find((x) => x.sources.length)) {
@@ -83,15 +83,15 @@ async function pushResources(
       .insertInto("sources")
       .onConflict((x) => x.doNothing())
       .values(
-        resources.flatMap(({ id, sources }) =>
+        resources.flatMap(({ sources, id }) =>
           sources.map((source, i) => ({
-            owner: id,
-            source,
             primary:
               +!i &&
               sql`NOT EXISTS (SELECT 1 FROM sources WHERE owner = ${id} AND "primary" = 1)`,
-          }))
-        )
+            owner: id,
+            source,
+          })),
+        ),
       )
       .execute();
   }
@@ -101,20 +101,20 @@ async function pushResources(
     .insertInto("assets")
     .onConflict((x) => x.doNothing())
     .values(
-      resources.flatMap(({ id, arts, thumbnails }) => {
+      resources.flatMap(({ thumbnails, arts, id }) => {
         if (!arts) return [];
         const primaryAsset = arts.find((_, i) => !!thumbnails?.[i]) || arts[0];
         return arts.map((art, i) => ({
-          owner: id,
-          art,
-          thumbnail: thumbnails?.[i],
           primary:
             +(art === primaryAsset) &&
             sql`NOT EXISTS (SELECT 1 FROM assets WHERE owner = ${id} AND "primary" = 1)`,
+          thumbnail: thumbnails?.[i],
+          owner: id,
+          art,
         }));
-      })
+      }),
     )
     .execute();
 }
 
-export { pushTracks, pushAlbums, pushArtists, pushResources };
+export { pushResources, pushArtists, pushTracks, pushAlbums };

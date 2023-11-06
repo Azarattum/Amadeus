@@ -11,7 +11,7 @@ import { bright, async, reset, Feed, arg } from "@amadeus-music/core";
 import { delay } from "@amadeus-music/util/async";
 import { suggest } from "./recommendation";
 
-init(function* ({ feed: { chunk, recommendations } }) {
+init(function* ({ feed: { recommendations, chunk } }) {
   const interval = day / (recommendations / chunk);
   const from = new Date();
   from.setMinutes(0, 0, 0);

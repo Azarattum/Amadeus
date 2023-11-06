@@ -26,7 +26,7 @@ message(function* (text) {
   }
   yield* persistence(this.user).history.log(text);
 
-  const [id] = yield* this.reply({ page: text, icon: icon.search });
+  const [id] = yield* this.reply({ icon: icon.search, page: text });
   const page = pages.get(id);
   if (!page) return;
 
@@ -61,7 +61,7 @@ post(function* (meta, chat) {
 
 voice(function* (url) {
   info(`${this.name} requested an audio recognition...`);
-  const [id] = yield* this.reply({ page: "Recognition", icon: icon.recognize });
+  const [id] = yield* this.reply({ icon: icon.recognize, page: "Recognition" });
   const page = pages.get(id);
   if (!page) return;
   this.signal.addEventListener("abort", page.close, { once: true });

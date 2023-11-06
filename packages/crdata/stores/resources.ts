@@ -19,16 +19,6 @@ export const resources = ({ replicated }: DB) =>
         ])
         .$castTo<MediaBase>(),
     {
-      async prioritize(db, type: "art" | "source", resource: string) {
-        const table = type === "art" ? "assets" : "sources";
-        await db
-          .updateTable(table)
-          .set({ primary: sql`${sql.ref(type)} = ${resource}` })
-          .where("owner", "=", (qb) =>
-            qb.selectFrom(table).where(type, "=", resource).select("owner"),
-          )
-          .execute();
-      },
       get(db, owner: number) {
         return db
           .with("source", source)
@@ -45,6 +35,16 @@ export const resources = ({ replicated }: DB) =>
           .where("source.owner", "=", owner)
           .$castTo<MediaBase>()
           .executeTakeFirstOrThrow();
+      },
+      async prioritize(db, type: "source" | "art", resource: string) {
+        const table = type === "art" ? "assets" : "sources";
+        await db
+          .updateTable(table)
+          .set({ primary: sql`${sql.ref(type)} = ${resource}` })
+          .where("owner", "=", (qb) =>
+            qb.selectFrom(table).where(type, "=", resource).select("owner"),
+          )
+          .execute();
       },
     },
   );

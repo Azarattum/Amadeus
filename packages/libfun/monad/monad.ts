@@ -17,16 +17,30 @@ import { errorify } from "../utils/error";
 
 const empty = Symbol();
 const nothing = [empty] as const;
-type Nothing = typeof empty | typeof nothing;
+type Nothing = typeof nothing | typeof empty;
 
 const error = Symbol();
 const state = Symbol();
 
 function monad<F extends Transform = Identity>(
   transformer: Wrapper<F> = (value, fn) => fn(value),
-  extensions: Extensions<F> = {}
+  extensions: Extensions<F> = {},
 ) {
   const proto: Monad<unknown, [F]> = {
+    expose(): any {
+      try {
+        const data = unwrap(this[state]);
+        if (thenable(data)) {
+          return data.then(
+            (x) => ({ data: x }),
+            (e) => ({ error: invalidate(e)[error] }),
+          );
+        }
+        return { data };
+      } catch (reason) {
+        return { error: invalidate(reason)[error] };
+      }
+    },
     then(resolve, reject): any {
       if (native(reject) && native(resolve)) {
         try {
@@ -39,34 +53,20 @@ function monad<F extends Transform = Identity>(
 
       return create(transform(this[state], resolve, reject, transformer));
     },
-    catch(reject): any {
-      return this.then((x) => x, reject);
-    },
     finally(handler): any {
       return this.then(
         (x) => (queueMicrotask(handler || (() => {})), x),
         (x) => {
           queueMicrotask(handler || (() => {}));
           throw x;
-        }
+        },
       );
+    },
+    catch(reject): any {
+      return this.then((x) => x, reject);
     },
     unwrap(fallback) {
       return unwrap(this[state], fallback);
-    },
-    expose(): any {
-      try {
-        const data = unwrap(this[state]);
-        if (thenable(data)) {
-          return data.then(
-            (x) => ({ data: x }),
-            (e) => ({ error: invalidate(e)[error] })
-          );
-        }
-        return { data };
-      } catch (reason) {
-        return { error: invalidate(reason)[error] };
-      }
     },
     get [Symbol.toStringTag]() {
       return "Monad";
@@ -103,8 +103,8 @@ function all<T extends readonly any[]>(values: T) {
 }
 
 function unwrap<T, U = never, F extends Transform[] = [Identity]>(
-  value: Monad<T, F> | PromiseLike<T> | T,
-  fallback?: U
+  value: PromiseLike<T> | Monad<T, F> | T,
+  fallback?: U,
 ): Unwrapped<F, T> | Promised<F, U> {
   if (unwrappable(value)) value = value.unwrap(fallback) as any;
   if (thenable(value)) {
@@ -113,7 +113,7 @@ function unwrap<T, U = never, F extends Transform[] = [Identity]>(
       (e) => {
         if (fallback !== undefined) return fallback;
         throw e;
-      }
+      },
     ) as any;
   }
 
@@ -128,7 +128,7 @@ function transform<T, F extends Transform = Identity>(
   value: T,
   resolve?: Resolve<T>,
   reject?: Reject,
-  transformer: Wrapper<F> = (value, fn) => fn(value)
+  transformer: Wrapper<F> = (value, fn) => fn(value),
 ) {
   return apply(
     (value) => {
@@ -141,13 +141,13 @@ function transform<T, F extends Transform = Identity>(
       } catch (reason) {
         return invalidate(reason);
       }
-    }
+    },
   )(value);
 }
 
 function apply<T, U, F extends Transform>(
   resolve: Resolve<Wrapped<[F], T>, U>,
-  reject: Reject
+  reject: Reject,
 ) {
   return function next(value: any): any {
     if (thenable(value)) return value.then(next, reject);
@@ -187,5 +187,5 @@ function invalidate(what: unknown): { [error]: Error } {
   return { [error]: errorify(what) };
 }
 
-export { monad, all, unwrap, transform, state, nothing };
+export { transform, nothing, unwrap, monad, state, all };
 export type { Transform as Monad, Nothing };

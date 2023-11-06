@@ -4,18 +4,8 @@ import { platform } from "os";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  preprocess: vitePreprocess(),
   kit: {
-    files: {
-      lib: "lib",
-      routes: "routes",
-      serviceWorker: "./cache.worker.ts",
-      appTemplate: "routes/+layout.html",
-    },
-
-    adapter: adapter({ pages: "../../build/public" }),
     prerender: {
-      handleMissingId: "warn",
       entries: [
         "/explore/album",
         "/explore/artist",
@@ -23,7 +13,15 @@ const config = {
         "/library/playlist",
         "*",
       ],
+      handleMissingId: "warn",
     },
+    files: {
+      serviceWorker: "./cache.worker.ts",
+      appTemplate: "routes/+layout.html",
+      routes: "routes",
+      lib: "lib",
+    },
+    adapter: adapter({ pages: "../../build/public" }),
   },
   vitePlugin: {
     inspector: {
@@ -31,6 +29,7 @@ const config = {
         platform() === "darwin" ? "meta-shift-x" : "control-shift-x",
     },
   },
+  preprocess: vitePreprocess(),
 };
 
 export default config;

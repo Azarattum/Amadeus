@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Header, Button, Icon } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
-  import { library, playlists } from "$lib/data";
+  import { playlists, library } from "$lib/data";
   import Tracks from "$lib/ui/Tracks.svelte";
 
   export let local: Track[];
@@ -9,7 +9,7 @@
 
   let selected = new Set<Track>();
 
-  function save(tracks: Track[] | Set<Track>) {
+  function save(tracks: Set<Track> | Track[]) {
     library.push([...tracks], $playlists[0].id);
     if (tracks == selected) {
       selected.clear();
@@ -20,22 +20,22 @@
 
 {#if local.length}
   <div class="pt-4">
-    <Header sm indent>Library</Header>
-    <Tracks fixed tracks={local}><Icon name="last" slot="action" /></Tracks>
+    <Header indent sm>Library</Header>
+    <Tracks fixed tracks={local}><Icon of="last" slot="action" /></Tracks>
   </div>
 {/if}
 <div class="pt-4">
-  <Header sm indent>Search</Header>
+  <Header indent sm>Search</Header>
   <Tracks
     fixed
-    on:end
-    bind:selected
     tracks={remote}
     on:action={({ detail }) => save([detail])}
+    bind:selected
+    on:end
   >
-    <Icon name="save" slot="action" />
-    <Button air stretch on:click={() => save(selected)}>
-      <Icon name="save" />
+    <Icon of="save" slot="action" />
+    <Button stretch air on:click={() => save(selected)}>
+      <Icon of="save" />
     </Button>
   </Tracks>
 </div>

@@ -1,8 +1,8 @@
-import { source, asset, artist, track, album } from "../operations/cte";
-import type { Artist, ArtistBase } from "@amadeus-music/protocol";
+import { source, artist, asset, track, album } from "../operations/cte";
+import type { ArtistBase, Artist } from "@amadeus-music/protocol";
 import { pushArtists } from "../operations/push";
 import { sanitize } from "../operations/utils";
-import { json, groupJSON } from "crstore";
+import { groupJSON, json } from "crstore";
 import type { DB } from "../data/schema";
 
 export const artists = ({ replicated }: DB) =>
@@ -28,20 +28,20 @@ export const artists = ({ replicated }: DB) =>
           "artist.sources",
           (qb) =>
             json(qb, {
-              size: qb.fn.count<number>("track.duration"),
+              tracks: groupJSON(qb, {
+                duration: "track.duration",
+                artists: "track.artists",
+                sources: "track.sources",
+                title: "track.title",
+                album: "track.album",
+                entry: "track.id",
+                id: "track.id",
+              }).filterWhere("track.id", "is not", null),
               duration: qb.fn.coalesce(
                 qb.fn.sum<number>("track.duration"),
                 qb.val(0),
               ),
-              tracks: groupJSON(qb, {
-                id: "track.id",
-                entry: "track.id",
-                title: "track.title",
-                duration: "track.duration",
-                album: "track.album",
-                artists: "track.artists",
-                sources: "track.sources",
-              }).filterWhere("track.id", "is not", null),
+              size: qb.fn.count<number>("track.duration"),
             }).as("collection"),
         ])
         .groupBy("artist.id")
@@ -49,26 +49,6 @@ export const artists = ({ replicated }: DB) =>
         .orderBy("artist.title")
         .$castTo<Artist & { collection: { tracks: { entry: number }[] } }>(),
     {
-      async push(db, artists: Artist[]) {
-        await pushArtists(db, artists);
-      },
-      async edit(db, id: number, artist: Partial<ArtistBase>) {
-        await db.updateTable("artists").where("id", "=", id).set(artist);
-      },
-      async follow(db, id: number) {
-        await db
-          .updateTable("artists")
-          .set({ following: 1 })
-          .where("id", "=", id)
-          .execute();
-      },
-      async unfollow(db, id: number) {
-        await db
-          .updateTable("artists")
-          .set({ following: 0 })
-          .where("id", "=", id)
-          .execute();
-      },
       async search(db, query: string, limit = 10, offset = 0) {
         if (!query) return [];
         return db
@@ -95,6 +75,26 @@ export const artists = ({ replicated }: DB) =>
           .selectAll()
           .$castTo<Artist>()
           .executeTakeFirstOrThrow();
+      },
+      async unfollow(db, id: number) {
+        await db
+          .updateTable("artists")
+          .set({ following: 0 })
+          .where("id", "=", id)
+          .execute();
+      },
+      async follow(db, id: number) {
+        await db
+          .updateTable("artists")
+          .set({ following: 1 })
+          .where("id", "=", id)
+          .execute();
+      },
+      async edit(db, id: number, artist: Partial<ArtistBase>) {
+        await db.updateTable("artists").where("id", "=", id).set(artist);
+      },
+      async push(db, artists: Artist[]) {
+        await pushArtists(db, artists);
       },
     },
   );

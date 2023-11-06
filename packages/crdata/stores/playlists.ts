@@ -1,6 +1,6 @@
-import { source, asset, artist, album, track } from "../operations/cte";
-import { identify, type Playlist } from "@amadeus-music/protocol";
-import { APPEND, groupJSON, json } from "crstore";
+import { source, artist, asset, album, track } from "../operations/cte";
+import { type Playlist, identify } from "@amadeus-music/protocol";
+import { groupJSON, APPEND, json } from "crstore";
 import type { DB } from "../data/schema";
 
 export const playlists = ({ replicated }: DB) =>
@@ -29,20 +29,20 @@ export const playlists = ({ replicated }: DB) =>
           "playlists.remote",
           (qb) =>
             json(qb, {
-              size: qb.fn.count<number>("track.duration"),
+              tracks: groupJSON(qb, {
+                duration: "track.duration",
+                artists: "track.artists",
+                sources: "track.sources",
+                entry: "track.entry",
+                title: "track.title",
+                album: "track.album",
+                id: "track.id",
+              }).filterWhere("track.id", "is not", null),
               duration: qb.fn.coalesce(
                 qb.fn.sum<number>("track.duration"),
                 qb.val(0),
               ),
-              tracks: groupJSON(qb, {
-                id: "track.id",
-                entry: "track.entry",
-                title: "track.title",
-                duration: "track.duration",
-                album: "track.album",
-                artists: "track.artists",
-                sources: "track.sources",
-              }).filterWhere("track.id", "is not", null),
+              size: qb.fn.count<number>("track.duration"),
             }).as("collection"),
         ])
         .groupBy("playlists.id")
@@ -62,13 +62,6 @@ export const playlists = ({ replicated }: DB) =>
           })
           .execute();
       },
-      async edit(db, id: number, playlist: Partial<Playlist>) {
-        await db
-          .updateTable("playlists")
-          .where("id", "=", id)
-          .set(playlist)
-          .execute();
-      },
       async rearrange(db, id: number, after?: number) {
         await db
           .updateTable("playlists_fractindex" as any)
@@ -76,8 +69,12 @@ export const playlists = ({ replicated }: DB) =>
           .where("id", "=", id)
           .execute();
       },
-      async delete(db, id: number) {
-        await db.deleteFrom("playlists").where("id", "=", id).execute();
+      async edit(db, id: number, playlist: Partial<Playlist>) {
+        await db
+          .updateTable("playlists")
+          .where("id", "=", id)
+          .set(playlist)
+          .execute();
       },
       get(db, id: number) {
         return db
@@ -85,6 +82,9 @@ export const playlists = ({ replicated }: DB) =>
           .selectAll()
           .where("id", "=", id)
           .executeTakeFirstOrThrow();
+      },
+      async delete(db, id: number) {
+        await db.deleteFrom("playlists").where("id", "=", id).execute();
       },
     },
   );

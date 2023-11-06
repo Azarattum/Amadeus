@@ -1,9 +1,9 @@
-import { cancel, thenable } from "../utils/async";
+import { thenable, cancel } from "../utils/async";
 import type { Task } from "./pool.types";
 import { handle } from "../utils/error";
 
 const passthrough = Symbol();
-type SomeIterator<T = any> = Iterator<T> | AsyncIterator<T>;
+type SomeIterator<T = any> = AsyncIterator<T> | Iterator<T>;
 type Passthrough<T> = PromiseLike<T> & { [passthrough]: true };
 type Iterated<T extends SomeIterator, One = false> = T extends AsyncIterator<
   infer U
@@ -35,7 +35,7 @@ async function* wrap<T, U>(
   signal?: AbortSignal,
   group?: string,
   catcher?: (error: Error) => void,
-  name?: string
+  name?: string,
 ) {
   try {
     for (let value, done; ; ) {
@@ -70,7 +70,7 @@ async function* wrap<T, U>(
 
 function* map<T, M = T, R = void>(
   iterator: AsyncIterator<T>,
-  map?: (item: T) => Generator<M, R>
+  map?: (item: T) => Generator<M, R>,
 ) {
   const all: R[] = [];
   for (let value, done; ; ) {
@@ -80,7 +80,7 @@ function* map<T, M = T, R = void>(
     const mapped = wrap(
       (map || reyield)(value as T),
       context.signal,
-      context.group
+      context.group,
     );
     for (let value, done; !done; ) {
       ({ value, done } = yield* async(mapped.next()));
@@ -91,7 +91,7 @@ function* map<T, M = T, R = void>(
 }
 
 function generate<T>(
-  value: T
+  value: T,
 ): T extends Generator<any> ? T : Generator<T, void> {
   if (value && typeof value === "object" && Symbol.iterator in value) {
     return value as any;
@@ -105,7 +105,7 @@ function reuse<T>(
   generator: () => AsyncGenerator<T>,
   cache: Map<string, T[]>,
   key: string,
-  limit: number
+  limit: number,
 ): AsyncGenerator<T> {
   if (limit <= 0) return generator();
   let cached = cache.get(key);
@@ -128,14 +128,14 @@ function reuse<T>(
 
 async function* merge<T, U>(
   iterators: SomeIterator<T>[],
-  task: Partial<Task> = {}
+  task: Partial<Task> = {},
 ) {
   const never = new Promise<any>(() => {});
 
   function next(iterator: SomeIterator<T>, index: number) {
     return Promise.resolve(iterator.next()).then((result) => ({
-      index,
       result,
+      index,
     }));
   }
 
@@ -148,7 +148,7 @@ async function* merge<T, U>(
     }
   }
   task.tasks?.forEach(({ controller }) =>
-    controller.signal.addEventListener("abort", complete, { once: true })
+    controller.signal.addEventListener("abort", complete, { once: true }),
   );
 
   const results: U[] = [];
@@ -156,7 +156,7 @@ async function* merge<T, U>(
   try {
     let { length } = iterators;
     while (length) {
-      const { index, result } = await Promise.race(promises);
+      const { result, index } = await Promise.race(promises);
       if (result.done) {
         promises[index] = never;
         results[index] = result.value;
@@ -175,7 +175,7 @@ async function* merge<T, U>(
 
 function take<T extends SomeIterator>(
   iterator: T,
-  limit = Infinity
+  limit = Infinity,
 ): Iterated<T> {
   if (Symbol.iterator in iterator) {
     let i = 0;
@@ -200,7 +200,7 @@ function take<T extends SomeIterator>(
 
 function first<T extends SomeIterator>(
   iterator: T,
-  close = true
+  close = true,
 ): Iterated<T, true> {
   if (Symbol.iterator in iterator) {
     const { value, done } = (iterator as any).next();
@@ -226,5 +226,5 @@ function passable(value: any) {
   );
 }
 
-export { wrap, merge, take, first, async, map, context, generate, reuse };
+export { generate, context, merge, first, async, reuse, wrap, take, map };
 export type { Passthrough };

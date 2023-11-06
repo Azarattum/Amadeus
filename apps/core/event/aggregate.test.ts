@@ -1,4 +1,4 @@
-import { async, first, pools, type Mapped } from "libfun";
+import { type Mapped, async, first, pools } from "libfun";
 import { delay } from "@amadeus-music/util/async";
 import type { Page } from "../data/pagination";
 import { aggregate } from "./aggregate";

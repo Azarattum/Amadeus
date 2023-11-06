@@ -1,6 +1,6 @@
-import { persistence, stop, users, err } from "./plugin";
-import { existsSync, mkdirSync, readdirSync } from "fs";
-import { close, connect } from "@amadeus-music/crdata";
+import { persistence, users, stop, err } from "./plugin";
+import { readdirSync, existsSync, mkdirSync } from "fs";
+import { connect, close } from "@amadeus-music/crdata";
 import { async, path } from "@amadeus-music/core";
 
 persistence(function* (user = "shared") {
@@ -24,7 +24,7 @@ users(function* () {
     .map(async (filename) => {
       const { settings } = connect({ name: path(`users/${filename}`), paths });
       const data = await settings
-        .then((x) => x.map(({ key, value }) => [key, value]))
+        .then((x) => x.map(({ value, key }) => [key, value]))
         .then(Object.fromEntries);
 
       return [filename.replace(".db", ""), data] as const;

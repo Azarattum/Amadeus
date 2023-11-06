@@ -1,4 +1,4 @@
-import { lock, unlock } from "../../internal/touch";
+import { unlock, lock } from "../../internal/touch";
 
 /**
  * Polyfills drag events to make them isomorphic
@@ -6,7 +6,7 @@ import { lock, unlock } from "../../internal/touch";
  */
 export function drag(
   node: HTMLElement,
-  trigger = "touchstart" as "touchstart" | "hold"
+  trigger = "touchstart" as "touchstart" | "hold",
 ) {
   function draggable(target: HTMLElement | null) {
     do {

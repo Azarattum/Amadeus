@@ -1,4 +1,4 @@
-import { info, procedure, transcribe as transcribeOf } from "../plugin";
+import { transcribe as transcribeOf, procedure, info } from "../plugin";
 import { format, track } from "@amadeus-music/protocol";
 import { first } from "@amadeus-music/core";
 

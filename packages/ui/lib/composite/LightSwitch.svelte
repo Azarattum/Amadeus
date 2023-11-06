@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script context="module" lang="ts">
   import { writable } from "svelte/store";
   export const flipped = writable(false);
 </script>
@@ -47,8 +47,8 @@
 </script>
 
 <Checkbox target="light-switch" class={classes}>
-  <Icon name="sun" />
-  <Icon name="moon" slot="after" />
+  <Icon of="sun" />
+  <Icon of="moon" slot="after" />
 </Checkbox>
 <Portal to="root" unique="light-switch">
   <input class="absolute appearance-none" id="light-switch" type="checkbox" />

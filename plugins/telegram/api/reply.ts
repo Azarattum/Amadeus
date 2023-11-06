@@ -4,14 +4,14 @@ import {
   sendMessage,
   sendAudio,
 } from "./methods";
-import { async, first, map, type Pool } from "@amadeus-music/core";
-import type { Message, Queue, Replier } from "../types/reply";
-import { desource, info, persistence, pool } from "../plugin";
+import { type Pool, async, first, map } from "@amadeus-music/core";
+import type { Message, Replier, Queue } from "../types/reply";
+import { persistence, desource, info, pool } from "../plugin";
 import { bright, reset } from "@amadeus-music/util/color";
 import type { Track } from "@amadeus-music/protocol";
 import { pretty } from "@amadeus-music/util/object";
 import { format } from "@amadeus-music/protocol";
-import { menu, markdown } from "./markup";
+import { markdown, menu } from "./markup";
 import { sendPage } from "./pages";
 
 function notifier(chat: number) {
@@ -52,10 +52,10 @@ function* queue(
     info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
     promises.push(
       pool({
-        url,
-        track,
-        mode: markdown(),
         markup: !group ? menu(track.id) : undefined,
+        mode: markdown(),
+        track,
+        url,
       }).then((x) => (setTimeout(() => done || notifier(), 10), x)),
     );
   }
@@ -132,4 +132,4 @@ function editor(chat: number) {
   };
 }
 
-export { replier, editor, paramify };
+export { paramify, replier, editor };

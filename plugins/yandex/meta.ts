@@ -2,15 +2,15 @@ import { randomUUID } from "crypto";
 
 const auth = {
   event: {
-    header: {
-      messageId: randomUUID(),
-      name: "SynchronizeState",
-      namespace: "System",
-    },
     payload: {
-      accept_invalid_auth: true,
       auth_token: "5983ba91-339e-443c-8452-390fe7d9d308",
+      accept_invalid_auth: true,
       uuid: randomUUID(),
+    },
+    header: {
+      name: "SynchronizeState",
+      messageId: randomUUID(),
+      namespace: "System",
     },
   },
 };
@@ -19,10 +19,10 @@ let streams = -1;
 const header = () => ({
   event: {
     header: {
+      streamId: (streams += 2),
       messageId: randomUUID(),
       name: "Recognize",
       namespace: "ASR",
-      streamId: (streams += 2),
     },
     payload: {
       music_request2: {
@@ -63,4 +63,4 @@ const transform = (id: number) => {
   });
 };
 
-export { header, auth, transform };
+export { transform, header, auth };

@@ -1,12 +1,12 @@
 import {
-  any,
+  type Infer,
   instance,
-  object,
   optional,
+  object,
   record,
   string,
   Struct,
-  type Infer,
+  any,
 } from "superstruct";
 import type { PoolMaker } from "libfun/pool/pool.types";
 import type { User } from "../event/persistence.types";
@@ -14,11 +14,11 @@ import type { Config } from "../data/config";
 import type { Pool } from "libfun";
 
 const pluginInfo = object({
-  name: string(),
-  version: string(),
+  settings: optional(record(string(), instance(Struct<any, null>))),
   config: optional(record(string(), instance(Struct<any>))),
   context: optional(record(string(), any())),
-  settings: optional(record(string(), instance(Struct<any, null>))),
+  version: string(),
+  name: string(),
 });
 
 type RecordStruct = Record<string, Struct<any>> | undefined;
@@ -31,18 +31,18 @@ type InferMap<T> = T extends Record<string, Struct<any>>
 type Plugin<
   T extends RecordStruct = RecordStruct,
   S extends RecordStruct = RecordStruct,
-  C extends Record<string, any> = Record<string, any>
+  C extends Record<string, any> = Record<string, any>,
 > = Infer<typeof pluginInfo> & {
-  config?: T;
-  context?: C;
   settings?: S;
+  context?: C;
+  config?: T;
 };
 
 type Configure<
   T extends Record<string, any>,
   U extends RecordStruct,
   S extends RecordStruct,
-  C extends Record<string, any>
+  C extends Record<string, any>,
 > = {
   [K in keyof T]: K extends "init"
     ? Pool<(config: Config & InferMap<U>) => void, C>
@@ -59,7 +59,7 @@ type Configure<
     : T[K];
 };
 
-type Context = void | { group?: string };
+type Context = { group?: string } | void;
 
 export { pluginInfo };
-export type { Plugin, RecordStruct, Configure, Context };
+export type { RecordStruct, Configure, Context, Plugin };

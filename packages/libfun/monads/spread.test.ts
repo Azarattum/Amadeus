@@ -1,4 +1,4 @@
-import { unwrap, nothing } from "..";
+import { nothing, unwrap } from "..";
 import { expect, it } from "vitest";
 import { spread } from ".";
 

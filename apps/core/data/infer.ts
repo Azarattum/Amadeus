@@ -21,8 +21,8 @@ const separators = [
 
 function unbrace(text: string) {
   const result = {
-    clean: "",
     parts: [] as string[],
+    clean: "",
   };
 
   const opening = "[({【「";
@@ -114,7 +114,7 @@ function isGenre(text: string, strict = false) {
 
   if (strict) return genres.some((x: string) => x.toLowerCase() === text);
   return genres.some((x: string) =>
-    text.match(new RegExp(r`(\s|^)${x.toLowerCase()}(\s|$)`))
+    text.match(new RegExp(r`(\s|^)${x.toLowerCase()}(\s|$)`)),
   );
 }
 
@@ -172,12 +172,12 @@ function toArtist(text: string) {
 
   const regexes = [];
   regexes.push(
-    ...postfixes.map((x) => new RegExp(r`^(?<artist>.*?)\s+${x}(\b|$)`, "i"))
+    ...postfixes.map((x) => new RegExp(r`^(?<artist>.*?)\s+${x}(\b|$)`, "i")),
   );
   regexes.push(
     ...prefixes.map(
-      (x) => new RegExp(r`(^|\b)${x}(\s+by)?\s+(?<artist>.*?)$`, "i")
-    )
+      (x) => new RegExp(r`(^|\b)${x}(\s+by)?\s+(?<artist>.*?)$`, "i"),
+    ),
   );
 
   const artists = [];
@@ -203,7 +203,7 @@ function inferArtists(text?: string) {
       text
         .split(joins)
         .map((x) => trim(x))
-        .filter((x) => x)
+        .filter((x) => x),
     ),
   ];
 }
@@ -279,11 +279,11 @@ function inferTrack(text: string, artistless = false) {
   if (meta.length) title += ` (${meta.join(", ")})`;
 
   return {
-    title,
     artists,
+    title,
     album,
     year,
   };
 }
 
-export { inferTrack, inferArtists };
+export { inferArtists, inferTrack };

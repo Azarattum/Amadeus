@@ -1,11 +1,11 @@
 import type {
-  Database,
-  Method,
   Persistence,
+  Database,
   Strategy,
+  Method,
   User,
 } from "./persistence.types";
-import type { Reject, Resolve } from "libfun/monad/monad.types";
+import type { Resolve, Reject } from "libfun/monad/monad.types";
 import { persistence as database, users as load } from "./pool";
 import type { Handler } from "libfun/pool/pool.types";
 import { all } from "@amadeus-music/util/async";
@@ -51,7 +51,7 @@ const strategies: { [K in Method]?: Strategy } = {
 
 function persistence(this: Context, user?: string): Persistence;
 function persistence(this: Context, pool: Handler<() => Database>): void;
-function persistence(this: Context, arg?: string | Handler<() => Database>) {
+function persistence(this: Context, arg?: Handler<() => Database> | string) {
   if (typeof arg === "function") return database.bind(this)(arg);
   const group = this?.group || "settings";
   const connect = () => async(database.bind(this)(arg).then());
@@ -62,7 +62,7 @@ function persistence(this: Context, arg?: string | Handler<() => Database>) {
       const dbs = yield* connect();
       const fns = dbs
         .map<(..._: any[]) => Promise<unknown>>((x: any) =>
-          method ? x[scope]?.[method] : x[scope]
+          method ? x[scope]?.[method] : x[scope],
         )
         .filter((x) => x);
       if (!fns.length) throw new Error(`${target} is not implemented!`);
@@ -99,7 +99,7 @@ function persistence(this: Context, arg?: string | Handler<() => Database>) {
         new Proxy((...args: any[]) => resolve(scope)(...args), {
           get: (_, method: string) => resolve(scope, method),
         }),
-    }
+    },
   ) as Persistence;
 }
 
@@ -107,7 +107,7 @@ function users(this: Context): Promise<Record<string, User>>;
 function users(this: Context, pool: Handler<() => Record<string, User>>): void;
 async function users(
   this: Context,
-  pool?: Handler<() => Record<string, User>>
+  pool?: Handler<() => Record<string, User>>,
 ) {
   if (pool) return load.bind(this)(pool);
   const results = load.bind(this)();

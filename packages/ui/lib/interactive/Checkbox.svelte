@@ -25,8 +25,8 @@
   <div class="relative">
     {#if !target}
       <input
-        type="checkbox"
         class="peer pointer-events-none absolute h-full w-full appearance-none rounded-2xl outline-2 outline-primary-600 focus-visible:outline"
+        type="checkbox"
         {...$$restProps}
         {id}
         bind:checked

@@ -1,5 +1,5 @@
-import type { Album, Artist, Track } from "@amadeus-music/protocol";
-import { group, json, groupJSON } from "crstore";
+import type { Artist, Album, Track } from "@amadeus-music/protocol";
+import { groupJSON, group, json } from "crstore";
 import type { Schema } from "../data/schema";
 import type { QueryCreator } from "crstore";
 
@@ -64,11 +64,11 @@ const album = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE>) =>
       (qb) => qb.fn.coalesce("source.sources", qb.val("[]")).as("sources"),
       (qb) =>
         groupJSON(qb, {
-          id: "artist.id",
-          title: "artist.title",
-          arts: "artist.arts",
           thumbnails: "artist.thumbnails",
           sources: "artist.sources",
+          title: "artist.title",
+          arts: "artist.arts",
+          id: "artist.id",
         })
           .filterWhere("artist.id", "is not", null)
           .as("artists"),
@@ -89,23 +89,23 @@ const track = (qc: QueryCreator<Schema & ResourceCTE & ArtistCTE & AlbumCTE>) =>
       (qb) => qb.fn.coalesce("source.sources", qb.val("[]")).as("sources"),
       (qb) =>
         json(qb, {
-          id: "album.id",
+          thumbnails: "album.thumbnails",
+          sources: "album.sources",
           title: "album.title",
           year: "album.year",
           arts: "album.arts",
-          thumbnails: "album.thumbnails",
-          sources: "album.sources",
+          id: "album.id",
         }).as("album"),
     ])
     .$castTo<TrackCTE["track"]>();
 
 type AssetCTE = {
-  asset: { owner: number; arts: string[]; thumbnails: string[] };
+  asset: { thumbnails: string[]; arts: string[]; owner: number };
 };
-type SourceCTE = { source: { owner: number; sources: string[] } };
+type SourceCTE = { source: { sources: string[]; owner: number } };
 type ResourceCTE = AssetCTE & SourceCTE;
 type ArtistCTE = { artist: Omit<Artist, "collection"> };
 type AlbumCTE = { album: Omit<Album, "collection"> };
 type TrackCTE = { track: Omit<Track, "entry"> };
 
-export { source, asset, artist, album, track };
+export { source, artist, asset, album, track };

@@ -8,17 +8,17 @@ module.exports = plugin.withOptions(
         ({ modifySelectors }) => (
           modifySelectors(
             ({ className }) =>
-              `:where(#${id}:not(:checked)~*) .dark\\:${e(className)}`
+              `:where(#${id}:not(:checked)~*) .dark\\:${e(className)}`,
           ),
           "@media (prefers-color-scheme: dark)"
         ),
         ({ modifySelectors }) => (
           modifySelectors(
             ({ className }) =>
-              `:where(#${id}:checked~*) .dark\\:${e(className)}`
+              `:where(#${id}:checked~*) .dark\\:${e(className)}`,
           ),
           "@media (prefers-color-scheme: light)"
         ),
       ]);
-    }
+    },
 );

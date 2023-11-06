@@ -1,4 +1,4 @@
-import type { Pipe, Pipeline } from "./pipe.types";
+import type { Pipeline, Pipe } from "./pipe.types";
 import { errorify } from "../utils/error";
 import type { Fn } from "../utils/types";
 import { all } from "./monad";
@@ -15,7 +15,7 @@ const pipeline: Pipeline = (...fns: Fn[]) => {
         if (!fns.length) throw reason;
         if (error in fns[0]) return fns[0](reason);
         else throw reason;
-      }
+      },
     );
 
     for (let i = 1; i < fns.length; i++) {
@@ -31,7 +31,7 @@ const pipe: Pipe = (...data: any[]) => {
 };
 
 const error = Symbol();
-const fallback = <T>(value: T | ((e: any) => T)) => {
+const fallback = <T>(value: ((e: any) => T) | T) => {
   const handler = <U>(error: U) => {
     return typeof value === "function"
       ? ((value as any)(error) as T | U)
@@ -42,8 +42,8 @@ const fallback = <T>(value: T | ((e: any) => T)) => {
 };
 
 const expose = [
-  <T>(data: T) => ({ data, error: undefined }),
+  <T>(data: T) => ({ error: undefined, data }),
   fallback((e: any) => ({ error: errorify(e), data: undefined })),
 ] as const;
 
-export { fallback, expose, pipeline, pipe };
+export { fallback, pipeline, expose, pipe };

@@ -1,5 +1,5 @@
-import { bright, highlight, red } from "@amadeus-music/util/color";
-import { offset, rescape } from "@amadeus-music/util/string";
+import { highlight, bright, red } from "@amadeus-music/util/color";
+import { rescape, offset } from "@amadeus-music/util/string";
 import type { Context } from "../plugin/types";
 import { StructError } from "superstruct";
 import { PoolError } from "libfun";
@@ -17,7 +17,7 @@ function format(error: any, context?: Context, message = false) {
     const root = JSON.stringify(branch[0], null, 2);
     const target = JSON.stringify(branch[branch.length - 1], null, 2) || "";
     const pattern = new RegExp(
-      rescape(target).replace(/(\s|\n)+/g, "(\\s|\\n)*") || "$^"
+      rescape(target).replace(/(\s|\n)+/g, "(\\s|\\n)*") || "$^",
     );
     const important = [error.path.join("."), error.value + "", error.type]
       .filter((x) => x)

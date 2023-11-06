@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { Collection, CollectionType } from "@amadeus-music/protocol";
-  import { Icon, Virtual, type EditEvent } from "@amadeus-music/ui";
+  import type { CollectionType, Collection } from "@amadeus-music/protocol";
+  import { type EditEvent, Virtual, Icon } from "@amadeus-music/ui";
   import { createEventDispatcher } from "svelte";
   import Card from "$lib/ui/Card.svelte";
   import { match } from "$lib/util";
   import { ready } from "$lib/data";
 
   const dispatch = createEventDispatcher<{
-    rearrange: { id: number; after: number | undefined };
+    rearrange: { after: number | undefined; id: number };
     create: void;
   }>();
 
@@ -21,7 +21,7 @@
 
   function edit({ detail }: EditEvent<Collection | undefined | null>) {
     if (!detail.item || detail.action !== "rearrange") return;
-    dispatch("rearrange", { id: detail.item.id, after: detail.after?.id });
+    dispatch("rearrange", { after: detail.after?.id, id: detail.item.id });
   }
 
   $: items =
@@ -31,15 +31,15 @@
 </script>
 
 <Virtual
+  animate
   sortable={editable && !filter}
   key={(x) => x?.id}
   columns="20rem"
-  on:edit={edit}
   {prerender}
-  let:item
   gap={16}
-  animate
   {items}
+  on:edit={edit}
+  let:item
   on:end
 >
   {#if item}
@@ -49,7 +49,7 @@
       class="p flex w-full cursor-pointer justify-center rounded-2xl p-4 text-highlight ring-4 ring-inset ring-highlight focus-visible:outline-none focus-visible:ring-primary-600"
       on:click={() => dispatch("create")}
     >
-      <Icon name="plus" xxl />
+      <Icon of="plus" xxl />
     </button>
   {:else}
     <Card {...{ [style]: true }} />

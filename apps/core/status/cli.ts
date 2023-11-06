@@ -1,8 +1,8 @@
 import { createInterface, type Interface } from "node:readline/promises";
-import { cyan, highlight } from "@amadeus-music/util/color";
+import { highlight, cyan } from "@amadeus-music/util/color";
 import { prefix, split } from "@amadeus-music/util/string";
-import { log, pool, stop as close } from "../event/pool";
-import { stdin, stdout } from "node:process";
+import { stop as close, pool, log } from "../event/pool";
+import { stdout, stdin } from "node:process";
 import type { WriteStream } from "node:tty";
 import { commands } from "./commands";
 import { stop } from "./manage";
@@ -23,8 +23,8 @@ async function interactive() {
     return wrn("Running in non-interactive mode!");
   }
   const cli = createInterface({
-    input: stdin,
     output: stdout,
+    input: stdin,
     prompt: "> ",
     tabSize: 2,
     completer,
@@ -58,7 +58,7 @@ async function options(parts: string[], index: number) {
       if (typeof x === "function") return await x();
       if (typeof x === "string") return x;
       return [];
-    })
+    }),
   ).then((x) => x.flat(2));
 }
 
@@ -86,7 +86,7 @@ function colorize(cli: Interface) {
   const output: WriteStream = (cli as any).output;
   return () => {
     const patterns = [...commands.keys()].map(
-      (x) => new RegExp(`(^${x}(\\s|$))`)
+      (x) => new RegExp(`(^${x}(\\s|$))`),
     );
     const colored = highlight(cli.line, patterns, cyan);
     if (colored === cli.line) return;

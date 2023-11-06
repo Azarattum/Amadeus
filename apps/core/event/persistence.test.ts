@@ -7,17 +7,17 @@ const err = async () => {
 };
 
 persistence(() => ({
+  tracks: { get: async () => ({ sources: ["b"], title: "aaa" }) as any },
   settings: { lookup: async (a, b) => `${b}.${a}`, extract: err },
-  tracks: { get: async () => ({ title: "aaa", sources: ["b"] } as any) },
+  artists: { get: async () => ({ title: "Test" }) as any },
   history: { get: async () => [{ query: "a", date: 1 }] },
-  artists: { get: async () => ({ title: "Test" } as any) },
   subscribe: () => spy,
 }));
 persistence(() => ({
-  playlists: { create: async () => 123 as any },
-  settings: { lookup: () => Promise.resolve("never") },
-  tracks: { get: async () => ({ title: "Aaa", sources: ["a"] } as any) },
+  tracks: { get: async () => ({ sources: ["a"], title: "Aaa" }) as any },
   history: { get: async () => [{ query: "b", date: 2 }] },
+  settings: { lookup: () => Promise.resolve("never") },
+  playlists: { create: async () => 123 as any },
   artists: { get: async () => err() },
   subscribe: () => spy,
 }));
@@ -34,7 +34,7 @@ it("processes raced", async () => {
 
 it("processes merged", async () => {
   const result = await persistence().tracks.get(123);
-  expect(result).toEqual({ title: "Aaa", sources: ["b", "a"] });
+  expect(result).toEqual({ sources: ["b", "a"], title: "Aaa" });
 });
 
 it("processes dated", async () => {
@@ -54,14 +54,14 @@ it("processes composed", async () => {
 
 it("throws unimplemented", () => {
   expect(persistence().history.log("test")).rejects.toThrowError(
-    "history.log is not implemented!"
+    "history.log is not implemented!",
   );
 });
 
 it("handles exceptions", async () => {
   expect(await persistence().artists.get(42)).toEqual({ title: "Test" });
   expect(persistence().settings.extract("")).rejects.toThrowError(
-    "All promises were rejected"
+    "All promises were rejected",
   );
 });
 
@@ -87,13 +87,13 @@ users(() => ({
 
 it("merges users", async () => {
   expect(await users()).toEqual({
-    first: {
-      name: "First",
-      data: 42,
-    },
     second: {
       name: "Second",
       data: 1337,
+    },
+    first: {
+      name: "First",
+      data: 42,
     },
     third: {
       name: "Third",

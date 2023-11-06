@@ -1,16 +1,16 @@
 import {
-  black,
+  type Color,
   bright,
+  yellow,
+  black,
   clean,
   clear,
   green,
   paint,
-  red,
   reset,
-  yellow,
-  type Color,
+  red,
 } from "@amadeus-music/util/color";
-import { type WriteStream, createWriteStream } from "node:fs";
+import { createWriteStream, type WriteStream } from "node:fs";
 import { access, mkdir } from "node:fs/promises";
 import type { Context } from "../plugin/types";
 import { log as logged } from "../event/pool";
@@ -25,7 +25,7 @@ function time() {
   return new Date().toTimeString().slice(0, 8);
 }
 
-function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
+function log(this: Context, { separator, level, color, data, pure }: LogInfo) {
   separator ??= "|";
   level ??= "info";
   color ??= reset;
@@ -63,7 +63,7 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
 
 /** Logs a successful message */
 function ok(this: Context, ...data: any[]) {
-  log.bind(this)({ color: green, separator: "+", data });
+  log.bind(this)({ separator: "+", color: green, data });
 }
 
 /** Logs a informational message */
@@ -73,7 +73,7 @@ function info(this: Context, ...data: any[]) {
 
 /** Logs a warning message */
 function wrn(this: Context, ...data: any[]) {
-  log.bind(this)({ level: "warn", color: yellow, separator: "?", data });
+  log.bind(this)({ separator: "?", level: "warn", color: yellow, data });
 }
 
 /** Logs an error message */
@@ -91,14 +91,14 @@ function err(this: Context, ...data: any[]) {
   const context: Context = { ...(this || {}) };
   data = data.map((x) => format(x, context));
 
-  log.bind(context)({ level: "error", color: red, separator: "!", data });
+  log.bind(context)({ level: "error", separator: "!", color: red, data });
 }
 
 /** Prints a visual log divider  */
 function divide(title = "") {
   const divider = "=".repeat(30 - title.length / 2);
   const data = [divider + title + divider + (title.length % 2 ? "=" : "")];
-  log({ data, pure: true });
+  log({ pure: true, data });
 }
 
 let logFile: string | undefined;
@@ -119,7 +119,7 @@ async function store(line: string) {
 }
 
 type LogInfo = {
-  level?: "info" | "warn" | "error";
+  level?: "error" | "info" | "warn";
   separator?: string;
   pure?: boolean;
   color?: Color;
@@ -132,4 +132,4 @@ class SilentError extends Error {
   }
 }
 
-export { ok, info, wrn, err, divide, SilentError };
+export { SilentError, divide, info, wrn, err, ok };

@@ -4,7 +4,7 @@
     Collection,
     Track,
   } from "@amadeus-music/protocol";
-  import { Icon, Stack, Header, Text, Topbar, Spacer } from "@amadeus-music/ui";
+  import { Header, Topbar, Spacer, Stack, Icon, Text } from "@amadeus-music/ui";
   import { capitalize } from "@amadeus-music/util/string";
   import { format } from "@amadeus-music/util/time";
   import Tracks from "$lib/ui/Tracks.svelte";
@@ -45,32 +45,32 @@
       class={`place-items-center gap-4 ${style !== "playlist" ? "p-4" : ""}`}
     >
       {#if style !== "playlist"}
-        <Avatar {href} round={style === "artist"} {of} />
+        <Avatar {of} round={style === "artist"} {href} />
       {/if}
       <Stack class="grow-0 gap-2">
         <Header
-          xl={style === "playlist"}
           indent={style === "playlist"}
+          xl={style === "playlist"}
           loading={!of}>{of?.title}</Header
         >
         <Stack x class="gap-4">
           {#if of?.collection}
             <Text secondary indent={style === "playlist"}>
-              <Icon name="note" sm />
+              <Icon of="note" sm />
               {of.collection.size}
             </Text>
             <Text secondary indent={style === "playlist"}>
-              <Icon name="clock" sm />
+              <Icon of="clock" sm />
               {format(of.collection.duration)}
             </Text>
             {#if "remote" in of && of.remote}
               <Spacer />
-              <Text secondary><Icon name="share" sm /> {of.remote}</Text>
+              <Text secondary><Icon of="share" sm /> {of.remote}</Text>
             {/if}
           {:else}
-            <Text secondary loading={!of} indent={style === "playlist"}>
+            <Text secondary indent={style === "playlist"} loading={!of}>
               {#if style === "artist"}
-                <Icon name="globe" sm />
+                <Icon of="globe" sm />
               {/if}
               {details}
             </Text>
@@ -84,11 +84,11 @@
   <Tracks
     fixed={fixed || (style === "playlist" ? !!$search : true)}
     tracks={filtered}
-    on:edit
-    on:click
-    on:action
-    on:end
     bind:selected
+    on:action
+    on:click
+    on:edit
+    on:end
   >
     <slot name="action" slot="action" />
     <slot />

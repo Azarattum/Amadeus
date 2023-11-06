@@ -1,8 +1,8 @@
 import {
-  pluginInfo,
   type RecordStruct,
   type Configure,
   type Plugin,
+  pluginInfo,
 } from "./types";
 import { bright, reset } from "@amadeus-music/util/color";
 import { command, usage, arg } from "../status/commands";
@@ -11,7 +11,7 @@ import type { FetchOptions } from "../network/fetch";
 import * as persistence from "../event/persistence";
 import { lookup } from "../event/aggregate";
 import { connect } from "../network/socket";
-import { format, plugins } from "./loader";
+import { plugins, format } from "./loader";
 import * as fetch from "../network/fetch";
 import * as events from "../event/pool";
 import * as log from "../status/log";
@@ -44,11 +44,11 @@ function register<
   info(`Loading ${bright}${plugin.name}${reset} plugin v${plugin.version}...`);
   plugins.set(id, plugin);
 
-  type NativeContext = { fetch: FetchOptions; connect: ConnectOptions };
+  type NativeContext = { connect: ConnectOptions; fetch: FetchOptions };
   const context = {
+    context: { connect: {}, fetch: {}, ...(plugin.context || {}) },
     group: id,
     scope: id,
-    context: { fetch: {}, connect: {}, ...(plugin.context || {}) },
   };
   return Object.fromEntries(
     Object.entries(bound)
@@ -57,12 +57,12 @@ function register<
   ) as Configure<typeof bound, T, S, C & NativeContext>;
 }
 
-export { register, usage, arg };
-export { path } from "../data/path";
-export { http } from "../network/http";
-export { wss } from "../network/socket";
+export { inferArtists, inferTrack } from "../data/infer";
 export { reencode, resize } from "../data/ffmpeg";
-export { inferTrack, inferArtists } from "../data/infer";
+export { wss } from "../network/socket";
+export { http } from "../network/http";
+export { path } from "../data/path";
+export { register, usage, arg };
 
 export * from "superstruct";
 export { map as dict } from "superstruct";

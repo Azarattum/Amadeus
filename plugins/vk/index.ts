@@ -4,40 +4,40 @@ import {
   search,
   expand,
   relate,
+  lookup,
   fetch,
   init,
-  lookup,
 } from "./plugin";
 import {
   responseOf,
   convert,
   artist,
+  lyrics,
   items,
   track,
   album,
-  lyrics,
 } from "./types";
-import { array, optional } from "@amadeus-music/core";
+import { optional, array } from "@amadeus-music/core";
 import { safeFetch } from "./captcha";
 
 init(function* ({ vk: { tokens } }) {
   if (!tokens.length) throw "No token found!";
   this.fetch.baseURL = "https://api.vk.me/method/";
-  this.fetch.params = { v: "5.190", access_token: tokens };
+  this.fetch.params = { access_token: tokens, v: "5.190" };
   this.fetch.headers = {
     "User-Agent": "Mrs.ia/1520 CFNetwork/1331.0.7 Darwin/21.4.0",
   };
 });
 
 search(function* (type, query, page) {
-  const method = { track: "", artist: "Artists", album: "Albums" }[type];
-  const struct = { track, artist, album }[type];
+  const method = { artist: "Artists", album: "Albums", track: "" }[type];
+  const struct = { artist, track, album }[type];
   let empty = 0;
 
   for (let i = 0; ; i += +page) {
     const { response } = yield* safeFetch(
       `audio.search${method}`,
-      { params: { q: query, count: page, offset: i } },
+      { params: { count: page, offset: i, q: query } },
       responseOf(items(struct)),
     );
     if (!response.items.length) break;
@@ -62,11 +62,11 @@ desource(function* (target) {
 expand(function* (type, what, page) {
   const method = { artist: "getAudiosByArtist", album: "get" }[type];
   const args = {
-    artist: (src: string) => ({ artist_id: src }),
     album: (src: string) => {
       const [owner_id, album_id, access_key] = src.split("/");
-      return { owner_id, album_id, access_key };
+      return { access_key, owner_id, album_id };
     },
+    artist: (src: string) => ({ artist_id: src }),
   }[type];
   const id = yield* identify(what, type);
   if (!id) return;
@@ -110,7 +110,7 @@ transcribe(function* (track) {
 
 function* identify(
   data: { sources?: string[]; title?: string },
-  type: "track" | "artist" | "album",
+  type: "artist" | "track" | "album",
 ) {
   return (
     data.sources?.find((x) => x.startsWith("vk/"))?.slice(3) ||

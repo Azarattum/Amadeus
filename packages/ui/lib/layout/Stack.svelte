@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Either, HTMLProps } from "../../internal/types";
+  import type { HTMLProps, Either } from "../../internal/types";
   import { tw } from "../../internal/tailwind";
   import { setContext } from "svelte";
 

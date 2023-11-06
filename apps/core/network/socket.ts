@@ -1,9 +1,9 @@
-import { WebSocket, createWebSocketStream, WebSocketServer } from "ws";
+import { createWebSocketStream, WebSocketServer, WebSocket } from "ws";
 import { bright, reset } from "@amadeus-music/util/color";
 import { merge, pick } from "@amadeus-music/util/object";
 import type { Context } from "../plugin/types";
 import type { Struct } from "superstruct";
-import { async, context } from "libfun";
+import { context, async } from "libfun";
 import { pools } from "../event/pool";
 import { info } from "../status/log";
 import { Writable } from "stream";
@@ -13,8 +13,8 @@ import { http } from "./http";
 import { parse } from "url";
 
 type ConnectOptions = {
-  baseURL?: string | string[];
-  params?: Record<string, string | string[]>;
+  params?: Record<string, string[] | string>;
+  baseURL?: string[] | string;
 };
 
 function connect(this: Context, url = "", options: ConnectOptions = {}) {
@@ -36,28 +36,6 @@ function connect(this: Context, url = "", options: ConnectOptions = {}) {
   });
 
   return {
-    socket,
-    *send(data: Buffer | Record<string, any> | ReadableStream | string) {
-      yield* async(connected);
-      if (
-        typeof data === "object" &&
-        !(data instanceof Buffer) &&
-        !(data instanceof ReadableStream)
-      ) {
-        data = JSON.stringify(data);
-      }
-
-      yield* async(
-        new Promise<void>((resolve, reject) => {
-          if (data instanceof ReadableStream) {
-            const stream = Writable.toWeb(createWebSocketStream(socket));
-            data.pipeTo(stream, { preventClose: true }).then(resolve, reject);
-          } else {
-            socket.send(data as any, (err) => (err ? reject(err) : resolve()));
-          }
-        })
-      );
-    },
     *recv<T = void, S = never>(as?: Struct<T, S>, until?: Struct<any, any>) {
       yield* async(connected);
       return yield* async(
@@ -81,7 +59,7 @@ function connect(this: Context, url = "", options: ConnectOptions = {}) {
                 if (until?.is(parsed)) {
                   const formatted = JSON.stringify(parsed, null, 2);
                   throw new Error(
-                    `End condition is reached!\nReceived: ${formatted}`
+                    `End condition is reached!\nReceived: ${formatted}`,
                   );
                 }
               } catch (err) {
@@ -90,13 +68,35 @@ function connect(this: Context, url = "", options: ConnectOptions = {}) {
               }
             });
           }
-        })
+        }),
+      );
+    },
+    *send(data: Record<string, any> | ReadableStream | Buffer | string) {
+      yield* async(connected);
+      if (
+        typeof data === "object" &&
+        !(data instanceof Buffer) &&
+        !(data instanceof ReadableStream)
+      ) {
+        data = JSON.stringify(data);
+      }
+
+      yield* async(
+        new Promise<void>((resolve, reject) => {
+          if (data instanceof ReadableStream) {
+            const stream = Writable.toWeb(createWebSocketStream(socket));
+            data.pipeTo(stream, { preventClose: true }).then(resolve, reject);
+          } else {
+            socket.send(data as any, (err) => (err ? reject(err) : resolve()));
+          }
+        }),
       );
     },
     *close() {
       socket.close();
       yield* async(promisify(socket.on.bind(socket))("close").catch(() => {}));
     },
+    socket,
   };
 }
 

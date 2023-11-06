@@ -1,12 +1,12 @@
 <script lang="ts">
   import {
-    Stack,
-    Text,
-    Button,
-    Image,
-    Icon,
     Spinner,
+    Button,
+    Stack,
+    Image,
     Range,
+    Text,
+    Icon,
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { format } from "@amadeus-music/util/time";
@@ -21,13 +21,13 @@
 <Stack class="place-items-center gap-1 p-4">
   <Text accent>{track?.title || "Not Playing"}</Text>
   <Button
-    air
     primary
     slim
-    disabled={!track}
+    air
     href={track?.artists.length === 1
       ? `/explore/artist#${track.artists[0].id}`
       : undefined}
+    disabled={!track}
   >
     {track?.artists.map((x) => x.title).join(", ") || "\u202F"}
   </Button>
@@ -35,8 +35,8 @@
 <div class="px-11">
   <label class="relative block cursor-pointer rounded-2xl shadow-xl">
     <input
-      type="checkbox"
       class="peer absolute inset-0 appearance-none rounded-2xl outline-2 outline-offset-8 outline-primary-600 focus-visible:outline"
+      type="checkbox"
       bind:checked={paused}
     />
 
@@ -45,7 +45,7 @@
         class="flex h-full w-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
         style:filter="hue-rotate({track?.id || 0}deg)"
       >
-        <Icon name="note" />
+        <Icon of="note" />
       </div>
     </Image>
     <div
@@ -53,7 +53,7 @@
       class:opacity-100={loading}
     >
       {#if loading}
-        <div transition:scale class="absolute">
+        <div class="absolute" transition:scale>
           <Spinner color="hsl(var(--color-content))" />
         </div>
       {:else}
@@ -63,15 +63,15 @@
   </label>
 </div>
 <Range
-  {format}
+  controls
+  hints
+  p
   max={track?.duration || 0}
+  {format}
   bind:value={currentTime}
   on:forward
   on:rewind
   on:reset
-  controls
-  hints
-  p
 />
 
 <style>

@@ -1,15 +1,15 @@
-import { info, procedure, router, expand as expandOf } from "../plugin";
-import type { Album, Artist, Track } from "@amadeus-music/protocol";
+import { expand as expandOf, procedure, router, info } from "../plugin";
+import type { Artist, Album, Track } from "@amadeus-music/protocol";
 import { observable } from "@trpc/server/observable";
 import { type Stream, stream } from "./stream";
 import { number, object } from "superstruct";
 
 const expandProcedure = procedure.input(
-  object({ id: number(), page: number() })
+  object({ page: number(), id: number() }),
 );
 
 export const expand = router({
-  artist: expandProcedure.subscription(async ({ input: { id, page }, ctx }) => {
+  artist: expandProcedure.subscription(async ({ input: { page, id }, ctx }) => {
     const fallback = async () => ctx.cache().artists.get(id);
     const getArtist = async () =>
       ctx.persistence().artists.get(id).then(null, fallback);
@@ -20,7 +20,7 @@ export const expand = router({
       return stream(next, expandOf("artist", artist, page), fallback);
     });
   }),
-  album: expandProcedure.subscription(async ({ input: { id, page }, ctx }) => {
+  album: expandProcedure.subscription(async ({ input: { page, id }, ctx }) => {
     const fallback = async () => ctx.cache().albums.get(id);
     const getAlbum = async () =>
       ctx.persistence().albums.get(id).then(null, fallback);

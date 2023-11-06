@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Track } from "@amadeus-music/protocol";
   import Collection from "$lib/ui/Collection.svelte";
-  import { Icon, Button } from "@amadeus-music/ui";
+  import { Button, Icon } from "@amadeus-music/ui";
   import { library, feed } from "$lib/data";
   import { page } from "$app/stores";
 
@@ -10,16 +10,16 @@
 
   function purge() {
     library.purge(
-      [...selected].map((x) => x.entry).filter((x): x is number => !!x)
+      [...selected].map((x) => x.entry).filter((x): x is number => !!x),
     );
     selected.clear();
     selected = selected;
   }
 </script>
 
-<Collection of={info} style="playlist" bind:selected fixed>
-  <Icon name="last" slot="action" />
-  <Button air stretch on:click={purge}><Icon name="trash" /></Button>
+<Collection of={info} fixed style="playlist" bind:selected>
+  <Icon of="last" slot="action" />
+  <Button stretch air on:click={purge}><Icon of="trash" /></Button>
 </Collection>
 
 <svelte:head>

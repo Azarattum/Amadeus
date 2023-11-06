@@ -48,17 +48,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta
-    name="viewport"
     content="width=device-width,height=device-height,initial-scale=1,user-scalable=no"
+    name="viewport"
   />
   <meta
-    name="theme-color"
     content="#{$flipped ? '000000' : 'ffffff'}"
     media="(prefers-color-scheme: light)"
+    name="theme-color"
   />
   <meta
-    name="theme-color"
     content="#{$flipped ? 'ffffff' : '000000'}"
     media="(prefers-color-scheme: dark)"
+    name="theme-color"
   />
 </svelte:head>

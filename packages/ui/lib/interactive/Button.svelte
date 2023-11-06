@@ -4,10 +4,10 @@
   import { uuid } from "../../internal/util";
 
   type Group = {
-    id: string;
     value: Writable<string>;
-    i: number;
     size: number;
+    id: string;
+    i: number;
   } | null;
 
   const panel = !!getContext("panel");
@@ -15,7 +15,7 @@
   const index = group ? group.i++ % group.size : undefined;
   const value = group?.value;
 
-  export let href: string | Readable<string> | undefined = undefined;
+  export let href: Readable<string> | string | undefined = undefined;
   export let id: string | undefined = undefined;
   export let to: string | undefined = undefined;
   export let stretch = !!group;
@@ -32,9 +32,9 @@
   else onDestroy(href.subscribe((x) => (url = x)));
 
   $: tag = (group || to ? "label" : href ? "a" : "button") as
+    | "button"
     | "label"
-    | "a"
-    | "button";
+    | "a";
   const uid = group ? uuid() : id || uuid();
 
   $: background = air
@@ -70,34 +70,34 @@
 
 <svelte:element
   this={tag}
-  href={url}
-  role="button"
-  tabindex="0"
-  for={to || undefined}
-  draggable="false"
-  {disabled}
-  id={uid}
-  on:click
   class="relative flex min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white {text} {background}
   {slim ? '' : 'h-11'}
   {compact ? 'flex-col text-2xs' : 'gap-[0.625rem]'}
   {round ? 'rounded-full' : 'rounded-lg'}
   "
-  class:px-[0.625rem]={!air || group}
+  for={to || undefined}
+  draggable="false"
+  role="button"
+  tabindex="0"
+  href={url}
+  {disabled}
+  id={uid}
   class:justify-center={stretch || compact || panel}
+  class:px-[0.625rem]={!air || group}
   class:aspect-square={square}
   class:shrink-0={!stretch}
   class:w-full={stretch}
+  on:click
 >
   {#if group}
     <input
       class="sibling peer absolute appearance-none"
       checked={$value === index?.toString()}
-      bind:group={$value}
       name={group.id}
       value={index}
       type="radio"
       {id}
+      bind:group={$value}
     />
   {/if}
   <slot />

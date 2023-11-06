@@ -2,11 +2,11 @@ import {
   type Struct,
   StructError,
   async,
-  path,
   first,
+  path,
 } from "@amadeus-music/core";
 import type { FetchOptions } from "@amadeus-music/core/network/fetch";
-import { fetch as call, ok, pool, wrn } from "./plugin";
+import { fetch as call, pool, wrn, ok } from "./plugin";
 // @ts-ignore
 import * as onnx from "onnxruntime-web";
 import { captcha } from "./types";
@@ -37,13 +37,13 @@ async function recognize(bytes: ArrayBuffer) {
   return interpret(result.dense2.data as Uint8Array);
 
   function preprocess({
-    width,
     height,
+    width,
     data,
   }: {
-    width: number;
-    height: number;
     data: Uint8Array;
+    height: number;
+    width: number;
   }) {
     const result = new Float32Array(data.length);
     for (let y = 0; y < height; y++) {
@@ -76,7 +76,7 @@ async function recognize(bytes: ArrayBuffer) {
     }
     answer = answer.slice(0, 7);
 
-    return { answer, confidence };
+    return { confidence, answer };
   }
 }
 

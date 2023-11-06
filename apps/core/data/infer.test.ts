@@ -1,21 +1,21 @@
-import { inferTrack, inferArtists } from "./infer";
-import { it, expect } from "vitest";
+import { inferArtists, inferTrack } from "./infer";
+import { expect, it } from "vitest";
 
 it("infers tracks", () => {
   let val = inferTrack(
-    "Game of Thrones Theme Song - Karliene Version Cover (Oh La Lau) (Lyrics)"
+    "Game of Thrones Theme Song - Karliene Version Cover (Oh La Lau) (Lyrics)",
   );
   expect(val.title).toBe("Game of Thrones Theme Song (Oh La Lau)");
   expect(val.artists).toEqual(["Karliene"]);
 
   val = inferTrack(
-    "Lau - Game of Thrones Theme - Karliene Version Cover (Audio Only)"
+    "Lau - Game of Thrones Theme - Karliene Version Cover (Audio Only)",
   );
   expect(val.title).toBe("Game of Thrones Theme");
   expect(val.artists).toEqual(["Karliene", "Lau"]);
 
   val = inferTrack(
-    "Karliene & Celtic Borders - You Win or You Die - Game of Thrones"
+    "Karliene & Celtic Borders - You Win or You Die - Game of Thrones",
   );
   expect(val.title).toBe("You Win or You Die");
   expect(val.artists).toEqual(["Celtic Borders", "Karliene"]);
@@ -53,7 +53,7 @@ it("infers tracks", () => {
   expect(val.album).toBe("Plus 8 Records");
 
   val = inferTrack(
-    "Varg | I Did Not Always Appear This Way [Ascetic House 2015]"
+    "Varg | I Did Not Always Appear This Way [Ascetic House 2015]",
   );
   expect(val.year).toBe(2015);
   expect(val.title).toBe("I Did Not Always Appear This Way");
@@ -64,7 +64,7 @@ it("infers tracks", () => {
   expect(val.artists).toEqual(["Dan", "Lee Van Dowski", "Pig"]);
 
   val = inferTrack(
-    "Ambi Sessions 12/11 {Ambient Techno-Tribal-Dub Techno-Meditative}"
+    "Ambi Sessions 12/11 {Ambient Techno-Tribal-Dub Techno-Meditative}",
   );
   expect(val.title).toBe("Ambi Sessions 12/11");
   expect(val.artists).toEqual([]);
@@ -94,7 +94,7 @@ it("infers tracks", () => {
   expect(val.artists).toEqual(["Miracle Of Sound", "WITCHER 3 SONG"]);
 
   val = inferTrack(
-    "Miracle Of Sound - The Call - Elder Scrolls Online Song [pleer.com]"
+    "Miracle Of Sound - The Call - Elder Scrolls Online Song [pleer.com]",
   );
   expect(val.title).toBe("The Call");
   expect(val.artists).toEqual(["Miracle Of Sound"]);
@@ -117,13 +117,13 @@ it("infers tracks", () => {
   expect(val.artists).toEqual(["Ali Sethi"]);
 
   val = inferTrack(
-    "Bruno Mars, Anderson .Paak, Silk Sonic - Leave the Door Open [Official Video]"
+    "Bruno Mars, Anderson .Paak, Silk Sonic - Leave the Door Open [Official Video]",
   );
   expect(val.title).toBe("Leave the Door Open");
   expect(val.artists).toEqual(["Anderson .Paak", "Bruno Mars", "Silk Sonic"]);
 
   val = inferTrack(
-    "Galasy ZMesta - Ya Nauchu Tebya (I'll Teach You) - Belarus - Official Video - Eurovision 2021"
+    "Galasy ZMesta - Ya Nauchu Tebya (I'll Teach You) - Belarus - Official Video - Eurovision 2021",
   );
   expect(val.title).toBe("Ya Nauchu Tebya (I'll Teach You, Belarus)");
   expect(val.year).toBe(2021);
@@ -131,19 +131,19 @@ it("infers tracks", () => {
   expect(val.artists).toEqual(["Galasy ZMesta"]);
 
   val = inferTrack(
-    "Game Of Thrones Theme (Music Box Vocal Version -- Cover of Karliene Lyrics)"
+    "Game Of Thrones Theme (Music Box Vocal Version -- Cover of Karliene Lyrics)",
   );
   expect(val.title).toBe("Game Of Thrones Theme");
   expect(val.artists).toEqual(["Music Box Vocal"]);
 
   val = inferTrack(
-    "🎵MiatriSs🎵 - Yandere Song (The Original Song) [Русская Версия] + ENG Subtitles"
+    "🎵MiatriSs🎵 - Yandere Song (The Original Song) [Русская Версия] + ENG Subtitles",
   );
   expect(val.title).toBe("Yandere Song (Русская Версия)");
   expect(val.artists).toEqual(["MiatriSs"]);
 
   val = inferTrack(
-    "【Helltaker Original Song】 What the Hell by @OR3O , @Lollia  , and @Sleeping Forest   ft. Friends"
+    "【Helltaker Original Song】 What the Hell by @OR3O , @Lollia  , and @Sleeping Forest   ft. Friends",
   );
   expect(val.title).toBe("What the Hell");
   expect(val.artists).toEqual(["Friends", "Lollia", "OR3O", "Sleeping Forest"]);
@@ -158,7 +158,7 @@ it("infers tracks", () => {
   expect(val.artists).toEqual(["ECHO", "MiatriSs"]);
 
   val = inferTrack(
-    "Endless Mistakes Cover - check out the original at https://soundcloud.com/"
+    "Endless Mistakes Cover - check out the original at https://soundcloud.com/",
   );
   expect(val.title).toBe("Endless Mistakes Cover");
   expect(val.album).toBe("Endless Mistakes Cover");
@@ -169,7 +169,7 @@ it("infers tracks", () => {
   expect(val.artists).toEqual(["Rihanna"]);
 
   val = inferTrack(
-    "Fall - Ross Bugden ''Piano Tutorial'' (Piano Arrangement by AnubisMusic)"
+    "Fall - Ross Bugden ''Piano Tutorial'' (Piano Arrangement by AnubisMusic)",
   );
   expect(val.title).toBe("Ross Bugden");
   expect(val.album).toBe("Ross Bugden");
@@ -180,7 +180,7 @@ it("infers tracks", () => {
   expect(val.artists).toEqual(["Karliene"]);
 
   val = inferTrack(
-    "My Darkest Days - Porn Star Dancing (Rock Version) ft. Zakk Wylde (Official Video)"
+    "My Darkest Days - Porn Star Dancing (Rock Version) ft. Zakk Wylde (Official Video)",
   );
   expect(val.title).toBe("Porn Star Dancing (Rock Version)");
   expect(val.album).toBe("Porn Star Dancing");
@@ -198,7 +198,7 @@ it("infers tracks", () => {
 
   val = inferTrack(
     "Epic and Dramatic Trailer Music - Olympus (Copyright and Royalty Free)",
-    true
+    true,
   );
   expect(val.title).toBe("Olympus");
   expect(val.album).toBe("Epic and Dramatic Trailer Music");
@@ -210,7 +210,7 @@ it("infers tracks", () => {
   expect(val.artists).toEqual(["I:Scintilla"]);
 
   val = inferTrack(
-    "The Pretty Reckless - Make Me Wanna Die (Acoustic Version)"
+    "The Pretty Reckless - Make Me Wanna Die (Acoustic Version)",
   );
   expect(val.title).toBe("Make Me Wanna Die (Acoustic Version)");
   expect(val.album).toBe("Make Me Wanna Die");
@@ -225,7 +225,7 @@ it("infers tracks", () => {
   expect(val.title).toBe("Nice song");
 
   val = inferTrack(
-    "Time's Up (feat. Jonas, Ts3 & T-Bear) feat. Jonas,Ts3,T-Bear"
+    "Time's Up (feat. Jonas, Ts3 & T-Bear) feat. Jonas,Ts3,T-Bear",
   );
   expect(val.title).toBe("Time's Up");
   expect(val.artists).toEqual(["Jonas", "T-Bear", "Ts3"]);

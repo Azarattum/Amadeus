@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { initRealm, type Realm } from "./Realm.svelte";
+  import { type Realm, initRealm } from "./Realm.svelte";
   import { getContext } from "svelte";
 
   export let to = "";
@@ -52,9 +52,9 @@
       context.destroy.add(destroy);
       return {
         ...instance,
-        d: destroy,
-        l: () => {},
         m: () => context.target && mount.apply(null, context.target),
+        l: () => {},
+        d: destroy,
       };
     };
   }

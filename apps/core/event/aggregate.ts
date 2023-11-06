@@ -1,21 +1,21 @@
 import {
-  normalize,
-  format,
-  stringify,
-  identify,
-  track,
-  album,
-  artist,
   type MediaInfo,
   type Media,
+  normalize,
+  stringify,
+  identify,
+  format,
+  artist,
+  track,
+  album,
 } from "@amadeus-music/protocol";
-import type { Meta, FromType, MediaType } from "@amadeus-music/protocol";
-import { pages, type Page } from "../data/pagination";
+import type { MediaType, FromType, Meta } from "@amadeus-music/protocol";
+import { type Page, pages } from "../data/pagination";
 import stringSimilarity from "string-similarity-js";
 import { batch } from "@amadeus-music/util/object";
 import { clean } from "@amadeus-music/util/string";
 import type { Context } from "../plugin/types";
-import { map, merge, take } from "libfun/pool";
+import { merge, take, map } from "libfun/pool";
 import { cancel } from "libfun/utils/async";
 import { persistence } from "./persistence";
 import { inferTrack } from "../data/infer";
@@ -26,7 +26,7 @@ import { search } from "./pool";
 
 async function* aggregate(
   generators: AsyncGenerator<any>[],
-  { args, id, tasks, controller }: Task<[...any[], number]>,
+  { controller, tasks, args, id }: Task<[...any[], number]>,
 ) {
   generators = generators.map(batch);
   const groups = tasks.map((x) => x.group as string).filter((x) => x);

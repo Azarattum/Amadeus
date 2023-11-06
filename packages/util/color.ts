@@ -52,7 +52,7 @@ export function highlight(
   string: string,
   segments: (string | RegExp | undefined)[] | (string | RegExp | undefined),
   color: Color,
-  regular = reset
+  regular = reset,
 ) {
   if (!Array.isArray(segments)) segments = [segments];
   for (let segment of segments) {
@@ -74,4 +74,4 @@ export function clean(string: string) {
 }
 
 /** Color type */
-export type Color = typeof colors[number];
+export type Color = (typeof colors)[number];

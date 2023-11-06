@@ -1,15 +1,15 @@
 import {
-  defaulted,
   intersection,
-  type,
+  type Infer,
+  defaulted,
   create,
   number,
-  type Infer,
   string,
   array,
+  type,
 } from "superstruct";
 import { persistence, users } from "../event/persistence";
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile, readFile } from "node:fs/promises";
 import { merge } from "@amadeus-music/util/object";
 import { plugins, unload } from "../plugin/loader";
 import type { Plugin } from "../plugin/types";
@@ -19,8 +19,8 @@ import { path } from "./path";
 
 type Config = Infer<typeof baseConfig>;
 const baseConfig = type({
-  port: defaulted(number(), 8080),
   disabled: defaulted(array(string()), []),
+  port: defaulted(number(), 8080),
 });
 const baseSetting = type({
   name: defaulted(string(), "Unknown"),
@@ -82,5 +82,5 @@ async function register(username: string) {
   await setup(user);
 }
 
-export { configure, register, setup, settings };
+export { configure, register, settings, setup };
 export type { Config };

@@ -2,7 +2,7 @@
  * Formats the date into a relative or absolute string representation
  * @param date Date to format
  */
-export function format(date: Date | number, relative = false) {
+export function format(date: number | Date, relative = false) {
   if (!relative) {
     date = Math.round(+date);
     if (date <= 0) date = 0;

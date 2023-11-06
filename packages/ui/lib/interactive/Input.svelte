@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { HTMLProps } from "../../internal/types";
-  import { Icon, Button, tw } from "../../component";
+  import { Button, Icon, tw } from "../../component";
   import { getContext } from "svelte";
 
   type $$Props = {
+    resettable?: boolean;
     class?: string;
     value?: string;
-    resettable?: boolean;
   } & HTMLProps["input"];
 
   let classes = "";
@@ -27,8 +27,8 @@
 >
   <slot />
   <input
-    type="text"
     class="h-11 w-full touch-manipulation bg-transparent py-3 text-md text-content outline-none placeholder:text-content-200"
+    type="text"
     {...$$restProps}
     bind:value
   />
@@ -38,8 +38,8 @@
       class:pointer-events-none={!value}
       class:opacity-100={value}
     >
-      <Button disabled={!value} air on:click={() => (value = "")}>
-        <Icon sm name="close" />
+      <Button air disabled={!value} on:click={() => (value = "")}>
+        <Icon of="close" sm />
       </Button>
     </div>
   {/if}

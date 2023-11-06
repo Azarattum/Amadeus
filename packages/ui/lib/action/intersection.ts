@@ -11,7 +11,7 @@ const dispatch = (entries: IntersectionObserverEntry[]) =>
     );
   });
 
-export function intersection(node: HTMLElement, threshold?: number | number[]) {
+export function intersection(node: HTMLElement, threshold?: number[] | number) {
   const id = threshold?.toString() || "";
   const entry = observers.get(id) || [
     new IntersectionObserver(dispatch, { threshold }),

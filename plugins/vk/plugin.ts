@@ -5,24 +5,24 @@ import {
   object,
   array,
 } from "@amadeus-music/core";
-import { name, version } from "./package.json";
+import { version, name } from "./package.json";
 
 export const {
-  ok,
-  wrn,
-  init,
-  pool,
-  fetch,
+  transcribe,
+  desource,
   search,
   relate,
   expand,
   lookup,
-  desource,
-  transcribe,
+  fetch,
+  init,
+  pool,
+  wrn,
+  ok,
 } = register({
-  name,
-  version,
   config: {
     vk: defaulted(object({ tokens: defaulted(array(string()), []) }), {}),
   },
+  version,
+  name,
 });

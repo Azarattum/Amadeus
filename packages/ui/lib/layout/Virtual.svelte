@@ -1,15 +1,15 @@
-<script lang="ts" context="module">
+<script context="module" lang="ts">
   import { writable } from "svelte/store";
 
   export type EditEvent<T> = CustomEvent<{
-    action: "push" | "purge" | "rearrange";
+    action: "rearrange" | "purge" | "push";
     after: T | undefined;
     index: number;
     item: T;
   }>;
 
   type Transfer<T = any, K = any> = {
-    group: string | HTMLElement;
+    group: HTMLElement | string;
     owner: HTMLElement;
     offset: DOMRect;
     back?: DOMRect;
@@ -24,13 +24,13 @@
   import { getScrollParent } from "../../internal/util";
   import { minmax } from "@amadeus-music/util/math";
   import { position } from "../../internal/pointer";
-  import { drag, hold, resize } from "../../action";
+  import { resize, drag, hold } from "../../action";
   import { Portal } from "../../component";
   type T = $$Generic;
   type K = $$Generic;
   type P = $$Generic<number>;
   type Prerender = P & (P extends 0 ? never : NonNullable<unknown>);
-  type $$Slots = { default: { item: T; index: number } };
+  type $$Slots = { default: { index: number; item: T } };
 
   const dispatch = createEventDispatcher<{
     edit: EditEvent<T>["detail"];
@@ -45,7 +45,7 @@
   export let prerender = 1 as Prerender;
   export let columns: number | string = 1;
   export let key = (x: T) => x as any as K;
-  export let animate: number | boolean = false;
+  export let animate: boolean | number = false;
   export let sortable: boolean | string = false;
   export let container: HTMLElement | undefined = undefined;
 
@@ -122,8 +122,8 @@
       `translate3d(0,0,0)`,
     ];
     target?.animate(
-      { transform, zIndex: ["100", "100"] },
-      { easing: "ease", composite: "accumulate", duration },
+      { zIndex: ["100", "100"], transform },
+      { composite: "accumulate", easing: "ease", duration },
     );
   }
 
@@ -136,7 +136,7 @@
     inner.width += gap;
     const target = wrapper.firstElementChild;
     if (!target) return;
-    const { width, height } = target.getBoundingClientRect();
+    const { height, width } = target.getBoundingClientRect();
     if (!width || !height) return;
     perRow = ~~(inner.width / (width + gap));
     rowHeight = height + gap;
@@ -255,21 +255,21 @@
   <div
     class="grid auto-rows-max will-change-transform contain-layout"
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
+    class:pointer-events-none={!!$transfer}
     style:grid-template-columns={template}
     style:gap="{gap}px"
-    class:pointer-events-none={!!$transfer}
     bind:this={wrapper}
     use:drag={"hold"}
     use:hold
   >
     {#each slice as item, i (order[(from + i) % window] ?? i)}
       <div
-        class:invisible={$transfer?.owner === wrapper &&
-          $transfer?.key === key(item)}
         draggable={sortable && key(item) != null ? "true" : undefined}
         style="overflow-anchor: none;"
+        class:invisible={$transfer?.owner === wrapper &&
+          $transfer?.key === key(item)}
       >
-        <slot {item} index={from + i} />
+        <slot index={from + i} {item} />
       </div>
     {/each}
   </div>
@@ -278,7 +278,6 @@
       {#if $transfer?.owner === wrapper}
         <div
           class="absolute will-change-transform contain-[size_layout]"
-          class:transition-transform={$transfer.back}
           style:transform="translate3d(
           {$transfer.back
             ? $transfer.back.x
@@ -288,6 +287,7 @@
             ? $transfer.back.y
             : cursor.y + Math.max($transfer.offset.y, -rowHeight + gap)}px, 0)"
           style:width="{inner.width / perRow - gap}px"
+          class:transition-transform={$transfer.back}
           style:height="{rowHeight - gap}px"
         >
           <slot item={$transfer.data} index={NaN} />
@@ -297,4 +297,4 @@
   {/if}
 </div>
 
-<svelte:window on:dragstart={grab} on:dragend={retract} />
+<svelte:window on:dragend={retract} on:dragstart={grab} />

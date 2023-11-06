@@ -1,13 +1,13 @@
 import {
+  transcribe,
   desource,
   expand,
-  info,
-  init,
   lookup,
   relate,
   scrape,
   search,
-  transcribe,
+  info,
+  init,
 } from "./plugin";
 import { async } from "@amadeus-music/core";
 import { Innertube } from "youtubei.js";
@@ -46,7 +46,7 @@ desource(function* (track) {
   yield yield* async<string>(
     this.youtube.music
       .getInfo(id)
-      .then((x) => x.chooseFormat({ type: "audio", quality: "best" }))
+      .then((x) => x.chooseFormat({ quality: "best", type: "audio" }))
       .then((x) => x.decipher(this.youtube.player)),
   );
 });
@@ -130,7 +130,7 @@ transcribe(function* (track) {
 
 function* identify(
   data: { sources?: string[]; title?: string },
-  type: "track" | "artist" | "album",
+  type: "artist" | "track" | "album",
 ) {
   return (
     data.sources?.find((x) => x.startsWith("youtube/"))?.slice(8) ||

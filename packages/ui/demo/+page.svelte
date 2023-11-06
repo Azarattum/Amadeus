@@ -39,8 +39,8 @@
   <Sidenav slot="panel-left">
     <svelte:fragment slot="secondary">
       {#each data.stories as story}
-        <Button href="#{story}" air>
-          <Icon name="book" />{capitalize(story)}
+        <Button air href="#{story}">
+          <Icon of="book" />{capitalize(story)}
           <span id={story} />
         </Button>
       {/each}
@@ -50,8 +50,8 @@
   </Sidenav>
   <div class="h-full w-full p-8">
     <iframe
-      title="Story"
       class="h-full w-full grow resize rounded-md p-4 outline outline-1 outline-highlight-100"
+      title="Story"
       bind:this={preview}
     />
   </div>

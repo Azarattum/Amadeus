@@ -1,14 +1,14 @@
 import type {
+  ArtistInfo,
   TrackInfo,
   AlbumInfo,
-  ArtistInfo,
   MediaInfo,
   FromInfo,
 } from "@amadeus-music/protocol";
 import type { Database, User } from "./persistence.types";
 import type { Page } from "../data/pagination";
 import type { Config } from "../data/config";
-import { pools, type Mapped } from "libfun";
+import { type Mapped, pools } from "libfun";
 import { aggregate } from "./aggregate";
 
 const rate = 90;
@@ -27,20 +27,20 @@ const stop = pool("stop");
 type Aggregated<T extends MediaInfo> = Mapped<T, Page<FromInfo<T>>>;
 
 const search = pool<
+  | ((type: "artist", query: string, page: number) => Aggregated<ArtistInfo>)
   | ((type: "track", query: string, page: number) => Aggregated<TrackInfo>)
   | ((type: "album", query: string, page: number) => Aggregated<AlbumInfo>)
-  | ((type: "artist", query: string, page: number) => Aggregated<ArtistInfo>)
 >("search", { transform: aggregate, timeout, rate });
 
 const expand = pool<
-  | ((type: "album", what: AlbumInfo, page: number) => Aggregated<TrackInfo>)
   | ((type: "artist", what: ArtistInfo, page: number) => Aggregated<TrackInfo>)
+  | ((type: "album", what: AlbumInfo, page: number) => Aggregated<TrackInfo>)
 >("expand", { transform: aggregate, timeout });
 
 const relate = pool<
+  | ((type: "artist", to: ArtistInfo, page: number) => Aggregated<ArtistInfo>)
   | ((type: "track", to: TrackInfo, page: number) => Aggregated<TrackInfo>)
   | ((type: "album", to: AlbumInfo, page: number) => Aggregated<AlbumInfo>)
-  | ((type: "artist", to: ArtistInfo, page: number) => Aggregated<ArtistInfo>)
 >("relate", { transform: aggregate, timeout, rate });
 
 const scrape = pool<(url: string, page: number) => Aggregated<TrackInfo>>(
@@ -66,17 +66,17 @@ const persistence = pool<(user?: string) => Database>("persistence");
 const users = pool<() => Record<string, User>>("users");
 
 export {
-  log,
-  init,
-  stop,
-  users,
+  persistence,
+  transcribe,
+  recognize,
+  desource,
   search,
   relate,
   expand,
   scrape,
-  desource,
-  recognize,
-  transcribe,
-  persistence,
+  users,
+  init,
+  stop,
+  log,
 };
 export { all as pools, pool };

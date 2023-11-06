@@ -1,11 +1,11 @@
 <script lang="ts">
   import {
+    Separator,
     Button,
     Header,
-    Icon,
-    Separator,
     Spacer,
     Stack,
+    Icon,
   } from "@amadeus-music/ui";
   import { history } from "$lib/data";
 
@@ -18,12 +18,12 @@
       <Header center sm>History</Header>
       <Spacer />
       <Button air on:click={() => history.clear()}>
-        <Icon name="trash" />
+        <Icon of="trash" />
       </Button>
     </Stack>
     <Separator />
     {#each $history.slice(0, 6) as entry}
-      <Button air stretch href="#{type}/{entry.query}">{entry.query}</Button>
+      <Button stretch air href="#{type}/{entry.query}">{entry.query}</Button>
     {/each}
   </div>
 {/if}

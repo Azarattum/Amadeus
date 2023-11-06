@@ -1,4 +1,4 @@
-import { upcoming, preceding, playback } from "../stores/playback";
+import { preceding, upcoming, playback } from "../stores/playback";
 import { playlists } from "../stores/playlists";
 import { resources } from "../stores/resources";
 import { settings } from "../stores/settings";
@@ -70,8 +70,8 @@ function nocrr<T>(schema: T) {
 
 type Connection = DB & ReturnType<typeof stores>;
 type Options = Parameters<typeof database>[1] & {
-  name: string;
   local?: boolean;
+  name: string;
 };
 
 export { connect, close };

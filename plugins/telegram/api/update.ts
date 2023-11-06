@@ -1,19 +1,19 @@
 import {
-  wrn,
-  users,
+  persistence,
+  callback,
   message,
   command,
-  voice,
-  post,
   mention,
-  callback,
-  fetch,
   invite,
   update,
+  users,
+  voice,
+  fetch,
+  post,
   temp,
-  persistence,
+  wrn,
 } from "../plugin";
-import { async, inferArtists, map } from "@amadeus-music/core";
+import { inferArtists, async, map } from "@amadeus-music/core";
 import { answerCallbackQuery, deleteMessage } from "./methods";
 import { bright, reset } from "@amadeus-music/util/color";
 import { IncomingMessage, ServerResponse } from "http";
@@ -72,10 +72,10 @@ function* verify(update: unknown, me: string) {
             .settings.lookup(chat.id)
             .then(
               () => user,
-              () => undefined
-            )
-        )
-      ).then((x) => x.filter((x) => x))
+              () => undefined,
+            ),
+        ),
+      ).then((x) => x.filter((x) => x)),
     );
     user = candidates[0]; /// TODO: consider multi-user events support
     if (!user) throw `Unauthorized post to "${chat.title}" (${chat.id})!`;
@@ -93,11 +93,11 @@ function* verify(update: unknown, me: string) {
   temp.get(chat.id)?.forEach((x) => deleteMessage(chat?.id, x).catch(() => {}));
   temp.get(chat.id)?.clear();
   return {
-    chat: chat.id,
-    user: user[0],
+    reply: replier(chat.id, user[1].name, chat.type !== "private"),
     name: `${bright}${user[1].name}${reset}`,
     edit: editor(chat.id),
-    reply: replier(chat.id, user[1].name, chat.type !== "private"),
+    chat: chat.id,
+    user: user[0],
   };
 }
 
@@ -113,12 +113,12 @@ async function* handle(update: unknown, me: string, url?: string) {
     yield* voice(
       new URL(
         data.result.file_path,
-        url.replace("/bot", "/file/bot")
-      ).toString()
+        url.replace("/bot", "/file/bot"),
+      ).toString(),
     );
   }
   if (type.text.is(update)) {
-    const { text, reply_to_message } = update.message;
+    const { reply_to_message, text } = update.message;
     if (!text.startsWith("/")) yield* message(text);
     else yield* command(text.slice(1), reply_to_message?.message_id);
   }
@@ -130,7 +130,7 @@ async function* handle(update: unknown, me: string, url?: string) {
     });
   }
   if (type.post.is(update)) {
-    const { chat, audio, text } = update.channel_post;
+    const { audio, chat, text } = update.channel_post;
     if (text?.includes(`@${me}`)) yield* mention(chat.id);
     if (audio) {
       const meta = {
@@ -141,7 +141,7 @@ async function* handle(update: unknown, me: string, url?: string) {
     }
   }
   if (type.callback.is(update)) {
-    const { id, data, from, message } = update.callback_query;
+    const { message, data, from, id } = update.callback_query;
     const action = JSON.parse(data);
     yield* callback(action, message.message_id, from.id);
     answerCallbackQuery(id);

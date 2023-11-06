@@ -1,7 +1,7 @@
-import { has, mergeSorted } from "@amadeus-music/util/object";
-import { compare, identify, type MediaBase } from ".";
+import { mergeSorted, has } from "@amadeus-music/util/object";
+import { type MediaBase, identify, compare } from ".";
 import { unbrace } from "@amadeus-music/util/string";
-import type { Media, ToInfo } from "./derived";
+import type { ToInfo, Media } from "./derived";
 
 function collection<T extends Media>(compare = (a: T, b: T) => b.id - a.id) {
   const groups = new Map<number, T[]>();
@@ -38,7 +38,7 @@ function collection<T extends Media>(compare = (a: T, b: T) => b.id - a.id) {
     },
     get items() {
       return [...new Set(mergeSorted([...groups.values()], compare))].filter(
-        (x) => !deleted.has(x.id)
+        (x) => !deleted.has(x.id),
       );
     },
   };
@@ -141,9 +141,9 @@ function fix(assets: MediaBase) {
   if (!assets.thumbnails) assets.thumbnails = [];
   assets.thumbnails = assets.thumbnails.slice(0, assets.arts.length);
   assets.thumbnails = assets.thumbnails.concat(
-    Array(assets.arts.length - assets.thumbnails.length).fill(null)
+    Array(assets.arts.length - assets.thumbnails.length).fill(null),
   );
   return assets;
 }
 
-export { merge, convert, collection };
+export { collection, convert, merge };

@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-object-types */
 import type {
   MonadsTransform,
   Unwrapped,
@@ -24,22 +25,22 @@ type λ7<W, A, B, C, D, E, F, G, H> = [...λ6<W, A, B, C, D, E, F, G>, λ<G, H, 
 type λ8<W, A, B, C, D, E, F, G, H, I> = [...λ7<W, A, B, C, D, E, F, G, H>, λ<H, I, [A, B, C, D, E, F, G]>];
 type λ_<W, A, B, C, D, E, F, G, H, I, Z extends λs> = [
   ...λ8<W, A, B, C, D, E, F, G, H, I>,
-  ...λn<I, Z, [A, B, C, D, E, F, G, H]>
+  ...λn<I, Z, [A, B, C, D, E, F, G, H]>,
 ];
 
 type λn<A, Z extends λs, H extends any[] = []> = Z extends [
   λ<any, infer B, any>,
-  ...infer Rest
+  ...infer Rest,
 ]
   ? Rest extends [any, ...any]
     ? [λ<A, B, H>, ...λn<B, Rest, [...H, A]>]
     : [λ<A, B, H>]
   : Z;
 
-type Type = "pipe" | "pipeline";
+type Type = "pipeline" | "pipe";
 type Awaits<T> = { -readonly [P in keyof T]: Awaited<T[P]> };
 type Returns<T extends γs> = { -readonly [P in keyof T]: ReturnType<T[P]> };
-type Thenable<T> = T | Monad<T, any> | Promise<T>;
+type Thenable<T> = Monad<T, any> | Promise<T> | T;
 type Thenify<T> = T extends [infer Item, ...infer Rest]
   ? [Thenable<Item>, ...Thenify<Rest>]
   : T;

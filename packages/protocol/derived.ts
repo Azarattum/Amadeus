@@ -1,20 +1,20 @@
 import {
+  collectionBase,
+  playlistBase,
+  artistBase,
   mediaBase,
   trackBase,
   albumBase,
-  artistBase,
-  playlistBase,
-  collectionBase,
 } from "./base";
 import {
-  array,
-  assign,
+  optional,
   literal,
+  assign,
   number,
   object,
-  omit,
-  optional,
+  array,
   union,
+  omit,
 } from "superstruct";
 import type { Infer } from "superstruct";
 import { unique } from "./modifiers";
@@ -23,14 +23,14 @@ import { unique } from "./modifiers";
 const artistInfo = assign(artistBase, mediaBase);
 const albumInfo = assign(
   albumBase,
-  assign(mediaBase, object({ artists: array(artistInfo) }))
+  assign(mediaBase, object({ artists: array(artistInfo) })),
 );
 const trackInfo = assign(
   trackBase,
   assign(
     omit(mediaBase, ["arts", "thumbnails"]),
-    object({ album: omit(albumInfo, ["artists"]), artists: array(artistInfo) })
-  )
+    object({ album: omit(albumInfo, ["artists"]), artists: array(artistInfo) }),
+  ),
 );
 const playlistInfo = playlistBase;
 
@@ -38,28 +38,28 @@ const playlistInfo = playlistBase;
 const track = assign(
   unique(trackInfo),
   object({
-    entry: optional(number()),
-    album: unique(trackInfo.schema.album),
     artists: array(unique(trackInfo.schema.artists.schema)),
-  })
+    album: unique(trackInfo.schema.album),
+    entry: optional(number()),
+  }),
 );
 const album = assign(
   unique(albumInfo),
   object({
     artists: array(unique(albumInfo.schema.artists.schema)),
     collection: optional(collectionBase(track)),
-  })
+  }),
 );
 const artist = assign(
   unique(artistInfo),
   object({
     following: optional(union([literal(0), literal(1)])),
     collection: optional(collectionBase(track)),
-  })
+  }),
 );
 const playlist = assign(
   unique(playlistInfo),
-  object({ collection: optional(collectionBase(track)) })
+  object({ collection: optional(collectionBase(track)) }),
 );
 
 enum Feed {
@@ -70,25 +70,25 @@ enum Feed {
 }
 
 // ======================= Types ========================
-type PlaybackPush = "first" | "next" | "last" | "random" | number;
-type PlaybackDirection = "forward" | "backward" | "shuffled";
-type PlaybackRepeat = "none" | "single" | "all";
-type MediaType = "track" | "album" | "artist";
-type CollectionType = "album" | "artist" | "playlist";
+type PlaybackPush = "random" | "first" | "next" | "last" | number;
+type PlaybackDirection = "backward" | "shuffled" | "forward";
+type PlaybackRepeat = "single" | "none" | "all";
+type CollectionType = "playlist" | "artist" | "album";
+type MediaType = "artist" | "track" | "album";
 
-type TrackInfo = Infer<typeof trackInfo>;
-type AlbumInfo = Infer<typeof albumInfo>;
-type ArtistInfo = Infer<typeof artistInfo>;
+type CollectionInfo = PlaylistInfo | ArtistInfo | AlbumInfo;
+type MediaInfo = ArtistInfo | TrackInfo | AlbumInfo;
 type PlaylistInfo = Infer<typeof playlistInfo>;
-type MediaInfo = TrackInfo | AlbumInfo | ArtistInfo;
-type CollectionInfo = AlbumInfo | ArtistInfo | PlaylistInfo;
+type ArtistInfo = Infer<typeof artistInfo>;
+type AlbumInfo = Infer<typeof albumInfo>;
+type TrackInfo = Infer<typeof trackInfo>;
 
-type Track = Infer<typeof track>;
-type Album = Infer<typeof album>;
-type Artist = Infer<typeof artist>;
+type Collection = Playlist | Artist | Album;
+type Media = Artist | Track | Album;
 type Playlist = Infer<typeof playlist>;
-type Media = Track | Album | Artist;
-type Collection = Album | Artist | Playlist;
+type Artist = Infer<typeof artist>;
+type Album = Infer<typeof album>;
+type Track = Infer<typeof track>;
 
 type FromType<T extends MediaType> = T extends "track"
   ? Track
@@ -114,24 +114,24 @@ type ToInfo<T extends MediaInfo> = T extends Track
   ? ArtistInfo
   : never;
 
-export { trackInfo, albumInfo, artistInfo, playlistInfo };
-export { track, album, artist, playlist };
+export { playlistInfo, artistInfo, trackInfo, albumInfo };
+export { playlist, artist, track, album };
 export { Feed };
 
-export type { Track, Album, Artist, Playlist, Media, Collection };
+export type { Collection, Playlist, Artist, Track, Album, Media };
 export type { FromType, FromInfo, ToInfo };
 export type {
   PlaybackDirection,
   PlaybackRepeat,
-  PlaybackPush,
   CollectionType,
+  PlaybackPush,
   MediaType,
 };
 export type {
+  CollectionInfo,
+  PlaylistInfo,
+  ArtistInfo,
   TrackInfo,
   AlbumInfo,
-  ArtistInfo,
-  PlaylistInfo,
-  CollectionInfo,
   MediaInfo,
 };

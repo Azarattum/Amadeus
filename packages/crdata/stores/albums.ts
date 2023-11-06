@@ -1,4 +1,4 @@
-import { album, source, asset, artist } from "../operations/cte";
+import { source, artist, album, asset } from "../operations/cte";
 import type { Album } from "@amadeus-music/protocol";
 import { pushAlbums } from "../operations/push";
 import { sanitize } from "../operations/utils";
@@ -16,9 +16,6 @@ export const albums = ({ replicated }: DB) =>
         .selectAll()
         .orderBy("album.title"),
     {
-      async push(db, albums: Album[]) {
-        await pushAlbums(db, albums);
-      },
       async search(db, query: string, limit = 10, offset = 0) {
         if (!query) return [];
         return db
@@ -47,6 +44,9 @@ export const albums = ({ replicated }: DB) =>
           .where("album.id", "=", id)
           .$castTo<Album>()
           .executeTakeFirstOrThrow();
+      },
+      async push(db, albums: Album[]) {
+        await pushAlbums(db, albums);
       },
     },
   );

@@ -16,5 +16,5 @@
     <Checkbox bind:checked={controls}>Controls</Checkbox>
     <Checkbox bind:checked={p}>Padding</Checkbox>
   </Stack>
-  <Range {min} {max} {hints} {controls} {p} />
+  <Range {controls} {hints} {min} {max} {p} />
 </Stack>

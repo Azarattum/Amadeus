@@ -1,5 +1,5 @@
 import externals from "rollup-plugin-node-externals";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import replace from "@rollup/plugin-replace";
 import copy from "rollup-plugin-copy";
 import { resolve } from "node:path";
@@ -20,33 +20,33 @@ export default defineConfig({
     copy({
       targets: [
         {
-          src: "./assets/*",
           dest: resolve(build, name),
+          src: "./assets/*",
         },
       ],
     }),
   ],
   resolve: {
-    conditions: ["import", "module", "node", "default"],
-    browserField: false,
     alias: [
       {
+        customResolver: (id) => ({ external: "relative", id }),
         find: "@amadeus-music/core",
         replacement: "../app.cjs",
-        customResolver: (id) => ({ external: "relative", id }),
       },
     ],
+    conditions: ["import", "module", "node", "default"],
+    browserField: false,
   },
   build: {
-    emptyOutDir: monorepo ? false : true,
-    outDir: build,
     lib: {
-      formats: ["cjs"],
-      entry: "./index.ts",
       fileName: (ext) => `${name}.${ext}`,
+      entry: "./index.ts",
+      formats: ["cjs"],
     },
     commonjsOptions: {
       ignoreDynamicRequires: true,
     },
+    emptyOutDir: monorepo ? false : true,
+    outDir: build,
   },
 });

@@ -17,16 +17,16 @@ import type { IsNever } from "libfun/utils/types";
 import type { async } from "libfun";
 
 type Database = DeepPartial<{
-  playlists: {
-    create(playlist: Partial<PlaylistBase> & { title: string }): Promise<void>;
-    edit(id: number, playlist: Partial<PlaylistBase>): Promise<void>;
-    rearrange(id: number, after?: number): Promise<void>;
-    get(id: number): Promise<Playlist>;
-    delete(id: number): Promise<void>;
-  };
-  feed: {
-    get(type: Feed, limit?: number): Promise<number[]>;
-    clear(type: Feed, before?: number): Promise<void>;
+  playback: {
+    push(tracks: Track[], at?: PlaybackPush): Promise<void>;
+    rearrange(track: number, after?: number): Promise<void>;
+    redirect(direction: PlaybackDirection): Promise<void>;
+    replicate(device: Uint8Array): Promise<void>;
+    repeat(type: PlaybackRepeat): Promise<void>;
+    clear(device?: Uint8Array): Promise<void>;
+    infinite(toggle?: boolean): Promise<void>;
+    purge(entries: number[]): Promise<void>;
+    sync(progress: number): Promise<void>;
   };
   library: {
     sample(size: number, deviation?: number): Promise<Track[]>;
@@ -37,58 +37,58 @@ type Database = DeepPartial<{
     purge(entries: number[]): Promise<void>;
     banned(): Promise<number[]>;
   };
-  settings: {
-    store(key: string, value: unknown, collection?: string): Promise<void>;
-    lookup(value: unknown, collection?: string): Promise<string>;
-    extract(key: string, collection?: string): Promise<any>;
-  };
-  history: {
-    get(): Promise<{ query: string; date: number }[]>;
-    log(query: string): Promise<void>;
-    clear(): Promise<void>;
-  };
-  tracks: {
-    edit(
-      id: number,
-      track: Partial<TrackBase & { album: AlbumBase }>,
-    ): Promise<void>;
-    search(query: string, limit?: number, offset?: number): Promise<Track[]>;
-    get(id: number): Promise<Track>;
-  };
   artists: {
     search(query: string, limit?: number, offset?: number): Promise<Artist[]>;
     edit(id: number, artist: Partial<ArtistBase>): Promise<void>;
     push(artists: Artist[]): Promise<void>;
-    get(id: number): Promise<Artist>;
     unfollow(id: number): Promise<void>;
     follow(id: number): Promise<void>;
+    get(id: number): Promise<Artist>;
+  };
+  playlists: {
+    create(playlist: Partial<PlaylistBase> & { title: string }): Promise<void>;
+    edit(id: number, playlist: Partial<PlaylistBase>): Promise<void>;
+    rearrange(id: number, after?: number): Promise<void>;
+    get(id: number): Promise<Playlist>;
+    delete(id: number): Promise<void>;
+  };
+  tracks: {
+    edit(
+      id: number,
+      track: Partial<{ album: AlbumBase } & TrackBase>,
+    ): Promise<void>;
+    search(query: string, limit?: number, offset?: number): Promise<Track[]>;
+    get(id: number): Promise<Track>;
+  };
+  settings: {
+    store(key: string, value: unknown, collection?: string): Promise<void>;
+    lookup(value: unknown, collection?: string): Promise<string>;
+    extract(key: string, collection?: string): Promise<any>;
   };
   albums: {
     search(query: string, limit?: number, offset?: number): Promise<Album[]>;
     push(albums: Album[]): Promise<void>;
     get(id: number): Promise<Album>;
   };
-  playback: {
-    push(tracks: Track[], at?: PlaybackPush): Promise<void>;
-    purge(entries: number[]): Promise<void>;
-    clear(device?: Uint8Array): Promise<void>;
-    sync(progress: number): Promise<void>;
-    rearrange(track: number, after?: number): Promise<void>;
-    redirect(direction: PlaybackDirection): Promise<void>;
-    repeat(type: PlaybackRepeat): Promise<void>;
-    infinite(toggle?: boolean): Promise<void>;
-    replicate(device: Uint8Array): Promise<void>;
+  history: {
+    get(): Promise<{ query: string; date: number }[]>;
+    log(query: string): Promise<void>;
+    clear(): Promise<void>;
   };
   resources: {
-    prioritize(type: "art" | "source", resource: string): Promise<void>;
+    prioritize(type: "source" | "art", resource: string): Promise<void>;
     get(owner: number): Promise<MediaBase>;
   };
-  merge(changes: string): Promise<void>;
+  feed: {
+    get(type: Feed, limit?: number): Promise<number[]>;
+    clear(type: Feed, before?: number): Promise<void>;
+  };
   subscribe(
     tables: string[],
     callback: (changes: string, sender?: string) => any,
-    options?: { client: string; version: number },
+    options?: { version: number; client: string },
   ): () => void;
+  merge(changes: string): Promise<void>;
 }>;
 
 type User = {
@@ -122,4 +122,4 @@ type DeepPartial<T> = {
     : T[P];
 };
 
-export type { Strategy, Database, Persistence, User, Method };
+export type { Persistence, Strategy, Database, Method, User };

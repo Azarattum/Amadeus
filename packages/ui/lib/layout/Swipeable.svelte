@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { intersection, type IntersectionEvent } from "../../action";
+  import { type IntersectionEvent, intersection } from "../../action";
   import { createEventDispatcher } from "svelte";
 
   const active = [false, false] as [boolean, boolean];
@@ -28,17 +28,17 @@
   style="grid: auto / auto-flow {$$slots.before ? '1fr ' : ''}100%{$$slots.after
     ? ' 1fr'
     : ''};"
-  class:bg-primary-600={active[0] || active[1]}
   on:wheel|passive={({ deltaX }) => (wheel = deltaX)}
+  class:bg-primary-600={active[0] || active[1]}
   on:touchend={finish}
 >
   {#if $$slots.before}
     <div
-      use:intersection={0.5}
-      on:intersect={intersected(0)}
       class="flex items-center px-4 text-content-200 transition-colors"
       style="scroll-snap-align: none;"
+      on:intersect={intersected(0)}
       class:text-white={active[0]}
+      use:intersection={0.5}
     >
       <slot name="before" />
     </div>
@@ -46,10 +46,10 @@
   <div class="snap-center snap-always"><slot /></div>
   {#if $$slots.after}
     <div
-      use:intersection={0.5}
-      on:intersect={intersected(1)}
       class="flex items-center px-4 text-content-200 transition-colors"
+      on:intersect={intersected(1)}
       class:text-white={active[1]}
+      use:intersection={0.5}
     >
       <slot name="after" />
     </div>

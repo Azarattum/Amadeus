@@ -4,24 +4,24 @@
 
   export let sm = false;
   export let progress = 0;
-  export let selected: boolean | "passive" = false;
+  export let selected: "passive" | boolean = false;
   export let track: Track | undefined = undefined;
 
   $: [primary = undefined, ...sub] = track?.title.split("(") || [];
   $: secondary = sub.length ? "(" + sub.join("(") : "";
 </script>
 
-<Card sm flat flow={!sm} interactive on:contextmenu on:click {selected}>
+<Card interactive flat sm flow={!sm} {selected} on:contextmenu on:click>
   <Image
-    src={track ? track.album.arts?.[0] || "" : undefined}
     thumbnail={track ? track.album.thumbnails?.[0] || "" : undefined}
+    src={track ? track.album.arts?.[0] || "" : undefined}
     slot="before"
   >
     <div
       class="flex h-full w-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
       style:filter="hue-rotate({track?.id || 0}deg)"
     >
-      <Icon name="note" />
+      <Icon of="note" />
     </div>
   </Image>
   <Text accent loading={!track}>

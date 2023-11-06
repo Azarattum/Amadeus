@@ -1,4 +1,4 @@
-import { black, bright, reset } from "./color";
+import { bright, black, reset } from "./color";
 
 /**
  * Makes the first letter of first/every word uppercase in a string
@@ -55,7 +55,7 @@ export function plural(word: string, count?: number) {
  */
 export function split(text: string) {
   return (text.trim().match(/(--\S+=)?"(\\"|[^"])*"|[^ "]+/g) || []).map((x) =>
-    x.replace(/^"|"$/g, "").trim()
+    x.replace(/^"|"$/g, "").trim(),
   );
 }
 
@@ -90,7 +90,7 @@ export function clean(text: string) {
 export function dedupe(
   input: string,
   format = (line: string, i: number) =>
-    `${line} ${bright + black}(x${i})${reset}`
+    `${line} ${bright + black}(x${i})${reset}`,
 ) {
   const lines = input.split("\n");
   let count = 1;

@@ -19,8 +19,8 @@ import {
   take,
   wrap,
 } from "./iterator";
-import { derive, block, delay, cancel, cleanup } from "../utils/async";
-import type { Reject, Resolve } from "../monad/monad.types";
+import { cleanup, derive, cancel, block, delay } from "../utils/async";
+import type { Resolve, Reject } from "../monad/monad.types";
 import type { Fn } from "../utils/types";
 import { handle } from "../utils/error";
 
@@ -64,46 +64,59 @@ function pools(options: Partial<Options<any>> = {}): Pools {
 
   type ProtoPool = Pool<Fn<unknown[], unknown>, Record<string, any>>;
   const prototype: Pick<ProtoPool, keyof ProtoPool> = {
-    abort(filter) {
-      this[state].executing.forEach((executor) => {
-        match(executor, filter).forEach((x) => x.controller.abort());
-      });
-    },
-    drain(filter) {
-      this[state].pending.forEach((executor) => {
-        match(executor, filter).forEach((x) => x.controller.abort());
-      });
-      this.abort(filter);
-    },
-    close(filter) {
-      const { listeners, cached, catchers } = this[state];
-      listeners.forEach((x) => {
-        if (!filter) listeners.delete(x);
-        if (filter?.group && x.group === filter.group) listeners.delete(x);
-        if (filter?.handler && x.group === filter.handler) listeners.delete(x);
-      });
-      this.drain(filter);
-      if (!listeners.size) {
-        all.delete(this[state].id);
-        cached.clear();
-        catchers.clear();
+    split() {
+      const group = (this as any).group || this[state].group;
+      return (...args: any[]) => {
+        const results = new Map();
+        const groups = new Set(
+          [...this[state].listeners]
+            .map((x) => x.group as string)
+            .filter((x) => x),
+        );
+        const executor: Executor = {
+          controller: derive(globalContext.signal),
+          tasks: new Set(),
+          group,
+        };
+        executor.controller.signal.addEventListener(
+          "abort",
+          () => {
+            this[state].pending.delete(executor);
+            this[state].executing.delete(executor);
+          },
+          { once: true },
+        );
 
-        for (const group of contexts.keys()) {
-          const obsolete = [...all.values()].every(
-            (x) =>
-              x[state].group !== group &&
-              (x as any).group !== group &&
-              [...x[state].listeners].every((y) => y.group !== group),
-          );
-          if (obsolete) contexts.delete(group);
-        }
-      }
-    },
-    status() {
-      return this[state];
-    },
-    catch(handler) {
-      this[state].catchers.add(handler || (() => {}));
+        let running = 0;
+        groups.forEach((filter) => {
+          const context = { filter, group };
+          const generator = (this as any).bind(context)(...args);
+          const current = generator.executor as Executor;
+
+          const abort = () => (current.controller.abort(), remove());
+          const remove = () => {
+            executor?.controller.signal.removeEventListener("abort", abort);
+            current.controller.signal.removeEventListener("abort", remove);
+            if (!--running) executor.controller.abort();
+          };
+          executor.controller.signal.addEventListener("abort", abort);
+          current.controller.signal.addEventListener("abort", remove);
+          current.tasks.forEach((x) => executor?.tasks.add(x));
+          current.tasks = executor.tasks;
+          generator.executor = executor;
+          if (this[state].pending.delete(current)) {
+            this[state].pending.add(executor);
+          }
+          if (this[state].executing.delete(current)) {
+            this[state].executing.add(executor);
+          }
+
+          running += 1;
+          results.set(filter, generator);
+        });
+
+        return results;
+      };
     },
     schedule(when) {
       const group = (this as any).group || this[state].group;
@@ -164,67 +177,29 @@ function pools(options: Partial<Options<any>> = {}): Pools {
         return Object.assign(generator, { executor, then });
       };
     },
-    where(filter) {
-      const group = (this as any).group || this[state].group;
-      const context = { group, filter };
-      return Function.bind.call(this as any, context) as any;
-    },
-    split() {
-      const group = (this as any).group || this[state].group;
-      return (...args: any[]) => {
-        const results = new Map();
-        const groups = new Set(
-          [...this[state].listeners]
-            .map((x) => x.group as string)
-            .filter((x) => x),
-        );
-        const executor: Executor = {
-          controller: derive(globalContext.signal),
-          tasks: new Set(),
-          group,
-        };
-        executor.controller.signal.addEventListener(
-          "abort",
-          () => {
-            this[state].pending.delete(executor);
-            this[state].executing.delete(executor);
-          },
-          { once: true },
-        );
+    close(filter) {
+      const { listeners, catchers, cached } = this[state];
+      listeners.forEach((x) => {
+        if (!filter) listeners.delete(x);
+        if (filter?.group && x.group === filter.group) listeners.delete(x);
+        if (filter?.handler && x.group === filter.handler) listeners.delete(x);
+      });
+      this.drain(filter);
+      if (!listeners.size) {
+        all.delete(this[state].id);
+        cached.clear();
+        catchers.clear();
 
-        let running = 0;
-        groups.forEach((filter) => {
-          const context = { group, filter };
-          const generator = (this as any).bind(context)(...args);
-          const current = generator.executor as Executor;
-
-          const abort = () => (current.controller.abort(), remove());
-          const remove = () => {
-            executor?.controller.signal.removeEventListener("abort", abort);
-            current.controller.signal.removeEventListener("abort", remove);
-            if (!--running) executor.controller.abort();
-          };
-          executor.controller.signal.addEventListener("abort", abort);
-          current.controller.signal.addEventListener("abort", remove);
-          current.tasks.forEach((x) => executor?.tasks.add(x));
-          current.tasks = executor.tasks;
-          generator.executor = executor;
-          if (this[state].pending.delete(current)) {
-            this[state].pending.add(executor);
-          }
-          if (this[state].executing.delete(current)) {
-            this[state].executing.add(executor);
-          }
-
-          running += 1;
-          results.set(filter, generator);
-        });
-
-        return results;
-      };
-    },
-    context(context) {
-      this.bind({ context, group: "" });
+        for (const group of contexts.keys()) {
+          const obsolete = [...all.values()].every(
+            (x) =>
+              x[state].group !== group &&
+              (x as any).group !== group &&
+              [...x[state].listeners].every((y) => y.group !== group),
+          );
+          if (obsolete) contexts.delete(group);
+        }
+      }
     },
     bind(context: Override) {
       if (context?.context) {
@@ -243,46 +218,71 @@ function pools(options: Partial<Options<any>> = {}): Pools {
       if (context?.group) pool.group = context.group;
       return Object.assign(pool, { [state]: this[state] });
     },
+    where(filter) {
+      const group = (this as any).group || this[state].group;
+      const context = { filter, group };
+      return Function.bind.call(this as any, context) as any;
+    },
+    drain(filter) {
+      this[state].pending.forEach((executor) => {
+        match(executor, filter).forEach((x) => x.controller.abort());
+      });
+      this.abort(filter);
+    },
+    abort(filter) {
+      this[state].executing.forEach((executor) => {
+        match(executor, filter).forEach((x) => x.controller.abort());
+      });
+    },
+    catch(handler) {
+      this[state].catchers.add(handler || (() => {}));
+    },
+    context(context) {
+      this.bind({ group: "", context });
+    },
+    status() {
+      return this[state];
+    },
   };
   Object.setPrototypeOf(prototype, Function);
 
   return {
-    contexts,
+    pool(
+      this: { scope?: string } & Override,
+      id: string,
+      options: Partial<Options<any>> = {},
+    ) {
+      return pool.bind(this, {
+        options: globals,
+        prototype,
+        catchers,
+        contexts,
+        all,
+      })(id, options) as any;
+    },
+    catch(handler) {
+      catchers.add(handler || (() => {}));
+    },
     schedule: each("schedule"),
     status: each("status"),
+    count: () => all.size,
     abort: each("abort"),
     drain: each("drain"),
     close: each("close"),
     where: each("where"),
     split: each("split"),
-    count: () => all.size,
-    catch(handler) {
-      catchers.add(handler || (() => {}));
-    },
-    pool(
-      this: Override & { scope?: string },
-      id: string,
-      options: Partial<Options<any>> = {},
-    ) {
-      return pool.bind(this, {
-        all,
-        catchers,
-        contexts,
-        prototype,
-        options: globals,
-      })(id, options) as any;
-    },
+    contexts,
   };
 }
 
 function pool<T extends Fn = () => void, R = never>(
-  this: Override & { scope?: string },
+  this: { scope?: string } & Override,
   global: {
-    options: Options<Fn>;
-    prototype: object;
+    contexts: Map<string, Ctx>;
     all: Map<string, Pool>;
     catchers: Set<Catcher>;
-    contexts: Map<string, Ctx>;
+    options: Options<Fn>;
+    prototype: object;
   },
   id: string,
   options: Partial<Options<any>> = {},
@@ -295,12 +295,12 @@ function pool<T extends Fn = () => void, R = never>(
   options.group = options.group || this?.group || global.options.group;
   const data: Pick<Pool, symbol> = {
     [state]: {
-      id,
-      cached: new Map(),
-      pending: new Set(),
-      catchers: new Set(),
       executing: new Set(),
       listeners: new Set(),
+      catchers: new Set(),
+      pending: new Set(),
+      cached: new Map(),
+      id,
       ...global.options,
       ...options,
     },
@@ -355,8 +355,8 @@ function pool<T extends Fn = () => void, R = never>(
           ...(handler.group ? global.contexts.get(handler.group) || {} : {}),
         }),
         task: {
-          group: handler.group,
           controller: derive(context.signal),
+          group: handler.group,
         },
       }));
 
@@ -448,11 +448,11 @@ function match(executor: Executor, filter?: Filter) {
 }
 
 class PoolError extends Error implements Details {
-  pool: string;
-  reason: string;
-  caller?: string;
-  handler?: string;
   trace: string[] = [];
+  handler?: string;
+  caller?: string;
+  reason: string;
+  pool: string;
 
   constructor(error: Error, details: Omit<Details, "reason">) {
     super(error.message);
@@ -483,4 +483,4 @@ class PoolError extends Error implements Details {
   }
 }
 
-export { pools, PoolError };
+export { PoolError, pools };

@@ -1,5 +1,5 @@
 import { pages } from "./pagination";
-import { it, expect } from "vitest";
+import { expect, it } from "vitest";
 
 const objectify = <T>(x: T) => ({ title: String(x) });
 
@@ -11,7 +11,7 @@ it("appends pages", async () => {
   const generator = data.values();
   const nextIs = async (expected: number[]) =>
     expect((await generator.next()).value?.items).toMatchObject(
-      expected.map(objectify)
+      expected.map(objectify),
     );
 
   data.append(0, [1, 5, 3].map(objectify));

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Icon, Button, type EditEvent } from "@amadeus-music/ui";
-  import { extra, library, playlists } from "$lib/data";
+  import { type EditEvent, Button, Icon } from "@amadeus-music/ui";
+  import { playlists, library, extra } from "$lib/data";
   import type { Track } from "@amadeus-music/protocol";
   import Collection from "$lib/ui/Collection.svelte";
   import { page } from "$app/stores";
@@ -24,9 +24,9 @@
   }
 </script>
 
-<Collection of={info} style="playlist" bind:selected on:edit={edit}>
-  <Icon name="last" slot="action" />
-  <Button air stretch on:click={purge}><Icon name="trash" /></Button>
+<Collection of={info} style="playlist" on:edit={edit} bind:selected>
+  <Icon of="last" slot="action" />
+  <Button stretch air on:click={purge}><Icon of="trash" /></Button>
 </Collection>
 
 <svelte:head>

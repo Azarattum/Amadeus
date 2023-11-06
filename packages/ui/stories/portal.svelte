@@ -21,11 +21,11 @@
   <Stack class="gap-2">
     {#if shown}
       <Portal to={to.toString()} unique="busy">
-        <b id="glow" class="target:text-primary-600">Portal says {value}!</b>
+        <b class="target:text-primary-600" id="glow">Portal says {value}!</b>
       </Portal>
     {/if}
     <Checkbox bind:checked={shown}>Enabled</Checkbox>
-    <Input bind:value resettable>Message:</Input>
+    <Input resettable bind:value>Message:</Input>
     <Group size={4} bind:value={to}>
       <Button>Place 0</Button>
       <Button>Place 1</Button>

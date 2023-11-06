@@ -1,5 +1,5 @@
-import { source, asset, track, album, artist } from "../operations/cte";
-import type { Album, Track, TrackBase } from "@amadeus-music/protocol";
+import { source, artist, asset, track, album } from "../operations/cte";
+import type { TrackBase, Album, Track } from "@amadeus-music/protocol";
 import { sanitize } from "../operations/utils";
 import type { DB } from "../data/schema";
 
@@ -29,21 +29,6 @@ export const tracks = ({ replicated }: DB) =>
         .orderBy("library.id")
         .$castTo<Track & { entry: number; date: number }>(),
     {
-      async edit(db, id: number, track: Partial<TrackBase & { album: Album }>) {
-        const result = await db
-          .updateTable("tracks")
-          .where("id", "=", id)
-          .set({ ...track, album: undefined })
-          .returning("album")
-          .executeTakeFirst();
-        if (result?.album && track.album) {
-          await db
-            .updateTable("albums")
-            .where("id", "=", result.album)
-            .set(track.album)
-            .execute();
-        }
-      },
       async search(db, query: string, limit = 10, offset = 0) {
         if (!query) return [];
         return db
@@ -61,6 +46,21 @@ export const tracks = ({ replicated }: DB) =>
           .offset(offset)
           .$castTo<Track>()
           .execute();
+      },
+      async edit(db, id: number, track: Partial<TrackBase & { album: Album }>) {
+        const result = await db
+          .updateTable("tracks")
+          .where("id", "=", id)
+          .set({ ...track, album: undefined })
+          .returning("album")
+          .executeTakeFirst();
+        if (result?.album && track.album) {
+          await db
+            .updateTable("albums")
+            .where("id", "=", result.album)
+            .set(track.album)
+            .execute();
+        }
       },
       get(db, id: number) {
         return db

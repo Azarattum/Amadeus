@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import { Button, Header, Icon, Separator, tw } from "@amadeus-music/ui";
+  import { Separator, Button, Header, Icon, tw } from "@amadeus-music/ui";
   import { throttle } from "@amadeus-music/util/async";
   import type { Track } from "@amadeus-music/protocol";
   import Playback from "$lib/ui/Playback.svelte";
@@ -77,19 +77,19 @@
 </script>
 
 <audio
-  {src}
   preload="auto"
-  bind:paused
-  bind:readyState
-  bind:currentTime
-  bind:playbackRate
+  {src}
   on:ended={() => ended || (playback.sync(1), (ended = true))}
+  bind:playbackRate
+  bind:currentTime
+  bind:readyState
+  bind:paused
 />
 <div class={tw`flex h-screen flex-col border-l border-highlight ${classes}`}>
   <div>
     <Playback
-      {track}
       loading={readyState <= 2 && !!src}
+      {track}
       on:forward={() => (playbackRate = 5)}
       on:rewind={() => (playbackRate = -5)}
       on:reset={() => (playbackRate = 1)}
@@ -101,12 +101,12 @@
   </div>
   <div class="grow overflow-y-scroll contain-strict">
     <Tracks
-      tracks={$upcoming}
       sm
-      bind:selected
+      tracks={$upcoming}
       on:click={(e) => (e.preventDefault(), skip(e.detail))}
+      bind:selected
     >
-      <Button air stretch on:click={purge}><Icon name="trash" /></Button>
+      <Button stretch air on:click={purge}><Icon of="trash" /></Button>
     </Tracks>
   </div>
 </div>

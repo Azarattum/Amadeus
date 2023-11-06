@@ -1,5 +1,5 @@
 <script>
-  import { Stack, Header } from "@amadeus-music/ui";
+  import { Header, Stack } from "@amadeus-music/ui";
 </script>
 
 <Stack class="h-full overflow-auto">

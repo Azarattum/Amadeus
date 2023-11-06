@@ -2,7 +2,7 @@
 /// <reference no-default-lib="true"/>
 /// <reference lib="webworker" />
 /// <reference lib="esnext" />
-import { build, files, version } from "$service-worker";
+import { version, build, files } from "$service-worker";
 
 /** Current cache version */
 const current = `cache-${version}`;
@@ -17,7 +17,7 @@ sw.addEventListener("fetch", (event: FetchEvent) => {
 
   async function respond() {
     const cache = await caches.open(current);
-    const { hash, pathname } = new URL(event.request.url);
+    const { pathname, hash } = new URL(event.request.url);
     const params = new URLSearchParams(hash.slice(1)).get("cache");
 
     // Immediately serve application files

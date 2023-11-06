@@ -1,9 +1,5 @@
 export default {
-  plugins: [
-    "prettier-plugin-svelte",
-    "prettier-plugin-tailwindcss",
-    "prettier-plugin-sort-imports",
-  ],
-  overrides: [{ files: "*.svelte", options: { parser: "svelte" } }],
+  plugins: ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+  overrides: [{ options: { parser: "svelte" }, files: "*.svelte" }],
   tailwindPreserveWhitespace: true,
 };

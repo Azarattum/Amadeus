@@ -5,7 +5,7 @@ const streams = new Map<number, () => void>();
 function stream<T, U>(
   next: (_: Stream<T, U>) => void,
   pages: AsyncGenerator<Page<T>>,
-  detail?: U | (() => Promise<U> | U)
+  detail?: (() => Promise<U> | U) | U,
 ) {
   const id = (Math.random() * 2 ** 32) >>> 0;
   (async () => {
@@ -39,11 +39,11 @@ const next = router({
 });
 
 type Stream<T, U = undefined> = {
-  id: number;
-  detail?: U;
+  progress: number;
   page: number;
   results: T[];
-  progress: number;
+  id: number;
+  detail?: U;
 };
 
 export { stream, next };

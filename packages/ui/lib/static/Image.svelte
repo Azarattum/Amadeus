@@ -1,15 +1,15 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  export let thumbnail: string | null | undefined = undefined;
-  export let src: string | null | undefined = undefined;
+  export let thumbnail: string | undefined | null = undefined;
+  export let src: string | undefined | null = undefined;
   export let size = 48;
   export let alt = "";
 
   $: state =
     src === "" || src === null
       ? "error"
-      : ("loading" as "loading" | "ok" | "error");
+      : ("loading" as "loading" | "error" | "ok");
 
   let image: HTMLImageElement;
   onMount(() => (image?.complete && (image.style.opacity = "1"), false));
@@ -25,17 +25,17 @@
 >
   {#if src && state !== "error"}
     <img
-      {alt}
       src={size < 100 / devicePixelRatio ? thumbnail : src}
       class="opacity-0 transition-opacity duration-500"
-      class:opacity-100={state === "ok"}
-      loading="lazy"
-      width="{size}px"
       height="{size}px"
       draggable="false"
-      bind:this={image}
-      on:load={() => (state = "ok")}
+      width="{size}px"
+      loading="lazy"
+      {alt}
+      class:opacity-100={state === "ok"}
       on:error={() => (state = "error")}
+      on:load={() => (state = "ok")}
+      bind:this={image}
     />
   {:else if state === "error"}
     <slot />

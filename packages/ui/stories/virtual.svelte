@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Header, Virtual } from "@amadeus-music/ui";
+  import { Virtual, Header } from "@amadeus-music/ui";
   import { autoscroll } from "../action";
 
   let items1 = Array.from({ length: 30 }).map((_, i) => i);
@@ -12,37 +12,37 @@
   >
     <Header>List 1</Header>
     <Virtual
-      items={items1}
-      let:item
-      let:index
       animate
+      items={items1}
       columns="7rem"
       sortable="a"
+      let:index
+      let:item
     >
       <p
-        class:shadow-lg={Number.isNaN(index)}
         class="flex h-11 items-center justify-center border border-highlight bg-surface"
+        class:shadow-lg={Number.isNaN(index)}
       >
         {item}
       </p>
     </Virtual>
   </div>
   <div
-    use:autoscroll
     class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll p-4"
+    use:autoscroll
   >
     <Header>List 2</Header>
     <Virtual
-      items={items2}
-      let:item
-      let:index
       animate
       columns="20rem"
+      items={items2}
       sortable="a"
+      let:index
+      let:item
     >
       <p
-        class:shadow-lg={Number.isNaN(index)}
         class="flex h-20 items-center justify-center border border-highlight bg-surface"
+        class:shadow-lg={Number.isNaN(index)}
       >
         {item}
       </p>

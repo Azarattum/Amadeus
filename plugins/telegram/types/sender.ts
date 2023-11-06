@@ -8,11 +8,11 @@ import {
 import { chat } from "./core";
 
 const fromUser = type({
-  message_id: optional(number()),
   from: type({
-    id: number(),
     username: optional(string()),
+    id: number(),
   }),
+  message_id: optional(number()),
 });
 
 const fromChat = type({
@@ -21,11 +21,11 @@ const fromChat = type({
 });
 
 const sender = type({
-  message: optional(intersection([fromUser, fromChat])),
-  my_chat_member: optional(intersection([fromUser, fromChat])),
   callback_query: optional(
-    intersection([fromUser, type({ message: fromChat })])
+    intersection([fromUser, type({ message: fromChat })]),
   ),
+  my_chat_member: optional(intersection([fromUser, fromChat])),
+  message: optional(intersection([fromUser, fromChat])),
   channel_post: optional(fromChat),
 });
 

@@ -1,6 +1,6 @@
 import { bright, reset } from "@amadeus-music/core";
-import { changed, persistence } from "../plugin";
-import { editor, replier } from "../api/reply";
+import { persistence, changed } from "../plugin";
+import { replier, editor } from "../api/reply";
 import { decode } from "crstore";
 
 changed(function* (entries) {
@@ -19,7 +19,7 @@ function handleChanges(user: string) {
         const chat = await storage.settings.extract(playlist);
         const reply = replier(chat, name, true);
         const edit = editor(chat);
-        changed.context({ chat, user, reply, name, edit });
+        changed.context({ reply, chat, user, name, edit });
         await changed([...entries]);
       } catch {}
     }

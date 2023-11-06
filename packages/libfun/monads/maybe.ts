@@ -1,4 +1,4 @@
-import { monad, nothing, type Monad, type Nothing } from "..";
+import { type Nothing, type Monad, nothing, monad } from "..";
 
 interface Maybe extends Monad<"Maybe"> {
   then: Exclude<NonNullable<this[""]>, Nothing>;
@@ -10,4 +10,4 @@ const maybe = monad<Maybe>((value, fn) => {
   throw new Error("Value is nothing!");
 });
 
-export { maybe, type Maybe };
+export { type Maybe, maybe };

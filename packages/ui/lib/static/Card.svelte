@@ -2,7 +2,7 @@
   import type { Either } from "../../internal/types";
   import { Icon } from "../../component";
   type $$Props = Either<"xs" | "sm"> & {
-    selected?: boolean | "passive";
+    selected?: "passive" | boolean;
     href?: string | undefined;
     interactive?: boolean;
     flat?: boolean;
@@ -15,17 +15,11 @@
   export let flow = false;
   export let interactive = false;
   export let href: string | undefined = undefined;
-  export let selected: boolean | "passive" = false;
+  export let selected: "passive" | boolean = false;
 </script>
 
 <svelte:element
   this={interactive ? (href ? "a" : "button") : "article"}
-  role={href ? "link" : "button"}
-  tabindex="0"
-  {href}
-  on:click
-  on:contextmenu
-  draggable="false"
   class="group relative z-10 flex w-full items-center gap-4 overflow-hidden px-4 outline-2 -outline-offset-2 outline-primary-600 contain-inline-size focus-visible:outline
   {interactive
     ? 'cursor-pointer touch-manipulation select-none ' +
@@ -40,11 +34,17 @@
     ? 'bg-surface'
     : 'bg-surface-100 shadow-[0_0_20px_-4px] shadow-black/20 dark:shadow-none'}
   "
+  role={href ? "link" : "button"}
+  draggable="false"
+  tabindex="0"
+  {href}
+  on:contextmenu
+  on:click
 >
   <div
     aria-hidden
-    class:opacity-100={selected === true}
     class="pointer-events-none absolute inset-0 -z-10 bg-primary-200/30 opacity-0 transition-opacity"
+    class:opacity-100={selected === true}
   />
   <div
     aria-hidden
@@ -80,13 +80,13 @@
       class="flex justify-center text-primary-600 opacity-0 transition-opacity"
       class:opacity-100={selected}
     >
-      <Icon name="circle" />
+      <Icon of="circle" />
     </div>
     <div
       class="flex scale-0 justify-center text-primary-600 transition-transform"
       class:scale-100={selected === true}
     >
-      <Icon name="target" />
+      <Icon of="target" />
     </div>
     <div class="opacity-0 transition-opacity" class:opacity-100={!selected}>
       <slot name="after" />

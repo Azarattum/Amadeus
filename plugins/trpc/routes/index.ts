@@ -7,11 +7,11 @@ import { search } from "./search";
 import { sync } from "./sync";
 
 export const app = router({
-  sync,
+  transcribe,
+  desource,
+  streams,
   expand,
   search,
-  streams,
-  desource,
-  transcribe,
+  sync,
 });
 export type App = typeof app;

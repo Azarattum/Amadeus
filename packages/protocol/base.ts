@@ -1,24 +1,24 @@
 import {
-  Struct,
-  array,
-  integer,
   nullable,
+  optional,
+  integer,
+  Struct,
   number,
   object,
-  optional,
   string,
+  array,
   type,
 } from "superstruct";
 import type { Infer } from "superstruct";
 
 const track = object({
-  title: string(),
   duration: number(),
+  title: string(),
 });
 
 const album = object({
-  title: string(),
   year: integer(),
+  title: string(),
 });
 
 const artist = object({
@@ -26,29 +26,29 @@ const artist = object({
 });
 
 const playlist = object({
-  title: string(),
-  relevancy: number(),
   shared: nullable(string()),
   remote: nullable(string()),
+  relevancy: number(),
+  title: string(),
 });
 
 const meta = type({
-  title: optional(string()),
-  album: optional(type({ title: optional(string()) })),
   artists: optional(array(type({ title: optional(string()) }))),
+  album: optional(type({ title: optional(string()) })),
+  title: optional(string()),
 });
 
 const media = object({
-  sources: array(string()),
-  arts: optional(array(string())),
   thumbnails: optional(array(nullable(string()))),
+  arts: optional(array(string())),
+  sources: array(string()),
 });
 
 const collection = <T extends Struct<any, any>>(item: T) =>
   object({
-    size: integer(),
-    duration: number(),
     tracks: array(item),
+    duration: number(),
+    size: integer(),
   });
 
 type TrackBase = Infer<typeof track>;
@@ -63,20 +63,20 @@ type CollectionBase<T = unknown> = Infer<
 >;
 
 export type {
-  Meta,
+  CollectionBase,
+  PlaylistBase,
+  ArtistBase,
   MediaBase,
   TrackBase,
   AlbumBase,
-  ArtistBase,
-  PlaylistBase,
-  CollectionBase,
+  Meta,
 };
 export {
-  meta,
+  collection as collectionBase,
+  playlist as playlistBase,
+  artist as artistBase,
   media as mediaBase,
   track as trackBase,
   album as albumBase,
-  artist as artistBase,
-  playlist as playlistBase,
-  collection as collectionBase,
+  meta,
 };

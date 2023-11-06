@@ -28,7 +28,7 @@ it("throws & catches errors", async () => {
   invalid(chain.then(() => null));
 
   expect(maybe(Promise.resolve()).unwrap()).rejects.toEqual(
-    new Error("Value is nothing!")
+    new Error("Value is nothing!"),
   );
 
   invalid(maybe(null).catch(() => null));
@@ -52,7 +52,7 @@ it("rejects inline", () => {
       .then(() => null)
       .then(
         () => 42,
-        () => null
+        () => null,
       );
     invalid(monad);
   }
@@ -60,11 +60,11 @@ it("rejects inline", () => {
     const monad = maybe(1)
       .then(
         () => null,
-        () => 2
+        () => 2,
       )
       .then(
         () => 3,
-        () => 4
+        () => 4,
       );
     check(monad).toBe(3);
   }

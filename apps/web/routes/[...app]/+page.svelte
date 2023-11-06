@@ -17,18 +17,18 @@
   import Home from "./home/-page.svelte";
 
   const icons: Record<string, string> = {
-    home: "house",
-    feed: "activity",
-    library: "note",
+    recommended: "stars",
+    listened: "history",
+    following: "people",
     explore: "compass",
     playlists: "last",
     artists: "people",
     timeline: "clock",
+    feed: "activity",
+    library: "note",
     tracks: "note",
     albums: "disk",
-    listened: "history",
-    recommended: "stars",
-    following: "people",
+    home: "house",
   };
 
   const urls: Record<string, string> = {
@@ -48,14 +48,14 @@
   <Shell>
     <svelte:fragment slot="tabs">
       {#each Object.keys(sections) as x}
-        <Button air compact stretch primary={x === section} href={link(x)}>
-          <Icon md name={icons[x]} />{capitalize(x)}
+        <Button compact stretch air primary={x === section} href={link(x)}>
+          <Icon of={icons[x]} md />{capitalize(x)}
         </Button>
       {/each}
       <When sm>
         <Spacer />
-        <Button air compact stretch href={link("settings")}>
-          <Icon md name="settings" />Settings
+        <Button compact stretch air href={link("settings")}>
+          <Icon of="settings" md />Settings
         </Button>
       </When>
     </svelte:fragment>
@@ -64,18 +64,18 @@
       {#each sections[section] || [] as x (section + x)}
         <Button
           to={section === "explore" ? x : undefined}
+          air
           href={urls[x] || `${root}/${section}/#${x}`}
           primary={x === hash}
-          air
         >
-          <Icon name={icons[x]} />{capitalize(x)}
+          <Icon of={icons[x]} />{capitalize(x)}
         </Button>
       {/each}
       <!-- /// TODO: fix $extra -->
       <!-- {#if pageToName(page, hash)}
         <Separator />
         <Button air primary>
-          <Icon name="person" />{pageToName(page, hash)}
+          <Icon of="person" />{pageToName(page, hash)}
         </Button>
       {/if} -->
     </svelte:fragment>

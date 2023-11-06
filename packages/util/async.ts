@@ -80,18 +80,18 @@ export function delay(duration: number) {
  */
 export function lock<T = void>() {
   const no = Symbol();
-  let resolved: T | typeof no = no;
+  let resolved: typeof no | T = no;
   const resolves = new Set<(value: T) => void>();
   const wait = () =>
     new Promise<T>((r) =>
-      resolved !== no ? (r(resolved), (resolved = no)) : resolves.add(r)
+      resolved !== no ? (r(resolved), (resolved = no)) : resolves.add(r),
     );
   const resolve = (value: T) => {
     if (!resolves.size) return (resolved = value);
     resolves.forEach((x) => x(value));
     resolves.clear();
   };
-  return { wait, resolve };
+  return { resolve, wait };
 }
 
 /**
@@ -100,11 +100,11 @@ export function lock<T = void>() {
  */
 export function all<T>(
   promises: Promise<T>[],
-  reject?: (reason: unknown) => void
+  reject?: (reason: unknown) => void,
 ) {
   return Promise.allSettled(promises).then((x) =>
     x
       .filter((y) => y.status === "fulfilled" || (reject?.(y.reason), false))
-      .map((y: any) => y.value as T)
+      .map((y: any) => y.value as T),
   );
 }
