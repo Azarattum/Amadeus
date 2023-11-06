@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { type Classes, tw } from "../../internal/tailwind";
   import { setContext, onMount } from "svelte";
-  import { tw } from "../../internal/tailwind";
   import { isiOS } from "../../internal/util";
   import { slide } from "svelte/transition";
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
 
   setContext("panel", true);

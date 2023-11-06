@@ -12,3 +12,5 @@ export function tw(
     ),
   );
 }
+
+export type { ClassNameValue as Classes };

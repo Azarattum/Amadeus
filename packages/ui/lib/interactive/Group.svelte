@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { type Classes, tw } from "../../internal/tailwind";
   import { getContext, setContext } from "svelte";
-  import { tw } from "../../internal/tailwind";
   import { uuid } from "../../internal/util";
   import { writable } from "svelte/store";
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
   export let size: number;
   export let value = 0;

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { tw } from "../../internal/tailwind";
+  import { type Classes, tw } from "../../internal/tailwind";
   import { autoscroll } from "../../action";
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
 </script>
 

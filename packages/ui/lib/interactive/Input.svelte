@@ -1,15 +1,15 @@
 <script lang="ts">
+  import { type Classes, Button, Icon, tw } from "../../component";
   import type { HTMLProps } from "../../internal/types";
-  import { Button, Icon, tw } from "../../component";
   import { getContext } from "svelte";
 
   type $$Props = {
     resettable?: boolean;
-    class?: string;
+    class?: Classes;
     value?: string;
-  } & HTMLProps["input"];
+  } & Omit<HTMLProps["input"], "class">;
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
   export let resettable = false;
   export let value = "";
