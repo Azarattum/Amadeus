@@ -9,10 +9,12 @@
     class?: ((active: boolean) => string) | string;
     ephemeral?: boolean;
     default?: boolean;
+    title?: string;
     at: string;
   } & (Transition<In, Out> & HTMLProps["div"]);
 
   export let at: string;
+  export let title = "";
   export let ephemeral = false;
   const {
     transition = [() => null, {}],
@@ -61,3 +63,11 @@
     <slot {visible} {active} />
   </div>
 {/if}
+
+<svelte:head>
+  {#if visible && title}
+    {#key title}
+      <title>{title}</title>
+    {/key}
+  {/if}
+</svelte:head>

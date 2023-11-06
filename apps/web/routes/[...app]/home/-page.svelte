@@ -91,12 +91,12 @@
   </Stack>
 </Frame>
 
-<Projection at="listened" ephemeral class="bg-surface">
+<Projection at="listened" ephemeral title="Listened - Amadeus">
   <Frame>
     <Playlist id={-1} />
   </Frame>
 </Projection>
-<Projection at="recommended" ephemeral class="bg-surface">
+<Projection at="recommended" ephemeral title="Recommended - Amadeus">
   <Frame>
     <Playlist id={-2} />
   </Frame>
@@ -119,7 +119,3 @@
     </Button>
   </Portal>
 {/if}
-
-<svelte:head>
-  <title>Amadeus</title>
-</svelte:head>

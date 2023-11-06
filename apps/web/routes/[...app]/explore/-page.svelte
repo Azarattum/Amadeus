@@ -33,6 +33,8 @@
   let title = "";
   let type = 0;
 
+  $: pageTitle = title ? `${title} - Amadeus` : "Amadeus";
+
   const types = ["tracks", "artists", "albums"] as const;
   const log = debounce((x: string) => history.log(x), 2000);
   const estimate = ~~((globalThis.innerHeight / 56) * 2);
@@ -114,12 +116,12 @@
   </Panel>
 </Portal>
 
-<Projection at="album" ephemeral class="bg-surface">
+<Projection at="album" ephemeral title={pageTitle}>
   <Frame>
     <AlbumPage bind:title />
   </Frame>
 </Projection>
-<Projection at="artist" ephemeral class="bg-surface">
+<Projection at="artist" ephemeral title={pageTitle}>
   <Frame>
     <ArtistPage bind:title />
   </Frame>
@@ -153,7 +155,3 @@
     {/if}
   </Portal>
 {/if}
-
-<svelte:head>
-  <title>{$query || "Explore"} - Amadeus</title>
-</svelte:head>

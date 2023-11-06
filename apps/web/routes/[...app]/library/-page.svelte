@@ -25,6 +25,9 @@
   export let hash = "";
   export let page = "";
 
+  let title = "";
+  $: pageTitle = title ? `${title} - Amadeus` : "Amadeus";
+
   $: if (visible && !$navigating && globalThis.location && !location?.hash) {
     goto("#playlists", { replaceState: true });
   }
@@ -58,14 +61,14 @@
   </Tab>
 </Tabs>
 
-<Projection at="playlist" ephemeral class="bg-surface">
+<Projection at="playlist" ephemeral title={pageTitle}>
   <Frame>
-    <Playlist />
+    <Playlist bind:title />
   </Frame>
 </Projection>
-<Projection at="artist" ephemeral class="bg-surface">
+<Projection at="artist" ephemeral title={pageTitle}>
   <Frame>
-    <Artist />
+    <Artist bind:title />
   </Frame>
 </Projection>
 
@@ -95,7 +98,3 @@
     {/if}
   </Portal>
 {/if}
-
-<svelte:head>
-  <title>Library - Amadeus</title>
-</svelte:head>
