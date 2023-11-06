@@ -14,7 +14,7 @@ if (!("DOMRect" in scope)) {
       public x = 0,
       public y = 0,
       public width = 0,
-      public height = 0
+      public height = 0,
     ) {
       this.top = y;
       this.bottom = y + height;
@@ -29,7 +29,7 @@ if (!("DOMRect" in scope)) {
 
 if (!("ResizeObserver" in scope)) {
   scope.ResizeObserver = function () {
-    return { disconnect() {}, observe() {}, unobserve() {} };
+    return { disconnect() {}, unobserve() {}, observe() {} };
   };
 }
 

@@ -9,18 +9,18 @@
   } from "@amadeus-music/ui";
 
   const icons: Record<string, string> = {
-    Home: "house",
-    Feed: "activity",
-    Library: "note",
+    Recommended: "stars",
+    Listened: "history",
+    Following: "people",
     Explore: "compass",
     Playlists: "last",
     Artists: "people",
     Timeline: "clock",
+    Feed: "activity",
+    Library: "note",
     Tracks: "note",
     Albums: "disk",
-    Listened: "history",
-    Recommended: "stars",
-    Following: "people",
+    Home: "house",
   };
 
   const sections: Record<string, string[]> = {
@@ -37,24 +37,24 @@
 <Sidenav class="hidden sm:flex">
   {#each Object.keys(sections) as x}
     <Button
-      air
       compact
       stretch
+      air
       primary={x === section}
       on:click={() => (section = x)}
     >
-      <Icon md name={icons[x]} />{x}
+      <Icon of={icons[x]} md />{x}
     </Button>
   {/each}
   <Spacer />
-  <Button air compact stretch>
-    <Icon md name="settings" />Settings
+  <Button compact stretch air>
+    <Icon of="settings" md />Settings
   </Button>
   <svelte:fragment slot="secondary">
     <Header sm>{section}</Header>
     {#each sections[section] as x}
       <Button air primary={x === subsection} on:click={() => (subsection = x)}>
-        <Icon name={icons[x]} />{x}
+        <Icon of={icons[x]} />{x}
       </Button>
     {/each}
   </svelte:fragment>
@@ -62,13 +62,13 @@
 <Navbar class="absolute bottom-0 sm:hidden">
   {#each Object.keys(sections) as x}
     <Button
-      air
       compact
       stretch
+      air
       primary={x === section}
       on:click={() => (section = x)}
     >
-      <Icon md name={icons[x]} />{x}
+      <Icon of={icons[x]} md />{x}
     </Button>
   {/each}
 </Navbar>

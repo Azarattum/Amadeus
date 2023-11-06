@@ -10,13 +10,13 @@ import {
   any,
 } from "superstruct";
 import {
-  unique,
+  playlistBase,
+  artistBase,
   albumBase,
   trackBase,
-  artistBase,
-  playlistBase,
+  unique,
 } from "@amadeus-music/protocol";
-import { primary, crr, ordered, index } from "crstore";
+import { primary, ordered, index, crr } from "crstore";
 import { type SvelteDatabase } from "crstore/svelte";
 import type { Struct } from "superstruct";
 
@@ -37,26 +37,26 @@ crr(artists);
 primary(artists, "id");
 
 const attribution = object({
-  album: id(),
   artist: id(),
+  album: id(),
 });
 crr(attribution);
 index(attribution, "artist");
 primary(attribution, "album", "artist");
 
 const sources = object({
+  primary: boolean(),
   source: string(),
   owner: id(),
-  primary: boolean(),
 });
 crr(sources);
 primary(sources, "owner", "source");
 
 const assets = object({
-  art: string(),
   thumbnail: nullable(string()),
-  owner: id(),
   primary: boolean(),
+  art: string(),
+  owner: id(),
 });
 crr(assets);
 primary(assets, "owner", "art");
@@ -68,11 +68,11 @@ ordered(playlists, "order");
 index(playlists, "order", "id");
 
 const library = object({
-  id: id(),
-  playlist: id(),
-  track: id(),
   date: integer(),
   order: string(),
+  playlist: id(),
+  track: id(),
+  id: id(),
 });
 crr(library);
 primary(library, "id");
@@ -83,11 +83,11 @@ index(library, "order", "id");
 ordered(library, "order", "playlist");
 
 const playback = object({
-  id: id(),
   device: instance(Uint8Array),
-  track: id(),
   order: string(),
+  track: id(),
   temp: any(),
+  id: id(),
 });
 crr(playback);
 primary(playback, "id");
@@ -97,18 +97,18 @@ ordered(playback, "order", "device");
 
 const devices = object({
   id: instance(Uint8Array),
-  playback: id(),
   direction: integer(),
   infinite: integer(),
   progress: number(),
   repeat: integer(),
+  playback: id(),
 });
 crr(devices);
 primary(devices, "id");
 
 const settings = object({
-  key: string(),
   value: string(),
+  key: string(),
 });
 crr(settings);
 index(settings, "value");
@@ -123,22 +123,22 @@ index(history, "date");
 primary(history, "query");
 
 type Views = {
-  queue: { id: number; device: Uint8Array; track: number; position: number };
+  queue: { device: Uint8Array; position: number; track: number; id: number };
 };
 
 export type Schema = Infer<typeof schema> & Views;
 export type DB = SvelteDatabase<Schema>;
 export const schema = object({
-  tracks,
-  albums,
   attribution,
-  artists,
-  sources,
-  assets,
-  library,
   playlists,
   playback,
-  devices,
   settings,
+  artists,
+  sources,
+  library,
+  devices,
   history,
+  tracks,
+  albums,
+  assets,
 });

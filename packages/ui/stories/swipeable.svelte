@@ -4,15 +4,15 @@
 
 <Stack class="p-4">
   <Swipeable>
-    <Icon name="sun" slot="before" />
-    <Card interactive sm flat>
+    <Icon of="sun" slot="before" />
+    <Card interactive flat sm>
       <Text accent>Hello</Text>
       <Text secondary sm>Adele</Text>
       <div
-        slot="before"
         class="h-[48px] w-[48px] rounded bg-gradient-to-r from-green-500 to-lime-500 shadow-lg"
+        slot="before"
       />
     </Card>
-    <Icon name="moon" slot="after" />
+    <Icon of="moon" slot="after" />
   </Swipeable>
 </Stack>

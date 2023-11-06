@@ -1,11 +1,11 @@
-import { object, string, StructError, validate } from "superstruct";
-import { divide, err, info, ok, SilentError, wrn } from "./log";
+import { StructError, validate, object, string } from "superstruct";
+import { SilentError, divide, info, err, wrn, ok } from "./log";
 import { clean } from "@amadeus-music/util/color";
 import { expect, it, vi } from "vitest";
 import { PassThrough } from "stream";
 import { Console } from "console";
 
-type Expected = ((RegExp | string) | (RegExp | string)[])[];
+type Expected = ((RegExp | string)[] | (RegExp | string))[];
 /** Mocks and checks console logs */
 function logger(expected: Expected) {
   let reject: (_?: any) => void;

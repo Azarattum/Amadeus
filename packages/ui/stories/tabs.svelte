@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Tab, Tabs, LightSwitch, Stack } from "@amadeus-music/ui";
+  import { LightSwitch, Stack, Tabs, Tab } from "@amadeus-music/ui";
   import Content from "./content.svelte";
 </script>
 

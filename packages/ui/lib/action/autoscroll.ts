@@ -1,13 +1,13 @@
-import { position, type Point } from "../../internal/pointer";
+import { type Point, position } from "../../internal/pointer";
 
 export function autoscroll(
   node: HTMLElement,
   {
-    trigger = "auto" as "auto" | "always" | "none",
+    trigger = "auto" as "always" | "auto" | "none",
     axis = "both" as "both" | "x" | "y",
     enabled = false,
     threshold = 64,
-  } = {}
+  } = {},
 ) {
   let bounds: DOMRect;
   const direction = { x: 0, y: 0 };
@@ -92,14 +92,14 @@ export function autoscroll(
   toggle();
 
   return {
-    update(config: { enabled: boolean }) {
-      if (config.enabled != null) toggle(config.enabled);
-    },
     destroy() {
       removeEventListener("dragstart", enable);
       removeEventListener("dragend", disable);
       trigger = "none";
       toggle(false);
+    },
+    update(config: { enabled: boolean }) {
+      if (config.enabled != null) toggle(config.enabled);
     },
   };
 }
@@ -107,7 +107,7 @@ export function autoscroll(
 declare global {
   namespace svelteHTML {
     interface HTMLAttributes {
-      autoscroll?: boolean | "true" | "false" | null;
+      autoscroll?: boolean | "false" | "true" | null;
     }
   }
 }

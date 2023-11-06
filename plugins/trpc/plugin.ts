@@ -1,35 +1,35 @@
 import {
   defaulted,
-  string,
   register,
+  string,
   bright,
   reset,
 } from "@amadeus-music/core";
-import { TRPCError, type inferAsyncReturnType, initTRPC } from "@trpc/server";
+import { type inferAsyncReturnType, TRPCError, initTRPC } from "@trpc/server";
 import type { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws";
-import { name, version } from "./package.json";
+import { version, name } from "./package.json";
 
 export const {
-  ok,
-  wrn,
+  persistence,
+  transcribe,
+  desource,
+  command,
+  expand,
+  search,
+  users,
   info,
   init,
   stop,
-  users,
-  expand,
-  search,
-  command,
-  desource,
-  transcribe,
-  persistence,
+  wrn,
+  ok,
 } = register({
-  name,
-  version,
   settings: { password: defaulted(string(), "") },
+  version,
+  name,
 });
 
 type Context = inferAsyncReturnType<typeof context>;
-const { router, procedure, middleware } = initTRPC.context<Context>().create();
+const { middleware, procedure, router } = initTRPC.context<Context>().create();
 
 function hash(text: string) {
   return crypto.subtle
@@ -69,4 +69,4 @@ const auth = middleware(({ next, ctx }) => {
 
 const protectedProcedure = procedure.use(auth);
 
-export { hash, router, context, protectedProcedure as procedure };
+export { protectedProcedure as procedure, context, router, hash };

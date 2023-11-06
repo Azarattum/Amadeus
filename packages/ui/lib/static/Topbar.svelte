@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { getScrollParent } from "../../internal/util";
+  import { onMount } from "svelte";
 
   export let stuck = false;
   export let title = "";
@@ -21,17 +21,17 @@
 
 <aside class="absolute left-0 top-0">
   <button
-    tabindex="-1"
-    on:click={scrollUp}
     class="fixed z-50 flex h-11 w-full origin-top scale-y-0 transform-gpu touch-manipulation select-none items-center justify-center border-b border-highlight bg-gradient-to-t from-surface/70 to-surface font-semibold opacity-0 backdrop-blur-md transition-composite will-change-transform sm:bg-inherit"
+    tabindex="-1"
     class:scale-y-100={stuck}
     class:opacity-100={stuck}
+    on:click={scrollUp}
   >
     <h2>{title}</h2>
   </button>
 </aside>
 
-<div bind:this={trigger} class:opacity-0={stuck} class="transition-composite">
+<div class="transition-composite" class:opacity-0={stuck} bind:this={trigger}>
   <slot />
 </div>
 

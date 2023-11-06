@@ -1,10 +1,10 @@
-import { string, defaulted, object, register } from "@amadeus-music/core";
-import { name, version } from "./package.json";
+import { defaulted, register, string, object } from "@amadeus-music/core";
+import { version, name } from "./package.json";
 
-export const { init, connect, recognize } = register({
-  name,
-  version,
+export const { recognize, connect, init } = register({
   config: {
     audd: defaulted(object({ token: defaulted(string(), "") }), {}),
   },
+  version,
+  name,
 });

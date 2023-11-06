@@ -42,6 +42,9 @@ importers:
       eslint-config-prettier:
         specifier: ^9.1.0
         version: 9.1.0(eslint@8.56.0)
+      eslint-plugin-perfectionist:
+        specifier: ^2.2.0
+        version: 2.5.0(eslint@8.56.0)(svelte@4.2.10)(typescript@5.3.3)
       eslint-plugin-svelte:
         specifier: ^2.35.1
         version: 2.35.1(eslint@8.56.0)(svelte@4.2.10)
@@ -54,9 +57,6 @@ importers:
       prettier:
         specifier: ^3.2.5
         version: 3.2.5
-      prettier-plugin-sort-imports:
-        specifier: ^1.8.1
-        version: 1.8.1(typescript@5.3.3)
       prettier-plugin-svelte:
         specifier: ^3.1.2
         version: 3.1.2(prettier@3.2.5)(svelte@4.2.10)
@@ -2205,6 +2205,34 @@ packages:
       eslint: 8.56.0
     dev: true
 
+  /eslint-plugin-perfectionist@2.5.0(eslint@8.56.0)(svelte@4.2.10)(typescript@5.3.3):
+    resolution: {integrity: sha512-F6XXcq4mKKUe/SREoMGQqzgw6cgCgf3pFzkFfQVIGtqD1yXVpQjnhTepzhBeZfxZwgMzR9HO4yH4CUhIQ2WBcQ==}
+    peerDependencies:
+      astro-eslint-parser: ^0.16.0
+      eslint: '>=8.0.0'
+      svelte: '>=3.0.0'
+      svelte-eslint-parser: ^0.33.0
+      vue-eslint-parser: '>=9.0.0'
+    peerDependenciesMeta:
+      astro-eslint-parser:
+        optional: true
+      svelte:
+        optional: true
+      svelte-eslint-parser:
+        optional: true
+      vue-eslint-parser:
+        optional: true
+    dependencies:
+      '@typescript-eslint/utils': 6.21.0(eslint@8.56.0)(typescript@5.3.3)
+      eslint: 8.56.0
+      minimatch: 9.0.3
+      natural-compare-lite: 1.4.0
+      svelte: 4.2.10
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+    dev: true
+
   /eslint-plugin-svelte@2.35.1(eslint@8.56.0)(svelte@4.2.10):
     resolution: {integrity: sha512-IF8TpLnROSGy98Z3NrsKXWDSCbNY2ReHDcrYTuXZMbfX7VmESISR78TWgO9zdg4Dht1X8coub5jKwHzP0ExRug==}
     engines: {node: ^14.17.0 || >=16.0.0}
@@ -3179,6 +3207,10 @@ packages:
       - supports-color
     dev: true
 
+  /natural-compare-lite@1.4.0:
+    resolution: {integrity: sha512-Tj+HTDSJJKaZnfiuw+iaF9skdPpTo2GtEly5JHnWV/hfv2Qj/9RKsGISQtLh2ox3l5EAGw487hnBee0sIJ6v2g==}
+    dev: true
+
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
@@ -3819,15 +3851,6 @@ packages:
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
-    dev: true
-
-  /prettier-plugin-sort-imports@1.8.1(typescript@5.3.3):
-    resolution: {integrity: sha512-0oB5wKhidbpfbEjBOvLieuwOlVmA75mw1yoKdQHZeV8qGaQpckiedi08+Tbakp1JzulWWF09dV19RGl0OyOLbg==}
-    peerDependencies:
-      typescript: '>4.0.0'
-    dependencies:
-      prettier: 3.2.5
-      typescript: 5.3.3
     dev: true
 
   /prettier-plugin-svelte@3.1.2(prettier@3.2.5)(svelte@4.2.10):

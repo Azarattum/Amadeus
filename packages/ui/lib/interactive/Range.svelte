@@ -26,9 +26,9 @@
       class="relative w-full cursor-pointer appearance-none rounded bg-transparent outline-2 outline-offset-2 outline-primary-600 focus-visible:outline"
       style="--progress:{((value - min) / (max - min)) * 100}%"
       type="range"
-      bind:value
       {min}
       {max}
+      bind:value
     />
   </div>
   {#if hints}
@@ -37,24 +37,24 @@
       class:pointer-events-none={!controls}
     >
       <button
-        use:hold={{ mouse: true }}
-        on:hold={() => ((holding = true), dispatch("rewind"))}
+        class="group rounded-lg p-2 text-content-200 outline-2 outline-primary-600 transition-paint focus-visible:bg-highlight focus-visible:outline active:scale-95 hover:bg-highlight"
         on:click={() =>
           holding
             ? ((holding = false), dispatch("reset"))
             : (value = Math.max(value - skip, min))}
-        class="group rounded-lg p-2 text-content-200 outline-2 outline-primary-600 transition-paint focus-visible:bg-highlight focus-visible:outline active:scale-95 hover:bg-highlight"
+        on:hold={() => ((holding = true), dispatch("rewind"))}
+        use:hold={{ mouse: true }}
       >
         {format(value)}
         <div
           class="flex items-center opacity-0 transition-opacity group-focus-visible:opacity-100 group-hover:opacity-100"
         >
           <svg
-            width="7"
-            height="10"
-            viewBox="0 0 7 10"
             fill="hsl(var(--color-content-200)"
             xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 7 10"
+            height="10"
+            width="7"
           >
             <path
               d="M0.190422 5.42655C-0.0634185 5.19098 -0.0634185 4.80903 0.190422 4.57345L4.92804 0.176684C5.18188 -0.0588945 5.59343 -0.0588946 5.84728 0.176684C6.10112 0.412262 6.10112 0.794209 5.84728 1.02979L1.10966 5.42655C0.855821 5.66213 0.444263 5.66213 0.190422 5.42655Z"
@@ -63,29 +63,29 @@
               d="M0.190422 4.57345C0.444263 4.33787 0.855738 4.33787 1.10958 4.57345L5.84719 8.97021C6.10103 9.20579 6.10103 9.58774 5.84719 9.82332C5.59335 10.0589 5.18179 10.0589 4.92795 9.82332L0.190422 5.42655C-0.0634185 5.19098 -0.0634185 4.80903 0.190422 4.57345Z"
             />
           </svg>
-          <div class="h-[1.3px] flex-grow rounded bg-content-200" />
+          <div class="h-[1.3px] grow rounded bg-content-200" />
         </div>
       </button>
       <button
-        use:hold={{ mouse: true }}
-        on:hold={() => ((holding = true), dispatch("forward"))}
+        class="group rounded-lg p-2 text-content-200 outline-2 outline-primary-600 transition-paint focus-visible:bg-highlight focus-visible:outline active:scale-95 hover:bg-highlight"
         on:click={() =>
           holding
             ? ((holding = false), dispatch("reset"))
             : (value = Math.min(value + skip, max))}
-        class="group rounded-lg p-2 text-content-200 outline-2 outline-primary-600 transition-paint focus-visible:bg-highlight focus-visible:outline active:scale-95 hover:bg-highlight"
+        on:hold={() => ((holding = true), dispatch("forward"))}
+        use:hold={{ mouse: true }}
       >
         {format(max - value)}
         <div
           class="flex items-center opacity-0 transition-opacity group-focus-visible:opacity-100 group-hover:opacity-100"
         >
-          <div class="h-[1.3px] flex-grow rounded bg-content-200" />
+          <div class="h-[1.3px] grow rounded bg-content-200" />
           <svg
-            width="7"
-            height="10"
-            viewBox="0 0 7 10"
             fill="hsl(var(--color-content-200)"
             xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 7 10"
+            height="10"
+            width="7"
           >
             <path
               d="M6.80958 5.42655C7.06342 5.19098 7.06342 4.80903 6.80958 4.57345L2.07196 0.176684C1.81812 -0.0588945 1.40657 -0.0588946 1.15272 0.176684C0.898884 0.412262 0.898884 0.794209 1.15272 1.02979L5.89034 5.42655C6.14418 5.66213 6.55574 5.66213 6.80958 5.42655Z"
@@ -113,7 +113,8 @@
       appearance: none;
       height: 4px;
       border-radius: 4px;
-      background: linear-gradient(
+      background:
+        linear-gradient(
             to right,
             hsl(var(--color-primary-600)),
             hsl(var(--color-primary-600))

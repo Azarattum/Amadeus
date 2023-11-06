@@ -1,26 +1,26 @@
-import { Feed, type Track } from "@amadeus-music/protocol";
-import { afterAll, it, afterEach, expect } from "vitest";
+import { type Track, Feed } from "@amadeus-music/protocol";
+import { afterEach, afterAll, expect, it } from "vitest";
 import { connect } from "../data";
 import { rm } from "fs/promises";
 
-const { playback, preceding, upcoming, close, feed } = connect({
+const { preceding, playback, upcoming, close, feed } = connect({
   name: "playback.test.db",
 });
 
 const track = (id: number): Track => ({
-  id,
-  title: id.toString(),
-  duration: 42,
-  sources: [],
   album: {
-    id: 0,
     title: "Album",
+    thumbnails: [],
     sources: [],
     year: 2042,
     arts: [],
-    thumbnails: [],
+    id: 0,
   },
-  artists: [{ id: 0, title: "Artist", arts: [], sources: [], thumbnails: [] }],
+  artists: [{ title: "Artist", thumbnails: [], sources: [], arts: [], id: 0 }],
+  title: id.toString(),
+  duration: 42,
+  sources: [],
+  id,
 });
 
 const t0 = track(0);
@@ -142,7 +142,7 @@ it("pushes randomly", async () => {
   const expected = [t0, t1, t3, t4, t5].map((t) => expect.objectContaining(t));
   expect(tracks).toEqual(expect.arrayContaining(expected));
   expect(tracks).not.toEqual(
-    expect.arrayContaining([expect.objectContaining(t2)])
+    expect.arrayContaining([expect.objectContaining(t2)]),
   );
 
   const next = tracks[0];
@@ -150,7 +150,7 @@ it("pushes randomly", async () => {
   expect(await preceding).toMatchObject([t2]);
   expect(await playback).toMatchObject([{ track: next }]);
   expect(await upcoming).not.toEqual(
-    expect.arrayContaining([expect.objectContaining(next)])
+    expect.arrayContaining([expect.objectContaining(next)]),
   );
 
   await playback.redirect("forward");

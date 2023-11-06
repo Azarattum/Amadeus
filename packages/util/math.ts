@@ -5,7 +5,7 @@ export function minmax(
   value: number,
   min: number,
   max: number,
-  fallback?: number
+  fallback?: number,
 ) {
   if (value < min) return fallback != null ? fallback : min;
   if (value > max) return fallback != null ? fallback : max;

@@ -1,26 +1,26 @@
-import { string, defaulted, object, register } from "@amadeus-music/core";
-import { name, version } from "./package.json";
+import { defaulted, register, string, object } from "@amadeus-music/core";
+import { version, name } from "./package.json";
 
 export const {
-  info,
-  err,
-  wrn,
-  init,
-  pool,
-  fetch,
+  transcribe,
+  recognize,
+  desource,
+  command,
+  connect,
   search,
   relate,
   expand,
   lookup,
-  command,
-  connect,
-  desource,
-  recognize,
-  transcribe,
+  fetch,
+  info,
+  init,
+  pool,
+  err,
+  wrn,
 } = register({
-  name,
-  version,
   config: {
     yandex: defaulted(object({ token: defaulted(string(), "") }), {}),
   },
+  version,
+  name,
 });

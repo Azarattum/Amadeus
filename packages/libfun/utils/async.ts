@@ -70,7 +70,7 @@ function thenable<T = unknown>(value: any): value is PromiseLike<T> {
 }
 
 function block<T extends AsyncGenerator, U extends object>(
-  condition: () => true | number,
+  condition: () => number | true,
   resolve: () => T,
   catcher?: (error: Error) => void,
   meta = {} as U,
@@ -108,4 +108,4 @@ function block<T extends AsyncGenerator, U extends object>(
   }
 }
 
-export { cancel, cleanup, thenable, derive, block, delay };
+export { thenable, cleanup, cancel, derive, block, delay };

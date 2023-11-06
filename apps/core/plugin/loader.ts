@@ -1,10 +1,10 @@
-import { plural, capitalize, unprefix } from "@amadeus-music/util/string";
+import { capitalize, unprefix, plural } from "@amadeus-music/util/string";
 import { delay } from "@amadeus-music/util/async";
-import { init, pools, stop } from "../event/pool";
+import { pools, init, stop } from "../event/pool";
 import { commands } from "../status/commands";
-import { ok, wrn, err } from "../status/log";
+import { wrn, err, ok } from "../status/log";
 import { readdir } from "node:fs/promises";
-import { parse, resolve } from "node:path";
+import { resolve, parse } from "node:path";
 import type { Plugin } from "./types";
 import { pipeline } from "libfun";
 
@@ -16,7 +16,7 @@ async function load() {
     if (error.handler) unload(error.handler);
     wrn.bind({ group: error.handler })(
       "Plugin disabled! " +
-        ((error.cause as any)?.message || error.cause || error.message)
+        ((error.cause as any)?.message || error.cause || error.message),
     );
   });
 
@@ -30,8 +30,8 @@ async function load() {
             .map((file) => [
               file,
               () => import("file://" + resolve(path, file)),
-            ])
-        )
+            ]),
+        ),
       );
 
   // Wait a bit to make sure everything is initialized
@@ -43,8 +43,8 @@ async function load() {
         wrn(`Failed to load plugin "${name}"!`);
         err.bind({ group: name })(e);
         throw e;
-      })
-    )
+      }),
+    ),
   );
 
   const successes = results.filter((x) => x.status === "fulfilled").length;
@@ -76,4 +76,4 @@ async function unload(plugin: string) {
   plugins.delete(plugin);
 }
 
-export { load, unload, format, plugins };
+export { plugins, unload, format, load };

@@ -1,16 +1,16 @@
 <script lang="ts">
   import {
+    type EditEvent,
     Swipeable,
     Separator,
     Virtual,
     Header,
     Portal,
     Button,
-    When,
-    Icon,
     Panel,
     Stack,
-    type EditEvent,
+    When,
+    Icon,
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { compare } from "@amadeus-music/util/time";
@@ -40,7 +40,7 @@
   function process(items: typeof tracks) {
     if (!items) return Array.from<undefined>({ length: prerender });
     if (!timeline) return items;
-    const timed: (Track | string | undefined)[] = [];
+    const timed: (string | Track | undefined)[] = [];
     let lastLabel = "";
 
     for (const item of items) {
@@ -96,14 +96,14 @@
     </When>
   {/if}
   <Virtual
+    animate
     key={(x) => (typeof x === "string" ? x : x?.entry || x?.id)}
     sortable="tracks"
-    let:item={track}
-    let:index
     {prerender}
     {fixed}
     {items}
-    animate
+    let:item={track}
+    let:index
     on:edit
     on:end
   >
@@ -122,8 +122,8 @@
       {/if}
       {#if typeof track === "string"}
         <h2
-          draggable="false"
           class="relative top-2 flex h-14 items-center indent-4 text-lg [*:has(>div>&)]:pointer-events-none"
+          draggable="false"
         >
           {track}
         </h2>
@@ -135,19 +135,19 @@
           >
             <slot name="action" slot="before" />
             <TrackUI
-              {sm}
-              {track}
               selected={check(track, selected)}
+              {track}
+              {sm}
               on:click={() => (selected.size ? select(track) : play(track))}
               on:contextmenu={(e) => (e.preventDefault(), select(track))}
             />
-            <Icon name="list" slot="after" />
+            <Icon of="list" slot="after" />
           </Swipeable>
         {:else}
           <TrackUI
-            {sm}
-            {track}
             selected={check(track, selected)}
+            {track}
+            {sm}
             on:click={() => play(track)}
           />
         {/if}
@@ -165,7 +165,7 @@
         <Stack x>
           <slot />
           <Separator />
-          <Button air square on:click={clear}><Icon name="close" /></Button>
+          <Button square air on:click={clear}><Icon of="close" /></Button>
         </Stack>
       </Panel>
     {/if}

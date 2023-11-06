@@ -1,7 +1,7 @@
-import { monad, unwrap, all } from "./monad";
-import { expect, it, vitest } from "vitest";
+import { unwrap, monad, all } from "./monad";
+import { expect, vitest, it } from "vitest";
 import type { Monad } from "./monad.types";
-import { maybe, spread } from "../monads";
+import { spread, maybe } from "../monads";
 
 const check = (x: any) => expect(unwrap(x));
 const identity = monad();
@@ -185,7 +185,7 @@ it("alls monads & promises", async () => {
   expect(await two).toEqual("1242123TEST1337");
 
   expect(two.then(() => null).unwrap()).rejects.toEqual(
-    new Error("Value is nothing!")
+    new Error("Value is nothing!"),
   );
 });
 
@@ -195,10 +195,10 @@ it("correctly rejects promises", async () => {
   target = target.then((x: any) => value.then((y) => [...x, y]));
 
   expect(target.then(() => null)).rejects.toEqual(
-    new Error("Value is nothing!")
+    new Error("Value is nothing!"),
   );
   expect(target.then(() => null).unwrap()).rejects.toEqual(
-    new Error("Value is nothing!")
+    new Error("Value is nothing!"),
   );
 
   expect(maybe(Promise.resolve(123))).resolves.toBe(123);
@@ -239,25 +239,25 @@ it("respects unwrap fallback", () => {
 it("exposes data & error", async () => {
   {
     const monad = maybe(42);
-    const { data, error } = monad.expose();
+    const { error, data } = monad.expose();
     expect(data).toBe(42);
     expect(error).toBeTypeOf("undefined");
   }
   {
     const monad = maybe<number>(undefined as any);
-    const { data, error } = monad.expose();
+    const { error, data } = monad.expose();
     expect(data).toBeTypeOf("undefined");
     expect(error).toBeInstanceOf(Error);
   }
   {
     const monad = maybe(Promise.resolve(42));
-    const { data, error } = await monad.expose();
+    const { error, data } = await monad.expose();
     expect(data).toBe(42);
     expect(error).toBeTypeOf("undefined");
   }
   {
     const monad = maybe(Promise.reject("123"));
-    const { data, error } = await monad.expose();
+    const { error, data } = await monad.expose();
     expect(data).toBeTypeOf("undefined");
     expect(error).toBeInstanceOf(Error);
   }

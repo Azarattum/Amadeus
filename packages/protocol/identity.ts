@@ -17,7 +17,7 @@ function compare(a: any, b: any): number {
 }
 
 function normalize<T extends Record<string, any> | string>(
-  data: T
+  data: T,
 ): T extends string ? string : T {
   if (typeof data === "string") return clean(data) as any;
   if (typeof data !== "object") return data as any;
@@ -61,4 +61,4 @@ function format(data: any): string {
     : String(data);
 }
 
-export { identify, stringify, normalize, compare, format };
+export { stringify, normalize, identify, compare, format };

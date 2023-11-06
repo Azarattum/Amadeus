@@ -1,45 +1,53 @@
 import {
+  type Infer,
   defaulted,
   register,
   number,
   object,
   string,
-  type Infer,
 } from "@amadeus-music/core";
 import type { Meta } from "@amadeus-music/protocol";
 import type { Reply, Edit } from "./types/reply";
-import { name, version } from "./package.json";
+import { version, name } from "./package.json";
 import { query } from "./types/action";
 import { me } from "./types/core";
 
 export const {
-  ok,
-  err,
-  wrn,
-  info,
-  init,
-  pool,
-  stop,
-  fetch,
-  users,
+  command: cli,
+  persistence,
+  transcribe,
+  recognize,
+  desource,
   search,
   scrape,
   relate,
   expand,
   lookup,
-  desource,
-  recognize,
-  transcribe,
-  persistence,
-  command: cli,
+  fetch,
+  users,
+  info,
+  init,
+  pool,
+  stop,
+  err,
+  wrn,
+  ok,
 } = register({
-  name,
-  version,
+  context: {
+    state: {
+      me: {} as Infer<typeof me>,
+    },
+    user: undefined as string | undefined,
+    reply: null as any as Reply,
+    edit: null as any as Edit,
+    name: "",
+    chat: 0,
+  },
   config: {
     telegram: defaulted(
       object({
-        token: defaulted(string(), ""),
         webhook: defaulted(string(), ""),
+        token: defaulted(string(), ""),
       }),
       {},
     ),
@@ -47,16 +55,8 @@ export const {
   settings: {
     telegram: defaulted(number(), -1),
   },
-  context: {
-    chat: 0,
-    name: "",
-    edit: null as any as Edit,
-    reply: null as any as Reply,
-    user: undefined as string | undefined,
-    state: {
-      me: {} as Infer<typeof me>,
-    },
-  },
+  version,
+  name,
 });
 
 const temp = new Map<number, Set<number>>();

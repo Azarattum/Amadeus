@@ -1,4 +1,5 @@
-INSERT OR IGNORE INTO devices VALUES (crsql_site_id(), -1, 0, 0, 0, 0);
+INSERT OR IGNORE INTO devices (id, playback, direction, infinite, progress, repeat)
+  VALUES (crsql_siteid(), -1, 0, 0, 0, 0);
 
 CREATE VIEW IF NOT EXISTS queue AS
   WITH ordered AS
@@ -29,7 +30,8 @@ BEFORE UPDATE OF progress ON devices
 FOR EACH ROW
 WHEN NEW.progress >= 1 AND NEW.id = crsql_site_id()
 BEGIN
-  INSERT INTO library SELECT ABS(RANDOM() % 4294967296), -1, track, UNIXEPOCH(), -1 FROM playback WHERE id = NEW.playback;
+  INSERT INTO library (id, playlist, track, date, "order")
+    SELECT ABS(RANDOM() % 4294967296), -1, track, UNIXEPOCH(), -1 FROM playback WHERE id = NEW.playback;
   UPDATE devices SET 
     playback = CASE WHEN NEW.repeat = 2 AND NOT EXISTS (SELECT 1 FROM queue WHERE position > 0)
       THEN IFNULL((SELECT id FROM queue LIMIT 1), playback)

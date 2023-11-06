@@ -1,20 +1,20 @@
 import {
-  callback,
-  info,
-  invite,
-  mention,
-  ok,
   persistence,
-  wrn,
-  relate,
   transcribe,
-  temp,
+  callback,
+  mention,
+  invite,
+  relate,
   expand,
+  info,
+  temp,
+  wrn,
+  ok,
 } from "../plugin";
-import { markdown, menu, keyboard, icon, escape } from "../api/markup";
-import { format, identify } from "@amadeus-music/protocol";
+import { markdown, keyboard, escape, menu, icon } from "../api/markup";
+import { identify, format } from "@amadeus-music/protocol";
 import { bright, reset } from "@amadeus-music/util/color";
-import { artist, action as type } from "../types/action";
+import { action as type, artist } from "../types/action";
 import { async, first, map } from "@amadeus-music/core";
 import { shuffle } from "@amadeus-music/util/object";
 import { finitify } from "@amadeus-music/util/math";
@@ -23,7 +23,7 @@ import { getChat } from "../api/methods";
 import { pages } from "../api/pages";
 
 callback(function* (action, message) {
-  const { tracks, artists } = persistence();
+  const { artists, tracks } = persistence();
   const report = (result: number[], type: string) => {
     const errors = result.filter((x) => !x).length;
     const op = `${type} download for ${this.name}`;
@@ -38,8 +38,8 @@ callback(function* (action, message) {
   if (type("reset").is(action)) {
     const track = yield* tracks.get(action.reset);
     yield* this.edit(message, {
-      mode: markdown(),
       markup: menu(track.id),
+      mode: markdown(),
     });
   }
   if (type("download").is(action)) {
@@ -75,18 +75,18 @@ callback(function* (action, message) {
     const limit = 1024 - header.length;
     if (lyrics.length > limit) {
       const [id] = yield* this.reply({
-        text: lyrics,
         to: message.toString(),
+        text: lyrics,
       });
       temp.get(this.chat)?.add(id);
       return;
     }
     yield* this.edit(message, {
-      mode: markdown(),
       caption:
         `${icon.lyrics} *${escape(format(track))}*\n\n` +
         (lyrics === fallback ? fallback : escape(lyrics)),
-      markup: keyboard([[{ text: icon.close, callback: { reset: track.id } }]]),
+      markup: keyboard([[{ callback: { reset: track.id }, text: icon.close }]]),
+      mode: markdown(),
     });
   }
   if (type("album").is(action)) {
@@ -106,15 +106,15 @@ callback(function* (action, message) {
       expand("album", { ...track.album, artists: track.artists }, 8),
       function* (state) {
         yield* page.update(state);
-      }
+      },
     );
   }
   if (type("similar").is(action)) {
     const track = yield* tracks.get(action.similar);
     info(`${this.name} requested similar to "${format(track)}".`);
     const [id] = yield* this.reply({
-      page: "Similar",
       icon: icon.similar,
+      page: "Similar",
       reset: track.id,
       message,
     });
@@ -132,13 +132,13 @@ callback(function* (action, message) {
       action = { artist: track.artists[0].id, track: track.id };
     } else {
       yield* this.edit(message, {
-        mode: markdown(),
         markup: keyboard([
           ...track.artists.map((x) => [
-            { text: x.title, callback: { artist: x.id, track: track.id } },
+            { callback: { track: track.id, artist: x.id }, text: x.title },
           ]),
-          [{ text: icon.close, callback: { reset: track.id } }],
+          [{ callback: { reset: track.id }, text: icon.close }],
         ]),
+        mode: markdown(),
       });
     }
   }
@@ -146,9 +146,9 @@ callback(function* (action, message) {
     const artist = yield* artists.get(action.artist);
     info(`${this.name} requested tracks of artist "${artist.title}".`);
     const [id] = yield* this.reply({
+      reset: action.track,
       page: artist.title,
       icon: icon.artist,
-      reset: action.track,
       message,
     });
     const page = pages.get(id);
@@ -170,19 +170,19 @@ invite(function* (chat, title) {
   const id = -special.findIndex((x) => meta.description?.includes("#" + x)) - 1;
   const relevancy: number = finitify(
     +(meta.description?.match(/#relevancy:([0-9.]+)/)?.[1] || NaN),
-    1
+    1,
   );
 
   const storage = persistence(this.user);
   const existing = yield* async(
-    storage.settings.lookup(chat).then(null, () => undefined)
+    storage.settings.lookup(chat).then(null, () => undefined),
   );
 
   if (existing) {
-    if (!id) yield* storage.playlists.edit(+existing, { title, relevancy });
+    if (!id) yield* storage.playlists.edit(+existing, { relevancy, title });
     info(`${this.name} updated playlist "${title}".`);
   } else {
-    if (!id) yield* storage.playlists.create({ title, relevancy });
+    if (!id) yield* storage.playlists.create({ relevancy, title });
     yield* storage.settings.store((id || identify(title)).toString(), chat);
     info(`${this.name} registered playlist "${title}".`);
   }

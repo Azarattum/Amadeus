@@ -11,39 +11,39 @@
 </script>
 
 <Stack class="gap-2">
-  <Checkbox><Icon name="sun" /><Icon name="moon" slot="after" /></Checkbox>
+  <Checkbox><Icon of="sun" /><Icon of="moon" slot="after" /></Checkbox>
   <Checkbox>
     Search?
-    <Icon name="search" />
+    <Icon of="search" />
     <Tooltip>Not really...</Tooltip>
   </Checkbox>
   <Input placeholder="Just Input"><Tooltip>This is an input!</Tooltip></Input>
-  <Input placeholder="Search" resettable><Icon name="search" /></Input>
+  <Input resettable placeholder="Search"><Icon of="search" /></Input>
   <Stack x class="gap-2">
-    <Button><Icon name="sun" /></Button>
-    <Button primary><Icon name="moon" /></Button>
-    <Button primary round><Icon name="search" /></Button>
+    <Button><Icon of="sun" /></Button>
+    <Button primary><Icon of="moon" /></Button>
+    <Button primary round><Icon of="search" /></Button>
     <Button primary>Primary Button</Button>
-    <Button><Icon name="sun" />Button With Icon</Button>
-    <Button air><Icon name="people" />Air Button</Button>
-    <Button compact air><Icon md name="moon" />Moon</Button>
-    <Button compact air><Icon md name="sun" />Sun</Button>
+    <Button><Icon of="sun" />Button With Icon</Button>
+    <Button air><Icon of="people" />Air Button</Button>
+    <Button compact air><Icon of="moon" md />Moon</Button>
+    <Button compact air><Icon of="sun" md />Sun</Button>
   </Stack>
   <Stack x class="gap-2">
-    <Group size={4} value={1}>
-      <Button><Icon name="last" /></Button>
-      <Button><Icon name="history" /></Button>
-      <Button><Icon name="stars" /></Button>
-      <Button><Icon name="people" /></Button>
+    <Group value={1} size={4}>
+      <Button><Icon of="last" /></Button>
+      <Button><Icon of="history" /></Button>
+      <Button><Icon of="stars" /></Button>
+      <Button><Icon of="people" /></Button>
     </Group>
     <Group size={2}>
-      <Button><Icon name="list" /><Tooltip>Queue</Tooltip></Button>
-      <Button><Icon name="book" /><Tooltip>Lyrics</Tooltip></Button>
+      <Button><Icon of="list" /><Tooltip>Queue</Tooltip></Button>
+      <Button><Icon of="book" /><Tooltip>Lyrics</Tooltip></Button>
     </Group>
-    <Group size={3} value={2}>
-      <Button><Icon name="note" />Tracks</Button>
-      <Button><Icon name="people" />Artists</Button>
-      <Button><Icon name="disk" />Albums</Button>
+    <Group value={2} size={3}>
+      <Button><Icon of="note" />Tracks</Button>
+      <Button><Icon of="people" />Artists</Button>
+      <Button><Icon of="disk" />Albums</Button>
     </Group>
   </Stack>
 </Stack>

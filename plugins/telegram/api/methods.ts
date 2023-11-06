@@ -1,6 +1,6 @@
-import { chat, file, me, responseOf, sent } from "../types/core";
-import { format, reencode, resize } from "@amadeus-music/core";
-import type { Audio, Message, Text } from "../types/reply";
+import { responseOf, chat, file, sent, me } from "../types/core";
+import { reencode, format, resize } from "@amadeus-music/core";
+import type { Message, Audio, Text } from "../types/reply";
 import { has } from "@amadeus-music/util/object";
 import { fetch, wrn } from "../plugin";
 import { paramify } from "./reply";
@@ -14,7 +14,7 @@ export const sendChatAction = (chat: number, action: "upload_voice") =>
 
 export const deleteMessage = (chat: number, message: number) =>
   fetch("deleteMessage", {
-    params: { chat_id: chat, message_id: message },
+    params: { message_id: message, chat_id: chat },
   })
     .request.text()
     .catch(wrn);
@@ -31,15 +31,15 @@ export const sendAudio = (chat: number, message: Audio) => {
   const art = !message.file ? message.track.album.arts?.[0] : undefined;
   return fetch("sendAudio", {
     form: {
-      chat_id: chat,
-      title: message.track.title,
-      duration: Math.round(message.track.duration),
       audio: message.file || [
         reencode(message.url, message.track),
         `${filename}.ogm`,
       ],
-      thumbnail: art ? [resize(art, 320), "art.jpg"] : undefined,
       performer: message.track.artists.map((x: any) => x.title).join(", "),
+      thumbnail: art ? [resize(art, 320), "art.jpg"] : undefined,
+      duration: Math.round(message.track.duration),
+      title: message.track.title,
+      chat_id: chat,
       ...paramify(message),
     },
   }).as(responseOf(sent));
@@ -53,13 +53,13 @@ export const sendMessage = (chat: number, message: Text) =>
     },
   }).as(responseOf(sent));
 
-export const setWebhook = (url: URL | string, secret: string) =>
+export const setWebhook = (url: string | URL, secret: string) =>
   fetch("setWebhook", {
-    params: { url: url.toString(), secret_token: secret },
+    params: { secret_token: secret, url: url.toString() },
   }).text();
 
 export const setMyCommands = (
-  commands: { command: string; description: string }[],
+  commands: { description: string; command: string }[],
 ) =>
   fetch("setMyCommands", {
     params: { commands: JSON.stringify(commands) },
@@ -72,8 +72,8 @@ export const editMessageCaption = (
 ) =>
   fetch("editMessageCaption", {
     params: {
-      chat_id: chat,
       message_id: message,
+      chat_id: chat,
       ...paramify(params),
     },
   })
@@ -91,8 +91,8 @@ export const editMessageText = (
 ) =>
   fetch("editMessageText", {
     params: {
-      chat_id: chat,
       message_id: message,
+      chat_id: chat,
       ...paramify(params),
     },
   })

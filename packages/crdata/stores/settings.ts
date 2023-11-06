@@ -26,16 +26,8 @@ export const settings = ({ replicated }: DB) =>
         await db
           .insertInto(collection as any)
           .onConflict((x) => x.doUpdateSet({ value: JSON.stringify(value) }))
-          .values({ key, value: JSON.stringify(value) })
+          .values({ value: JSON.stringify(value), key })
           .execute();
-      },
-      async extract(db, key: string, collection = "settings") {
-        return db
-          .selectFrom(collection as any)
-          .select("value")
-          .where("key", "=", key)
-          .executeTakeFirstOrThrow()
-          .then((x) => JSON.parse(x.value));
       },
       async lookup(db, value: unknown, collection = "settings") {
         return db
@@ -44,6 +36,14 @@ export const settings = ({ replicated }: DB) =>
           .where("value", "=", JSON.stringify(value))
           .executeTakeFirstOrThrow()
           .then((x) => x.key);
+      },
+      async extract(db, key: string, collection = "settings") {
+        return db
+          .selectFrom(collection as any)
+          .select("value")
+          .where("key", "=", key)
+          .executeTakeFirstOrThrow()
+          .then((x) => JSON.parse(x.value));
       },
     },
   );

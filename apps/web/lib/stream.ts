@@ -1,6 +1,6 @@
 import type { Unsubscribable } from "@trpc/server/observable";
 import { debounce } from "@amadeus-music/util/async";
-import { get, writable } from "svelte/store";
+import { writable, get } from "svelte/store";
 
 function stream<I, T, U>(from: Subscription<I, Stream<T, U>>, next: Next) {
   let unsubscribe = () => {};
@@ -9,7 +9,7 @@ function stream<I, T, U>(from: Subscription<I, Stream<T, U>>, next: Next) {
 
   const { subscribe, set } = writable<(T[] & { detail?: U }) | undefined>(
     undefined,
-    () => () => unsubscribe()
+    () => () => unsubscribe(),
   );
 
   const resubscribe = debounce((input: I) => {
@@ -34,25 +34,25 @@ function stream<I, T, U>(from: Subscription<I, Stream<T, U>>, next: Next) {
     if (input) resubscribe(input);
   }
 
-  return { subscribe, update, next: () => next.mutate(id) };
+  return { next: () => next.mutate(id), subscribe, update };
 }
 
 function multistream<T extends Record<string, Subscription>>(
   from: T,
   next: Next,
-  initial: keyof T
+  initial: keyof T,
 ) {
   let unsubscribe = () => {};
-  let current = null as null | (typeof streams)[keyof T];
-  let last = null as null | Parameters<T[keyof T]["subscribe"]>[0];
+  let current = null as (typeof streams)[keyof T] | null;
+  let last = null as Parameters<T[keyof T]["subscribe"]>[0] | null;
 
   const streams = Object.fromEntries(
-    Object.entries(from).map(([key, val]) => [key, stream(val, next)])
+    Object.entries(from).map(([key, val]) => [key, stream(val, next)]),
   ) as Record<keyof T, ReturnType<typeof stream>>;
 
   const { subscribe, set } = writable<Multistream<typeof from>>(
-    { type: initial, data: undefined } as any,
-    () => () => unsubscribe()
+    { data: undefined, type: initial } as any,
+    () => () => unsubscribe(),
   );
 
   function update(input: typeof last) {
@@ -71,30 +71,30 @@ function multistream<T extends Record<string, Subscription>>(
 
   choose(initial);
 
-  return { subscribe, update, choose, next: () => current?.next() };
+  return { next: () => current?.next(), subscribe, update, choose };
 }
 
 type Multistream<T extends Record<string, Subscription<any, any>>> = {
   [K in keyof T]: T[K] extends Subscription<any, Stream<infer T, infer U>>
-    ? { type: K; data: (T[] & { detail?: U }) | undefined }
+    ? { data: (T[] & { detail?: U }) | undefined; type: K }
     : never;
 }[keyof T];
 
 type Stream<T, U = undefined> = {
-  id: number;
-  detail?: U;
+  progress: number;
   results: T[];
   page: number;
-  progress: number;
+  id: number;
+  detail?: U;
 };
 
 type Subscription<I = any, T = any> = {
   subscribe(
     input: I,
-    options: { onData(value: T): void; onError(error: unknown): void }
+    options: { onError(error: unknown): void; onData(value: T): void },
   ): Unsubscribable;
 };
 
 type Next = { mutate: (id: number) => void };
 
-export { stream, multistream };
+export { multistream, stream };

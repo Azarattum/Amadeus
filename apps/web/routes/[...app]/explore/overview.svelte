@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Collection, CollectionType } from "@amadeus-music/protocol";
+  import type { CollectionType, Collection } from "@amadeus-music/protocol";
   import { Header, Stack } from "@amadeus-music/ui";
   import Overview from "$lib/ui/Overview.svelte";
 
@@ -12,11 +12,11 @@
   {#if local.length}
     <div>
       <Header sm>Library</Header>
-      <Overview {style} of={local} />
+      <Overview of={local} {style} />
     </div>
   {/if}
   <div>
     <Header sm>Search</Header>
-    <Overview {style} of={remote} href="/explore" on:end />
+    <Overview of={remote} href="/explore" {style} on:end />
   </div>
 </Stack>

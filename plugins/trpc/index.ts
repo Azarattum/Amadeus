@@ -5,22 +5,22 @@ import {
   users,
   hash,
   init,
-  ok,
   wrn,
+  ok,
 } from "./plugin";
-import { wss, arg, async, usage, bright, reset } from "@amadeus-music/core";
+import { bright, async, usage, reset, wss, arg } from "@amadeus-music/core";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import { app } from "./routes";
 
 init(function* () {
   yield* async(new Promise((r) => setTimeout(r, 100)));
-  applyWSSHandler({ wss: wss("/trpc"), router: app, createContext: context });
+  applyWSSHandler({ createContext: context, wss: wss("/trpc"), router: app });
 });
 
 command(
   "password",
   arg.user,
-  arg.text
+  arg.text,
 )(function* (user, password) {
   const all = yield* async(users());
   if (!user || !password) return usage("password");

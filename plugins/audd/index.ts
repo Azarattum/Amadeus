@@ -1,5 +1,5 @@
-import { init, recognize, connect } from "./plugin";
-import { convert, error, success } from "./types";
+import { recognize, connect, init } from "./plugin";
+import { convert, success, error } from "./types";
 import { concat } from "./meta";
 
 init(function* ({ audd: { token } }) {

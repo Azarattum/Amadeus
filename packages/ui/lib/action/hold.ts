@@ -1,6 +1,6 @@
 export function hold(
   node: HTMLElement,
-  { touch = true, mouse = false, duration = 300 }: HoldOptions = {}
+  { duration = 300, mouse = false, touch = true }: HoldOptions = {},
 ) {
   function detectHold(event: TouchEvent | MouseEvent) {
     const timeout = setTimeout(() => {
@@ -25,8 +25,8 @@ export function hold(
       node.addEventListener("touchcancel", cancel, { once: true });
       node.addEventListener("touchend", cancel, { once: true });
       node.addEventListener("touchmove", cancel, {
-        once: true,
         passive: true,
+        once: true,
       });
     }
     if (mouse) {

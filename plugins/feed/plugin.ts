@@ -1,26 +1,24 @@
 import {
   defaulted,
+  register,
   integer,
   number,
   object,
-  register,
 } from "@amadeus-music/core";
-import { name, version } from "./package.json";
+import { version, name } from "./package.json";
 
 export const {
-  ok,
+  persistence,
+  command,
+  relate,
+  lookup,
+  users,
   init,
   stop,
   info,
   pool,
-  users,
-  relate,
-  lookup,
-  command,
-  persistence,
+  ok,
 } = register({
-  name,
-  version,
   config: {
     feed: defaulted(
       object({
@@ -31,6 +29,8 @@ export const {
     ),
   },
   context: { preferences: { recommendations: 0, time: 0 } },
+  version,
+  name,
 });
 
 export const recommend = pool<(user: string) => void>("recommend", {

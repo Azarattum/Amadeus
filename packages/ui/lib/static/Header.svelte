@@ -20,7 +20,6 @@
 
 <svelte:element
   this={tag}
-  {id}
   class="relative box-content line-clamp-3 max-w-full rounded-md
   {center ? 'text-center' : 'text-left'}
   {sm ? 'light py-2 text-xs uppercase text-content-200' : ''}
@@ -29,6 +28,7 @@
   {xl ? 'mt-11 h-11 text-2xl' : ''}
   {loading ? 'animate-pulse bg-highlight text-transparent' : 'bg-transparent'}
   "
+  {id}
   class:ml-4={indent}
 >
   {#if id}

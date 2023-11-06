@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { autoscroll, intersection } from "../../action";
+  import { intersection, autoscroll } from "../../action";
   import type { IntersectionEvent } from "../../action";
   import { getContext, onMount } from "svelte";
   import { Topbar } from "../../component";
@@ -28,16 +28,16 @@
 </script>
 
 <article
-  use:intersection={[0, 0.5, 0.999]}
-  on:intersect={changed}
-  bind:this={article}
-  use:autoscroll
-  id={name.toLowerCase()}
   class="relative z-10 h-full w-full snap-start snap-always overflow-x-hidden overflow-y-scroll"
+  id={name.toLowerCase()}
   class:[&~nav_div_a]:pointer-events-none={current && stuck}
   class:[&~nav_div_a]:-translate-y-full={current && stuck}
   class:[&~nav_div]:opacity-0={current && stuck}
+  use:intersection={[0, 0.5, 0.999]}
+  on:intersect={changed}
   class:target={current}
+  bind:this={article}
+  use:autoscroll
 >
   <Topbar title={name} bind:stuck><div class="py-11" /></Topbar>
   <slot />

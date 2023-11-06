@@ -1,10 +1,10 @@
 import type {
-  Track,
-  PlaybackRepeat,
   PlaybackDirection,
+  PlaybackRepeat,
+  Track,
 } from "@amadeus-music/protocol";
-import { source, asset, artist, album, track } from "../operations/cte";
-import { uuid, localDevice, position } from "../operations/utils";
+import { source, artist, asset, album, track } from "../operations/cte";
+import { localDevice, position, uuid } from "../operations/utils";
 import { pushTracks } from "../operations/push";
 import type { DB } from "../data/schema";
 import { json, sql } from "crstore";
@@ -66,13 +66,13 @@ export const playback = ({ replicated }: DB) =>
         .select(["direction", "repeat", "infinite", "device", "progress"])
         .select((qb) =>
           json(qb, {
-            entry: "playback.id",
-            id: "track.id",
-            title: "track.title",
             duration: "track.duration",
-            album: "track.album",
             artists: "track.artists",
             sources: "track.sources",
+            entry: "playback.id",
+            title: "track.title",
+            album: "track.album",
+            id: "track.id",
           }).as("track"),
         )
         .select(sql<boolean>`device = crsql_site_id()`.as("local"))
@@ -82,7 +82,7 @@ export const playback = ({ replicated }: DB) =>
       async push(
         db,
         tracks: Track[],
-        at: "first" | "next" | "last" | "random" | number = "next",
+        at: "random" | "first" | "next" | "last" | number = "next",
       ) {
         if (!tracks.length) return;
         await pushTracks(db, tracks);
@@ -114,15 +114,15 @@ export const playback = ({ replicated }: DB) =>
           .insertInto("playback_fractindex" as any)
           .values(
             tracks.map((track, i) => ({
-              id: ids[i],
-              track: track.id,
-              device: localDevice,
               after_id:
                 at === "random"
                   ? position.random(ids.slice(0, i))
                   : i > 0 && direction != 1
-                    ? ids[i - 1]
-                    : order,
+                  ? ids[i - 1]
+                  : order,
+              device: localDevice,
+              track: track.id,
+              id: ids[i],
             })),
           )
           .execute();
@@ -143,23 +143,50 @@ export const playback = ({ replicated }: DB) =>
           /// TODO: update temps (+generate for at="random")
         }
       },
-      async purge(db, entries: number[]) {
-        if (!entries.length) return;
-        await db.deleteFrom("playback").where("id", "in", entries).execute();
-      },
-      async clear(db, device: Uint8Array = localDevice as any) {
-        await db.deleteFrom("playback").where("device", "=", device).execute();
-        await db
-          .updateTable("devices")
-          .set({ playback: -1, progress: 0 })
-          .where("id", "=", device)
-          .execute();
-      },
-      async sync(db, progress: number) {
+      async replicate(db, device: Uint8Array) {
+        const id = uuid();
         await db
           .updateTable("devices")
           .where("id", "=", localDevice)
-          .set({ progress })
+          .set({
+            progress: (qb) =>
+              qb
+                .selectFrom("devices")
+                .where("id", "=", device)
+                .select("progress"),
+            playback: id,
+          })
+          .execute();
+        await db
+          .deleteFrom("playback")
+          .where("device", "=", localDevice)
+          .execute();
+        await db
+          .insertInto("playback")
+          .expression((qb) =>
+            qb
+              .selectFrom("playback")
+              .select((qb) =>
+                qb
+                  .case()
+                  .when(
+                    (qb) =>
+                      qb
+                        .selectFrom("devices")
+                        .whereRef("id", "=", "playback.device")
+                        .select("devices.playback"),
+                    "=",
+                    qb.ref("playback.id"),
+                  )
+                  .then(id)
+                  .else(sql`ABS(RANDOM() % 4294967296)`)
+                  .end()
+                  .as("id"),
+              )
+              .select(sql`${localDevice}`.as("device"))
+              .select(["track", "order", "temp"])
+              .where("device", "=", device),
+          )
           .execute();
       },
       async rearrange(db, track: number, after: number | null = null) {
@@ -197,6 +224,14 @@ export const playback = ({ replicated }: DB) =>
           .where("id", "=", localDevice)
           .execute();
       },
+      async clear(db, device: Uint8Array = localDevice as any) {
+        await db.deleteFrom("playback").where("device", "=", device).execute();
+        await db
+          .updateTable("devices")
+          .set({ playback: -1, progress: 0 })
+          .where("id", "=", device)
+          .execute();
+      },
       async repeat(db, type: PlaybackRepeat) {
         const types = ["none", "single", "all"];
         await db
@@ -212,51 +247,16 @@ export const playback = ({ replicated }: DB) =>
           .where("id", "=", localDevice)
           .execute();
       },
-      async replicate(db, device: Uint8Array) {
-        const id = uuid();
+      async sync(db, progress: number) {
         await db
           .updateTable("devices")
           .where("id", "=", localDevice)
-          .set({
-            playback: id,
-            progress: (qb) =>
-              qb
-                .selectFrom("devices")
-                .where("id", "=", device)
-                .select("progress"),
-          })
+          .set({ progress })
           .execute();
-        await db
-          .deleteFrom("playback")
-          .where("device", "=", localDevice)
-          .execute();
-        await db
-          .insertInto("playback")
-          .expression((qb) =>
-            qb
-              .selectFrom("playback")
-              .select((qb) =>
-                qb
-                  .case()
-                  .when(
-                    (qb) =>
-                      qb
-                        .selectFrom("devices")
-                        .whereRef("id", "=", "playback.device")
-                        .select("devices.playback"),
-                    "=",
-                    qb.ref("playback.id"),
-                  )
-                  .then(id)
-                  .else(sql`ABS(RANDOM() % 4294967296)`)
-                  .end()
-                  .as("id"),
-              )
-              .select(sql`${localDevice}`.as("device"))
-              .select(["track", "order", "temp"])
-              .where("device", "=", device),
-          )
-          .execute();
+      },
+      async purge(db, entries: number[]) {
+        if (!entries.length) return;
+        await db.deleteFrom("playback").where("id", "in", entries).execute();
       },
     },
   );
@@ -271,11 +271,11 @@ const fields = [
 ] as const;
 
 type Playback = {
+  track: Track & { entry: number };
   device: Uint8Array;
   progress: number;
   direction: 0 | 1;
   infinite: 0 | 1;
   repeat: 0 | 1;
   local: 0 | 1;
-  track: Track & { entry: number };
 };

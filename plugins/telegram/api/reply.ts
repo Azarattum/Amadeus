@@ -4,14 +4,14 @@ import {
   sendMessage,
   sendAudio,
 } from "./methods";
-import { async, first, map, type Pool } from "@amadeus-music/core";
-import type { Message, Queue, Replier } from "../types/reply";
-import { desource, info, persistence, pool } from "../plugin";
+import { type Pool, async, first, map } from "@amadeus-music/core";
+import type { Message, Replier, Queue } from "../types/reply";
+import { persistence, desource, info, pool } from "../plugin";
 import { bright, reset } from "@amadeus-music/util/color";
 import type { Track } from "@amadeus-music/protocol";
 import { pretty } from "@amadeus-music/util/object";
 import { format } from "@amadeus-music/protocol";
-import { menu, markdown } from "./markup";
+import { markdown, menu } from "./markup";
 import { sendPage } from "./pages";
 
 function notifier(chat: number) {
@@ -41,7 +41,7 @@ function* queue(
   notifier: () => void,
   name: string,
   tracks: Track[],
-  group = true
+  group = true,
 ) {
   let done = false;
   const ping = (notifier(), setInterval(notifier, 3000));
@@ -52,17 +52,17 @@ function* queue(
     info(`Sending "${format(track)}" to ${bright}${name}${reset}...`);
     promises.push(
       pool({
-        url,
-        track,
-        mode: markdown(),
         markup: !group ? menu(track.id) : undefined,
-      }).then((x) => (setTimeout(() => done || notifier(), 10), x))
+        mode: markdown(),
+        track,
+        url,
+      }).then((x) => (setTimeout(() => done || notifier(), 10), x)),
     );
   }
   yield* yield* async(
     Promise.allSettled(promises).then((x) =>
-      x.map((x) => (x.status === "rejected" ? 0 : +x.value))
-    )
+      x.map((x) => (x.status === "rejected" ? 0 : +x.value)),
+    ),
   );
   done = true;
 }
@@ -73,7 +73,7 @@ function* reply(chat: number, params: Message) {
     params.file = yield* async(
       persistence()
         .settings.extract(params.track.id.toString())
-        .then(null, () => undefined)
+        .then(null, () => undefined),
     );
   }
 
@@ -87,7 +87,7 @@ function* reply(chat: number, params: Message) {
   if ("track" in params && result.audio?.file_id) {
     yield* persistence().settings.store(
       params.track.id.toString(),
-      result.audio.file_id
+      result.audio.file_id,
     );
   }
 
@@ -132,4 +132,4 @@ function editor(chat: number) {
   };
 }
 
-export { replier, editor, paramify };
+export { paramify, replier, editor };

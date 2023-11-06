@@ -3,7 +3,7 @@ import { PassThrough, Readable } from "stream";
 const boundary = "xXx_boundary_xXx";
 
 export class Form extends PassThrough {
-  private params: [string, string | number | boolean][];
+  private params: [string, boolean | string | number][];
   private streams: [string, [Readable, string]][];
 
   public constructor(params: Record<string, any> = {}) {
@@ -29,18 +29,6 @@ export class Form extends PassThrough {
     };
   }
 
-  private writeParams(): void {
-    for (const param of this.params) {
-      let [name, value] = param;
-      if (typeof value == "object") value = JSON.stringify(value);
-      name = name.toString();
-      if (value == null) continue;
-
-      const data = this.formatProperty(name, value.toString());
-      this.write(data);
-    }
-  }
-
   private async writeStreams(): Promise<void> {
     for await (const stream of this.streams) {
       const [name, [readable, filename]] = stream;
@@ -55,11 +43,16 @@ export class Form extends PassThrough {
     }
   }
 
-  private formatStream(name: string, filename: string): Buffer {
-    return Buffer.from(
-      `--${boundary}\r\n` +
-        `Content-Disposition: form-data; name="${name}"; filename="${filename}"\r\n\r\n`
-    );
+  private writeParams(): void {
+    for (const param of this.params) {
+      let [name, value] = param;
+      if (typeof value == "object") value = JSON.stringify(value);
+      name = name.toString();
+      if (value == null) continue;
+
+      const data = this.formatProperty(name, value.toString());
+      this.write(data);
+    }
   }
 
   private formatProperty(name: string, value: string): Buffer {
@@ -67,7 +60,14 @@ export class Form extends PassThrough {
       `--${boundary}\r\n` +
         `Content-Disposition: form-data; name="${name}"\r\n\r\n` +
         value +
-        "\r\n"
+        "\r\n",
+    );
+  }
+
+  private formatStream(name: string, filename: string): Buffer {
+    return Buffer.from(
+      `--${boundary}\r\n` +
+        `Content-Disposition: form-data; name="${name}"; filename="${filename}"\r\n\r\n`,
     );
   }
 

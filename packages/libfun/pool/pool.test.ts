@@ -1,11 +1,11 @@
-import { take, async, context, map, first, merge } from "./iterator";
+import { context, async, first, merge, take, map } from "./iterator";
 import type { Mapped } from "./pool.types";
 import { PoolError, pools } from "./pool";
 import type { Fn } from "../utils/types";
 import { expect, it, vi } from "vitest";
 import { delay } from "../utils/async";
 
-const { pool, count, status, abort } = pools({ group: "test" });
+const { status, count, abort, pool } = pools({ group: "test" });
 const barrier = () => {
   let resolve: () => void = () => {};
   const promise = new Promise<void>((r) => (resolve = r));
@@ -272,7 +272,7 @@ it("supports synchronous non-generator handlers", async () => {
   event((x) => 42 * x);
 
   const iterator = event(2);
-  expect(await iterator.next()).toEqual({ value: 84, done: false });
+  expect(await iterator.next()).toEqual({ done: false, value: 84 });
   expect(await iterator.next()).toEqual({ value: undefined, done: true });
   event.close();
 });
@@ -364,7 +364,7 @@ it("supports context groups", async () => {
     expect.arrayContaining([
       expect.objectContaining({ group: "g1" }),
       expect.objectContaining({ group: "g2" }),
-    ])
+    ]),
   );
   space.abort("event", { handler: "g1" });
   block1.resolve();
@@ -577,7 +577,7 @@ it("creates bound context", async () => {
   event(function* () {
     expect((this as any).context).toBeUndefined();
   });
-  const bound = event.bind({ group: "bound", context: { value: 42 } });
+  const bound = event.bind({ context: { value: 42 }, group: "bound" });
   expect(all.contexts.get("bound")).toEqual({ value: 42 });
 
   let counter = 0;
@@ -602,7 +602,7 @@ it("creates bound context", async () => {
 
 it("does not leak contexts from groups", async () => {
   const event = pool("event");
-  const event1 = event.bind({ group: "1", context: { val: 42 } });
+  const event1 = event.bind({ context: { val: 42 }, group: "1" });
 
   event1(function* () {
     expect(this.val).toBe(10);
@@ -768,7 +768,7 @@ it("stops after async abort", async () => {
 
 it("transforms items", async () => {
   const mapped = pool<(_: number) => Mapped<number, string>>("event", {
-    async *transform(generators, { args, tasks, controller, id }) {
+    async *transform(generators, { controller, tasks, args, id }) {
       expect(controller).toBeInstanceOf(AbortController);
       expect(tasks[0]).toMatchObject({ group: "test" });
       expect(args).toEqual([4]);

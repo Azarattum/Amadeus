@@ -10,26 +10,26 @@
 </script>
 
 <svg
-  class="inline-block animate-spin"
-  width="{size}px"
-  height="{size}px"
-  viewBox="0 0 {size} {size}"
   xmlns="http://www.w3.org/2000/svg"
+  class="inline-block animate-spin"
+  viewBox="0 0 {size} {size}"
+  height="{size}px"
+  width="{size}px"
   role="status"
 >
   <circle
     class="animate-[dash-wiggle_var(--duration)_ease-in-out_infinite]"
-    fill="none"
-    stroke={color}
-    stroke-dasharray={circumference}
     stroke-dashoffset={circumference * cutoff}
+    stroke-dasharray={circumference}
+    r={size / 2 - thickness / 2}
     stroke-width={thickness}
     stroke-linecap="round"
+    stroke={color}
     cx={size / 2}
     cy={size / 2}
-    r={size / 2 - thickness / 2}
-    style:--back={circumference * (cutoff - wiggle)}
+    fill="none"
     style:--forth={circumference * (cutoff + wiggle)}
+    style:--back={circumference * (cutoff - wiggle)}
     style:--duration="{duration}ms"
   />
 </svg>

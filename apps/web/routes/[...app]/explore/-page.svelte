@@ -10,13 +10,13 @@
     Panel,
     Icon,
   } from "@amadeus-music/ui";
-  import { albums, artists, history, search as query, tracks } from "$lib/data";
+  import { search as query, artists, history, albums, tracks } from "$lib/data";
   import type { Artist, Album, Track } from "@amadeus-music/protocol";
   import { debounce } from "@amadeus-music/util/async";
   import { navigating, page } from "$app/stores";
   import ArtistPage from "./artist/-page.svelte";
   import AlbumPage from "./album/-page.svelte";
-  import { search, streams } from "$lib/trpc";
+  import { streams, search } from "$lib/trpc";
   import { multistream } from "$lib/stream";
   import Overview from "./overview.svelte";
   import History from "./history.svelte";
@@ -30,7 +30,7 @@
   const log = debounce((x: string) => history.log(x), 2000);
   const estimate = ~~((globalThis.innerHeight / 56) * 2);
   const remote = multistream(
-    { tracks: search.tracks, artists: search.artists, albums: search.albums },
+    { artists: search.artists, tracks: search.tracks, albums: search.albums },
     streams.next,
     types[type],
   );
@@ -41,7 +41,7 @@
   }
 
   $: remote.choose(types[type]);
-  $: remote.update($query ? { query: $query, page: estimate } : null);
+  $: remote.update($query ? { page: estimate, query: $query } : null);
 
   let localTracks: Track[] = [];
   let localAlbums: Album[] = [];
@@ -62,7 +62,7 @@
 </script>
 
 <Topbar title="Explore">
-  <Header xl indent>Explore</Header>
+  <Header indent xl>Explore</Header>
 </Topbar>
 
 {#if $query}
@@ -70,16 +70,16 @@
     <Tracks remote={$remote.data} local={localTracks} on:end={remote.next} />
   {:else if $remote.type === "artists"}
     <Overview
-      style="artist"
       remote={$remote.data}
       local={localArtists}
+      style="artist"
       on:end={remote.next}
     />
   {:else if $remote.type === "albums"}
     <Overview
-      style="album"
       remote={$remote.data}
       local={localAlbums}
+      style="album"
       on:end={remote.next}
     />
   {/if}
@@ -87,10 +87,10 @@
   <History type={types[type]} />
 {/if}
 
-<Projection at="album" class="bg-surface" ephemeral>
+<Projection at="album" ephemeral class="bg-surface">
   <AlbumPage />
 </Projection>
-<Projection at="artist" class="bg-surface" ephemeral>
+<Projection at="artist" ephemeral class="bg-surface">
   <ArtistPage />
 </Projection>
 
@@ -98,13 +98,13 @@
   <Panel class={visible ? "flex" : "hidden"}>
     <Input
       resettable
-      bind:value={$query}
-      placeholder="Search"
       class="w-full sm:hidden"
+      placeholder="Search"
+      bind:value={$query}
     >
-      <Icon name="search" />
+      <Icon of="search" />
     </Input>
-    <Group size={3} stretch bind:value={type}>
+    <Group stretch size={3} bind:value={type}>
       <Button id="tracks">Tracks</Button>
       <Button id="artists">Artists</Button>
       <Button id="albums">Albums</Button>

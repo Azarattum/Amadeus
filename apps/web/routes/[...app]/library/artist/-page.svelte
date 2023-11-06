@@ -9,7 +9,7 @@
 </script>
 
 <Collection of={info} style="artist">
-  <Icon name="last" slot="action" />
+  <Icon of="last" slot="action" />
 </Collection>
 
 <svelte:head>

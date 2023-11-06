@@ -42,11 +42,11 @@
 </script>
 
 <section
-  bind:this={container}
-  bind:clientWidth={width}
-  class:scroll-smooth={compact}
   class="grid h-full max-h-[100dvh] snap-x snap-mandatory overflow-y-hidden overflow-x-scroll"
   style="grid: auto / auto-flow 100%; perspective: 1px; perspective-origin: top left;"
+  class:scroll-smooth={compact}
+  bind:clientWidth={width}
+  bind:this={container}
 >
   <slot />
   <nav
@@ -59,13 +59,13 @@
     {#each tabs as tab, i}
       <div
         class="h-11 origin-top-left overflow-hidden pl-4 text-center text-2xl font-normal text-content-200 underline-offset-4 transition-opacity duration-300 ease-in"
+        aria-label={tab}
         style:transform={transforms[i]}
         bind:this={elements[i]}
-        aria-label={tab}
       >
         <a
-          href="#{tab.toLowerCase()}"
           class="block transform-gpu touch-manipulation select-none transition-composite duration-300 will-change-transform focus-visible:underline focus-visible:outline-none hover:text-content-100"
+          href="#{tab.toLowerCase()}"
         >
           {tab}
         </a>

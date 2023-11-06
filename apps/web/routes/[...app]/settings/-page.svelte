@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Stack, Input, Header } from "@amadeus-music/ui";
+  import { Button, Header, Stack, Input } from "@amadeus-music/ui";
 
   let hostname = "";
   let username = "";
@@ -10,7 +10,7 @@
     const provided =
       protocols.find((x) => hostname.startsWith(x)) ||
       globalThis.location?.protocol;
-    const protocol = ["ws:", "http:"].includes(provided) ? "ws:" : "wss:";
+    const protocol = ["http:", "ws:"].includes(provided) ? "ws:" : "wss:";
     const base = hostname.replace(/^\w+:\/\//, "");
 
     const url = `${protocol}//${base}/trpc/${username}/${token}`;

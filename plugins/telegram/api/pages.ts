@@ -1,18 +1,18 @@
 import {
-  deleteMessage,
   editMessageCaption,
   editMessageText,
+  deleteMessage,
   sendMessage,
 } from "./methods";
-import { async, type Infer, type Page as State } from "@amadeus-music/core";
-import { icon as icons, markdown, pager, escape, menu } from "./markup";
+import { type Page as State, type Infer, async } from "@amadeus-music/core";
+import { icon as icons, markdown, escape, pager, menu } from "./markup";
 import type { Page as Options } from "../types/reply";
 import { format } from "@amadeus-music/protocol";
 import { sent } from "../types/core";
 
 const pages = new Map<number, Page>();
 
-function* sendPage(chat: number, { page, icon, message, reset }: Options) {
+function* sendPage(chat: number, { message, reset, page, icon }: Options) {
   const inline = !!message;
   const edit = inline ? editMessageCaption : editMessageText;
   const target =
@@ -20,13 +20,13 @@ function* sendPage(chat: number, { page, icon, message, reset }: Options) {
     (yield* sendMessage(chat, { text: icons.load })).result.message_id;
 
   const id = (Math.random() * 2 ** 32) >>> 0;
-  let lastState = null as null | State<any>;
+  let lastState = null as State<any> | null;
   pages.set(id, {
     *update(state) {
       lastState = state;
       const buttons = state.items.map((x) => ({
-        text: format(x),
         callback: { download: x.id },
+        text: format(x),
       }));
 
       const nextExists = state.progress >= 1 && state.items.length >= 8;
@@ -38,9 +38,9 @@ function* sendPage(chat: number, { page, icon, message, reset }: Options) {
 
       yield* async(
         edit(chat, target, {
-          mode: markdown(),
-          [inline ? "caption" : "text"]: header,
           markup: pager(id, state.number, buttons, nextExists),
+          [inline ? "caption" : "text"]: header,
+          mode: markdown(),
         }),
       );
     },
@@ -49,18 +49,18 @@ function* sendPage(chat: number, { page, icon, message, reset }: Options) {
       pages.delete(id);
       if (!inline || !reset) return deleteMessage(chat, target);
       return editMessageCaption(chat, message, {
-        mode: markdown(),
         markup: menu(reset),
+        mode: markdown(),
       });
     },
-    get loaded() {
-      return lastState?.loaded;
+    get all() {
+      return lastState?.pages.flatMap((x) => x.items) || [];
     },
     get items() {
       return lastState?.items || [];
     },
-    get all() {
-      return lastState?.pages.flatMap((x) => x.items) || [];
+    get loaded() {
+      return lastState?.loaded;
     },
     next: () => lastState?.next(),
     prev: () => lastState?.prev(),

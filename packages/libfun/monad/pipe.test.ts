@@ -1,6 +1,6 @@
-import { pipeline, pipe, fallback, expose } from "./pipe";
-import { it, expect, vitest } from "vitest";
-import { maybe, spread } from "../monads";
+import { pipeline, fallback, expose, pipe } from "./pipe";
+import { expect, vitest, it } from "vitest";
+import { spread, maybe } from "../monads";
 import { monad } from "./monad";
 
 function adders(length: number) {
@@ -14,8 +14,8 @@ it("pipeline", () => {
     pipeline(
       (x: string) => x.toUpperCase(),
       (x) => x.split(" "),
-      ([a, b]) => `${a}, ${+b * 2}`
-    )("hello 123")
+      ([a, b]) => `${a}, ${+b * 2}`,
+    )("hello 123"),
   ).toBe("HELLO, 246");
 
   for (let i = 0; i < 10; i++) {
@@ -33,7 +33,7 @@ it("pipe", () => {
     (x) => x.split(" "),
     ([a, b]) => `${a}, ${+b * 2}`,
     expect,
-    (x) => x.equal("HELLO, 246")
+    (x) => x.equal("HELLO, 246"),
   );
 
   for (let i = 0; i < 10; i++) {
@@ -45,7 +45,7 @@ it("pipe", () => {
   const result = process(
     (x, y) => x * y,
     (x) => `Value: ${x}`,
-    (x) => x.toUpperCase()
+    (x) => x.toUpperCase(),
   );
   expect(result).toBe("VALUE: 39483");
 });
@@ -61,7 +61,7 @@ it("supports promises", async () => {
     (x) => Promise.resolve(x),
     (x) => x.toString(),
     (x) => Promise.resolve(x),
-    (x) => x
+    (x) => x,
   );
 
   expect(value).toBeInstanceOf(Promise);
@@ -70,7 +70,7 @@ it("supports promises", async () => {
   const future = monad()(Promise.resolve(1337));
   const result = pipe(future)(
     (x) => `data: ${x}`,
-    (x) => x.toUpperCase()
+    (x) => x.toUpperCase(),
   );
 
   expect(result).toBeInstanceOf(Promise);
@@ -80,7 +80,7 @@ it("supports promises", async () => {
 it("supports monads", async () => {
   const value = pipe(maybe(42))(
     (x) => x * 2,
-    (x) => x.toString()
+    (x) => x.toString(),
   );
 
   expect(typeof value).toBe("string");
@@ -88,7 +88,7 @@ it("supports monads", async () => {
 
   const value2 = pipe(maybe(Promise.resolve(42)))(
     (x) => x * 2,
-    (x) => x.toString()
+    (x) => x.toString(),
   );
 
   expect(value2).toBeInstanceOf(Promise);
@@ -101,7 +101,7 @@ it("supports monads", async () => {
     spread,
     (x) => x * x,
     (x) => x - 1,
-    (x) => x.toString()
+    (x) => x.toString(),
   );
 
   expect(value3).toBeInstanceOf(Array);
@@ -121,7 +121,7 @@ it("handles longs chains", async () => {
     (x: string) => x.toLowerCase(),
     (x: string) => Promise.resolve(x + "!"),
     (x) => x,
-    (x: string) => [x]
+    (x: string) => [x],
   );
 
   expect(data("123", 123)).resolves.toEqual(["nan!"]);
@@ -137,8 +137,8 @@ it("can be used as a callback", () => {
   multiple(
     pipeline(
       (x, y) => x.toUpperCase() + y.toPrecision(),
-      (x) => [x]
-    )
+      (x) => [x],
+    ),
   );
   expect(check).toBeCalled();
 
@@ -175,7 +175,7 @@ it("unwraps monads", () => {
   {
     const result = pipe(maybe(1))(
       (x) => x,
-      (x) => x
+      (x) => x,
     );
     expect(result).toBeTypeOf("number");
     expect(result).toBe(1);
@@ -189,7 +189,7 @@ it("propagates monads", () => {
   const value = pipe(maybe(4))(
     (x) => x * 2,
     dunno,
-    (x) => x.toString()
+    (x) => x.toString(),
   );
   expect(value).toBe("8");
 
@@ -199,7 +199,7 @@ it("propagates monads", () => {
     maybe,
     none,
     (x) => x.toFixed(),
-    never
+    never,
   );
   expect(invalid).toThrow();
   expect(never).not.toBeCalled();
@@ -219,7 +219,7 @@ it("propagates monads", () => {
     check,
     none,
     (x: number) => x.toFixed(),
-    never
+    never,
   );
 
   expect(long).toThrow();
@@ -241,17 +241,17 @@ it("respects fallback", () => {
     (x) => x * 2,
     fallback((e: Error) => e.message),
     (x) => x.toString(),
-    (x) => x.toUpperCase()
+    (x) => x.toUpperCase(),
   );
   expect(message).toBe("FAIL");
 
   {
-    const { data, error } = pipe(1)(bad, (x) => x * 2, ...expose);
+    const { error, data } = pipe(1)(bad, (x) => x * 2, ...expose);
     expect(data).toBeTypeOf("undefined");
     expect(error?.message).toBe("fail");
   }
   {
-    const { data, error } = pipe(1)((x) => x * 2, ...expose);
+    const { error, data } = pipe(1)((x) => x * 2, ...expose);
     expect(error).toBeTypeOf("undefined");
     expect(data).toBe(2);
   }

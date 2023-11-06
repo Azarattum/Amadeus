@@ -1,4 +1,4 @@
-import { twMerge, type ClassNameValue } from "tailwind-merge";
+import { type ClassNameValue, twMerge } from "tailwind-merge";
 
 export function tw(
   strings: TemplateStringsArray,
@@ -8,7 +8,7 @@ export function tw(
   return twMerge(
     strings.reduce(
       (arr, x, i) => (arr.push(x, interpolated[i]), arr),
-      [] as ClassNameValue[]
-    )
+      [] as ClassNameValue[],
+    ),
   );
 }

@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { maybe, stream } from ".";
+import { stream, maybe } from ".";
 
 it("wraps streamed values", () => {
   const a = stream(42);

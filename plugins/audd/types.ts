@@ -1,17 +1,17 @@
 import {
   inferTrack,
-  literal,
+  type Infer,
   nullable,
+  literal,
   string,
   type,
-  type Infer,
 } from "@amadeus-music/core";
 
 const track = type({
+  release_date: string(),
   artist: string(),
   title: string(),
   album: string(),
-  release_date: string(),
 });
 
 const success = type({
@@ -30,17 +30,17 @@ function convert(data: Infer<typeof track>) {
   ].sort();
 
   return {
-    title: inferred.artists.length ? inferred.title : data.title,
-    duration: 0,
-    sources: [],
     album: {
-      title: data.album,
       year: +(
         data.release_date.match(/([0-9]{4})-[0-9]{2}-[0-9]{2}/)?.[1] || 0
       ),
+      title: data.album,
       sources: [],
     },
-    artists: artists.map((title) => ({ title, sources: [] })),
+    title: inferred.artists.length ? inferred.title : data.title,
+    artists: artists.map((title) => ({ sources: [], title })),
+    duration: 0,
+    sources: [],
   };
 }
 

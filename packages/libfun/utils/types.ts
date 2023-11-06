@@ -1,7 +1,7 @@
 /** Combines deduplicated arrays without any new duplicates */
 type Combine<A extends readonly any[], B extends readonly any[]> = A extends [
   ...infer S,
-  infer L
+  infer L,
 ]
   ? Equal<L, B[0], Combine<S, B>, [...A, ...B]>
   : B;
@@ -31,7 +31,7 @@ type Flatten<T> = IsTuple<
   T extends readonly [infer U, ...infer Tail extends any[]]
     ? U extends readonly any[]
       ? Flatten<U>
-      : U | Flatten<Tail>
+      : Flatten<Tail> | U
     : never,
   T extends string
     ? T
@@ -59,7 +59,7 @@ type Contains<
   T extends readonly any[],
   U,
   True = true,
-  False = false
+  False = false,
 > = IsTuple<
   T,
   T extends [infer Item, ...infer Rest]
@@ -72,7 +72,7 @@ type Contains<
 
 /** Converts any union to its intersection. Eg. `A | B` to `A & B` */
 type Intersected<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I
+  k: infer I,
 ) => void
   ? I
   : never;

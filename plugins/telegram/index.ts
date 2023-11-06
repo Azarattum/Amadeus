@@ -1,13 +1,13 @@
-import { deleteMessage, getMe, setMyCommands, setWebhook } from "./api/methods";
-import { cli, init, stop, info, temp, users, persistence } from "./plugin";
+import { deleteMessage, setMyCommands, setWebhook, getMe } from "./api/methods";
+import { persistence, users, init, stop, info, temp, cli } from "./plugin";
 import { bright, reset } from "@amadeus-music/util/color";
-import { arg, async, http } from "@amadeus-music/core";
+import { async, http, arg } from "@amadeus-music/core";
 import { handleChanges } from "./handlers/database";
 import { delay } from "@amadeus-music/util/async";
-import { secret, request } from "./api/update";
+import { request, secret } from "./api/update";
 import { icon } from "./api/markup";
 
-init(function* ({ telegram: { token, webhook } }) {
+init(function* ({ telegram: { webhook, token } }) {
   if (!token) throw "Please set a bot token!";
   this.fetch.baseURL = `https://api.telegram.org/bot${token}/`;
   if (!webhook) throw "Please set a webhook URL!";
@@ -45,12 +45,12 @@ cli("register", [arg.text])(function* (user) {
 
 const commands = [
   {
-    command: "cancel",
     description: `${icon.cancel} Stop pending uploads`,
+    command: "cancel",
   },
   {
-    command: "history",
     description: `${icon.history} Show search history`,
+    command: "history",
   },
 ];
 

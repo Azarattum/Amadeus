@@ -8,7 +8,7 @@
     Icon,
     When,
   } from "@amadeus-music/ui";
-  import { feed, playback, search } from "$lib/data";
+  import { playback, search, feed } from "$lib/data";
   import Overview from "$lib/ui/Overview.svelte";
   import Playlist from "./playlist/-page.svelte";
   import Track from "$lib/ui/Track.svelte";
@@ -26,10 +26,10 @@
 </script>
 
 <Topbar title="Home">
-  <Header xl indent id="feed">
+  <Header indent xl id="feed">
     Home
     <When not sm slot="after">
-      <Button round href="/settings"><Icon name="settings" /></Button>
+      <Button round href="/settings"><Icon of="settings" /></Button>
     </When>
   </Header>
 </Topbar>
@@ -40,21 +40,21 @@
       <div
         class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,40rem),1fr))] gap-1"
       >
-        {#each devices as { device, track, progress }}
+        {#each devices as { progress, device, track }}
           <div
             class="dark:ring-none rounded-lg shadow-sm ring-1 ring-highlight [&>*]:bg-surface-100"
           >
             <Track
               sm
-              {track}
               {progress}
+              {track}
               on:click={() => playback.replicate(device)}
             >
               <Button
                 air
                 on:click={(e) => (playback.clear(device), e.stopPropagation())}
               >
-                <Icon name="close" />
+                <Icon of="close" />
               </Button>
             </Track>
           </div>
@@ -66,9 +66,9 @@
   <Stack class="gap-1">
     <Header sm>You Might Like</Header>
     <Overview
+      of={$feed.filter((x) => !hidden.has(x.id))}
       style="playlist"
       filter={$search}
-      of={$feed.filter((x) => !hidden.has(x.id))}
       href="/home"
     />
   </Stack>
@@ -77,7 +77,7 @@
   <!-- /// TODO add artists cards -->
 </Stack>
 
-<Projection at="playlist" class="bg-surface" ephemeral>
+<Projection at="playlist" ephemeral class="bg-surface">
   <Playlist />
 </Projection>
 

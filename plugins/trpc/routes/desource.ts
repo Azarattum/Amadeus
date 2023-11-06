@@ -1,4 +1,4 @@
-import { procedure, desource as desourceOf, info } from "../plugin";
+import { desource as desourceOf, procedure, info } from "../plugin";
 import { format, track } from "@amadeus-music/protocol";
 import { first } from "@amadeus-music/core";
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Tab, Tabs, Stack, Projection } from "@amadeus-music/ui";
-  import { artists, playlists, tracks, search } from "$lib/data";
+  import { Projection, Stack, Tabs, Tab } from "@amadeus-music/ui";
+  import { playlists, artists, tracks, search } from "$lib/data";
   import Overview from "$lib/ui/Overview.svelte";
   import Playlist from "./playlist/-page.svelte";
   import Artist from "./artist/-page.svelte";
@@ -19,35 +19,35 @@
   <Tab name="Playlists" {visible}>
     <Stack class="p-4">
       <Overview
-        on:rearrange={({ detail }) =>
-          playlists.rearrange(detail.id, detail.after)}
-        on:create={() =>
-          playlists.create({ title: Math.random().toString(36).slice(2) })}
-        style="playlist"
-        filter={$search}
         of={$playlists}
         expandable
         editable
+        style="playlist"
+        filter={$search}
+        on:create={() =>
+          playlists.create({ title: Math.random().toString(36).slice(2) })}
+        on:rearrange={({ detail }) =>
+          playlists.rearrange(detail.id, detail.after)}
       />
     </Stack>
   </Tab>
   <Tab name="Artists" {visible}>
     <Stack class="p-4">
-      <Overview style="artist" of={$artists} filter={$search} />
+      <Overview of={$artists} filter={$search} style="artist" />
     </Stack>
   </Tab>
   <Tab name="Timeline" {visible}>
-    <Tracks tracks={$tracks} timeline fixed class="pt-4">
+    <Tracks timeline fixed tracks={$tracks} class="pt-4">
       <div><!-- /// TODO: add actions --></div>
     </Tracks>
   </Tab>
 </Tabs>
 
-<Projection at="playlist" class="bg-surface" ephemeral>
+<Projection at="playlist" ephemeral class="bg-surface">
   <Playlist />
 </Projection>
 
-<Projection at="artist" class="bg-surface" ephemeral>
+<Projection at="artist" ephemeral class="bg-surface">
   <Artist />
 </Projection>
 

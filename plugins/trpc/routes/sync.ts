@@ -1,11 +1,8 @@
 import { observable } from "@trpc/server/observable";
 import { number, object, string } from "superstruct";
-import { info, procedure, router } from "../plugin";
+import { procedure, router, info } from "../plugin";
 
 export const sync = router({
-  push: procedure.input(string()).mutation(async ({ input, ctx }) => {
-    return ctx.persistence().merge(input).then();
-  }),
   pull: procedure
     .input(object({ version: number(), client: string() }))
     .subscription(({ input, ctx }) =>
@@ -18,4 +15,7 @@ export const sync = router({
         };
       }),
     ),
+  push: procedure.input(string()).mutation(async ({ input, ctx }) => {
+    return ctx.persistence().merge(input).then();
+  }),
 });

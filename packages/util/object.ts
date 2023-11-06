@@ -1,11 +1,11 @@
 import {
-  black,
-  bright,
-  cyan,
   highlight,
   magenta,
-  reset,
+  bright,
   yellow,
+  black,
+  reset,
+  cyan,
 } from "./color";
 import { delay } from "./async";
 
@@ -75,7 +75,7 @@ export function binsert<T>(
     compare = (a: T, b: T) => +a - +b,
     end = collection.length - 1,
     start = 0,
-  } = {}
+  } = {},
 ) {
   if (!collection.length) {
     insert(0, item);
@@ -88,8 +88,8 @@ export function binsert<T>(
   } else {
     const mid = Math.floor((end - start) / 2) + start;
     const left = compare(item, collection[mid]) < 0;
-    if (left) binsert(collection, item, { insert, compare, start, end: mid });
-    else binsert(collection, item, { insert, compare, start: mid, end });
+    if (left) binsert(collection, item, { end: mid, compare, insert, start });
+    else binsert(collection, item, { start: mid, compare, insert, end });
   }
 }
 
@@ -103,9 +103,9 @@ export async function combine<T, U>(
   a: T[],
   b: U[],
   {
-    identify,
-    compare = () => 0,
     convert = (x) => x as any,
+    compare = () => 0,
+    identify,
     merge,
     map,
   }: {
@@ -114,7 +114,7 @@ export async function combine<T, U>(
     merge: (a: T, b: U) => void;
     convert?: (item: U) => T;
     map: Map<number, T>;
-  }
+  },
 ) {
   const insert = (where: number, item: T) => {
     map.set(identify(item), item);
@@ -125,7 +125,7 @@ export async function combine<T, U>(
     const id = identify(item);
     const existing = map.get(id);
     if (existing) merge(existing, item);
-    else binsert(a, convert(item), { insert, compare });
+    else binsert(a, convert(item), { compare, insert });
   }
 }
 
@@ -160,7 +160,7 @@ export async function* batch<T>(generator: AsyncGenerator<T>) {
  */
 export function merge<
   A extends Record<string, any>,
-  B extends Record<string, any>
+  B extends Record<string, any>,
 >(a: A, b: B) {
   const target: Record<string, any> = { ...a };
 
@@ -225,7 +225,7 @@ export function pick<T>(from: T): Picked<T> {
  */
 export function has<K extends string>(
   target: unknown,
-  property: K
+  property: K,
 ): target is { [P in K]: any } {
   return (
     target !== null &&
@@ -252,7 +252,7 @@ export function shuffle<T>(array: T[]): T[] {
 type Picked<T> = T extends (infer U)[]
   ? U
   : T extends Record<string, any>
-  ? { [key in keyof T]: T[key] extends infer U | (infer U)[] ? U : T[key] }
+  ? { [key in keyof T]: T[key] extends (infer U)[] | infer U ? U : T[key] }
   : T;
 
 /**

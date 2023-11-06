@@ -1,41 +1,41 @@
-import { Album, Artist, Track, identify } from "@amadeus-music/protocol";
+import { identify, Artist, Album, Track } from "@amadeus-music/protocol";
 import { afterAll, it } from "vitest";
 import { connect } from "../data";
 import { rm } from "fs/promises";
 import { expect } from "vitest";
 
-const { close, playlists, artists, library, tracks, albums } = connect({
+const { playlists, artists, library, tracks, albums, close } = connect({
   name: "library.test.db",
 });
 
 const makeArtist = (id: number): Artist => ({
-  id: id,
-  title: "artist" + id.toString(),
-  sources: [id + "_0", id + "_1"],
   arts: [id + "_secondary", id + "_primary"],
   thumbnails: [null, id + "_primary"],
+  title: "artist" + id.toString(),
+  sources: [id + "_0", id + "_1"],
+  id: id,
 });
 
 const makeAlbum = (id: number): Album => ({
+  arts: [id + 100 + "_secondary", id + 100 + "_primary"],
   artists: [makeArtist(id), makeArtist(id + 50)],
-  id: (id += 100),
-  title: "album" + id.toString(),
+  sources: [id + 100 + "_0", id + 100 + "_1"],
+  thumbnails: [null, id + 100 + "_primary"],
+  title: "album" + (id + 100).toString(),
+  id: id + 100,
   year: 2042,
-  sources: [id + "_0", id + "_1"],
-  arts: [id + "_secondary", id + "_primary"],
-  thumbnails: [null, id + "_primary"],
 });
 
 const makeTrack = (id: number): Track => ({
-  album: makeAlbum(id),
+  sources: [id + 200 + "_0", id + 200 + "_1"],
+  title: "track" + (id + 200).toString(),
   artists: [makeArtist(id)],
-  id: (id += 200),
-  title: "track" + id.toString(),
-  duration: 42 + id,
-  sources: [id + "_0", id + "_1"],
+  album: makeAlbum(id),
+  duration: 242 + id,
+  id: id + 200,
 });
 
-const fixSource = (media: Album | Artist) => ({
+const fixSource = (media: Artist | Album) => ({
   ...media,
   thumbnails: media.thumbnails?.slice().reverse(),
   arts: media.arts?.slice().reverse(),
@@ -47,25 +47,25 @@ it("pushes artists", async () => {
   expect(await artists).toHaveLength(1);
   expect((await artists)[0]).toMatchObject({
     ...fixSource(makeArtist(0)),
-    collection: { size: 0, duration: 0, tracks: [] },
+    collection: { duration: 0, tracks: [], size: 0 },
   });
   await library.push([makeTrack(1), makeTrack(2)]);
   const results = await artists;
   expect(results).toHaveLength(3);
   expect(results[0]).toMatchObject({
     ...fixSource(makeArtist(1)),
-    collection: { size: 1, duration: 243, tracks: [expect.anything()] },
+    collection: { tracks: [expect.anything()], duration: 243, size: 1 },
   });
   expect(results[1]).toMatchObject({
     ...fixSource(makeArtist(2)),
-    collection: { size: 1, duration: 244, tracks: [expect.anything()] },
+    collection: { tracks: [expect.anything()], duration: 244, size: 1 },
   });
   expect(results[2]).toMatchObject({
     ...fixSource(makeArtist(0)),
-    collection: { size: 0, duration: 0, tracks: [] },
+    collection: { duration: 0, tracks: [], size: 0 },
   });
   expect((await artists.search("ist2"))[0]).toMatchObject(
-    fixSource(makeArtist(2))
+    fixSource(makeArtist(2)),
   );
   expect(await artists.get(2)).toMatchObject(fixSource(makeArtist(2)));
 });
@@ -110,12 +110,12 @@ it("pushes tracks", async () => {
   {
     const results = await playlists;
     expect(results[0]).toMatchObject({
-      collection: { size: 1, duration: 242, tracks: [fixedTrack] },
+      collection: { tracks: [fixedTrack], duration: 242, size: 1 },
       id: identify("Test"),
       title: "Test",
     });
     expect(results[1]).toMatchObject({
-      collection: { size: 0, duration: 0, tracks: [] },
+      collection: { duration: 0, tracks: [], size: 0 },
       id: identify("Test2"),
       title: "Test2",
     });
@@ -129,7 +129,7 @@ it("pushes tracks", async () => {
     await library.rearrange(results.collection.tracks[1].entry);
     expect((await playlists)[0].collection.tracks[1]).toMatchObject(fixedTrack);
     expect(
-      await library.get([results.collection.tracks[0].entry])
+      await library.get([results.collection.tracks[0].entry]),
     ).toMatchObject([fixedTrack]);
   }
 

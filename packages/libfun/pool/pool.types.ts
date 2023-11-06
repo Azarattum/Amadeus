@@ -1,8 +1,8 @@
-import type { Fn, Intersected } from "../utils/types";
+import type { Intersected, Fn } from "../utils/types";
 import type { Passthrough } from "./iterator";
 
 type Task<T extends any[] = any[]> = {
-  tasks: { group: string | undefined; controller: AbortController }[];
+  tasks: { controller: AbortController; group: string | undefined }[];
   controller: AbortController;
   id: string;
   args: T;
@@ -11,7 +11,7 @@ type Task<T extends any[] = any[]> = {
 interface Options<T extends Fn> {
   transform: (
     generators: AsyncGenerator<Result<ReturnType<T>>>[],
-    task: Task<Parameters<T>>
+    task: Task<Parameters<T>>,
   ) => AsyncGenerator<Result<ReturnType<T>, true>>;
   concurrency: number;
   timeout: number;
@@ -47,7 +47,7 @@ type Context<T extends Ctx> = T & {
 
 type Catcher = (error: Error & PoolError) => void;
 type Override<T = unknown> =
-  | ({ group?: string; context?: never } | { group: string; context: T })
+  | ({ context?: never; group?: string } | { group: string; context: T })
   | void;
 
 interface PoolError {
@@ -86,8 +86,8 @@ type Handler<T extends Fn, C = unknown> = ((
   ...args: Parameters<T>
 ) =>
   | Generator<
-      | Result<ReturnType<T>>
       | Promise<Result<ReturnType<T>>>
+      | Result<ReturnType<T>>
       | Passthrough<unknown>,
       void
     >
@@ -114,13 +114,11 @@ type Caller<T, Split = false> = Intersected<
 >;
 
 type Filter =
-  | { group: string; caller?: never; handler?: never }
-  | { group?: never; caller: string; handler?: string }
-  | { group?: never; caller?: string; handler: string };
+  | { handler?: string; caller: string; group?: never }
+  | { caller?: string; handler: string; group?: never }
+  | { handler?: never; caller?: never; group: string };
 
 type Pool<T extends Fn = (..._: any) => any, C extends Ctx = unknown> = {
-  (this: Override, handler: Handler<T, C>): () => void;
-
   bind: <C extends Ctx>(context: Override<C>) => Pool<T, C>;
   schedule: (when: Schedule) => Caller<T>;
   where: (group: string) => Caller<T>;
@@ -128,9 +126,10 @@ type Pool<T extends Fn = (..._: any) => any, C extends Ctx = unknown> = {
   abort: (filter?: Filter) => void;
   drain: (filter?: Filter) => void;
   close: (filter?: Filter) => void;
+  split: () => Caller<T, true>;
   status: () => State<T, C>;
-  split(): Caller<T, true>;
 
+  (this: Override, handler: Handler<T, C>): () => void;
   [state: symbol]: State<T, C>;
 } & Caller<T> &
   (C extends Record<string, any>
@@ -138,10 +137,10 @@ type Pool<T extends Fn = (..._: any) => any, C extends Ctx = unknown> = {
     : unknown);
 
 type PoolMaker<C extends Ctx = unknown> = {
-  <T extends Fn = () => void>(id: string, options?: Partial<Options<T>>): Pool<
-    T,
-    C
-  >;
+  <T extends Fn = () => void>(
+    id: string,
+    options?: Partial<Options<T>>,
+  ): Pool<T, C>;
   bind<T>(context: Override<T> & { scope?: string }): PoolMaker<T>;
 };
 
@@ -149,17 +148,17 @@ type Pools = Omit<
   {
     [key in keyof Pool]: Pool[key] extends (..._: infer A) => infer R
       ? {
-          (id?: null | "*", ..._: A): R extends void ? R : R[];
+          (id?: "*" | null, ..._: A): R extends void ? R : R[];
           (id: string, ..._: A): R;
         }
       : never;
   },
-  "bind" | "catch" | "context"
+  "context" | "catch" | "bind"
 > & {
   catch: (handler?: Catcher) => void;
   contexts: Map<string, Ctx>;
-  count(): number;
   pool: PoolMaker;
+  count(): number;
 };
 
 export type {

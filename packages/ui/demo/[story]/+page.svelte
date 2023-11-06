@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script context="module" lang="ts">
   const modules = import.meta.glob("../../stories/*.svelte", {
     eager: true,
   });

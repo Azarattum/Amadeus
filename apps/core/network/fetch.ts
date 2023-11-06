@@ -1,25 +1,25 @@
 import { merge, pick } from "@amadeus-music/util/object";
-import { gretch, type GretchOptions } from "gretchen";
+import { type GretchOptions, gretch } from "gretchen";
 import type { Context } from "../plugin/types";
 import { errorify } from "libfun/utils/error";
 import type { Struct } from "superstruct";
-import { async, context } from "libfun";
+import { context, async } from "libfun";
 import { Readable } from "node:stream";
 import { pools } from "../event/pool";
 import { Form } from "./form";
 
 type FetchOptions = {
   [K in keyof GretchOptions]: K extends "baseURL"
-    ? string | string[]
+    ? string[] | string
     : K extends "headers"
-    ? Record<string, string | string[]>
+    ? Record<string, string[] | string>
     : GretchOptions[K];
 } & {
-  params?: Record<string, string | number | (string | number)[]>;
   form?: Record<
     string,
-    string | number | (string | number)[] | [Readable, string] | undefined
+    (string | number)[] | [Readable, string] | string | number | undefined
   >;
+  params?: Record<string, (string | number)[] | string | number>;
 };
 
 function fetcher(this: Context, defaults: FetchOptions = {}) {
@@ -40,7 +40,7 @@ function fetch(this: Context, url: string, options: FetchOptions = {}) {
   }
   const body = options.form
     ? (Readable.toWeb(
-        new Form(options.form)
+        new Form(options.form),
       ) as ReadableStream<ArrayBufferView>)
     : undefined;
 
@@ -50,49 +50,49 @@ function fetch(this: Context, url: string, options: FetchOptions = {}) {
     method: options.form ? "POST" : "GET",
     body,
     ...options,
-    signal: context.signal || options.signal,
-    baseURL: pick(options.baseURL),
     headers: {
       ...(options.form ? Form.headers : {}),
       ...pick(options.headers),
     },
+    signal: context.signal || options.signal,
+    baseURL: pick(options.baseURL),
   });
 
   return {
-    request,
-    *flush() {
-      return yield* async(request.flush());
+    *as<T, S>(struct: Struct<T, S>) {
+      const { error, data } = yield* async(request.json());
+      if (error) throw errorify(error);
+      return struct.create(data);
     },
     *arrayBuffer() {
-      const { data, error } = yield* async(request.arrayBuffer());
+      const { error, data } = yield* async(request.arrayBuffer());
       if (error) throw errorify(error);
       return data as ArrayBuffer;
     },
-    *blob() {
-      const { data, error } = yield* async(request.blob());
-      if (error) throw errorify(error);
-      return data as Blob;
-    },
     *formData() {
-      const { data, error } = yield* async(request.formData());
+      const { error, data } = yield* async(request.formData());
       if (error) throw errorify(error);
       return data as FormData;
     },
     *text() {
-      const { data, error } = yield* async(request.text());
+      const { error, data } = yield* async(request.text());
       if (error) throw errorify(error);
       return data as string;
     },
+    *blob() {
+      const { error, data } = yield* async(request.blob());
+      if (error) throw errorify(error);
+      return data as Blob;
+    },
     *json() {
-      const { data, error } = yield* async(request.json());
+      const { error, data } = yield* async(request.json());
       if (error) throw errorify(error);
       return data;
     },
-    *as<T, S>(struct: Struct<T, S>) {
-      const { data, error } = yield* async(request.json());
-      if (error) throw errorify(error);
-      return struct.create(data);
+    *flush() {
+      return yield* async(request.flush());
     },
+    request,
   };
 }
 

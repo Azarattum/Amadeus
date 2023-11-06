@@ -1,4 +1,4 @@
-import { capitalize, offset, unprefix } from "./string";
+import { capitalize, unprefix, offset } from "./string";
 import { expect, it } from "vitest";
 
 it("capitalizes", () => {

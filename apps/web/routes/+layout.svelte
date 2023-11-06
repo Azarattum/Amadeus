@@ -31,14 +31,14 @@
 </script>
 
 <svelte:head>
-  <meta name="description" content="Listen to your music with Amadeus!" />
-  <link rel="apple-touch-icon" href="{base}/images/logo-180.webp" />
-  <link rel="manifest" href="{base}/manifest.json" />
+  <meta content="Listen to your music with Amadeus!" name="description" />
+  <link href="{base}/images/logo-180.webp" rel="apple-touch-icon" />
+  <link href="{base}/manifest.json" rel="manifest" />
   {#each splashes as [w, h, r, image]}
     <link
-      rel="apple-touch-startup-image"
       media="(device-width: {w}px) and (device-height: {h}px) and (-webkit-device-pixel-ratio: {r})"
       href="{base}/images/splash-{image}.webp"
+      rel="apple-touch-startup-image"
     />
   {/each}
 </svelte:head>

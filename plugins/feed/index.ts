@@ -1,23 +1,23 @@
 import {
+  persistence,
+  recommend,
   command,
+  lookup,
+  relate,
+  users,
   info,
   stop,
   init,
-  lookup,
   ok,
-  persistence,
-  recommend,
-  relate,
-  users,
 } from "./plugin";
 import {
+  type Track,
+  bright,
+  async,
+  reset,
   Feed,
   arg,
-  async,
-  bright,
   map,
-  reset,
-  type Track,
 } from "@amadeus-music/core";
 import { shuffle } from "@amadeus-music/util/object";
 import { delay } from "@amadeus-music/util/async";
@@ -51,7 +51,7 @@ command("register", [arg.text])(function* (user) {
   yield* async(delay(5));
   if (!(yield* async(users()))[user]) return;
   const absolute = this.preferences.time;
-  const pool = recommend.schedule({ absolute, interval: day })(user);
+  const pool = recommend.schedule({ interval: day, absolute })(user);
   cleanup.add(pool.executor.controller);
   pool.then();
 });

@@ -1,14 +1,14 @@
 import {
-  defaulted,
   intersection,
-  type,
+  type Infer,
+  defaulted,
   create,
   number,
-  type Infer,
   string,
+  type,
 } from "superstruct";
 import { persistence, users } from "../event/persistence";
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile, readFile } from "node:fs/promises";
 import { merge } from "@amadeus-music/util/object";
 import type { Plugin } from "../plugin/types";
 import { plugins } from "../plugin/loader";
@@ -34,7 +34,7 @@ async function configure(plugins: Map<string, Plugin>, overrides = {}) {
     fallback({}),
     (x) => merge(x, overrides),
     (x) => create(x, config, "Invalid configuration!"),
-    (x) => writeFile(file, JSON.stringify(x, null, 2)).then(() => x)
+    (x) => writeFile(file, JSON.stringify(x, null, 2)).then(() => x),
   );
 }
 
@@ -53,7 +53,7 @@ async function setup(username?: string) {
     promises.push(
       ...Object.entries(defaults)
         .filter(([key]) => !(key in settings))
-        .map(([key, value]) => storage.settings.store(key, value))
+        .map(([key, value]) => storage.settings.store(key, value)),
     );
   }
   await Promise.all(promises);
@@ -66,5 +66,5 @@ async function register(username: string) {
   await setup(user);
 }
 
-export { configure, register, setup, settings };
+export { configure, register, settings, setup };
 export type { Config };

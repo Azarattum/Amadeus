@@ -1,48 +1,48 @@
-type Buttons = { text: string; callback: Record<string, any> }[][];
+type Buttons = { callback: Record<string, any>; text: string }[][];
 
 const icon = {
-  all: "⏬",
-  page: "🔽",
+  recognize: "🌀",
+  history: "📜",
   shuffle: "🔀",
+  similar: "📻",
+  search: "🔎",
+  artist: "👤",
+  lyrics: "📃",
+  cancel: "🚫",
+  close: "👌",
+  album: "💿",
+  page: "🔽",
   stop: "🤚",
   prev: "👈",
   next: "👉",
-  close: "👌",
-  search: "🔎",
-  artist: "👤",
-  album: "💿",
-  similar: "📻",
-  lyrics: "📃",
   load: "⏳",
-  history: "📜",
-  cancel: "🚫",
-  recognize: "🌀",
+  all: "⏬",
 };
 
 function pager(
   aggregator: number,
   page: number,
   options: Buttons[number],
-  next = true
+  next = true,
 ) {
   const controls: Buttons = [[], []];
   controls[0].push(
     ...(["page", "shuffle", "all"] as const).map((x) => ({
-      text: icon[x],
       callback: { [x]: aggregator },
-    }))
+      text: icon[x],
+    })),
   );
   controls[1].push({
-    text: page > 0 ? icon.prev : icon.stop,
     callback: page > 0 ? { prev: aggregator } : {},
+    text: page > 0 ? icon.prev : icon.stop,
   });
   controls[1].push({
-    text: icon.close,
     callback: { close: aggregator },
+    text: icon.close,
   });
   controls[1].push({
-    text: next ? icon.next : icon.stop,
     callback: next ? { next: aggregator } : {},
+    text: next ? icon.next : icon.stop,
   });
 
   if (options.length <= 1) controls.shift();
@@ -52,20 +52,20 @@ function pager(
 function menu(id: number) {
   const controls: Buttons = [[]];
   controls[0].push({
-    text: icon.artist,
     callback: { artists: id },
+    text: icon.artist,
   });
   controls[0].push({
-    text: icon.album,
     callback: { album: id },
+    text: icon.album,
   });
   controls[0].push({
-    text: icon.similar,
     callback: { similar: id },
+    text: icon.similar,
   });
   controls[0].push({
-    text: icon.lyrics,
     callback: { lyrics: id },
+    text: icon.lyrics,
   });
   return keyboard(controls);
 }
@@ -73,10 +73,10 @@ function menu(id: number) {
 function keyboard(buttons: Buttons) {
   return JSON.stringify({
     inline_keyboard: buttons.map((x) =>
-      x.map(({ text, callback }) => ({
-        text,
+      x.map(({ callback, text }) => ({
         callback_data: JSON.stringify(callback),
-      }))
+        text,
+      })),
     ),
   });
 }
@@ -114,4 +114,4 @@ function markdown() {
   return "MarkdownV2";
 }
 
-export { keyboard, markdown, escape, pager, menu, replies, icon };
+export { keyboard, markdown, replies, escape, pager, menu, icon };

@@ -6,10 +6,10 @@
   type In = $$Generic;
   type Out = $$Generic;
   type $$Props = {
-    at: string;
-    default?: boolean;
+    class?: ((active: boolean) => string) | string;
     ephemeral?: boolean;
-    class?: string | ((active: boolean) => string);
+    default?: boolean;
+    at: string;
   } & (Transition<In, Out> & HTMLProps["div"]);
 
   export let at: string;
@@ -23,7 +23,7 @@
     ...props
   } = $$restProps;
 
-  const { route, parent } = makeRoute(at);
+  const { parent, route } = makeRoute(at);
   const current = getActive();
 
   $: inDOM = keep($current);
@@ -50,13 +50,13 @@
 {#if inDOM || active}
   <div
     {...props}
-    in:inFunc={inOpts}
-    out:outFunc={outOpts}
     class={tw`absolute inset-0 overflow-y-auto
       ${!active ? "-z-10 opacity-0" : "z-10"}
       ${typeof classes === "string" && classes}
       ${typeof classes === "function" && classes(active)}
     `}
+    out:outFunc={outOpts}
+    in:inFunc={inOpts}
   >
     <slot {active} {target} />
   </div>

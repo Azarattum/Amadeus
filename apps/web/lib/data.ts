@@ -17,9 +17,9 @@ export const {
   update,
   feed,
 } = connect({
-  name: "library.db",
-  push: sync.push.mutate,
   pull: sync.pull.subscribe,
+  push: sync.push.mutate,
+  name: "library.db",
 });
 
 export const search = writable("");

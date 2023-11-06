@@ -1,24 +1,24 @@
 import {
-  array,
-  number,
-  type,
-  optional,
-  string,
-  union,
-  type Infer,
   type Struct,
+  type Infer,
+  optional,
+  number,
+  string,
+  array,
+  union,
+  type,
 } from "@amadeus-music/core";
 
 function toAssets(x?: string) {
-  if (!x) return { arts: [], thumbnails: [] };
+  if (!x) return { thumbnails: [], arts: [] };
   const url = `https://${x.slice(0, -2)}`;
-  return { arts: [url + "800x800"], thumbnails: [url + "100x100"] };
+  return { thumbnails: [url + "100x100"], arts: [url + "800x800"] };
 }
 
 function toArtist(data: Infer<typeof artist>) {
   return {
-    title: data.name,
     sources: [`yandex/${data.id}`],
+    title: data.name,
     ...toAssets(data.cover?.uri),
   };
 }
@@ -27,9 +27,9 @@ function toAlbum(data: Infer<typeof album> | string, artistless = false) {
   const meta = typeof data !== "string";
 
   return {
+    sources: meta ? [`yandex/${data.id}`] : [],
     title: meta ? data.title : data,
     year: meta ? data.year || 0 : 0,
-    sources: meta ? [`yandex/${data.id}`] : [],
     ...toAssets(meta ? data.coverUri : undefined),
     ...(artistless
       ? {}
@@ -40,45 +40,45 @@ function toAlbum(data: Infer<typeof album> | string, artistless = false) {
 function toTrack(data: Infer<typeof track>) {
   return {
     title: data.title + (data.version ? ` (${data.version})` : ""),
-    duration: data.durationMs / 1000,
-    sources: [`yandex/${data.id}`],
     album: toAlbum(data.albums[0] || data.title, true),
     artists: data.artists.map(toArtist),
+    duration: data.durationMs / 1000,
+    sources: [`yandex/${data.id}`],
   };
 }
 
-function convert<T extends "track" | "artist" | "album">(
-  data: Infer<typeof track | typeof album | typeof artist>[] | undefined,
-  type: T
+function convert<T extends "artist" | "track" | "album">(
+  data: Infer<typeof artist | typeof track | typeof album>[] | undefined,
+  type: T,
 ) {
-  const map = { track: toTrack, artist: toArtist, album: toAlbum }[type];
+  const map = { artist: toArtist, track: toTrack, album: toAlbum }[type];
   const convert = map as (
-    x: Parameters<typeof map>[0]
+    x: Parameters<typeof map>[0],
   ) => ReturnType<typeof map>;
   return data?.map((x) => convert(x)) || [];
 }
 
 const artist = type({
+  cover: optional(type({ uri: string() })),
   name: string(),
   id: number(),
-  cover: optional(type({ uri: string() })),
 });
 
 const album = type({
-  id: number(),
-  title: string(),
-  year: optional(number()),
-  coverUri: optional(string()),
   artists: optional(array(artist)),
+  coverUri: optional(string()),
+  year: optional(number()),
+  title: string(),
+  id: number(),
 });
 
 const track = type({
   id: union([number(), string()]),
-  durationMs: number(),
-  title: string(),
   version: optional(string()),
   artists: array(artist),
+  durationMs: number(),
   albums: array(album),
+  title: string(),
 });
 
 const lyrics = type({
@@ -92,8 +92,8 @@ const link = type({
 const download = type({
   path: string(),
   host: string(),
-  s: string(),
   ts: string(),
+  s: string(),
 });
 
 const match = type({
@@ -115,7 +115,7 @@ const match = type({
 
 const resultOf = <const K extends string, T extends Struct<any, any>>(
   name: K,
-  item: T
+  item: T,
 ) =>
   type({
     result: type<{ [I in K]: Struct<Infer<T>[] | undefined, T> }>({
@@ -125,7 +125,7 @@ const resultOf = <const K extends string, T extends Struct<any, any>>(
 
 const resultsOf = <const K extends string, T extends Struct<any, any>>(
   name: K,
-  item: T
+  item: T,
 ) =>
   type({
     result: type<{

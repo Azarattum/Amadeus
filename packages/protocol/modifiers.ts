@@ -1,4 +1,4 @@
-import { assign, integer, object, type Struct } from "superstruct";
+import { type Struct, integer, assign, object } from "superstruct";
 
 type Simplify<T> = T extends any[] | Date
   ? T
@@ -11,5 +11,5 @@ const unique = <T extends Struct<any>>(t: T) =>
     Simplify<T["schema"] & { id: Struct<number, null> }>
   >;
 
-export type { Unique, Simplify };
+export type { Simplify, Unique };
 export { unique };

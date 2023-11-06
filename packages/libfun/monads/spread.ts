@@ -1,9 +1,9 @@
-import { monad, nothing, type Monad, type Nothing } from "..";
+import { type Nothing, type Monad, nothing, monad } from "..";
 import type { Flatten } from "../utils/types";
 
 interface Spread extends Monad<"Spread"> {
-  accept: { [Symbol.iterator]: () => any };
   then: Exclude<Flatten<this[""]>, Nothing>;
+  accept: { [Symbol.iterator]: () => any };
   unwrap: this[""][];
 }
 
@@ -39,4 +39,4 @@ const spread = monad<Spread>((value, fn) => {
   return result;
 });
 
-export { spread, type Spread };
+export { type Spread, spread };

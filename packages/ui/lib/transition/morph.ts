@@ -1,9 +1,9 @@
-import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
+import { cubicOut } from "svelte/easing";
 
 export function morph(
   node: HTMLElement,
-  { target, reverse = false }: { target: string; reverse?: boolean }
+  { reverse = false, target }: { reverse?: boolean; target: string },
 ): TransitionConfig {
   const from = document
     .querySelector(`[data-morph="${target}"`)
@@ -20,8 +20,6 @@ export function morph(
   const transform = style.transform === "none" ? "" : style.transform;
 
   return {
-    duration: Math.sqrt(distance) * 30,
-    easing: cubicOut,
     css: (t: number, u: number) => {
       return reverse
         ? `
@@ -36,5 +34,7 @@ export function morph(
       }, ${t + (1 - t) * dh});
     `;
     },
+    duration: Math.sqrt(distance) * 30,
+    easing: cubicOut,
   };
 }

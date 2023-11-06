@@ -1,10 +1,10 @@
 import {
-  black,
-  bright,
-  green,
   magenta,
-  reset,
+  bright,
   yellow,
+  black,
+  green,
+  reset,
 } from "@amadeus-music/util/color";
 import { format as formatPlugin, plugins } from "../plugin/loader";
 import { capitalize, dedupe } from "@amadeus-music/util/string";
@@ -12,30 +12,30 @@ import { persistence, users } from "../event/persistence";
 import { pretty } from "@amadeus-music/util/object";
 import { register, settings } from "../data/config";
 import { format } from "@amadeus-music/util/time";
-import { log, pool, pools } from "../event/pool";
+import { pools, pool, log } from "../event/pool";
 import type { Context } from "../plugin/types";
-import { async, map, take } from "libfun";
+import { async, take, map } from "libfun";
 import { launch, stop } from "./manage";
-import { info, ok, wrn } from "./log";
+import { info, wrn, ok } from "./log";
 
 type Completer = () => Promise<string[]> | string[];
-type Argument = readonly (string | Completer)[] | string | Completer;
+type Argument = readonly (Completer | string)[] | Completer | string;
 const commands = new Map<string, Argument[] | []>();
 
 const arg = {
-  text: () => [],
-  pool: () => pools.status().map((x) => x.id),
-  user: () => users().then(Object.keys),
   plugin: () => [...plugins.values()].map((x) => x.name.toLowerCase()),
   setting: () => Object.keys(settings().create({})),
+  pool: () => pools.status().map((x) => x.id),
+  user: () => users().then(Object.keys),
   command: () => [...commands.keys()],
+  text: () => [],
 };
 
 function command(this: Context, what: string, ...args: readonly Argument[]) {
   if (!what) throw new Error("Invalid command!");
   commands.set(what, (args || []) as any);
   const command = pool<(...args: (string | undefined)[]) => void>(
-    `command/${what}`
+    `command/${what}`,
   );
   return command.bind(this) as typeof command;
 }
@@ -55,7 +55,7 @@ function usage(command: string) {
                 "argument",
               ])[0]
             }${reset}`
-          : type
+          : type,
       )
       .join(`${bright + black}/${reset}`);
   });
@@ -196,7 +196,7 @@ command("register", [arg.text])(function* (username) {
   if (error) return wrn(error);
   info(
     `Registered user ${bright}${username}${reset}! ` +
-      `(Use ${bright}user ${username.toLowerCase()}${reset} for configuration).`
+      `(Use ${bright}user ${username.toLowerCase()}${reset} for configuration).`,
   );
 });
 
@@ -204,7 +204,7 @@ command(
   "user",
   arg.user,
   arg.setting,
-  arg.text
+  arg.text,
 )(function* (username, setting, value) {
   const current = yield* async(users());
   if (!username) {
@@ -215,7 +215,7 @@ command(
   if (!setting) {
     return info(
       `${bright}${username}${reset}'s settings:`,
-      pretty(current[username])
+      pretty(current[username]),
     );
   }
   const type = typeof current[username]?.[setting];
@@ -225,7 +225,7 @@ command(
   if (!value) {
     return info(
       `${bright}${username}${reset}.${setting} =`,
-      pretty(current[username][setting])
+      pretty(current[username][setting]),
     );
   }
 
@@ -240,7 +240,7 @@ command(
   info(
     `${bright}${setting}${reset} set to ` +
       `${bright}${value}${reset} for ` +
-      `${bright}${username}${reset}!`
+      `${bright}${username}${reset}!`,
   );
 });
 
@@ -252,4 +252,4 @@ command("restart")(() => {
   })();
 });
 
-export { command, commands, arg, usage };
+export { commands, command, usage, arg };

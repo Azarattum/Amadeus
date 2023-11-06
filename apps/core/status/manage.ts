@@ -1,13 +1,13 @@
 import { stop as close, pools, init } from "../event/pool";
-import { divide, err, info, ok, SilentError } from "./log";
+import { SilentError, divide, info, err, ok } from "./log";
 import { configure, setup } from "../data/config";
-import { load, plugins } from "../plugin/loader";
-import { name, version } from "../package.json";
+import { plugins, load } from "../plugin/loader";
+import { version, name } from "../package.json";
 import { fallback, pipe } from "libfun";
 import { commands } from "./commands";
 import { interactive } from "./cli";
 
-let started: null | number = null;
+let started: number | null = null;
 
 // Environment variables to fix running `ws` in prod
 process.env.WS_NO_BUFFER_UTIL = "true";
@@ -22,7 +22,7 @@ const launch = () =>
     () => setup(),
     complete,
     interactive,
-    fallback(err)
+    fallback(err),
   );
 
 async function start() {
@@ -68,4 +68,4 @@ async function stop(restart = false) {
   divide();
 }
 
-export { start, complete, stop, launch };
+export { complete, launch, start, stop };

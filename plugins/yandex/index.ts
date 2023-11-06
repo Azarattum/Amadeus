@@ -1,28 +1,28 @@
 import {
-  init,
-  search,
-  desource,
-  fetch,
-  relate,
   transcribe,
-  expand,
   recognize,
+  desource,
   connect,
+  search,
+  relate,
+  expand,
   lookup,
+  fetch,
+  init,
 } from "./plugin";
 import {
-  download,
-  link,
-  lyrics,
-  match,
-  convert,
   resultsOf,
-  track,
+  download,
   resultOf,
+  convert,
+  lyrics,
   artist,
+  match,
+  track,
   album,
+  link,
 } from "./types";
-import { auth, header, transform } from "./meta";
+import { transform, header, auth } from "./meta";
 import { array } from "@amadeus-music/core";
 import { createHash } from "node:crypto";
 
@@ -39,19 +39,19 @@ init(function* ({ yandex: { token } }) {
 });
 
 search(function* (type, query, page) {
-  const struct = { track, artist, album }[type];
+  const struct = { artist, track, album }[type];
   const collection = `${type}s` as const;
   for (let i = 0; ; i++) {
     const params = {
-      type,
-      text: query,
       nococrrect: "false",
-      page: i,
       "page-size": page,
+      text: query,
+      page: i,
+      type,
     };
 
     const { result } = yield* fetch("search", { params }).as(
-      resultsOf(collection, struct)
+      resultsOf(collection, struct),
     );
 
     const items = result[collection];
@@ -77,16 +77,16 @@ expand(function* (type, what, page) {
   if (!id) return;
   if (type === "album") {
     const { result } = yield* fetch(`albums/${id}/with-tracks`).as(
-      resultOf("volumes", array(track))
+      resultOf("volumes", array(track)),
     );
 
     yield* convert(result.volumes?.flat(), "track");
   } else if (type === "artist") {
     for (let i = 0; ; i++) {
       const url = `artists/${id}/tracks`;
-      const params = { page: i, "page-size": page };
+      const params = { "page-size": page, page: i };
       const { result } = yield* fetch(url, { params }).as(
-        resultOf("tracks", track)
+        resultOf("tracks", track),
       );
       if (!result.tracks) break;
       yield* convert(result.tracks, "track");
@@ -100,11 +100,11 @@ relate(function* (type, to, _) {
   const id = yield* identify(to, type);
   if (!id) return;
   const collection = `${type}s` as const;
-  const struct = { track, artist, album }[type];
+  const struct = { artist, track, album }[type];
   const upper = (x: string) => x[0].toUpperCase() + x.slice(1);
 
   const { result } = yield* fetch(`${collection}/${id}/similar`).as(
-    resultOf(`similar${upper(collection)}`, struct)
+    resultOf(`similar${upper(collection)}`, struct),
   );
   yield* convert(result[`similar${upper(collection)}`], type);
 });
@@ -134,7 +134,7 @@ recognize(function* (stream) {
 
 function* identify(
   data: { sources?: string[]; title?: string },
-  type: "track" | "artist" | "album"
+  type: "artist" | "track" | "album",
 ) {
   return (
     data.sources?.find((x) => x.startsWith("yandex/"))?.slice(7) ||

@@ -7,7 +7,7 @@ function errorify(what: unknown): Error {
 function handle<T = void>(
   error: unknown,
   catcher?: (error: Error) => void,
-  fallback?: T
+  fallback?: T,
 ) {
   const exception = errorify(error);
   if (!catcher) throw exception;

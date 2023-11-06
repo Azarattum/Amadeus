@@ -14,7 +14,7 @@
     const context = getContext<Context>("pages");
     const route = derived(context.route, (x) => (x ? `${x}/${at}` : at));
     setContext<Context>("pages", { ...context, route });
-    return { route, parent: context.route };
+    return { parent: context.route, route };
   }
 
   function link(to: string) {
@@ -42,7 +42,7 @@
 </script>
 
 <script lang="ts">
-  import { derived, readable, type Readable } from "svelte/store";
+  import { type Readable, readable, derived } from "svelte/store";
   import { getContext, setContext } from "svelte";
   import { page } from "$app/stores";
 
@@ -53,7 +53,7 @@
   const root = derived(page, (x) => x.route.id?.replace(pattern, "") || "");
   const active = derived(page, (x) => x.params[of]?.replace(/\/$/, "") || "");
 
-  setContext<Context>("pages", { route: readable(""), root, active, hash });
+  setContext<Context>("pages", { route: readable(""), active, root, hash });
 </script>
 
 <slot page={$active} hash={$hash} root={$root} />
