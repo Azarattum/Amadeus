@@ -3,7 +3,6 @@
   import type { IntersectionEvent } from "../../action";
   import { getContext, onMount } from "svelte";
   import { Topbar } from "../../component";
-  import { goto } from "$app/navigation";
 
   export let visible = true;
   export let name: string;
@@ -18,7 +17,8 @@
     if (tabs.length <= 1) return (current = true);
     current = detail.intersectionRatio > 0.5;
     if (visible && detail.intersectionRatio >= 0.999) {
-      goto(`#${name.toLowerCase()}`, { replaceState: true });
+      // Using Svelte's `goto` here breaks navigation!
+      location.replace(`#${name.toLowerCase()}`);
     }
   }
 
