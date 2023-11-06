@@ -1,5 +1,15 @@
 <script lang="ts">
-  import { Projection, Stack, Tabs, Tab } from "@amadeus-music/ui";
+  import {
+    Projection,
+    Separator,
+    Portal,
+    Header,
+    Button,
+    Stack,
+    Tabs,
+    Icon,
+    Tab,
+  } from "@amadeus-music/ui";
   import { playlists, artists, tracks, search } from "$lib/data";
   import Overview from "$lib/ui/Overview.svelte";
   import Playlist from "./playlist/-page.svelte";
@@ -9,6 +19,9 @@
   import { goto } from "$app/navigation";
 
   export let visible = true;
+  export let active = true;
+  export let hash = "";
+  export let page = "";
 
   $: if (visible && !$navigating && globalThis.location && !location?.hash) {
     goto("#playlists", { replaceState: true });
@@ -46,10 +59,36 @@
 <Projection at="playlist" ephemeral class="bg-surface">
   <Playlist />
 </Projection>
-
 <Projection at="artist" ephemeral class="bg-surface">
   <Artist />
 </Projection>
+
+{#if active}
+  <Portal to="sections">
+    <Header sm>Library</Header>
+    <Button air primary={hash === "playlists"} href="/library#playlists">
+      <Icon of="last" />Playlists
+    </Button>
+    <Button air primary={hash === "artists"} href="/library#artists">
+      <Icon of="people" />Artists
+    </Button>
+    <Button air primary={hash === "timeline"} href="/library#timeline">
+      <Icon of="clock" />Timeline
+    </Button>
+    {#if page.endsWith("playlist")}
+      {#await playlists.get(+hash) then { title }}
+        <Separator />
+        <Button primary air><Icon of="disk" />{title}</Button>
+      {/await}
+    {/if}
+    {#if page.endsWith("artist")}
+      {#await artists.get(+hash) then { title }}
+        <Separator />
+        <Button primary air><Icon of="person" />{title}</Button>
+      {/await}
+    {/if}
+  </Portal>
+{/if}
 
 <svelte:head>
   <title>Library - Amadeus</title>

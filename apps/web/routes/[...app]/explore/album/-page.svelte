@@ -4,13 +4,14 @@
   import { Icon } from "@amadeus-music/ui";
   import { stream } from "$lib/stream";
   import { page } from "$app/stores";
-  import { extra } from "$lib/data";
+
+  export let title = "";
 
   const estimate = ~~((globalThis.innerHeight / 56) * 2);
 
   $: remote = stream(expand.album, streams.next);
   $: remote.update({ id: +$page.url.hash.slice(1), page: estimate });
-  $: $extra = $remote?.detail ? [$remote.detail.title, "disk"] : null;
+  $: title = $remote?.detail?.title || "";
 </script>
 
 <Collection

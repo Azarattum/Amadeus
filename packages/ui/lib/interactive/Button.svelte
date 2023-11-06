@@ -56,18 +56,19 @@
 
   $: target =
     typeof href === "string" && href.includes("#") ? href.split("#").pop() : to;
-  $: style = !target
-    ? ""
-    : `body:has(#${target}:is(:target,:checked)) #${uid}{` +
-      (air
-        ? "color:hsl(var(--color-primary-600));"
-        : "color:white;background:hsl(var(--color-primary-600));") +
-      "}" +
-      `body:has(#${target}:id(:target,:checked)) #${uid}:hover{` +
-      (air
-        ? "color:hsl(var(--color-primary-700));"
-        : "color:white;background:hsl(var(--color-primary-700));") +
-      "}";
+  $: style =
+    !target || (!import.meta.env.SSR && !to)
+      ? ""
+      : `body:has(#${target}:is(:target,:checked)) #${uid}{` +
+        (air
+          ? "color:hsl(var(--color-primary-600));"
+          : "color:white;background:hsl(var(--color-primary-600));") +
+        "}" +
+        `body:has(#${target}:id(:target,:checked)) #${uid}:hover{` +
+        (air
+          ? "color:hsl(var(--color-primary-700));"
+          : "color:white;background:hsl(var(--color-primary-700));") +
+        "}";
 </script>
 
 <svelte:element

@@ -12,6 +12,7 @@
   }>();
 
   export let of: (Collection | undefined)[] | undefined = undefined;
+  export let aliases: Record<string, string> = {};
   export let style: CollectionType;
   export let expandable = false;
   export let href = "/library";
@@ -43,7 +44,10 @@
   on:end
 >
   {#if item}
-    <Card href="{href}/{style}#{item.id}" {...{ [style]: item }} />
+    <Card
+      href="{href}/{aliases[item.id] || `${style}#${item.id}`}"
+      {...{ [style]: item }}
+    />
   {:else if item === null}
     <button
       class="p flex w-full cursor-pointer justify-center rounded-2xl p-4 text-highlight ring-4 ring-inset ring-highlight focus-visible:outline-none focus-visible:ring-primary-600"

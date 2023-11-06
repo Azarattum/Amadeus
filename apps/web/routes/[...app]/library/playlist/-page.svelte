@@ -1,12 +1,11 @@
 <script lang="ts">
   import { type EditEvent, Button, Icon } from "@amadeus-music/ui";
-  import { playlists, library, extra } from "$lib/data";
   import type { Track } from "@amadeus-music/protocol";
   import Collection from "$lib/ui/Collection.svelte";
+  import { playlists, library } from "$lib/data";
   import { page } from "$app/stores";
 
   $: info = $playlists.find((x) => x.id === +$page.url.hash.slice(1));
-  $: $extra = info ? [info.title, "disk"] : null;
 
   let selected = new Set<Track>();
 

@@ -4,6 +4,7 @@
     Header,
     Topbar,
     Button,
+    Portal,
     Stack,
     Icon,
     When,
@@ -15,9 +16,12 @@
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
 
-  const hidden = new Set([-3, -4]);
-
   export let visible = true;
+  export let active = true;
+  export let hash = "";
+  export let page = "";
+
+  const aliases = { "-2": "recommended", "-1": "listened" };
 
   $: devices = $playback.filter((x) => !x.local);
   $: if (visible && !$navigating && globalThis.location && !location?.hash) {
@@ -66,20 +70,46 @@
   <Stack class="gap-1">
     <Header sm>You Might Like</Header>
     <Overview
-      of={$feed.filter((x) => !hidden.has(x.id))}
+      of={$feed.length
+        ? $feed.filter((x) => x.id in aliases)
+        : [undefined, undefined]}
       style="playlist"
       filter={$search}
       href="/home"
+      {aliases}
     />
   </Stack>
 
-  <!-- <Header id="following" sm>New for You</Header> -->
-  <!-- /// TODO add artists cards -->
+  <Header sm id="following">
+    <!-- New for You -->
+    <!-- /// TODO add artists cards -->
+  </Header>
 </Stack>
 
-<Projection at="playlist" ephemeral class="bg-surface">
-  <Playlist />
+<Projection at="listened" ephemeral class="bg-surface">
+  <Playlist id={-1} />
 </Projection>
+<Projection at="recommended" ephemeral class="bg-surface">
+  <Playlist id={-2} />
+</Projection>
+
+{#if active}
+  <Portal to="sections">
+    <Header sm>Home</Header>
+    <Button air primary={hash === "feed"} href="/home#feed">
+      <Icon of="activity" />Feed
+    </Button>
+    <Button air primary={hash === "following"} href="/home#following">
+      <Icon of="people" />Following
+    </Button>
+    <Button air primary={page.endsWith("listened")} href="/home/listened">
+      <Icon of="history" />Listened
+    </Button>
+    <Button air primary={page.endsWith("recommended")} href="/home/recommended">
+      <Icon of="stars" />Recommended
+    </Button>
+  </Portal>
+{/if}
 
 <svelte:head>
   <title>Amadeus</title>
