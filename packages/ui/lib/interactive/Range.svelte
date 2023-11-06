@@ -130,7 +130,7 @@
       height: 32px;
       margin-top: -14px;
       border-radius: 100%;
-      z-index: 100;
+      z-index: 1;
       background: radial-gradient(
           circle,
           hsl(var(--color-primary-600)),

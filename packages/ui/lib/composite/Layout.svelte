@@ -37,7 +37,7 @@
     <aside>
       <slot name="panel-right" />
     </aside>
-    <div class="pointer-events-none fixed inset-0 contain-strict">
+    <div class="pointer-events-none fixed inset-0 z-50 contain-strict">
       <Gateway for="overlay" />
     </div>
   </div>
