@@ -39,7 +39,7 @@
   <Sidenav slot="panel-left">
     <svelte:fragment slot="secondary">
       {#each data.stories as story}
-        <Button air href="#{story}">
+        <Button air primary={story === $page.url.hash.slice(1)} href="#{story}">
           <Icon of="book" />{capitalize(story)}
           <span id={story} />
         </Button>
