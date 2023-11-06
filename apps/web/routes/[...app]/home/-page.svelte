@@ -6,6 +6,7 @@
     Button,
     Portal,
     Stack,
+    Frame,
     Icon,
     When,
   } from "@amadeus-music/ui";
@@ -29,68 +30,76 @@
   }
 </script>
 
-<Topbar title="Home">
-  <Header indent xl id="feed">
-    Home
-    <When not sm slot="after">
-      <Button round href="/settings"><Icon of="settings" /></Button>
-    </When>
-  </Header>
-</Topbar>
-<Stack class="gap-4 p-4">
-  {#if devices.length}
-    <Stack class="gap-1">
-      <Header sm>Other Devices</Header>
-      <div
-        class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,40rem),1fr))] gap-1"
-      >
-        {#each devices as { progress, device, track }}
-          <div
-            class="dark:ring-none rounded-lg shadow-sm ring-1 ring-highlight [&>*]:bg-surface-100"
-          >
-            <Track
-              sm
-              {progress}
-              {track}
-              on:click={() => playback.replicate(device)}
+<Frame>
+  <Topbar title="Home">
+    <Header indent xl id="feed">
+      Home
+      <When not sm slot="after">
+        <Button round href="/settings"><Icon of="settings" /></Button>
+      </When>
+    </Header>
+  </Topbar>
+  <Stack class="gap-4 p-4">
+    {#if devices.length}
+      <Stack class="gap-1">
+        <Header sm>Other Devices</Header>
+        <div
+          class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,40rem),1fr))] gap-1"
+        >
+          {#each devices as { progress, device, track }}
+            <div
+              class="dark:ring-none rounded-lg shadow-sm ring-1 ring-highlight [&>*]:bg-surface-100"
             >
-              <Button
-                air
-                on:click={(e) => (playback.clear(device), e.stopPropagation())}
+              <Track
+                sm
+                {progress}
+                {track}
+                on:click={() => playback.replicate(device)}
               >
-                <Icon of="close" />
-              </Button>
-            </Track>
-          </div>
-        {/each}
-      </div>
+                <Button
+                  air
+                  on:click={(e) => (
+                    playback.clear(device), e.stopPropagation()
+                  )}
+                >
+                  <Icon of="close" />
+                </Button>
+              </Track>
+            </div>
+          {/each}
+        </div>
+      </Stack>
+    {/if}
+
+    <Stack class="gap-1">
+      <Header sm>You Might Like</Header>
+      <Overview
+        of={$feed.length
+          ? $feed.filter((x) => x.id in aliases)
+          : [undefined, undefined]}
+        style="playlist"
+        filter={$search}
+        href="/home"
+        {aliases}
+      />
     </Stack>
-  {/if}
 
-  <Stack class="gap-1">
-    <Header sm>You Might Like</Header>
-    <Overview
-      of={$feed.length
-        ? $feed.filter((x) => x.id in aliases)
-        : [undefined, undefined]}
-      style="playlist"
-      filter={$search}
-      href="/home"
-      {aliases}
-    />
+    <Header sm id="following">
+      <!-- New for You -->
+      <!-- /// TODO add artists cards -->
+    </Header>
   </Stack>
-
-  <Header sm id="following">
-    <!-- New for You -->
-    <!-- /// TODO add artists cards -->
-  </Header>
-</Stack>
+</Frame>
 
 <Projection at="listened" ephemeral class="bg-surface">
-  <Playlist id={-1} />
+  <Frame>
+    <Playlist id={-1} />
+  </Frame>
 </Projection>
 <Projection at="recommended" ephemeral class="bg-surface">
-  <Playlist id={-2} />
+  <Frame>
+    <Playlist id={-2} />
+  </Frame>
 </Projection>
 
 {#if active}

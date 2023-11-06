@@ -27,11 +27,11 @@
         </Stack>
       {/if}
       {#if secondary}
-        <section class="min-w-[15rem] {primary ? 'hidden xl:flex' : 'flex'}">
+        <section class="w-[15rem] {primary ? 'hidden xl:flex' : 'flex'}">
           {#if primary}
             <Separator />
           {/if}
-          <Stack class="gap-1 p-4">
+          <Stack class="max-w-full gap-1 p-4">
             <slot name="secondary" />
           </Stack>
         </section>

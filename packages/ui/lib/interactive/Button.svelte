@@ -74,7 +74,7 @@
 <svelte:element
   this={tag}
   for={to || undefined}
-  class={tw`relative flex min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white
+  class={tw`relative flex max-w-full cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white
   ${text} ${background}
   ${slim ? "" : "h-11"}
   ${compact ? "flex-col text-2xs" : "gap-[0.625rem]"}
