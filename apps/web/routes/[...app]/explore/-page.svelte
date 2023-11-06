@@ -102,7 +102,7 @@
     >
       <Icon of="search" />
     </Input>
-    <Group stretch size={3} bind:value={type}>
+    <Group size={3} bind:value={type}>
       <Button id="search-tracks">Tracks</Button>
       <Button id="search-artists">Artists</Button>
       <Button id="search-albums">Albums</Button>
