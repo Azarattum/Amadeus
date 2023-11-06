@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { HTMLProps, Either } from "../../internal/types";
-  import { tw } from "../../internal/tailwind";
+  import { type Classes, tw } from "../../internal/tailwind";
   import { setContext } from "svelte";
 
   type $$Props = {
-    class?: string;
-  } & (Either<"x" | "z"> & HTMLProps["div"]);
+    class?: Classes;
+  } & (Either<"x" | "z"> & Omit<HTMLProps["div"], "class">);
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
   export let x = false;
   export let z = false;

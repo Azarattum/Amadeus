@@ -6,7 +6,14 @@
 </script>
 
 <script lang="ts">
-  import { Separator, Button, Header, Icon, tw } from "@amadeus-music/ui";
+  import {
+    type Classes,
+    Separator,
+    Button,
+    Header,
+    Icon,
+    tw,
+  } from "@amadeus-music/ui";
   import { throttle } from "@amadeus-music/util/async";
   import type { Track } from "@amadeus-music/protocol";
   import Playback from "$lib/ui/Playback.svelte";
@@ -21,7 +28,7 @@
     if (progress < 1) playback.sync(progress);
   }, 3000);
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
 
   let track: Track | undefined = undefined;

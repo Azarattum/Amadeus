@@ -4,13 +4,13 @@
 </script>
 
 <script lang="ts">
-  import { Checkbox, Portal, Icon } from "../../component";
+  import { type Classes, Checkbox, Portal, Icon } from "../../component";
   import { onMount, tick } from "svelte";
 
   const isStored = () => "localStorage" in globalThis && "dark" in localStorage;
   const media = globalThis.matchMedia?.("(prefers-color-scheme: dark)");
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
 
   export let preference = media?.matches;

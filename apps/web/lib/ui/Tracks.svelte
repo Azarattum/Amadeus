@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     type EditEvent,
+    type Classes,
     Swipeable,
     Separator,
     Virtual,
@@ -11,6 +12,7 @@
     Stack,
     When,
     Icon,
+    tw,
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { compare } from "@amadeus-music/util/time";
@@ -25,7 +27,7 @@
     click: Track;
   }>();
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
   export let sm = false;
   export let fixed = false;
@@ -82,7 +84,7 @@
   }
 </script>
 
-<div class={classes}>
+<div class={tw`${classes}`}>
   {#if !sm}
     <When lg>
       <div

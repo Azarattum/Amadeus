@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { type Classes, tw } from "../../internal/tailwind";
   import type { Readable, Writable } from "svelte/store";
   import { getContext, onDestroy } from "svelte";
-  import { tw } from "../../internal/tailwind";
   import { uuid } from "../../internal/util";
 
   type Group = {
@@ -16,7 +16,7 @@
   const index = group ? group.i++ % group.size : undefined;
   const value = group?.value;
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
   export let href: Readable<string> | string | undefined = undefined;
   export let id: string | undefined = undefined;

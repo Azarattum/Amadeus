@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { type Classes, tw } from "../../../internal/tailwind";
   import { Separator, Stack } from "../../../component";
-  import { tw } from "../../../internal/tailwind";
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
 </script>
 

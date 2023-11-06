@@ -1,15 +1,15 @@
 <script lang="ts">
+  import { type Classes, tw } from "../../internal/tailwind";
   import type { HTMLProps } from "../../internal/types";
-  import { tw } from "../../internal/tailwind";
   import { uuid } from "../../internal/util";
 
   type $$Props = {
     checked?: boolean;
     target?: string;
-    class?: string;
-  } & HTMLProps["input"];
+    class?: Classes;
+  } & Omit<HTMLProps["input"], "class">;
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
   export let checked = false;
   export let target = "";
@@ -18,8 +18,8 @@
 </script>
 
 <label
-  class={tw`group relative flex w-max cursor-pointer select-none items-center gap-2 p-[6px] text-content-200 ${classes}`}
   for={id}
+  class={tw`group relative flex w-max cursor-pointer select-none items-center gap-2 p-[6px] text-content-200 ${classes}`}
 >
   <slot />
   <div class="relative">
