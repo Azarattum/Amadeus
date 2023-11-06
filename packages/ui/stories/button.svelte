@@ -4,7 +4,6 @@
   const props: Record<string, boolean> = {
     primary: false,
     compact: false,
-    stretch: false,
     round: false,
     slim: false,
     air: false,

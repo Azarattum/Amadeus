@@ -1,9 +1,11 @@
 <script lang="ts">
   import { getContext, setContext } from "svelte";
+  import { tw } from "../../internal/tailwind";
   import { uuid } from "../../internal/util";
   import { writable } from "svelte/store";
 
-  export let stretch = false;
+  let classes = "";
+  export { classes as class };
   export let size: number;
   export let value = 0;
 
@@ -26,10 +28,8 @@
 </script>
 
 <div
-  class="relative z-10 grid min-w-max touch-manipulation justify-around justify-items-center gap-2 rounded-lg p-0.5 outline-2 outline-offset-2 outline-primary-600 [&:has(input:focus-visible)]:outline
-  {stretch ? 'w-full' : 'w-max'}
-  {panel ? '' : 'bg-highlight'}
-  "
+  class={tw`relative z-10 grid min-w-max grow touch-manipulation justify-around justify-items-center gap-2 rounded-lg p-0.5 outline-2 outline-offset-2 outline-primary-600 [&:has(input:focus-visible)]:outline
+    ${!panel && "bg-highlight"} ${classes}`}
   {id}
   style:grid-template-columns="repeat({size}, minmax(0, 1fr))"
 >
