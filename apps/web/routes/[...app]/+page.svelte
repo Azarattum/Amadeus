@@ -62,11 +62,13 @@
     <svelte:fragment slot="sections">
       <Header sm>{section}</Header>
       {#each sections[section] || [] as x (section + x)}
+        <!-- /// TODO: account for $extra -->
         <Button
-          to={section === "explore" ? x : undefined}
           air
-          href={urls[x] || `${root}/${section}/#${x}`}
           primary={x === hash}
+          {...section === "explore"
+            ? { to: `search-${x}` }
+            : { href: urls[x] || `${root}/${section}/#${x}` }}
         >
           <Icon of={icons[x]} />{capitalize(x)}
         </Button>

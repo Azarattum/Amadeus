@@ -105,9 +105,9 @@
       <Icon of="search" />
     </Input>
     <Group stretch size={3} bind:value={type}>
-      <Button id="tracks">Tracks</Button>
-      <Button id="artists">Artists</Button>
-      <Button id="albums">Albums</Button>
+      <Button id="search-tracks">Tracks</Button>
+      <Button id="search-artists">Artists</Button>
+      <Button id="search-albums">Albums</Button>
     </Group>
   </Panel>
 </Portal>
