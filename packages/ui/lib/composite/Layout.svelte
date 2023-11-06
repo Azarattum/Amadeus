@@ -15,7 +15,7 @@
 </script>
 
 <Realm>
-  <Gateway name="root" />
+  <Gateway for="root" />
   <div class="flex h-[100dvh] max-h-[100dvh] w-[100dvw] max-w-[100dvw]">
     <aside>
       <slot name="panel-left" />
@@ -31,14 +31,14 @@
         class="fixed bottom-0 z-50 flex w-full touch-none flex-col-reverse items-center"
       >
         <slot name="panel-bottom" />
-        <Gateway name="panel" />
+        <Gateway for="panel" />
       </footer>
     </div>
     <aside>
       <slot name="panel-right" />
     </aside>
     <div class="pointer-events-none fixed inset-0 contain-strict">
-      <Gateway name="overlay" />
+      <Gateway for="overlay" />
     </div>
   </div>
 </Realm>

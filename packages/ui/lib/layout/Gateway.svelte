@@ -4,7 +4,8 @@
   import { type Realm, initRealm } from "./Realm.svelte";
   import { getContext } from "svelte";
 
-  export let name = "";
+  let name = "";
+  export { name as for };
 
   const realm = getContext<Realm>("realm");
   if (!realm) throw new Error("A gateway should exists within a realm!");

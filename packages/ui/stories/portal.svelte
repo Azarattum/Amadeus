@@ -17,7 +17,7 @@
 </script>
 
 <Realm>
-  Gateway 0: <Gateway name="0" />
+  Gateway 0: <Gateway for="0" />
   <Stack class="gap-2">
     {#if shown}
       <Portal to={to.toString()} unique="busy">
@@ -34,9 +34,9 @@
       <Tooltip>Choose destination for the portal</Tooltip>
     </Group>
   </Stack>
-  Gateway 1: <Gateway name="1" /><br />
-  Gateway 2: <Gateway name="2" /><br />
-  Gateway 3: <Gateway name="3" />
+  Gateway 1: <Gateway for="1" /><br />
+  Gateway 2: <Gateway for="2" /><br />
+  Gateway 3: <Gateway for="3" />
 
   <Portal to="2" unique="busy">
     <b>Gateway 2 is busy!</b>
