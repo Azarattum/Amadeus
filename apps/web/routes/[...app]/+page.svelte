@@ -14,6 +14,7 @@
   import Explore from "./explore/-page.svelte";
   import Shell from "$lib/ui/Shell.svelte";
   import Home from "./home/-page.svelte";
+  import { search } from "$lib/data";
 </script>
 
 <Hologram of="app" let:page let:hash>
@@ -37,15 +38,22 @@
       </When>
     </svelte:fragment>
     <Gateway for="sections" slot="sections" />
-    <Projection at="home" let:visible let:active>
+    <Projection at="home" title="Amadeus" let:visible let:active>
       <Home {visible} {active} {hash} {page} />
     </Projection>
-    <Projection at="library" let:visible let:active>
+    <Projection at="library" title="Library - Amadeus" let:visible let:active>
       <Library {visible} {active} {hash} {page} />
     </Projection>
-    <Projection at="explore" let:visible let:active>
+    <Projection
+      at="explore"
+      title="{$search || 'Explore'} - Amadeus"
+      let:visible
+      let:active
+    >
       <Explore {visible} {active} {hash} {page} />
     </Projection>
-    <Projection at="settings"><Settings /></Projection>
+    <Projection at="settings" title="Settings - Amadeus">
+      <Settings />
+    </Projection>
   </Shell>
 </Hologram>

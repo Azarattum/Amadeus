@@ -21,7 +21,3 @@
   <Icon of="last" slot="action" />
   <Button air on:click={purge}><Icon of="trash" /></Button>
 </Collection>
-
-<svelte:head>
-  <title>{info ? `${info.title} - ` : ""}Amadeus</title>
-</svelte:head>

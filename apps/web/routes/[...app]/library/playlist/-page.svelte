@@ -5,7 +5,10 @@
   import { playlists, library } from "$lib/data";
   import { page } from "$app/stores";
 
+  export let title = "";
+
   $: info = $playlists.find((x) => x.id === +$page.url.hash.slice(1));
+  $: title = info?.title || "";
 
   let selected = new Set<Track>();
 
@@ -27,7 +30,3 @@
   <Icon of="last" slot="action" />
   <Button air on:click={purge}><Icon of="trash" /></Button>
 </Collection>
-
-<svelte:head>
-  <title>{info ? `${info.title} - ` : ""}Amadeus</title>
-</svelte:head>

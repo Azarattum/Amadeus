@@ -4,13 +4,12 @@
   import { artists } from "$lib/data";
   import { page } from "$app/stores";
 
+  export let title = "";
+
   $: info = $artists.find((x) => x.id === +$page.url.hash.slice(1));
+  $: title = info?.title || "";
 </script>
 
 <Collection of={info} style="artist">
   <Icon of="last" slot="action" />
 </Collection>
-
-<svelte:head>
-  <title>{info ? `${info.title} - ` : ""}Amadeus</title>
-</svelte:head>

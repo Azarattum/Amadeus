@@ -33,7 +33,3 @@
   <Input placeholder="Password" bind:value={password} />
   <Button primary class="place-content-center" on:click={login}>Login</Button>
 </Stack>
-
-<svelte:head>
-  <title>Settings - Amadeus</title>
-</svelte:head>

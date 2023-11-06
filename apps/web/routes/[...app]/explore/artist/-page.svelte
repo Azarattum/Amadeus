@@ -22,7 +22,3 @@
 >
   <Icon of="last" slot="action" />
 </Collection>
-
-<svelte:head>
-  <title>{$remote?.detail ? `${$remote.detail.title} - ` : ""}Amadeus</title>
-</svelte:head>
