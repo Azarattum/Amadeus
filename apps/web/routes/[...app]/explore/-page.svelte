@@ -9,6 +9,8 @@
     Group,
     Input,
     Panel,
+    Frame,
+    Text,
     Icon,
   } from "@amadeus-music/ui";
   import { search as query, artists, history, albums, tracks } from "$lib/data";
@@ -66,31 +68,33 @@
   }
 </script>
 
-<Topbar title="Explore">
-  <Header indent xl>Explore</Header>
-</Topbar>
+<Frame>
+  <Topbar title="Explore">
+    <Header indent xl>Explore</Header>
+  </Topbar>
 
-{#if $query}
-  {#if $remote.type === "tracks"}
-    <Tracks remote={$remote.data} local={localTracks} on:end={remote.next} />
-  {:else if $remote.type === "artists"}
-    <Overview
-      remote={$remote.data}
-      local={localArtists}
-      style="artist"
-      on:end={remote.next}
-    />
-  {:else if $remote.type === "albums"}
-    <Overview
-      remote={$remote.data}
-      local={localAlbums}
-      style="album"
-      on:end={remote.next}
-    />
+  {#if $query}
+    {#if $remote.type === "tracks"}
+      <Tracks remote={$remote.data} local={localTracks} on:end={remote.next} />
+    {:else if $remote.type === "artists"}
+      <Overview
+        remote={$remote.data}
+        local={localArtists}
+        style="artist"
+        on:end={remote.next}
+      />
+    {:else if $remote.type === "albums"}
+      <Overview
+        remote={$remote.data}
+        local={localAlbums}
+        style="album"
+        on:end={remote.next}
+      />
+    {/if}
+  {:else}
+    <History type={types[type]} />
   {/if}
-{:else}
-  <History type={types[type]} />
-{/if}
+</Frame>
 
 <Portal to="panel">
   <Panel class={visible ? "flex" : "hidden"}>
@@ -111,10 +115,14 @@
 </Portal>
 
 <Projection at="album" ephemeral class="bg-surface">
-  <AlbumPage bind:title />
+  <Frame>
+    <AlbumPage bind:title />
+  </Frame>
 </Projection>
 <Projection at="artist" ephemeral class="bg-surface">
-  <ArtistPage bind:title />
+  <Frame>
+    <ArtistPage bind:title />
+  </Frame>
 </Projection>
 
 {#if active}
@@ -137,11 +145,11 @@
     {/if}
     {#if page.endsWith("album") && title}
       <Separator />
-      <Button primary air><Icon of="disk" />{title}</Button>
+      <Button primary air><Icon of="disk" /><Text>{title}</Text></Button>
     {/if}
     {#if page.endsWith("artist") && title}
       <Separator />
-      <Button primary air><Icon of="person" />{title}</Button>
+      <Button primary air><Icon of="person" /><Text>{title}</Text></Button>
     {/if}
   </Portal>
 {/if}

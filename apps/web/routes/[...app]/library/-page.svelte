@@ -6,8 +6,10 @@
     Header,
     Button,
     Stack,
+    Frame,
     Tabs,
     Icon,
+    Text,
     Tab,
   } from "@amadeus-music/ui";
   import { playlists, artists, tracks, search } from "$lib/data";
@@ -57,10 +59,14 @@
 </Tabs>
 
 <Projection at="playlist" ephemeral class="bg-surface">
-  <Playlist />
+  <Frame>
+    <Playlist />
+  </Frame>
 </Projection>
 <Projection at="artist" ephemeral class="bg-surface">
-  <Artist />
+  <Frame>
+    <Artist />
+  </Frame>
 </Projection>
 
 {#if active}
@@ -78,13 +84,13 @@
     {#if page.endsWith("playlist")}
       {#await playlists.get(+hash) then { title }}
         <Separator />
-        <Button primary air><Icon of="disk" />{title}</Button>
+        <Button primary air><Icon of="disk" /><Text>{title}</Text></Button>
       {/await}
     {/if}
     {#if page.endsWith("artist")}
       {#await artists.get(+hash) then { title }}
         <Separator />
-        <Button primary air><Icon of="person" />{title}</Button>
+        <Button primary air><Icon of="person" /><Text>{title}</Text></Button>
       {/await}
     {/if}
   </Portal>
