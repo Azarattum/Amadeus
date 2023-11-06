@@ -27,7 +27,7 @@
   const current = getActive();
 
   $: inDOM = keep($current);
-  $: target = $current === $route || (!!fallback && $current === $parent);
+  $: visible = $current === $route || (!!fallback && $current === $parent);
   $: active =
     $current.startsWith($route) || (!!fallback && $current === $parent);
 
@@ -58,6 +58,6 @@
     out:outFunc={outOpts}
     in:inFunc={inOpts}
   >
-    <slot {active} {target} />
+    <slot {visible} {active} />
   </div>
 {/if}

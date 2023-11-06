@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     Projection,
+    Separator,
     Button,
     Portal,
     Header,
@@ -13,17 +14,21 @@
   import { search as query, artists, history, albums, tracks } from "$lib/data";
   import type { Artist, Album, Track } from "@amadeus-music/protocol";
   import { debounce } from "@amadeus-music/util/async";
-  import { navigating, page } from "$app/stores";
   import ArtistPage from "./artist/-page.svelte";
   import AlbumPage from "./album/-page.svelte";
   import { streams, search } from "$lib/trpc";
   import { multistream } from "$lib/stream";
+  import { navigating } from "$app/stores";
   import Overview from "./overview.svelte";
   import History from "./history.svelte";
   import Tracks from "./tracks.svelte";
 
   export let visible = true;
+  export let active = true;
+  export let hash = "";
+  export let page = "";
 
+  let title = "";
   let type = 0;
 
   const types = ["tracks", "artists", "albums"] as const;
@@ -35,7 +40,7 @@
     types[type],
   );
 
-  $: visible && navigate($page.url.hash.slice(1));
+  $: visible && navigate(hash);
   $: if (visible && !$navigating) {
     globalThis.history?.replaceState(null, "", `#${types[type]}/${$query}`);
   }
@@ -87,13 +92,6 @@
   <History type={types[type]} />
 {/if}
 
-<Projection at="album" ephemeral class="bg-surface">
-  <AlbumPage />
-</Projection>
-<Projection at="artist" ephemeral class="bg-surface">
-  <ArtistPage />
-</Projection>
-
 <Portal to="panel">
   <Panel class={visible ? "flex" : "hidden"}>
     <Input
@@ -111,6 +109,42 @@
     </Group>
   </Panel>
 </Portal>
+
+<Projection at="album" ephemeral class="bg-surface">
+  <AlbumPage bind:title />
+</Projection>
+<Projection at="artist" ephemeral class="bg-surface">
+  <ArtistPage bind:title />
+</Projection>
+
+{#if active}
+  <Portal to="sections">
+    <Header sm>Explore</Header>
+    {#if page.endsWith("album") || page.endsWith("artist")}
+      <Button air href="/explore#tracks/{$query}">
+        <Icon of="note" />Tracks
+      </Button>
+      <Button air href="/explore#artists/{$query}">
+        <Icon of="people" />Artists
+      </Button>
+      <Button air href="/explore#albums/{$query}">
+        <Icon of="disk" />Albums
+      </Button>
+    {:else}
+      <Button to="search-tracks" air><Icon of="note" />Tracks</Button>
+      <Button to="search-artists" air><Icon of="people" />Artists</Button>
+      <Button to="search-albums" air><Icon of="disk" />Albums</Button>
+    {/if}
+    {#if page.endsWith("album") && title}
+      <Separator />
+      <Button primary air><Icon of="disk" />{title}</Button>
+    {/if}
+    {#if page.endsWith("artist") && title}
+      <Separator />
+      <Button primary air><Icon of="person" />{title}</Button>
+    {/if}
+  </Portal>
+{/if}
 
 <svelte:head>
   <title>{$query || "Explore"} - Amadeus</title>

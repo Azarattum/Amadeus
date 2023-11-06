@@ -251,7 +251,7 @@
   });
 </script>
 
-<div class="shrink-0 contain-[size_layout]" style:height="{totalHeight}px">
+<div class="shrink-0 contain-layout" style:height="{totalHeight}px">
   <div
     class="grid auto-rows-max will-change-transform contain-layout"
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
