@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Readable, Writable } from "svelte/store";
   import { getContext, onDestroy } from "svelte";
+  import { tw } from "../../internal/tailwind";
   import { uuid } from "../../internal/util";
 
   type Group = {
@@ -15,10 +16,11 @@
   const index = group ? group.i++ % group.size : undefined;
   const value = group?.value;
 
+  let classes = "";
+  export { classes as class };
   export let href: Readable<string> | string | undefined = undefined;
   export let id: string | undefined = undefined;
   export let to: string | undefined = undefined;
-  export let stretch = !!group;
   export let disabled = false;
   export let primary = false;
   export let compact = false;
@@ -70,23 +72,24 @@
 
 <svelte:element
   this={tag}
-  class="relative flex min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white {text} {background}
-  {slim ? '' : 'h-11'}
-  {compact ? 'flex-col text-2xs' : 'gap-[0.625rem]'}
-  {round ? 'rounded-full' : 'rounded-lg'}
-  "
   for={to || undefined}
+  class={tw`relative flex min-w-max cursor-pointer touch-manipulation select-none items-center outline-2 outline-offset-2 outline-primary-600 transition-paint focus-visible:outline active:scale-95 [&:has(input:checked)]:bg-transparent [&:has(input:checked)]:text-white
+  ${text} ${background}
+  ${slim ? "" : "h-11"}
+  ${compact ? "flex-col text-2xs" : "gap-[0.625rem]"}
+  ${round ? "rounded-full" : "rounded-lg"}
+  ${classes}`}
   draggable="false"
   role="button"
   tabindex="0"
   href={url}
   {disabled}
   id={uid}
-  class:justify-center={stretch || compact || panel}
+  class:justify-center={group || compact || panel}
   class:px-[0.625rem]={!air || group}
   class:aspect-square={square}
-  class:shrink-0={!stretch}
-  class:w-full={stretch}
+  class:shrink-0={!group}
+  class:w-full={group}
   on:click
 >
   {#if group}

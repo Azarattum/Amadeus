@@ -36,18 +36,12 @@
 
 <Sidenav class="hidden sm:flex">
   {#each Object.keys(sections) as x}
-    <Button
-      compact
-      stretch
-      air
-      primary={x === section}
-      on:click={() => (section = x)}
-    >
+    <Button compact air primary={x === section} on:click={() => (section = x)}>
       <Icon of={icons[x]} md />{x}
     </Button>
   {/each}
   <Spacer />
-  <Button compact stretch air>
+  <Button compact air>
     <Icon of="settings" md />Settings
   </Button>
   <svelte:fragment slot="secondary">
@@ -61,13 +55,7 @@
 </Sidenav>
 <Navbar class="absolute bottom-0 sm:hidden">
   {#each Object.keys(sections) as x}
-    <Button
-      compact
-      stretch
-      air
-      primary={x === section}
-      on:click={() => (section = x)}
-    >
+    <Button compact air primary={x === section} on:click={() => (section = x)}>
       <Icon of={icons[x]} md />{x}
     </Button>
   {/each}

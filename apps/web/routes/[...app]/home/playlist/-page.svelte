@@ -3,9 +3,9 @@
   import Collection from "$lib/ui/Collection.svelte";
   import { Button, Icon } from "@amadeus-music/ui";
   import { library, feed } from "$lib/data";
-  import { page } from "$app/stores";
 
-  $: info = $feed.find((x) => x.id === +$page.url.hash.slice(1));
+  export let id: number;
+  $: info = $feed.find((x) => x.id === id);
   let selected = new Set<Track>();
 
   function purge() {
@@ -19,7 +19,7 @@
 
 <Collection of={info} fixed style="playlist" bind:selected>
   <Icon of="last" slot="action" />
-  <Button stretch air on:click={purge}><Icon of="trash" /></Button>
+  <Button air on:click={purge}><Icon of="trash" /></Button>
 </Collection>
 
 <svelte:head>
