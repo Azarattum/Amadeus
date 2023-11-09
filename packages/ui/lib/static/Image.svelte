@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { type Classes, tw } from "../../internal/tailwind";
   import { onMount } from "svelte";
 
+  let classes: Classes = "";
+  export { classes as class };
   export let thumbnail: string | undefined | null = undefined;
   export let src: string | undefined | null = undefined;
   export let size = 48;
@@ -16,9 +19,8 @@
 </script>
 
 <div
-  class="overflow-hidden {size > 200
-    ? 'rounded-2xl'
-    : 'rounded'} bg-highlight-100"
+  class={tw`overflow-hidden bg-highlight-100
+    ${size > 200 ? "rounded-2xl" : "rounded"} ${classes}`}
   class:animate-pulse={state === "loading"}
   style:height="{size}px"
   style:width="{size}px"
