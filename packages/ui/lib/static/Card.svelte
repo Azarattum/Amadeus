@@ -1,14 +1,17 @@
 <script lang="ts">
+  import { type Classes, Icon, tw } from "../../component";
   import type { Either } from "../../internal/types";
-  import { Icon } from "../../component";
   type $$Props = Either<"xs" | "sm"> & {
     selected?: "passive" | boolean;
     href?: string | undefined;
     interactive?: boolean;
+    class?: Classes;
     flat?: boolean;
     flow?: boolean;
   };
 
+  let classes: Classes = "";
+  export { classes as class };
   export let xs = false;
   export let sm = false;
   export let flat = false;
@@ -20,20 +23,26 @@
 
 <svelte:element
   this={interactive ? (href ? "a" : "button") : "article"}
-  class="group relative z-10 flex w-full items-center gap-4 overflow-hidden px-4 outline-2 -outline-offset-2 outline-primary-600 contain-inline-size focus-visible:outline
-  {interactive
-    ? 'cursor-pointer touch-manipulation select-none ' +
-      (!flat ? 'transition-transform active:scale-95' : '')
-    : ''}
-  {xs
-    ? 'focus-visible:z-50'
-    : sm
-    ? 'rounded-lg py-1 focus-visible:z-50'
-    : 'rounded-2xl py-4'}
-  {flat
-    ? 'bg-surface'
-    : 'bg-surface-100 shadow-[0_0_20px_-4px] shadow-black/20 dark:shadow-none'}
-  "
+  class={tw`group relative z-10 flex w-full items-center gap-4 overflow-hidden px-4 outline-2 -outline-offset-2 outline-primary-600 contain-inline-size focus-visible:outline
+  ${
+    interactive &&
+    "cursor-pointer touch-manipulation select-none " +
+      (!flat ? "transition-transform active:scale-95" : "")
+  }
+  ${
+    xs
+      ? "focus-visible:z-50"
+      : sm
+      ? "rounded-lg py-1 focus-visible:z-50"
+      : "rounded-2xl py-4"
+  }
+  ${
+    flat
+      ? "bg-surface"
+      : "bg-surface-100 shadow-[0_0_20px_-4px] shadow-black/20 dark:shadow-none"
+  }
+  ${classes}
+  `}
   role={href ? "link" : "button"}
   draggable="false"
   tabindex="0"
