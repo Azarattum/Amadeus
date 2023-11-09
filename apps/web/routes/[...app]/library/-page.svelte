@@ -1,7 +1,9 @@
 <script lang="ts">
   import {
+    type EditEvent,
     Projection,
     Separator,
+    Tooltip,
     Portal,
     Header,
     Button,
@@ -12,10 +14,18 @@
     Text,
     Tab,
   } from "@amadeus-music/ui";
-  import { playlists, artists, tracks, search } from "$lib/data";
+  import {
+    playlists,
+    playback,
+    artists,
+    library,
+    tracks,
+    search,
+  } from "$lib/data";
+  import PlaybackActions from "$lib/ui/PlaybackActions.svelte";
+  import type { Track } from "@amadeus-music/protocol";
+  import Collection from "$lib/ui/Collection.svelte";
   import Overview from "$lib/ui/Overview.svelte";
-  import Playlist from "./playlist/-page.svelte";
-  import Artist from "./artist/-page.svelte";
   import Tracks from "$lib/ui/Tracks.svelte";
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
@@ -25,11 +35,34 @@
   export let hash = "";
   export let page = "";
 
-  let title = "";
-  $: pageTitle = title ? `${title} - Amadeus` : "Amadeus";
-
   $: if (visible && !$navigating && globalThis.location && !location?.hash) {
     goto("#playlists", { replaceState: true });
+  }
+
+  /* === Collection data === */
+  let kind: "playlist" | "artist" | "" = "";
+  let id = 0;
+
+  $: id = active ? +hash || id : id;
+  $: kind = active
+    ? page.endsWith("/artist")
+      ? "artist"
+      : page.endsWith("/playlist")
+      ? "playlist"
+      : kind
+    : kind;
+  $: data =
+    kind === "playlist"
+      ? $playlists.find((x) => x.id === id)
+      : kind === "artist"
+      ? $artists.find((x) => x.id === id)
+      : undefined;
+  $: title = data ? `${data.title} - Amadeus` : "Amadeus";
+
+  /* === Library Actions === */
+  function edit({ detail: { action, after, item } }: EditEvent<Track>) {
+    if (!item.entry) return;
+    if (action === "rearrange") library.rearrange(item.entry, after?.entry);
   }
 </script>
 
@@ -55,25 +88,40 @@
     </Stack>
   </Tab>
   <Tab name="Timeline" {visible}>
-    <Tracks timeline fixed tracks={$tracks} class="pt-4">
-      <div><!-- /// TODO: add actions --></div>
+    <Tracks
+      timeline
+      fixed
+      tracks={$tracks}
+      class="pt-4"
+      on:action={({ detail }) => playback.push([detail], "last")}
+      let:selected
+    >
+      <Icon of="last" slot="action" />
+      <PlaybackActions {selected} />
+      <Button air on:click={() => library.purge(selected.map((x) => x.entry))}>
+        <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
+      </Button>
     </Tracks>
   </Tab>
 </Tabs>
 
-<Projection at="playlist" ephemeral title={pageTitle}>
+<Projection at="playlist" ephemeral {title}>
   <Frame>
-    <Playlist bind:title />
+    <Collection of={data} style="playlist" on:edit={edit} let:selected>
+      <Button air on:click={() => library.purge(selected.map((x) => x.entry))}>
+        <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
+      </Button>
+    </Collection>
   </Frame>
 </Projection>
-<Projection at="artist" ephemeral title={pageTitle}>
+<Projection at="artist" ephemeral {title}>
   <Frame>
-    <Artist bind:title />
+    <Collection of={data} style="artist" />
   </Frame>
 </Projection>
 
 {#if active}
-  <Portal to="sections">
+  <Portal to="navigation">
     <Header sm>Library</Header>
     <Button air primary={hash === "playlists"} href="/library#playlists">
       <Icon of="last" />Playlists

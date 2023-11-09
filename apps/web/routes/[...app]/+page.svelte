@@ -37,7 +37,7 @@
         </Button>
       </When>
     </svelte:fragment>
-    <Gateway for="sections" slot="sections" />
+    <Gateway for="navigation" slot="sections" />
     <Projection at="home" title="Amadeus" let:visible let:active>
       <Home {visible} {active} {hash} {page} />
     </Projection>

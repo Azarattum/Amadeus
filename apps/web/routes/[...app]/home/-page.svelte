@@ -11,8 +11,8 @@
     When,
   } from "@amadeus-music/ui";
   import { playback, search, feed } from "$lib/data";
+  import Collection from "$lib/ui/Collection.svelte";
   import Overview from "$lib/ui/Overview.svelte";
-  import Playlist from "./playlist/-page.svelte";
   import Track from "$lib/ui/Track.svelte";
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
@@ -28,6 +28,18 @@
   $: if (visible && !$navigating && globalThis.location && !location?.hash) {
     goto("#feed", { replaceState: true });
   }
+
+  /* === Collection data === */
+  let id = 0;
+
+  $: id = active
+    ? page.endsWith("/recommended")
+      ? -2
+      : page.endsWith("/listened")
+      ? -1
+      : id
+    : id;
+  $: data = $feed.find((x) => x.id === id);
 </script>
 
 <Frame>
@@ -93,17 +105,17 @@
 
 <Projection at="listened" ephemeral title="Listened - Amadeus">
   <Frame>
-    <Playlist id={-1} />
+    <Collection of={data} fixed style="playlist" />
   </Frame>
 </Projection>
 <Projection at="recommended" ephemeral title="Recommended - Amadeus">
   <Frame>
-    <Playlist id={-2} />
+    <Collection of={data} fixed style="playlist" />
   </Frame>
 </Projection>
 
 {#if active}
-  <Portal to="sections">
+  <Portal to="navigation">
     <Header sm>Home</Header>
     <Button air primary={hash === "feed"} href="/home#feed">
       <Icon of="activity" />Feed

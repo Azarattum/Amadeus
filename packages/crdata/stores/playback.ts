@@ -232,6 +232,17 @@ export const playback = ({ replicated }: DB) =>
           .where("id", "=", device)
           .execute();
       },
+      async purge(db, entries: (number | undefined)[]) {
+        if (!entries.length) return;
+        await db
+          .deleteFrom("playback")
+          .where(
+            "id",
+            "in",
+            entries.filter((x): x is number => !!x),
+          )
+          .execute();
+      },
       async repeat(db, type: PlaybackRepeat) {
         const types = ["none", "single", "all"];
         await db
@@ -253,10 +264,6 @@ export const playback = ({ replicated }: DB) =>
           .where("id", "=", localDevice)
           .set({ progress })
           .execute();
-      },
-      async purge(db, entries: number[]) {
-        if (!entries.length) return;
-        await db.deleteFrom("playback").where("id", "in", entries).execute();
       },
     },
   );

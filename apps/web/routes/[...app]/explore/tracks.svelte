@@ -1,7 +1,8 @@
 <script lang="ts">
+  import PlaybackActions from "$lib/ui/PlaybackActions.svelte";
   import { Header, Button, Icon } from "@amadeus-music/ui";
+  import { playlists, playback, library } from "$lib/data";
   import type { Track } from "@amadeus-music/protocol";
-  import { playlists, library } from "$lib/data";
   import Tracks from "$lib/ui/Tracks.svelte";
 
   export let local: Track[];
@@ -21,7 +22,15 @@
 {#if local.length}
   <div class="pt-4">
     <Header indent sm>Library</Header>
-    <Tracks fixed tracks={local}><Icon of="last" slot="action" /></Tracks>
+    <Tracks
+      fixed
+      tracks={local}
+      on:action={({ detail }) => playback.push([detail], "last")}
+      let:selected
+    >
+      <PlaybackActions {selected} />
+      <Icon of="last" slot="action" />
+    </Tracks>
   </div>
 {/if}
 <div class="pt-4">
@@ -30,10 +39,11 @@
     fixed
     tracks={remote}
     on:action={({ detail }) => save([detail])}
-    bind:selected
+    let:selected
     on:end
   >
     <Icon of="save" slot="action" />
+    <PlaybackActions {selected} />
     <Button air on:click={() => save(selected)}>
       <Icon of="save" />
     </Button>
