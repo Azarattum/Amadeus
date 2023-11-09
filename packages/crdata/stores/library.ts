@@ -90,18 +90,23 @@ export const library = ({ replicated }: DB) =>
         .execute()
         .then((x) => x.map((y) => y.track as number));
     },
+    async purge(db, entries: (number | undefined)[]) {
+      if (!entries.length) return;
+      await db
+        .deleteFrom("library")
+        .where(
+          "id",
+          "in",
+          entries.filter((x): x is number => !!x),
+        )
+        .execute();
+    },
     async rearrange(db, entry: number, after?: number) {
       await db
         .updateTable("library_fractindex" as any)
         .set({ after_id: after || null })
         .where("id", "=", entry)
         .execute();
-    },
-    async purge(db, entries: number[]) {
-      const promises = entries.map((entry) =>
-        db.deleteFrom("library").where("id", "=", entry).execute(),
-      );
-      await Promise.all(promises);
     },
     async has(db, ids: number[]) {
       return await db

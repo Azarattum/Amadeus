@@ -32,10 +32,11 @@
   export let sm = false;
   export let fixed = false;
   export let timeline = false;
-  export let selected = new Set<Track>();
   export let tracks: (Track | undefined)[] | undefined = undefined;
 
+  let selected = new Set<Track>();
   const prerender = 10;
+
   $: items = process(tracks);
   $: if (!tracks?.length) clear();
 
@@ -165,9 +166,9 @@
     {#if selected.size}
       <Panel>
         <Stack x>
-          <Stack x class="[&>*]:grow">
-            <slot />
-          </Stack>
+          <form class="flex grow [&>*]:grow" on:submit={clear}>
+            <slot selected={[...selected]} />
+          </form>
           <Separator />
           <Button square air on:click={clear}><Icon of="close" /></Button>
         </Stack>

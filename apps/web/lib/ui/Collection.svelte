@@ -6,15 +6,15 @@
   } from "@amadeus-music/protocol";
   import { Header, Topbar, Spacer, Stack, Icon, Text } from "@amadeus-music/ui";
   import { capitalize } from "@amadeus-music/util/string";
+  import PlaybackActions from "./PlaybackActions.svelte";
   import { format } from "@amadeus-music/util/time";
+  import { playback, search } from "$lib/data";
   import Tracks from "$lib/ui/Tracks.svelte";
   import Avatar from "./Avatar.svelte";
-  import { search } from "$lib/data";
   import { match } from "$lib/util";
 
   export let fixed = false;
   export let style: CollectionType;
-  export let selected = new Set<Track>();
   export let of: Collection | undefined = undefined;
   export let tracks: Track[] | undefined = undefined;
 
@@ -84,13 +84,15 @@
   <Tracks
     fixed={fixed || (style === "playlist" ? !!$search : true)}
     tracks={filtered}
-    bind:selected
-    on:action
+    on:action={({ detail }) => playback.push([detail], "last")}
+    let:selected
     on:click
     on:edit
     on:end
   >
-    <slot name="action" slot="action" />
-    <slot />
+    <!-- /// TODO: support other quick actions -->
+    <Icon of="last" slot="action" />
+    <PlaybackActions {selected} />
+    <slot {selected} />
   </Tracks>
 </Stack>

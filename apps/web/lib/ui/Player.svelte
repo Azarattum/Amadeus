@@ -9,6 +9,7 @@
   import {
     type Classes,
     Separator,
+    Tooltip,
     Button,
     Header,
     Icon,
@@ -46,8 +47,6 @@
     currentTime = state.progress * track.duration;
   }
 
-  let selected = new Set<Track>();
-
   async function load(target?: Track) {
     if (target?.id === track?.id) return;
     track = target;
@@ -62,14 +61,6 @@
       await tick();
       paused = false;
     }
-  }
-
-  function purge() {
-    playback.purge(
-      [...selected].map((x) => x.entry).filter((x): x is number => !!x),
-    );
-    selected.clear();
-    selected = selected;
   }
 
   async function skip(to?: Track) {
@@ -111,9 +102,11 @@
       sm
       tracks={$upcoming}
       on:click={(e) => (e.preventDefault(), skip(e.detail))}
-      bind:selected
+      let:selected
     >
-      <Button air on:click={purge}><Icon of="trash" /></Button>
+      <Button air on:click={() => playback.purge(selected.map((x) => x.entry))}>
+        <Icon of="trash" /><Tooltip>Remove from Queue</Tooltip>
+      </Button>
     </Tracks>
   </div>
 </div>

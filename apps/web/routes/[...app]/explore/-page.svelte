@@ -16,10 +16,9 @@
   import { search as query, artists, history, albums, tracks } from "$lib/data";
   import type { Artist, Album, Track } from "@amadeus-music/protocol";
   import { debounce } from "@amadeus-music/util/async";
-  import ArtistPage from "./artist/-page.svelte";
-  import AlbumPage from "./album/-page.svelte";
-  import { streams, search } from "$lib/trpc";
-  import { multistream } from "$lib/stream";
+  import { streams, search, expand } from "$lib/trpc";
+  import Collection from "$lib/ui/Collection.svelte";
+  import { multistream, stream } from "$lib/stream";
   import { navigating } from "$app/stores";
   import Overview from "./overview.svelte";
   import History from "./history.svelte";
@@ -31,10 +30,14 @@
   export let page = "";
 
   let title = "";
+
+  $: visible && navigate(hash);
+  $: if (visible && !$navigating) {
+    globalThis.history?.replaceState(null, "", `#${types[type]}/${$query}`);
+  }
+
+  /* === Search data === */
   let type = 0;
-
-  $: pageTitle = title ? `${title} - Amadeus` : "Amadeus";
-
   const types = ["tracks", "artists", "albums"] as const;
   const log = debounce((x: string) => history.log(x), 2000);
   const estimate = ~~((globalThis.innerHeight / 56) * 2);
@@ -43,11 +46,6 @@
     streams.next,
     types[type],
   );
-
-  $: visible && navigate(hash);
-  $: if (visible && !$navigating) {
-    globalThis.history?.replaceState(null, "", `#${types[type]}/${$query}`);
-  }
 
   $: remote.choose(types[type]);
   $: remote.update($query ? { page: estimate, query: $query } : null);
@@ -68,6 +66,29 @@
     if (!~type) type = 0;
     if ($query !== parts[1]) $query = parts[1];
   }
+
+  /* === Collection data === */
+  let kind: "artist" | "album" | "" = "";
+  let id = 0;
+
+  $: id = active ? +hash || id : id;
+  $: kind = active
+    ? page.endsWith("/artist")
+      ? "artist"
+      : page.endsWith("/album")
+      ? "album"
+      : kind
+    : kind;
+  $: data =
+    kind === "album"
+      ? stream(expand.album, streams.next)
+      : kind === "artist"
+      ? stream(expand.artist, streams.next)
+      : undefined;
+  $: data?.update({ page: estimate, id });
+  $: title = $data?.detail?.title
+    ? `${$data?.detail?.title} - Amadeus`
+    : "Amadeus";
 </script>
 
 <Frame>
@@ -116,19 +137,29 @@
   </Panel>
 </Portal>
 
-<Projection at="album" ephemeral title={pageTitle}>
+<Projection at="album" ephemeral {title}>
   <Frame>
-    <AlbumPage bind:title />
+    <Collection
+      of={$data?.detail}
+      tracks={$data}
+      style="album"
+      on:end={() => remote.next()}
+    />
   </Frame>
 </Projection>
-<Projection at="artist" ephemeral title={pageTitle}>
+<Projection at="artist" ephemeral {title}>
   <Frame>
-    <ArtistPage bind:title />
+    <Collection
+      of={$data?.detail}
+      tracks={$data}
+      style="artist"
+      on:end={() => remote.next()}
+    />
   </Frame>
 </Projection>
 
 {#if active}
-  <Portal to="sections">
+  <Portal to="navigation">
     <Header sm>Explore</Header>
     {#if page.endsWith("album") || page.endsWith("artist")}
       <Button air href="/explore#tracks/{$query}">
