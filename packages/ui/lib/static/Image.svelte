@@ -1,6 +1,5 @@
 <script lang="ts">
   import { type Classes, tw } from "../../internal/tailwind";
-  import { onMount } from "svelte";
 
   let classes: Classes = "";
   export { classes as class };
@@ -15,7 +14,6 @@
       : ("loading" as "loading" | "error" | "ok");
 
   let image: HTMLImageElement;
-  onMount(() => (image?.complete && (image.style.opacity = "1"), false));
 </script>
 
 <div
@@ -27,14 +25,15 @@
 >
   {#if src && state !== "error"}
     <img
-      src={size < 100 / devicePixelRatio ? thumbnail : src}
-      class="opacity-0 transition-opacity duration-500"
+      class="transition-opacity duration-500
+        {image && !image.complete && state !== 'ok'
+        ? 'opacity-0'
+        : 'opacity-100'}"
+      src={size < 100 / globalThis.devicePixelRatio ? thumbnail : src}
       height="{size}px"
       draggable="false"
       width="{size}px"
-      loading="lazy"
       {alt}
-      class:opacity-100={state === "ok"}
       on:error={() => (state = "error")}
       on:load={() => (state = "ok")}
       bind:this={image}
