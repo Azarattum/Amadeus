@@ -10,8 +10,9 @@
         id?: number;
       }
     | undefined = undefined;
-  export let round = false;
   export let href: string | undefined = undefined;
+  export let id: string | false = false;
+  export let round = false;
 
   const size = 104;
 </script>
@@ -31,13 +32,18 @@
   {#if of?.collection && !of.arts}
     {#each of.collection.tracks
       .filter((x) => x.album.arts?.length)
-      .slice(0, 4) as { album: { thumbnails, arts } }}
-      <Image thumbnail={thumbnails?.[0] || ""} src={arts?.[0] || ""} />
+      .slice(0, 4) as { album: { thumbnails, arts } }, i}
+      <Image
+        thumbnail={thumbnails?.[0] || ""}
+        class={id && `avatar-${id}-${i}`}
+        src={arts?.[0] || ""}
+      />
     {/each}
   {:else}
     <Image
       thumbnail={of ? of.thumbnails?.[0] || "" : undefined}
       src={of ? of.arts?.[0] || "" : undefined}
+      class={id && `avatar-${id}`}
       {size}
     >
       <div

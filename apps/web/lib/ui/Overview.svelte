@@ -46,6 +46,7 @@
   {#if item}
     <Card
       href="{href}/{aliases[item.id] || `${style}#${item.id}`}"
+      id={item.id.toString()}
       {...{ [style]: item }}
     />
   {:else if item === null}
