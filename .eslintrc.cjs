@@ -31,6 +31,7 @@ module.exports = {
   },
   rules: {
     "no-var": "error",
+    "no-undef": "off",
     "no-empty": "off",
     "require-yield": "off",
     "svelte/no-at-html-tags": "off",
