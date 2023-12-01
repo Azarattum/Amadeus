@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Track } from "@amadeus-music/protocol";
-  import { Image, Icon } from "@amadeus-music/ui";
+  import { Image, Icon, tw } from "@amadeus-music/ui";
 
+  let classes = "";
+  export { classes as class };
   export let of:
     | {
         collection?: { tracks: Track[] };
@@ -11,7 +13,6 @@
       }
     | undefined = undefined;
   export let href: string | undefined = undefined;
-  export let id: string | false = false;
   export let round = false;
 
   const size = 104;
@@ -19,11 +20,12 @@
 
 <svelte:element
   this={href ? "a" : "div"}
-  class="grid shrink-0 grid-cols-2 gap-2 overflow-hidden shadow-lg contain-paint
-  {round ? 'rounded-full' : 'rounded-2xl'}
-  {href
-    ? 'outline outline-0 outline-highlight transition-[outline_transform] active:scale-95 hover:outline-8'
-    : ''}"
+  class={tw`grid shrink-0 grid-cols-2 gap-2 overflow-hidden shadow-lg contain-paint
+  ${round ? "rounded-full" : "rounded-2xl"}
+  ${
+    href &&
+    "outline outline-0 outline-highlight transition-[outline_transform] active:scale-95 hover:outline-8"
+  } ${classes}`}
   {href}
   class:bg-highlight={Array.isArray(of) && !of.length}
   style:height="{size}px"
@@ -33,17 +35,12 @@
     {#each of.collection.tracks
       .filter((x) => x.album.arts?.length)
       .slice(0, 4) as { album: { thumbnails, arts } }, i}
-      <Image
-        thumbnail={thumbnails?.[0] || ""}
-        class={id && `avatar-${id}-${i}`}
-        src={arts?.[0] || ""}
-      />
+      <Image thumbnail={thumbnails?.[0] || ""} src={arts?.[0] || ""} />
     {/each}
   {:else}
     <Image
       thumbnail={of ? of.thumbnails?.[0] || "" : undefined}
       src={of ? of.arts?.[0] || "" : undefined}
-      class={id && `avatar-${id}`}
       {size}
     >
       <div
