@@ -7,7 +7,7 @@
 </script>
 
 <span
-  class="w-max max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded-md text-left [&>*]:align-bottom
+  class="w-max max-w-full truncate rounded-md text-left [&>*]:align-bottom
   {loading ? 'animate-pulse bg-highlight text-transparent' : ''}
   {accent ? 'font-medium' : 'font-normal'}"
   class:text-content-200={secondary}
