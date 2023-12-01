@@ -1,15 +1,26 @@
 <script lang="ts">
+  import {
+    Header,
+    Topbar,
+    Spacer,
+    Stack,
+    Morph,
+    Words,
+    Icon,
+    Text,
+  } from "@amadeus-music/ui";
   import type {
     CollectionType,
     Collection,
     Track,
   } from "@amadeus-music/protocol";
-  import { Header, Topbar, Spacer, Stack, Icon, Text } from "@amadeus-music/ui";
   import { capitalize } from "@amadeus-music/util/string";
   import PlaybackActions from "./PlaybackActions.svelte";
   import { format } from "@amadeus-music/util/time";
   import { playback, search } from "$lib/data";
   import Tracks from "$lib/ui/Tracks.svelte";
+  import { cubicInOut } from "svelte/easing";
+  import { fade } from "svelte/transition";
   import Avatar from "./Avatar.svelte";
   import { match } from "$lib/util";
 
@@ -38,28 +49,39 @@
     : "Loading";
 </script>
 
-<Stack class={style === "playlist" ? "gap-4" : ""}>
-  <Topbar title={of?.title || ""}>
-    <Stack
-      x
-      class={`place-items-center gap-4 ${style !== "playlist" ? "p-4" : ""}`}
-    >
-      {#if style !== "playlist"}
-        <Avatar {of} round={style === "artist"} {href} />
-      {/if}
-      <Stack class="grow-0 gap-2">
+<Topbar title={of?.title || ""}>
+  <Stack
+    x
+    class={`place-items-center gap-4 ${style !== "playlist" ? "p-4" : "pb-4"}`}
+  >
+    {#if style !== "playlist"}
+      <Morph key="avatar-{style}-{of?.id}">
+        <Avatar {of} round={style === "artist"} class="z-30" {href} />
+      </Morph>
+    {/if}
+    <Stack class="z-20 grow-0 gap-2">
+      <Morph container key="heading-{style}-{of?.id}">
         <Header
           indent={style === "playlist"}
           xl={style === "playlist"}
-          loading={!of}>{of?.title}</Header
+          loading={!of}
         >
-        <Stack x class="gap-4">
+          <!-- This div is needed for the container morph -->
+          <div>
+            <Morph key="title-{style}-{of?.id}">
+              <Words from={of?.title} />
+            </Morph>
+          </div>
+        </Header>
+      </Morph>
+      <Morph key={`meta-${style}-${of?.id}`}>
+        <Stack x class="max-w-max gap-4 {style === 'playlist' ? 'ml-4' : ''}">
           {#if of?.collection}
-            <Text secondary indent={style === "playlist"}>
+            <Text secondary>
               <Icon of="note" sm />
               {of.collection.size}
             </Text>
-            <Text secondary indent={style === "playlist"}>
+            <Text secondary>
               <Icon of="clock" sm />
               {format(of.collection.duration)}
             </Text>
@@ -76,11 +98,13 @@
             </Text>
           {/if}
         </Stack>
-      </Stack>
+      </Morph>
     </Stack>
-  </Topbar>
-  <!-- /// TODO: albums -->
+  </Stack>
+</Topbar>
+<!-- /// TODO: albums -->
 
+<div transition:fade={{ easing: cubicInOut, duration: 300 }}>
   <Tracks
     fixed={fixed || (style === "playlist" ? !!$search : true)}
     tracks={filtered}
@@ -95,4 +119,4 @@
     <PlaybackActions {selected} />
     <slot {selected} />
   </Tracks>
-</Stack>
+</div>

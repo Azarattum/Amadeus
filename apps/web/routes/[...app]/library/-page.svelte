@@ -110,7 +110,7 @@
 </Tabs>
 
 <Projection at="playlist" ephemeral {title}>
-  <Frame>
+  <Frame morph="playlist-{hash}">
     <Collection of={data} style="playlist" on:edit={edit} let:selected>
       <Button air on:click={() => library.purge(selected.map((x) => x.entry))}>
         <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
@@ -119,7 +119,7 @@
   </Frame>
 </Projection>
 <Projection at="artist" ephemeral {title}>
-  <Frame>
+  <Frame morph="artist-{hash}">
     <Collection of={data} style="artist" />
   </Frame>
 </Projection>
