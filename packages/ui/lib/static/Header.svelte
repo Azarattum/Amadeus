@@ -24,7 +24,7 @@
 
 <svelte:element
   this={tag}
-  class={tw`relative box-content line-clamp-3 w-max max-w-full rounded-md
+  class={tw`relative box-content line-clamp-3 max-w-full rounded-md
     ${center ? "text-center" : "text-left"}
     ${sm && "light py-2 text-xs uppercase text-content-200"}
     ${!sm && !lg && !xl && "text-lg"}
