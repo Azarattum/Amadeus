@@ -5,7 +5,6 @@
   "exports": {
     ".": "./component.ts",
     "./action": "./action.ts",
-    "./transition": "./transition.ts",
     "./internal/*": "./internal/*.ts"
   },
   "scripts": {

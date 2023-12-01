@@ -9,6 +9,8 @@ export { default as Spacer } from "./Spacer.svelte";
 export { default as Realm } from "./Realm.svelte";
 export { default as Stack } from "./Stack.svelte";
 export { default as Frame } from "./Frame.svelte";
+export { default as Morph } from "./Morph.svelte";
+export { default as Words } from "./Words.svelte";
 export { default as Tabs } from "./Tabs.svelte";
 export { default as When } from "./When.svelte";
 export { default as Tab } from "./Tab.svelte";

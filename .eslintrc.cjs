@@ -100,7 +100,7 @@ module.exports = {
           "directives",
         ],
         "custom-groups": {
-          preposition: "+(at|of|as|to|for)",
+          preposition: "+(at|of|as|to|for|from)",
           directives: "*:*",
           this: "*this",
         },
