@@ -25,13 +25,13 @@
     return tabs
       .map(
         (x) =>
-          `:where(#${x.toLowerCase()}).target~nav>div{` +
+          `:where(#${x.toLowerCase()}).target~nav>div>a{` +
           `color:hsl(var(--color-content-200));` +
           `pointer-events:auto;` +
           `font-weight:normal;` +
           `}` +
-          `:where(#${x.toLowerCase()}:target~nav)>div[aria-label='${x}'],` +
-          `#${x.toLowerCase()}.target~nav>div[aria-label='${x}']{` +
+          `:where(#${x.toLowerCase()}:target~nav)>div[aria-label='${x}']>a,` +
+          `#${x.toLowerCase()}.target~nav>div[aria-label='${x}']>a{` +
           `color:hsl(var(--color-content));` +
           `pointer-events:none;` +
           `font-weight:bold;` +
@@ -58,7 +58,7 @@
   >
     {#each tabs as tab, i}
       <div
-        class="h-11 origin-top-left overflow-hidden pl-4 text-center text-2xl font-normal text-content-200 underline-offset-4 transition-opacity duration-300 ease-in"
+        class="pointer-events-none h-11 origin-top-left overflow-hidden pl-4 text-center text-2xl font-normal text-content-200 underline-offset-4 transition-opacity duration-300 ease-in"
         aria-label={tab}
         style:transform={transforms[i]}
         bind:this={elements[i]}
@@ -94,7 +94,7 @@
     display: block;
     height: 0;
   }
-  :where(div) {
+  :where(div) > a {
     pointer-events: auto;
   }
 </style>
