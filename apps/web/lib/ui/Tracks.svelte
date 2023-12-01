@@ -1,7 +1,6 @@
 <script lang="ts">
   import {
     type EditEvent,
-    type Classes,
     Swipeable,
     Separator,
     Virtual,
@@ -10,9 +9,7 @@
     Button,
     Panel,
     Stack,
-    When,
     Icon,
-    tw,
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { compare } from "@amadeus-music/util/time";
@@ -27,8 +24,6 @@
     click: Track;
   }>();
 
-  let classes: Classes = "";
-  export { classes as class };
   export let sm = false;
   export let fixed = false;
   export let timeline = false;
@@ -85,81 +80,77 @@
   }
 </script>
 
-<div class={tw`${classes}`}>
-  {#if !sm}
-    <When lg>
-      <div
-        class="sticky top-11 z-10 grid auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-10 backdrop-blur-md"
-        class:pl-24={timeline}
-      >
-        <Header sm>Title</Header>
-        <Header sm>Artist</Header>
-        <Header sm>Album</Header>
-      </div>
-    </When>
-  {/if}
-  <Virtual
-    animate
-    key={(x) => (typeof x === "string" ? x : x?.entry || x?.id)}
-    sortable="tracks"
-    {prerender}
-    {fixed}
-    {items}
-    let:item={track}
-    let:index
-    on:edit
-    on:end
+{#if !sm}
+  <div
+    class="sticky top-11 z-10 hidden auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-10 backdrop-blur-md lg:grid"
+    class:pl-24={timeline}
   >
-    <div
-      class="relative flex [&_hr]:!opacity-100 [*:has(>&):last-of-type_hr]:!opacity-0"
-    >
-      {#if timeline}
-        <div
-          class="visible ml-4 flex h-14 w-0.5 items-center justify-center bg-highlight-100"
-          class:opacity-0={Number.isNaN(index)}
+    <Header sm>Title</Header>
+    <Header sm>Artist</Header>
+    <Header sm>Album</Header>
+  </div>
+{/if}
+<Virtual
+  animate
+  key={(x) => (typeof x === "string" ? x : x?.entry || x?.id)}
+  sortable="tracks"
+  {prerender}
+  {fixed}
+  {items}
+  let:item={track}
+  let:index
+  on:edit
+  on:end
+>
+  <div
+    class="relative flex [&_hr]:!opacity-100 [*:has(>&):last-of-type_hr]:!opacity-0"
+  >
+    {#if timeline}
+      <div
+        class="visible ml-4 flex h-14 w-0.5 items-center justify-center bg-highlight-100"
+        class:opacity-0={Number.isNaN(index)}
+      >
+        {#if typeof track === "string"}
+          <div class="absolute mt-4 h-2 w-2 rounded-full bg-content" />
+        {/if}
+      </div>
+    {/if}
+    {#if typeof track === "string"}
+      <h2
+        class="relative top-2 flex h-14 items-center indent-4 text-lg [*:has(>div>&)]:pointer-events-none"
+        draggable="false"
+      >
+        {track}
+      </h2>
+    {:else if track}
+      {#if $$slots.default || $$slots.action}
+        <Swipeable
+          on:before={() => dispatch("action", track)}
+          on:after={() => select(track)}
         >
-          {#if typeof track === "string"}
-            <div class="absolute mt-4 h-2 w-2 rounded-full bg-content" />
-          {/if}
-        </div>
-      {/if}
-      {#if typeof track === "string"}
-        <h2
-          class="relative top-2 flex h-14 items-center indent-4 text-lg [*:has(>div>&)]:pointer-events-none"
-          draggable="false"
-        >
-          {track}
-        </h2>
-      {:else if track}
-        {#if $$slots.default || $$slots.action}
-          <Swipeable
-            on:before={() => dispatch("action", track)}
-            on:after={() => select(track)}
-          >
-            <slot name="action" slot="before" />
-            <TrackUI
-              selected={check(track, selected)}
-              {track}
-              {sm}
-              on:click={() => (selected.size ? select(track) : play(track))}
-              on:contextmenu={(e) => (e.preventDefault(), select(track))}
-            />
-            <Icon of="list" slot="after" />
-          </Swipeable>
-        {:else}
+          <slot name="action" slot="before" />
           <TrackUI
             selected={check(track, selected)}
             {track}
             {sm}
-            on:click={() => play(track)}
+            on:click={() => (selected.size ? select(track) : play(track))}
+            on:contextmenu={(e) => (e.preventDefault(), select(track))}
           />
-        {/if}
+          <Icon of="list" slot="after" />
+        </Swipeable>
       {:else}
-        <TrackUI {sm} />
+        <TrackUI
+          selected={check(track, selected)}
+          {track}
+          {sm}
+          on:click={() => play(track)}
+        />
       {/if}
-    </div>
-  </Virtual>
-</div>
+    {:else}
+      <TrackUI {sm} />
+    {/if}
+  </div>
+</Virtual>
 
 {#if $$slots.default || $$slots.action}
   <Portal to="panel">

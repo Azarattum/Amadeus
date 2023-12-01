@@ -88,20 +88,24 @@
     </Stack>
   </Tab>
   <Tab name="Timeline" {visible}>
-    <Tracks
-      timeline
-      fixed
-      tracks={$tracks}
-      class="pt-4"
-      on:action={({ detail }) => playback.push([detail], "last")}
-      let:selected
-    >
-      <Icon of="last" slot="action" />
-      <PlaybackActions {selected} />
-      <Button air on:click={() => library.purge(selected.map((x) => x.entry))}>
-        <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
-      </Button>
-    </Tracks>
+    <Stack class="pt-4">
+      <Tracks
+        timeline
+        fixed
+        tracks={$tracks}
+        on:action={({ detail }) => playback.push([detail], "last")}
+        let:selected
+      >
+        <Icon of="last" slot="action" />
+        <PlaybackActions {selected} />
+        <Button
+          air
+          on:click={() => library.purge(selected.map((x) => x.entry))}
+        >
+          <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
+        </Button>
+      </Tracks>
+    </Stack>
   </Tab>
 </Tabs>
 
