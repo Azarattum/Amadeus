@@ -59,25 +59,20 @@
           class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,40rem),1fr))] gap-1"
         >
           {#each devices as { progress, device, track }}
-            <div
-              class="dark:ring-none rounded-lg shadow-sm ring-1 ring-highlight [&>*]:bg-surface-100"
+            <Track
+              sm
+              class="dark:ring-none overflow-hidden rounded-lg bg-surface-100 shadow-sm ring-1 ring-highlight hover:bg-surface-highlight-100 [&>hr]:opacity-0"
+              {progress}
+              {track}
+              on:click={() => playback.replicate(device)}
             >
-              <Track
-                sm
-                {progress}
-                {track}
-                on:click={() => playback.replicate(device)}
+              <Button
+                air
+                on:click={(e) => (playback.clear(device), e.stopPropagation())}
               >
-                <Button
-                  air
-                  on:click={(e) => (
-                    playback.clear(device), e.stopPropagation()
-                  )}
-                >
-                  <Icon of="close" />
-                </Button>
-              </Track>
-            </div>
+                <Icon of="close" />
+              </Button>
+            </Track>
           {/each}
         </div>
       </Stack>

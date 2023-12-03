@@ -1,48 +1,33 @@
 <script lang="ts">
-  import { type Classes, Icon, tw } from "../../component";
-  import type { Either } from "../../internal/types";
-  type $$Props = Either<"xs" | "sm"> & {
-    selected?: "passive" | boolean;
-    href?: string | undefined;
-    interactive?: boolean;
-    class?: Classes;
-    flat?: boolean;
-    flow?: boolean;
-  };
+  import { type Classes, tw } from "../../component";
 
   let classes: Classes = "";
   export { classes as class };
-  export let xs = false;
-  export let sm = false;
-  export let flat = false;
-  export let flow = false;
-  export let interactive = false;
   export let href: string | undefined = undefined;
-  export let selected: "passive" | boolean = false;
+  export let disabled = false;
+  export let selected = false;
+  export let big = false;
+  export let fixed = big;
+
+  $: bg = selected
+    ? tw`bg-surface-highlight-200 
+      ${!disabled && "hover:bg-surface-highlight-300"}`
+    : big
+    ? tw`bg-surface-100 ${!disabled && "hover:bg-surface-highlight-100"}`
+    : tw`bg-surface ${!disabled && "hover:bg-surface-highlight"}`;
+  $: rounded = big ? "rounded-2xl" : "rounded-lg";
+  $: container = big
+    ? tw`gap-y-2 py-4 shadow-[0_0_20px_-4px] shadow-black/20 dark:shadow-none`
+    : tw`gap-y-0.5 py-1`;
+  $: content = tw`contain-inline-size overflow-hidden
+    ${big && "place-items-center"}`;
 </script>
 
 <svelte:element
-  this={interactive ? (href ? "a" : "button") : "article"}
-  class={tw`group relative z-10 flex w-full items-center gap-4 overflow-hidden px-4 outline-2 -outline-offset-2 outline-primary-600 contain-inline-size focus-visible:outline
-  ${
-    interactive &&
-    "cursor-pointer touch-manipulation select-none " +
-      (!flat ? "transition-transform active:scale-95" : "")
-  }
-  ${
-    xs
-      ? "focus-visible:z-50"
-      : sm
-      ? "rounded-lg py-1 focus-visible:z-50"
-      : "rounded-2xl py-4"
-  }
-  ${
-    flat
-      ? "bg-surface"
-      : "bg-surface-100 shadow-[0_0_20px_-4px] shadow-black/20 dark:shadow-none"
-  }
-  ${classes}
-  `}
+  this={disabled ? "article" : href ? "a" : "button"}
+  class={tw`group relative grid w-full touch-manipulation select-none grid-flow-col grid-cols-[auto_1fr_auto] px-4 outline-2 -outline-offset-2 outline-primary-600 contain-inline-size focus-visible:outline [&>div]:row-start-1
+  ${container} ${rounded} ${bg} 
+  ${!disabled && big && "transition-transform active:scale-95"} ${classes}`}
   role={href ? "link" : "button"}
   draggable="false"
   tabindex="0"
@@ -50,55 +35,23 @@
   on:contextmenu
   on:click
 >
+  <div class={tw`col-start-1 self-center ${$$slots.before && "mr-4"}`}>
+    <slot name="before" />
+  </div>
   <div
-    aria-hidden
-    class="pointer-events-none absolute inset-0 -z-10 bg-primary-200/30 opacity-0 transition-opacity"
-    class:opacity-100={selected === true}
-  />
-  <div
-    aria-hidden
-    class="pointer-events-none absolute inset-0 z-0 bg-highlight opacity-0
-    {interactive
-      ? 'group-hover:opacity-30 ' +
-        (flat ? 'dark:group-hover:opacity-50' : 'dark:group-hover:opacity-10')
-      : ''}"
-  />
-  {#if $$slots.before}
-    <div class="z-20 flex items-center">
-      <slot name="before" />
-    </div>
-  {/if}
-  <div
-    class="z-10 grid w-full grid-cols-1 items-baseline overflow-hidden contain-inline-size
-    {sm || xs
-      ? 'justify-start gap-0.5'
-      : 'place-items-center justify-center gap-2'}
-    {(sm || xs) && flow ? 'lg:auto-cols-fr lg:grid-flow-col lg:gap-4' : ''}
-  "
+    class={tw`col-start-2 grid grid-cols-1 items-baseline self-center ${content}
+      ${big ? "gap-2" : "gap-0.5"}
+      ${!fixed && "lg:auto-cols-fr lg:grid-flow-col lg:gap-4"}`}
   >
     <slot />
-    {#if flat && (sm || xs)}
-      <hr
-        aria-hidden
-        class="absolute bottom-0 h-[1px] w-full border-none bg-content/10 group-last-of-type:opacity-0"
-      />
-    {/if}
   </div>
-  <div class="z-20 grid items-center [&>*]:col-start-1 [&>*]:row-start-1">
-    <div
-      class="flex justify-center text-primary-600 opacity-0 transition-opacity"
-      class:opacity-100={selected}
-    >
-      <Icon of="circle" />
-    </div>
-    <div
-      class="flex scale-0 justify-center text-primary-600 transition-transform"
-      class:scale-100={selected === true}
-    >
-      <Icon of="target" />
-    </div>
-    <div class="opacity-0 transition-opacity" class:opacity-100={!selected}>
-      <slot name="after" />
-    </div>
+  <div class={tw`col-start-3 self-center ${$$slots.after && "ml-4"}`}>
+    <slot name="after" />
   </div>
+  {#if !big}
+    <hr
+      class={tw`relative top-1 col-start-2 col-end-4 row-start-1 h-[1px] w-[calc(100%+0.5rem)] self-end border-none group-last-of-type:opacity-0
+    ${selected ? "bg-primary-900/10" : "bg-content/10"}`}
+    />
+  {/if}
 </svelte:element>
