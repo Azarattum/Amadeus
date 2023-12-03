@@ -176,13 +176,17 @@
       <Button to="search-artists" air><Icon of="people" />Artists</Button>
       <Button to="search-albums" air><Icon of="disk" />Albums</Button>
     {/if}
-    {#if page.endsWith("album") && title}
+    {#if page.endsWith("album") && $data?.detail?.title}
       <Separator />
-      <Button primary air><Icon of="disk" /><Text>{title}</Text></Button>
+      <Button primary air>
+        <Icon of="disk" /><Text>{$data.detail.title}</Text>
+      </Button>
     {/if}
-    {#if page.endsWith("artist") && title}
+    {#if page.endsWith("artist") && $data?.detail?.title}
       <Separator />
-      <Button primary air><Icon of="person" /><Text>{title}</Text></Button>
+      <Button primary air>
+        <Icon of="person" /><Text>{$data.detail.title}</Text>
+      </Button>
     {/if}
   </Portal>
 {/if}
