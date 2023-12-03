@@ -3,12 +3,15 @@
 </script>
 
 <script lang="ts">
+  import { type Classes, tw } from "../../internal/tailwind";
   import type { Either } from "../../internal/types";
 
-  type $$Props = { of: string } & Either<
+  type $$Props = { class?: Classes; of: string } & Either<
     "xxl" | "xs" | "sm" | "md" | "lg" | "xl"
   >;
 
+  let classes: Classes = "";
+  export { classes as class };
   export let of: string;
   export let xs = false;
   export let sm = false;
@@ -23,7 +26,7 @@
 
 {#if source}
   <div
-    class="inline-block shrink-0"
+    class={tw`inline-block shrink-0 ${classes}`}
     aria-hidden="true"
     style:height="{size}px"
     style:width="{size}px"
