@@ -5,7 +5,7 @@
 <Stack class="p-4">
   <Swipeable>
     <Icon of="sun" slot="before" />
-    <Card interactive flat sm>
+    <Card fixed>
       <Text accent>Hello</Text>
       <Text secondary sm>Adele</Text>
       <div

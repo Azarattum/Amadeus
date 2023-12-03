@@ -50,6 +50,13 @@ const theme = {
         100: "hsl(var(--color-surface-100) / <alpha-value>)",
         200: "hsl(var(--color-surface-200))",
         300: "hsl(var(--color-surface-300) / <alpha-value>)",
+        highlight: "hsl(var(--color-surface-highlight) / <alpha-value>)",
+        "highlight-100":
+          "hsl(var(--color-surface-highlight-100) / <alpha-value>)",
+        "highlight-200":
+          "hsl(var(--color-surface-highlight-200) / <alpha-value>)",
+        "highlight-300":
+          "hsl(var(--color-surface-highlight-300) / <alpha-value>)",
       },
     },
   },

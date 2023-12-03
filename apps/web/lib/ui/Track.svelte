@@ -1,7 +1,17 @@
 <script lang="ts">
-  import { Image, Text, When, Card, Icon } from "@amadeus-music/ui";
+  import {
+    type Classes,
+    Image,
+    Stack,
+    Text,
+    Card,
+    Icon,
+    tw,
+  } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
 
+  let classes: Classes = "";
+  export { classes as class };
   export let sm = false;
   export let progress = 0;
   export let selected: "passive" | boolean = false;
@@ -11,7 +21,13 @@
   $: secondary = sub.length ? "(" + sub.join("(") : "";
 </script>
 
-<Card interactive flat sm flow={!sm} {selected} on:contextmenu on:click>
+<Card
+  selected={selected === true}
+  class={classes}
+  fixed={sm}
+  on:contextmenu
+  on:click
+>
   <Image
     thumbnail={track ? track.album.thumbnails?.[0] || "" : undefined}
     src={track ? track.album.arts?.[0] || "" : undefined}
@@ -32,13 +48,30 @@
     {track?.artists.map((x) => x.title).join(", ")}
   </Text>
   {#if !sm}
-    <When lg>
-      <Text secondary sm loading={!track}>{track?.album.title}</Text>
-    </When>
+    <Text secondary sm class="hidden lg:inline" loading={!track}>
+      {track?.album.title}
+    </Text>
   {/if}
-  <slot slot="after" />
-  <div
-    class="absolute bottom-0 left-0 h-0.5 w-full origin-left transform-gpu bg-highlight-200 transition-transform duration-1000"
-    style:transform="scaleX({progress})"
-  />
+  <svelte:fragment slot="after">
+    {#if $$slots.default}
+      <slot />
+    {:else}
+      <Stack z class="text-primary-600">
+        <Icon
+          of="circle"
+          class={tw`transition-opacity ${!selected && "opacity-0"}`}
+        />
+        <Icon
+          of="target"
+          class={tw`transition-transform ${selected !== true && "scale-0"}`}
+        />
+      </Stack>
+    {/if}
+  </svelte:fragment>
+  {#if progress}
+    <div
+      class="absolute bottom-0 left-0 h-0.5 w-full origin-left transform-gpu bg-highlight-200 transition-transform duration-1000"
+      style:transform="scaleX({progress})"
+    />
+  {/if}
 </Card>

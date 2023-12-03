@@ -32,7 +32,7 @@
 </script>
 
 <Morph marker key={`${type}-${id}`}>
-  <Card interactive={!!href && !loading} class={classes} {href}>
+  <Card big disabled={loading || !href} class={classes} {href}>
     <Morph marker key="heading-{type}-{id}">
       <Header center {loading}>
         <Morph marker key="title-{type}-{id}">
