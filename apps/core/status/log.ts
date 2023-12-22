@@ -10,7 +10,7 @@ import {
   yellow,
   type Color,
 } from "@amadeus-music/util/color";
-import { WriteStream, createWriteStream } from "node:fs";
+import { type WriteStream, createWriteStream } from "node:fs";
 import { access, mkdir } from "node:fs/promises";
 import type { Context } from "../plugin/types";
 import { log as logged } from "../event/pool";
@@ -49,7 +49,7 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
     ...data.map((x) => {
       if (typeof x !== "string") x = inspect(x);
       return paint(x.replaceAll(reset, reset + color), color || reset);
-    })
+    }),
   );
   save(
     [
@@ -57,7 +57,7 @@ function log(this: Context, { level, separator, color, data, pure }: LogInfo) {
       separator,
       `[${group}]:`,
       ...data.map((x) => (typeof x !== "string" ? inspect(x) : x)),
-    ].join(" ")
+    ].join(" "),
   );
 }
 
