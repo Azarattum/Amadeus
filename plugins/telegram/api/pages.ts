@@ -4,8 +4,8 @@ import {
   editMessageText,
   sendMessage,
 } from "./methods";
+import { async, type Infer, type Page as State } from "@amadeus-music/core";
 import { icon as icons, markdown, pager, escape, menu } from "./markup";
-import type { Infer, Page as State } from "@amadeus-music/core";
 import type { Page as Options } from "../types/reply";
 import { format } from "@amadeus-music/protocol";
 import { sent } from "../types/core";
@@ -36,11 +36,13 @@ function* sendPage(chat: number, { page, icon, message, reset }: Options) {
           ? `${percent}% ${icons.load} *${escape(page)}*`
           : `${icon} *${escape(page)}*`;
 
-      yield* edit(chat, target, {
-        mode: markdown(),
-        [inline ? "caption" : "text"]: header,
-        markup: pager(id, state.number, buttons, nextExists),
-      });
+      yield* async(
+        edit(chat, target, {
+          mode: markdown(),
+          [inline ? "caption" : "text"]: header,
+          markup: pager(id, state.number, buttons, nextExists),
+        }),
+      );
     },
     async close() {
       lastState?.close();

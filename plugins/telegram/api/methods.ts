@@ -1,6 +1,7 @@
 import { chat, file, me, responseOf, sent } from "../types/core";
 import { format, reencode, resize } from "@amadeus-music/core";
 import type { Audio, Message, Text } from "../types/reply";
+import { has } from "@amadeus-music/util/object";
 import { fetch, wrn } from "../plugin";
 import { paramify } from "./reply";
 
@@ -58,7 +59,7 @@ export const setWebhook = (url: URL | string, secret: string) =>
   }).text();
 
 export const setMyCommands = (
-  commands: { command: string; description: string }[]
+  commands: { command: string; description: string }[],
 ) =>
   fetch("setMyCommands", {
     params: { commands: JSON.stringify(commands) },
@@ -67,7 +68,7 @@ export const setMyCommands = (
 export const editMessageCaption = (
   chat: number,
   message: number,
-  params: Message
+  params: Message,
 ) =>
   fetch("editMessageCaption", {
     params: {
@@ -75,12 +76,18 @@ export const editMessageCaption = (
       message_id: message,
       ...paramify(params),
     },
-  }).text();
+  })
+    .request.json()
+    .then(({ error }) => {
+      if (has(error, "error_code") && error["error_code"] !== 400) {
+        wrn("Failed to edit message caption:", error);
+      }
+    });
 
 export const editMessageText = (
   chat: number,
   message: number,
-  params: Message
+  params: Message,
 ) =>
   fetch("editMessageText", {
     params: {
@@ -88,7 +95,13 @@ export const editMessageText = (
       message_id: message,
       ...paramify(params),
     },
-  }).text();
+  })
+    .request.json()
+    .then(({ error }) => {
+      if (has(error, "error_code") && error["error_code"] !== 400) {
+        wrn("Failed to edit message text:", error);
+      }
+    });
 
 export const getFile = (id: string) =>
   fetch("getFile", {
