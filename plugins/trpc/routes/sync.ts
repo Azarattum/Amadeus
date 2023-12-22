@@ -9,13 +9,13 @@ export const sync = router({
   pull: procedure
     .input(object({ version: number(), client: string() }))
     .subscription(({ input, ctx }) =>
-      observable<unknown>(({ next }) => {
+      observable<any>(({ next }) => {
         info(`${ctx.name} subscribed to database changes.`);
         const promise = ctx.persistence().subscribe(["*"], next, input).then();
         return async () => {
           info(`${ctx.name} unsubscribed from database changes.`);
           (await promise)();
         };
-      })
+      }),
     ),
 });
