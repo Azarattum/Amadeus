@@ -13,7 +13,7 @@ export const settings = ({ store }: DB) =>
           await db.schema
             .createTable(collection)
             .ifNotExists()
-            .addColumn("key", "text", (x) => x.primaryKey())
+            .addColumn("key", "text", (x) => x.primaryKey().notNull())
             .addColumn("value", "text")
             .execute();
           await db.schema
@@ -45,5 +45,5 @@ export const settings = ({ store }: DB) =>
           .executeTakeFirstOrThrow()
           .then((x) => x.key);
       },
-    }
+    },
   );
