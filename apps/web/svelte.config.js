@@ -1,4 +1,4 @@
-import { vitePreprocess } from "@sveltejs/kit/vite";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import adapter from "@sveltejs/adapter-static";
 import { platform } from "os";
 
@@ -20,7 +20,8 @@ const config = {
   },
   vitePlugin: {
     inspector: {
-      toggleKeyCombo: platform() === "darwin" ? "meta-shift-x" : "control-shift-x",
+      toggleKeyCombo:
+        platform() === "darwin" ? "meta-shift-x" : "control-shift-x",
     },
   },
 };

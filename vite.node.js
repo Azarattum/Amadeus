@@ -1,8 +1,11 @@
 import externals from "rollup-plugin-node-externals";
 import { defineConfig } from "vite";
 
-export default defineConfig({
-  plugins: [{ ...externals({ deps: false }), enforce: "pre" }],
+export default defineConfig((env) => ({
+  plugins:
+    env.mode !== "test"
+      ? [{ ...externals({ deps: false }), enforce: "pre" }]
+      : [],
   define: { "import.meta.env.SSR": false },
   resolve: {
     conditions: ["import", "module", "node", "default"],
@@ -14,4 +17,4 @@ export default defineConfig({
       reporter: ["lcovonly", "text"],
     },
   },
-});
+}));
