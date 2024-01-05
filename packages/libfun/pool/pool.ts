@@ -35,7 +35,7 @@ const defaults: Options<any> = {
 const then = function (
   this: AsyncGenerator<any>,
   resolve?: Resolve<any[]>,
-  reject?: Reject
+  reject?: Reject,
 ) {
   return take(this).then(resolve, reject);
 };
@@ -52,7 +52,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
     return function (id?: string | null, ...args: Parameters<Pool[T]>): any {
       if (id == null || id == "*") {
         return Array.from(all.values()).map((x) =>
-          x[method](...(args as [any]))
+          x[method](...(args as [any])),
         );
       }
 
@@ -93,7 +93,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
             (x) =>
               x[state].group !== group &&
               (x as any).group !== group &&
-              [...x[state].listeners].every((y) => y.group !== group)
+              [...x[state].listeners].every((y) => y.group !== group),
           );
           if (obsolete) contexts.delete(group);
         }
@@ -135,12 +135,15 @@ function pools(options: Partial<Options<any>> = {}): Pools {
               if (when.interval && time <= now) {
                 const times = Math.max(
                   Math.ceil((now - time) / when.interval),
-                  1
+                  1,
                 );
                 time += times * when.interval;
               }
               if (time >= now) {
-                await cancel(delay(time - now), executor.controller.signal);
+                await cancel(
+                  delay(time - now, executor.controller.signal),
+                  executor.controller.signal,
+                );
                 yield* run();
               }
               if (!when.interval) break;
@@ -173,7 +176,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
         const groups = new Set(
           [...this[state].listeners]
             .map((x) => x.group as string)
-            .filter((x) => x)
+            .filter((x) => x),
         );
         const executor: Executor = {
           controller: derive(globalContext.signal),
@@ -186,7 +189,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
             this[state].pending.delete(executor);
             this[state].executing.delete(executor);
           },
-          { once: true }
+          { once: true },
         );
 
         let running = 0;
@@ -259,7 +262,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
     pool(
       this: Override & { scope?: string },
       id: string,
-      options: Partial<Options<any>> = {}
+      options: Partial<Options<any>> = {},
     ) {
       return pool.bind(this, {
         all,
@@ -282,7 +285,7 @@ function pool<T extends Fn = () => void, R = never>(
     contexts: Map<string, Ctx>;
   },
   id: string,
-  options: Partial<Options<any>> = {}
+  options: Partial<Options<any>> = {},
 ): Pool<T, R> {
   if (this?.scope) id = `${this.scope}/${id}`;
   const existing = global.all.get(id);
@@ -380,13 +383,13 @@ function pool<T extends Fn = () => void, R = never>(
                 task.controller.signal,
                 task.group,
                 catcher(task.group),
-                self.id
+                self.id,
               );
 
               return (async function* () {
                 executor.tasks.add(task);
                 yield* cleanup(generator, task.controller, () =>
-                  executor.tasks.delete(task)
+                  executor.tasks.delete(task),
                 );
               })();
             } catch (error) {
@@ -394,7 +397,7 @@ function pool<T extends Fn = () => void, R = never>(
               return handle(
                 error,
                 catcher(task.group),
-                (async function* () {})()
+                (async function* () {})(),
               );
             }
           });
@@ -421,7 +424,7 @@ function pool<T extends Fn = () => void, R = never>(
         })();
       },
       catcher(),
-      { executor, then }
+      { executor, then },
     );
   }
 

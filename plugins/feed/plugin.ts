@@ -10,6 +10,7 @@ import { name, version } from "./package.json";
 export const {
   ok,
   init,
+  stop,
   info,
   pool,
   users,
@@ -26,7 +27,7 @@ export const {
         recommendations: defaulted(integer(), 50),
         hour: defaulted(number(), 6),
       }),
-      {}
+      {},
     ),
   },
   context: { preferences: { recommendations: 0, time: 0 } },

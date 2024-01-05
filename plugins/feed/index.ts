@@ -1,6 +1,7 @@
 import {
   command,
   info,
+  stop,
   init,
   lookup,
   ok,
@@ -23,6 +24,7 @@ import { delay } from "@amadeus-music/util/async";
 import { minmax } from "@amadeus-music/util/math";
 
 const day = 1000 * 60 * 60 * 24;
+const cleanup = new Set<AbortController>();
 
 init(function* ({ feed }) {
   const date = new Date();
@@ -33,8 +35,15 @@ init(function* ({ feed }) {
 
   // Register recommendations update time for each user
   for (const user of Object.keys(yield* async(users()))) {
-    recommend.schedule({ absolute: +date, interval: day })(user).then();
+    const pool = recommend.schedule({ absolute: +date, interval: day })(user);
+    cleanup.add(pool.executor.controller);
+    pool.then();
   }
+});
+
+stop(function* () {
+  cleanup.forEach((x) => x.abort());
+  cleanup.clear();
 });
 
 command("register", [arg.text])(function* (user) {
@@ -42,7 +51,9 @@ command("register", [arg.text])(function* (user) {
   yield* async(delay(5));
   if (!(yield* async(users()))[user]) return;
   const absolute = this.preferences.time;
-  recommend.schedule({ absolute, interval: day })(user).then();
+  const pool = recommend.schedule({ absolute, interval: day })(user);
+  cleanup.add(pool.executor.controller);
+  pool.then();
 });
 
 recommend(function* (user) {

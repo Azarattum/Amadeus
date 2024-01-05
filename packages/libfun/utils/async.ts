@@ -1,6 +1,12 @@
 import { handle } from "./error";
 
-const delay = (ms = 1) => new Promise((x) => setTimeout(x, ms));
+const delay = (ms = 1, signal?: AbortSignal) =>
+  new Promise((x) => {
+    const timeout = setTimeout(x, ms);
+    signal?.addEventListener("abort", () => clearTimeout(timeout), {
+      once: true,
+    });
+  });
 
 function cancel<T>(promise: T, signal?: AbortSignal) {
   const cancel = new Promise<void>((_, reject) => {
@@ -21,7 +27,7 @@ function cancel<T>(promise: T, signal?: AbortSignal) {
 async function* cleanup<T>(
   generator: AsyncGenerator<T, void>,
   controller: AbortController,
-  cleanup: () => void
+  cleanup: () => void,
 ) {
   const aborted = () => (generator.return(), cleanup());
   if (controller.signal.aborted) return aborted();
@@ -67,7 +73,7 @@ function block<T extends AsyncGenerator, U extends object>(
   condition: () => true | number,
   resolve: () => T,
   catcher?: (error: Error) => void,
-  meta = {} as U
+  meta = {} as U,
 ) {
   try {
     const ready = condition();
@@ -92,12 +98,12 @@ function block<T extends AsyncGenerator, U extends object>(
           handle(error, catcher);
         }
       })(),
-      meta
+      meta,
     );
   } catch (error) {
     return Object.assign(
       handle(error, catcher, (async function* () {})()),
-      meta
+      meta,
     );
   }
 }
