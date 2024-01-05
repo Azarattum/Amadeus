@@ -20,14 +20,14 @@ export const preceding = ({ store }: DB) =>
       .with("update", (qb) =>
         qb
           .selectFrom("playback") // ↓ We need this to trigger updates from `playback` & `devices`
-          .select((qb) => qb.selectFrom("devices").select("id").as("_"))
+          .select((qb) => qb.selectFrom("devices").select("id").as("_")),
       )
       .selectFrom("queue")
       .innerJoin("track", "track.id", "queue.track")
       .where("position", "<", 0)
       .select("queue.id as entry")
       .select(fields)
-      .$castTo<Track & { entry: number }>()
+      .$castTo<Track & { entry: number }>(),
   );
 
 export const upcoming = ({ store }: DB) =>
@@ -41,14 +41,14 @@ export const upcoming = ({ store }: DB) =>
       .with("update", (qb) =>
         qb
           .selectFrom("playback") // ↓ We need this to trigger updates from `playback` & `devices`
-          .select((qb) => qb.selectFrom("devices").select("id").as("_"))
+          .select((qb) => qb.selectFrom("devices").select("id").as("_")),
       )
       .selectFrom("queue")
       .innerJoin("track", "track.id", "queue.track")
       .where("position", ">", 0)
       .select("queue.id as entry")
       .select(fields)
-      .$castTo<Track & { entry: number }>()
+      .$castTo<Track & { entry: number }>(),
   );
 
 export const playback = ({ store }: DB) =>
@@ -73,16 +73,16 @@ export const playback = ({ store }: DB) =>
             album: "track.album",
             artists: "track.artists",
             sources: "track.sources",
-          }).as("track")
+          }).as("track"),
         )
-        .select(sql<boolean>`device = crsql_siteid()`.as("local"))
+        .select(sql<boolean>`device = crsql_site_id()`.as("local"))
         .select(fields)
         .$castTo<Playback>(),
     {
       async push(
         db,
         tracks: Track[],
-        at: "first" | "next" | "last" | "random" | number = "next"
+        at: "first" | "next" | "last" | "random" | number = "next",
       ) {
         if (!tracks.length) return;
         await pushTracks(db, tracks);
@@ -123,7 +123,7 @@ export const playback = ({ store }: DB) =>
                   : i > 0 && direction != 1
                   ? ids[i - 1]
                   : order,
-            }))
+            })),
           )
           .execute();
         if (!~playback && at === "random") {
@@ -245,20 +245,20 @@ export const playback = ({ store }: DB) =>
                         .whereRef("id", "=", "playback.device")
                         .select("devices.playback"),
                     "=",
-                    qb.ref("playback.id")
+                    qb.ref("playback.id"),
                   )
                   .then(id)
                   .else(sql`ABS(RANDOM() % 4294967296)`)
                   .end()
-                  .as("id")
+                  .as("id"),
               )
               .select(sql`${localDevice}`.as("device"))
               .select(["track", "order", "temp"])
-              .where("device", "=", device)
+              .where("device", "=", device),
           )
           .execute();
       },
-    }
+    },
   );
 
 const fields = [

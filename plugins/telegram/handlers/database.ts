@@ -27,7 +27,7 @@ function handleChanges(user: string) {
 }
 
 function parseChanges(changes: any) {
-  let target: string | null = null;
+  let target: string | undefined;
   let consequent = 0;
   let last = "";
 
@@ -35,10 +35,10 @@ function parseChanges(changes: any) {
 
   for (const { table, cid, val, pk } of decode(changes)) {
     if (table !== "library") continue;
-    if (last === pk) consequent++;
+    if (last === pk.toString()) consequent++;
     else consequent = 1;
-    last = pk;
-    if (cid === "playlist") target = val;
+    last = pk.toString();
+    if (cid === "playlist") target = val?.toString();
     // 4 is the number of columns other than the primary one
     if (consequent !== 4 || !target) continue;
     const entry = +(pk || NaN);

@@ -2,7 +2,7 @@ import type { ExpressionBuilder } from "crstore";
 import type { Schema } from "../data/schema";
 import { sql } from "crstore";
 
-const localDevice = sql<Uint8Array>`crsql_siteid()`;
+const localDevice = sql<Uint8Array>`crsql_site_id()`;
 const uuid = () => (Math.random() * 2 ** 32) >>> 0;
 const sanitize = (query: string) =>
   query
@@ -26,7 +26,7 @@ const position = {
             .select(sql`position + 1`.as("position"))
             .where("id", "=", id),
         "=",
-        "position"
+        "position",
       )
       .limit(1),
   next: (qb: ExpressionBuilder<Schema, "playback">) =>
@@ -51,13 +51,15 @@ const position = {
           .select(["id", "position"])
           .$if(!!ids.length, (qb) =>
             qb.unionAll(
-              sql`VALUES ${sql.raw(ids.map((x) => `(${x}, 1)`).join(","))}`
-            )
+              sql<any>`VALUES ${sql.raw(
+                ids.map((x) => `(${x}, 1)`).join(","),
+              )}`,
+            ),
           )
           .unionAll(
-            sql`SELECT null,1 WHERE NOT EXISTS (SELECT 1 FROM queue WHERE position >= 0)`
+            sql<any>`SELECT null,1 WHERE NOT EXISTS (SELECT 1 FROM queue WHERE position >= 0)`,
           )
-          .as("data")
+          .as("data"),
       )
       .select("id")
       .where("position", ">=", 0)

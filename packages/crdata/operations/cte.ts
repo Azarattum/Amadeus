@@ -10,20 +10,20 @@ const source = (qc: QueryCreator<Schema>) =>
         .selectFrom("sources")
         .select(["owner", "source"])
         .orderBy("sources.primary", "desc")
-        .as("ordered")
+        .as("ordered"),
     )
     .select(["owner", (qb) => group(qb, "source").as("sources")])
     .groupBy("owner")
     .$castTo<SourceCTE["source"]>();
 
-const asset = (qc: QueryCreator<Schema>) =>
+const asset = (qc: QueryCreator<Schema & SourceCTE>) =>
   qc
     .selectFrom((qb) =>
       qb
         .selectFrom("assets")
         .select(["owner", "art", "thumbnail"])
         .orderBy("assets.primary", "desc")
-        .as("ordered")
+        .as("ordered"),
     )
     .select([
       "owner",
