@@ -1,5 +1,5 @@
 INSERT OR IGNORE INTO devices (id, playback, direction, infinite, progress, repeat)
-  VALUES (crsql_siteid(), -1, 0, 0, 0, 0);
+  VALUES (crsql_site_id(), -1, 0, 0, 0, 0);
 
 CREATE VIEW IF NOT EXISTS queue AS
   WITH ordered AS

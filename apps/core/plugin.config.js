@@ -35,7 +35,7 @@ export default defineConfig({
       },
     ],
     conditions: ["import", "module", "node", "default"],
-    browserField: false,
+    mainFields: ["module", "jsnext:main", "jsnext"]
   },
   build: {
     lib: {
@@ -47,6 +47,6 @@ export default defineConfig({
       ignoreDynamicRequires: true,
     },
     emptyOutDir: monorepo ? false : true,
-    outDir: build,
+    outDir: build, 
   },
 });
