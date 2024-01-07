@@ -3,8 +3,8 @@ import type { Album, Track, TrackBase } from "@amadeus-music/protocol";
 import { sanitize } from "../operations/utils";
 import type { DB } from "../data/schema";
 
-export const tracks = ({ store }: DB) =>
-  store(
+export const tracks = ({ replicated }: DB) =>
+  replicated(
     (db) =>
       db
         .with("source", source)
@@ -75,5 +75,5 @@ export const tracks = ({ store }: DB) =>
           .$castTo<Track>()
           .executeTakeFirstOrThrow();
       },
-    }
+    },
   );

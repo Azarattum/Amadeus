@@ -13,4 +13,7 @@ export default defineConfig({
   server: {
     fs: { allow: ["."], deny: ["node_modules"] },
   },
+  ssr: {
+    noExternal: "crstore",
+  },
 });

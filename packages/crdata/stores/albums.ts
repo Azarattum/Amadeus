@@ -4,8 +4,8 @@ import { pushAlbums } from "../operations/push";
 import { sanitize } from "../operations/utils";
 import type { DB } from "../data/schema";
 
-export const albums = ({ store }: DB) =>
-  store(
+export const albums = ({ replicated }: DB) =>
+  replicated(
     (db) =>
       db
         .with("source", source)
@@ -48,5 +48,5 @@ export const albums = ({ store }: DB) =>
           .$castTo<Album>()
           .executeTakeFirstOrThrow();
       },
-    }
+    },
   );

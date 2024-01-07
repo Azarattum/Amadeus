@@ -9,7 +9,7 @@ export default defineConfig((env) => ({
   define: { "import.meta.env.SSR": false },
   resolve: {
     conditions: ["import", "module", "node", "default"],
-    browserField: false,
+    mainFields: ["module", "jsnext:main", "jsnext"],
   },
   test: {
     exclude: ["node_modules", "build", ".svelte-kit"],

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "types": ["node", "vite/client"],
     "verbatimModuleSyntax": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "target": "esnext",

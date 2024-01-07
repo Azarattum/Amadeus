@@ -5,9 +5,9 @@ import {
   optional,
   string,
   object,
-  Struct,
   literal,
   type Infer,
+  type Struct,
 } from "@amadeus-music/core";
 
 function toAssets(art?: string, thumbnail?: string) {
@@ -20,7 +20,7 @@ function toArtist(data: Infer<typeof artist> | string) {
 
   const art = data.photo?.length
     ? data.photo?.reduce((a, b) =>
-        a.width * a.height > b.width * b.height ? a : b
+        a.width * a.height > b.width * b.height ? a : b,
       ).url
     : undefined;
   const thumbnail = data.photo?.length
@@ -29,7 +29,7 @@ function toArtist(data: Infer<typeof artist> | string) {
         a.height > 100 &&
         a.width * a.height < b.width * b.height
           ? a
-          : b
+          : b,
       ).url
     : undefined;
 
@@ -45,7 +45,7 @@ function toAlbum(data: Infer<typeof album> | string, artistless = false) {
   const assets = meta ? data.photo || data.thumb : undefined;
   const artists = meta
     ? (data.main_artists?.map(toArtist) || []).concat(
-        data.featured_artists?.map(toArtist) || []
+        data.featured_artists?.map(toArtist) || [],
       )
     : [];
 
@@ -67,19 +67,19 @@ function toTrack(data: Infer<typeof track>) {
     sources: [`vk/${data.owner_id}_${data.id}`],
     title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
     artists: (data.main_artists?.map(toArtist) || []).concat(
-      data.featured_artists?.map(toArtist) || []
+      data.featured_artists?.map(toArtist) || [],
     ),
   };
 }
 
 function convert<T extends "track" | "artist" | "album">(
   data: Infer<typeof track | typeof album | typeof artist>[],
-  type: T
+  type: T,
 ) {
   const map = { track: toTrack, artist: toArtist, album: toAlbum }[type];
   const truthy = <T>(x: T): x is NonNullable<T> => !!x;
   const convert = map as (
-    x: Parameters<typeof map>[0]
+    x: Parameters<typeof map>[0],
   ) => ReturnType<typeof map>;
   return data.map((x) => convert(x)).filter(truthy);
 }
@@ -93,8 +93,8 @@ const artist = type({
         url: string(),
         width: number(),
         height: number(),
-      })
-    )
+      }),
+    ),
   ),
 });
 
@@ -110,13 +110,13 @@ const album = type({
     type({
       photo_135: string(),
       photo_1200: string(),
-    })
+    }),
   ),
   thumb: optional(
     type({
       photo_135: string(),
       photo_1200: string(),
-    })
+    }),
   ),
 });
 
@@ -141,7 +141,7 @@ const lyrics = type({
         begin: number(),
         end: number(),
         line: optional(string()),
-      })
+      }),
     ),
   }),
 });

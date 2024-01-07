@@ -8,8 +8,9 @@ import { library } from "../stores/library";
 import { type DB, schema } from "./schema";
 import { tracks } from "../stores/tracks";
 import { albums } from "../stores/albums";
-import { database, sql } from "crstore";
+import { database } from "crstore/svelte";
 import { feed } from "../stores/feed";
+import { sql } from "crstore";
 
 const connections = new Map<string, Connection>();
 
@@ -32,7 +33,7 @@ function connect(options: Options) {
   if (!connections.has(options.name)) {
     const db = database(
       options.local ? (nocrr(schema) as typeof schema) : schema,
-      options
+      options,
     ) as any as DB;
     connections.set(options.name, { ...db, ...stores(db) });
     const files = import.meta.glob("../sql/*.sql", { eager: true, as: "raw" });
@@ -62,7 +63,7 @@ function nocrr<T>(schema: T) {
       Object.entries((schema as any).schema).map(([key, value]) => [
         key,
         { ...(value as object), crr: false },
-      ])
+      ]),
     ),
   } as T;
 }

@@ -3,8 +3,8 @@ import { source, asset } from "../operations/cte";
 import type { DB } from "../data/schema";
 import { sql } from "crstore";
 
-export const resources = ({ store }: DB) =>
-  store(
+export const resources = ({ replicated }: DB) =>
+  replicated(
     (db) =>
       db
         .with("source", source)
@@ -25,7 +25,7 @@ export const resources = ({ store }: DB) =>
           .updateTable(table)
           .set({ primary: sql`${sql.ref(type)} = ${resource}` })
           .where("owner", "=", (qb) =>
-            qb.selectFrom(table).where(type, "=", resource).select("owner")
+            qb.selectFrom(table).where(type, "=", resource).select("owner"),
           )
           .execute();
       },
@@ -46,5 +46,5 @@ export const resources = ({ store }: DB) =>
           .$castTo<MediaBase>()
           .executeTakeFirstOrThrow();
       },
-    }
+    },
   );

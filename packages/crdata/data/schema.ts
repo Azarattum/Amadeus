@@ -16,7 +16,8 @@ import {
   artistBase,
   playlistBase,
 } from "@amadeus-music/protocol";
-import { primary, crr, ordered, index, type Database } from "crstore";
+import { primary, crr, ordered, index } from "crstore";
+import { type SvelteDatabase } from "crstore/svelte";
 import type { Struct } from "superstruct";
 
 const id = integer;
@@ -126,7 +127,7 @@ type Views = {
 };
 
 export type Schema = Infer<typeof schema> & Views;
-export type DB = Database<Schema>;
+export type DB = SvelteDatabase<Schema>;
 export const schema = object({
   tracks,
   albums,

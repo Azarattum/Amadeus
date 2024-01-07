@@ -3,8 +3,8 @@ import type { Feed, Playlist } from "@amadeus-music/protocol";
 import { groupJSON, json } from "crstore";
 import type { DB } from "../data/schema";
 
-export const feed = ({ store }: DB) =>
-  store(
+export const feed = ({ replicated }: DB) =>
+  replicated(
     (db) =>
       db
         .with("source", source)
@@ -16,7 +16,7 @@ export const feed = ({ store }: DB) =>
             .innerJoin("library", "library.track", "tracks.id")
             .select(["library.playlist", "library.id as entry"])
             .orderBy("library.order")
-            .orderBy("library.id")
+            .orderBy("library.id"),
         )
         .selectFrom("track")
         .fullJoin("playlists", "playlists.id", "track.playlist")
@@ -32,7 +32,7 @@ export const feed = ({ store }: DB) =>
               size: qb.fn.count<number>("track.duration"),
               duration: qb.fn.coalesce(
                 qb.fn.sum<number>("track.duration"),
-                qb.val(0)
+                qb.val(0),
               ),
               tracks: groupJSON(qb, {
                 id: "track.id",
@@ -62,5 +62,5 @@ export const feed = ({ store }: DB) =>
           .execute()
           .then((x) => x.map((y) => y.id as number));
       },
-    }
+    },
   );

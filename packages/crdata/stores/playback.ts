@@ -9,8 +9,8 @@ import { pushTracks } from "../operations/push";
 import type { DB } from "../data/schema";
 import { json, sql } from "crstore";
 
-export const preceding = ({ store }: DB) =>
-  store((db) =>
+export const preceding = ({ replicated }: DB) =>
+  replicated((db) =>
     db
       .with("source", source)
       .with("asset", asset)
@@ -30,8 +30,8 @@ export const preceding = ({ store }: DB) =>
       .$castTo<Track & { entry: number }>(),
   );
 
-export const upcoming = ({ store }: DB) =>
-  store((db) =>
+export const upcoming = ({ replicated }: DB) =>
+  replicated((db) =>
     db
       .with("source", source)
       .with("asset", asset)
@@ -51,8 +51,8 @@ export const upcoming = ({ store }: DB) =>
       .$castTo<Track & { entry: number }>(),
   );
 
-export const playback = ({ store }: DB) =>
-  store(
+export const playback = ({ replicated }: DB) =>
+  replicated(
     (db) =>
       db
         .with("source", source)
@@ -98,17 +98,17 @@ export const playback = ({ store }: DB) =>
             ? Number.isInteger(at)
               ? at
               : at === "first"
-              ? position.first
-              : at === "next"
-              ? position.next
-              : position.last
+                ? position.first
+                : at === "next"
+                  ? position.next
+                  : position.last
             : Number.isInteger(at)
-            ? position.shift(+at)
-            : at === "first"
-            ? position.last
-            : at === "next"
-            ? position.before
-            : position.first;
+              ? position.shift(+at)
+              : at === "first"
+                ? position.last
+                : at === "next"
+                  ? position.before
+                  : position.first;
 
         await db
           .insertInto("playback_fractindex" as any)
@@ -121,8 +121,8 @@ export const playback = ({ store }: DB) =>
                 at === "random"
                   ? position.random(ids.slice(0, i))
                   : i > 0 && direction != 1
-                  ? ids[i - 1]
-                  : order,
+                    ? ids[i - 1]
+                    : order,
             })),
           )
           .execute();
@@ -173,8 +173,8 @@ export const playback = ({ store }: DB) =>
           direction != 1
             ? after
             : after != null
-            ? position.shift(after)
-            : position.last;
+              ? position.shift(after)
+              : position.last;
 
         await db
           .updateTable("playback_fractindex" as any)

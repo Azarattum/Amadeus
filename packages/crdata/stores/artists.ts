@@ -5,8 +5,8 @@ import { sanitize } from "../operations/utils";
 import { json, groupJSON } from "crstore";
 import type { DB } from "../data/schema";
 
-export const artists = ({ store }: DB) =>
-  store(
+export const artists = ({ replicated }: DB) =>
+  replicated(
     (db) =>
       db
         .with("source", source)
@@ -31,7 +31,7 @@ export const artists = ({ store }: DB) =>
               size: qb.fn.count<number>("track.duration"),
               duration: qb.fn.coalesce(
                 qb.fn.sum<number>("track.duration"),
-                qb.val(0)
+                qb.val(0),
               ),
               tracks: groupJSON(qb, {
                 id: "track.id",
@@ -96,5 +96,5 @@ export const artists = ({ store }: DB) =>
           .$castTo<Artist>()
           .executeTakeFirstOrThrow();
       },
-    }
+    },
   );

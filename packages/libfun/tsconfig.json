@@ -3,7 +3,7 @@
     "allowSyntheticDefaultImports": true,
     "types": ["node", "vite/client"],
     "verbatimModuleSyntax": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "module": "esnext",

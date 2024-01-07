@@ -5,8 +5,8 @@ import { uuid } from "../operations/utils";
 import type { DB } from "../data/schema";
 import { APPEND, sql } from "crstore";
 
-export const library = ({ store }: DB) =>
-  store((db) => db.selectFrom("library").selectAll(), {
+export const library = ({ replicated }: DB) =>
+  replicated((db) => db.selectFrom("library").selectAll(), {
     async push(db, tracks: Track[], playlist?: number) {
       if (!tracks.length) return;
       await pushTracks(db, tracks);
@@ -21,7 +21,7 @@ export const library = ({ store }: DB) =>
             date: ~~(Date.now() / 1000),
             track: id,
             playlist,
-          }))
+          })),
         )
         .execute();
     },
@@ -34,7 +34,7 @@ export const library = ({ store }: DB) =>
     },
     async purge(db, entries: number[]) {
       const promises = entries.map((entry) =>
-        db.deleteFrom("library").where("id", "=", entry).execute()
+        db.deleteFrom("library").where("id", "=", entry).execute(),
       );
       await Promise.all(promises);
     },

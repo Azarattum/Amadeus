@@ -1,8 +1,8 @@
 import type { DB } from "../data/schema";
 import { sql } from "crstore";
 
-export const settings = ({ store }: DB) =>
-  store(
+export const settings = ({ replicated }: DB) =>
+  replicated(
     (db) =>
       db
         .selectFrom("settings")
