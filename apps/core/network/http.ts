@@ -1,7 +1,7 @@
+import { bright, reset } from "@amadeus-music/util/color";
 import { createServer, type Server } from "node:http";
 import { init, stop } from "../event/pool";
 import { err, info } from "../status/log";
-import { bright, reset } from "../app";
 import type { Socket } from "net";
 import { async } from "libfun";
 
