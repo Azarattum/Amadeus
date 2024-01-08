@@ -41,7 +41,15 @@ function parseChanges(changes: any) {
     if (cid === "playlist") target = val?.toString();
     // 4 is the number of columns other than the primary one
     if (consequent !== 4 || !target) continue;
-    const entry = +(pk || NaN);
+
+    // Check that pk is a single integer column
+    if (pk[0] !== 1 || (pk[1] & 0b111) !== 1) continue;
+    // Decode playlist entry number from the pk
+    const size = (pk[1] >> 3) & 0xff;
+    const buffer = new Uint8Array(8);
+    buffer.set(pk.slice(-size), 8 - size);
+    const entry = Number(new DataView(buffer.buffer).getBigUint64(0));
+
     if (!Number.isInteger(entry)) continue;
     if (!library.has(target)) library.set(target, new Set());
     library.get(target)?.add(entry);
