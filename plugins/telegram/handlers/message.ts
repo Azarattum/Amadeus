@@ -4,6 +4,7 @@ import {
   message,
   search,
   lookup,
+  scrape,
   voice,
   fetch,
   info,
@@ -28,6 +29,20 @@ message(function* (text) {
   const [id] = yield* this.reply({ page: text, icon: icon.search });
   const page = pages.get(id);
   if (!page) return;
+
+  if (text.match(/^https?:\/\//)) {
+    const reply = this.reply.bind(this);
+    yield* map(scrape(text, 8), function* (state) {
+      if (state.completed && state.items.length === 1) {
+        page.close();
+        state.close();
+        yield* reply(state.items);
+      } else {
+        yield* page.update(state);
+      }
+    });
+    return;
+  }
 
   this.signal.addEventListener("abort", page.close, { once: true });
   yield* map(search("track", text, 8), function* (state) {

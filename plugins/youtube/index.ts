@@ -5,6 +5,7 @@ import {
   init,
   lookup,
   relate,
+  scrape,
   search,
   transcribe,
 } from "./plugin";
@@ -15,7 +16,7 @@ import { convert } from "./types";
 init(function* () {
   const loadMessage = setTimeout(
     () => info("Retrieving player script..."),
-    1000
+    1000,
   );
 
   const youtube = yield* async(Innertube.create());
@@ -46,7 +47,7 @@ desource(function* (track) {
     this.youtube.music
       .getInfo(id)
       .then((x) => x.chooseFormat({ type: "audio", quality: "best" }))
-      .then((x) => x.decipher(this.youtube.player))
+      .then((x) => x.decipher(this.youtube.player)),
   );
 });
 
@@ -65,12 +66,12 @@ expand(function* (type, what, _) {
       : this.youtube.music
           .getAlbum(id)
           .then((x) => x.url?.match(/list=([^&]+)/)?.[1])
-          .catch(() => undefined)
+          .catch(() => undefined),
   );
   if (!playlist) return;
 
   let result = yield* async(
-    this.youtube.music.getPlaylist(playlist).catch(() => undefined)
+    this.youtube.music.getPlaylist(playlist).catch(() => undefined),
   );
   while (result) {
     yield* convert(result.items as any, "track");
@@ -90,8 +91,8 @@ relate(function* (type, to, _) {
           x.sections
             .find((x: any) => x.header?.title?.text === "Fans might also like")
             ?.contents.filter((x) => x.type === "MusicTwoRowItem"),
-        () => undefined
-      )
+        () => undefined,
+      ),
     );
     return yield* convert(artists as any, "artist");
   }
@@ -101,9 +102,17 @@ relate(function* (type, to, _) {
       .getRelated(id)
       .then((x) => x.find((x) => x.type === "MusicCarouselShelf"))
       .then((x: any) => x?.contents)
-      .catch(() => undefined)
+      .catch(() => undefined),
   );
   yield* convert(items, type);
+});
+
+scrape(function* (url) {
+  const id = url.match(/youtu(be.com|.be)\/(watch\?v=)?([a-zA-Z0-9_-]+)/)?.[3];
+  if (!id) return;
+
+  const info = yield* async(this.youtube.music.getInfo(id));
+  yield* convert([info["basic_info"]], "track");
 });
 
 transcribe(function* (track) {
@@ -114,14 +123,14 @@ transcribe(function* (track) {
     this.youtube.music
       .getLyrics(id)
       .then((x) => x?.description.toString())
-      .catch(() => undefined)
+      .catch(() => undefined),
   );
   if (lyrics) yield lyrics;
 });
 
 function* identify(
   data: { sources?: string[]; title?: string },
-  type: "track" | "artist" | "album"
+  type: "track" | "artist" | "album",
 ) {
   return (
     data.sources?.find((x) => x.startsWith("youtube/"))?.slice(8) ||

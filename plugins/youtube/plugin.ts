@@ -8,6 +8,7 @@ export const {
   search,
   relate,
   expand,
+  scrape,
   lookup,
   desource,
   transcribe,

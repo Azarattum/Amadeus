@@ -23,6 +23,7 @@ export const {
   fetch,
   users,
   search,
+  scrape,
   relate,
   expand,
   lookup,
@@ -40,7 +41,7 @@ export const {
         token: defaulted(string(), ""),
         webhook: defaulted(string(), ""),
       }),
-      {}
+      {},
     ),
   },
   settings: {
@@ -70,11 +71,11 @@ const command = pool<(command: string, replied?: number) => void>("command");
 const changed = pool<(entries: number[]) => void>("changed");
 const callback =
   pool<(request: Infer<typeof query>, message: number, chat: number) => void>(
-    "callback"
+    "callback",
   );
 
 update.catch((error: any) =>
-  wrn(error.cause?.message || error.cause || error.message)
+  wrn(error.cause?.message || error.cause || error.message),
 );
 
 export {

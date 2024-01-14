@@ -43,10 +43,15 @@ const relate = pool<
   | ((type: "artist", to: ArtistInfo, page: number) => Aggregated<ArtistInfo>)
 >("relate", { transform: aggregate, timeout, rate });
 
+const scrape = pool<(url: string, page: number) => Aggregated<TrackInfo>>(
+  "scrape",
+  { transform: aggregate, timeout },
+);
+
 const recognize = pool<
   (
     stream: () => ReadableStream<Uint8Array>,
-    page: number
+    page: number,
   ) => Aggregated<TrackInfo>
 >("recognize", { transform: aggregate, timeout });
 
@@ -68,6 +73,7 @@ export {
   search,
   relate,
   expand,
+  scrape,
   desource,
   recognize,
   transcribe,
