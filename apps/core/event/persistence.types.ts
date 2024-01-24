@@ -49,7 +49,7 @@ type Database = DeepPartial<{
   tracks: {
     edit(
       id: number,
-      track: Partial<TrackBase & { album: AlbumBase }>
+      track: Partial<TrackBase & { album: AlbumBase }>,
     ): Promise<void>;
     search(query: string, limit?: number, offset?: number): Promise<Track[]>;
     get(id: number): Promise<Track>;
@@ -82,11 +82,11 @@ type Database = DeepPartial<{
     prioritize(type: "art" | "source", resource: string): Promise<void>;
     get(owner: number): Promise<MediaBase>;
   };
-  merge(changes: any[]): Promise<void>;
+  merge(changes: string): Promise<void>;
   subscribe(
     tables: string[],
-    callback: (changes: any[], sender?: string) => any,
-    options?: { client: string; version: number }
+    callback: (changes: string, sender?: string) => any,
+    options?: { client: string; version: number },
   ): () => void;
 }>;
 

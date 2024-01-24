@@ -9,7 +9,7 @@ changed(function* (entries) {
 
 function handleChanges(user: string) {
   const storage = persistence(user);
-  return async (changes: any[]) => {
+  return async (changes: string) => {
     const parsed = parseChanges(changes);
     const id = await storage.settings.extract("name", "settings");
     const name = `${bright}${id}${reset}`;
@@ -26,7 +26,7 @@ function handleChanges(user: string) {
   };
 }
 
-function parseChanges(changes: any) {
+function parseChanges(changes: string) {
   let target: string | undefined;
   let consequent = 0;
   let last = "";
