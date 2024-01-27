@@ -21,13 +21,14 @@
 
 <script lang="ts">
   export let animation: KeyframeAnimationOptions & { duration?: number } = {};
+  export let key: string | undefined = undefined;
   export let container = false;
-  export let key = "";
   export let marker = !key;
   $: config = {
     fill: "forwards",
     easing: "ease",
     duration: 300,
+    id: "morph",
     ...animation,
     ...(marker ? { duration: 0, delay: 0 } : {}),
   } as const;
@@ -90,7 +91,7 @@
   }
 
   async function morph(event: Event & { currentTarget: Element }) {
-    if (marker) return;
+    if (marker || !key) return;
     const targets = opponent(event.currentTarget, key)?.children;
     const children = [...event.currentTarget.children];
     const backwards = event.type === "introstart";
@@ -99,11 +100,11 @@
 
     children.forEach((element, i) => {
       // Reverse already running animations
-      if (element.getAnimations().findLast((x) => (x.reverse(), x))) {
+      if (element.getAnimations().findLast(reverse)) {
         if (!container) return;
-        return [...element.children].forEach((child) => {
-          child.getAnimations().forEach((x) => x.reverse());
-        });
+        return [...element.children].forEach((child) =>
+          child.getAnimations().forEach(reverse),
+        );
       }
 
       const target = targets?.item(i);
@@ -132,18 +133,28 @@
     });
   }
 
+  function reverse(animation: Animation) {
+    if (animation.id !== config.id) return false;
+    animation.reverse();
+    return true;
+  }
+
   function enable(_: unknown) {
     return { duration: config.duration, delay: config.delay };
   }
 </script>
 
-<div
-  class="contents"
-  transition:enable|global
-  on:outrostart={morph}
-  on:introstart={morph}
-  on:introend={end}
-  use:mark={key}
->
+{#if key}
+  <div
+    class="contents"
+    transition:enable|global
+    on:outrostart={morph}
+    on:introstart={morph}
+    on:introend={end}
+    use:mark={key}
+  >
+    <slot />
+  </div>
+{:else}
   <slot />
-</div>
+{/if}

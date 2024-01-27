@@ -3,6 +3,7 @@
   import { type Classes, tw } from "../../internal/tailwind";
   import { createEventDispatcher } from "svelte";
 
+  export let disabled = false;
   let classes: Classes = "";
   export { classes as class };
 
@@ -27,30 +28,34 @@
   }
 </script>
 
-<div
-  class={tw`grid grow snap-x snap-mandatory grid-cols-[auto_100%_auto] overflow-x-scroll rounded-lg transition-colors duration-300 ease-linear will-change-transform ${classes}`}
-  on:wheel|passive={({ deltaX }) => (wheel = deltaX)}
-  class:bg-primary-600={active[0] || active[1]}
-  on:touchend={finish}
->
+{#if disabled}
+  <slot />
+{:else}
   <div
-    class="flex items-center px-4 text-content-200 transition-colors contain-paint"
-    on:intersect={intersected(0)}
-    class:text-white={active[0]}
-    use:intersection={0.5}
+    class={tw`grid grow snap-x snap-mandatory grid-cols-[auto_100%_auto] overflow-x-scroll rounded-lg transition-colors duration-300 ease-linear will-change-transform ${classes}`}
+    on:wheel|passive={({ deltaX }) => (wheel = deltaX)}
+    class:bg-primary-600={active[0] || active[1]}
+    on:touchend={finish}
   >
-    <slot name="before" />
+    <div
+      class="flex items-center px-4 text-content-200 transition-colors contain-paint"
+      on:intersect={intersected(0)}
+      class:text-white={active[0]}
+      use:intersection={0.5}
+    >
+      <slot name="before" />
+    </div>
+    <div class="snap-center snap-always"><slot /></div>
+    <div
+      class="flex items-center px-4 text-content-200 transition-colors contain-paint"
+      on:intersect={intersected(1)}
+      class:text-white={active[1]}
+      use:intersection={0.5}
+    >
+      <slot name="after" />
+    </div>
   </div>
-  <div class="snap-center snap-always"><slot /></div>
-  <div
-    class="flex items-center px-4 text-content-200 transition-colors contain-paint"
-    on:intersect={intersected(1)}
-    class:text-white={active[1]}
-    use:intersection={0.5}
-  >
-    <slot name="after" />
-  </div>
-</div>
+{/if}
 
 <style>
   .grid::-webkit-scrollbar {
