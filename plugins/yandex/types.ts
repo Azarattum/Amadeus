@@ -8,6 +8,7 @@ import {
   union,
   type,
 } from "@amadeus-music/core";
+import { nully } from "@amadeus-music/util/string";
 
 function toAssets(x?: string) {
   if (!x) return { thumbnails: [], arts: [] };
@@ -39,7 +40,7 @@ function toAlbum(data: Infer<typeof album> | string, artistless = false) {
 
 function toTrack(data: Infer<typeof track>) {
   return {
-    title: data.title + (data.version ? ` (${data.version})` : ""),
+    title: data.title + (nully` (${data.version})` || ""),
     album: toAlbum(data.albums[0] || data.title, true),
     artists: data.artists.map(toArtist),
     duration: data.durationMs / 1000,

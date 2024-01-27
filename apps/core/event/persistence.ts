@@ -8,6 +8,7 @@ import type {
 import type { Resolve, Reject } from "libfun/monad/monad.types";
 import { persistence as database, users as load } from "./pool";
 import type { Handler } from "libfun/pool/pool.types";
+import { nully } from "@amadeus-music/util/string";
 import { all } from "@amadeus-music/util/async";
 import { merge } from "@amadeus-music/protocol";
 import type { Context } from "../plugin/types";
@@ -57,13 +58,13 @@ function persistence(this: Context, arg?: Handler<() => Database> | string) {
   const connect = () => async(database.bind(this)(arg).then());
 
   function resolve(scope: string, method?: string) {
-    const target = (method ? `${scope}.${method}` : scope) as Method;
+    const target = (nully`${scope}.${method}` || scope) as Method;
     function* generate(...args: any[]) {
       const dbs = yield* connect();
       const fns = dbs
-        .map<(..._: any[]) => Promise<unknown>>((x: any) =>
-          method ? x[scope]?.[method] : x[scope],
-        )
+        .map<
+          (..._: any[]) => Promise<unknown>
+        >((x: any) => (method ? x[scope]?.[method] : x[scope]))
         .filter((x) => x);
       if (!fns.length) throw new Error(`${target} is not implemented!`);
       if (scope === "settings") args.push(group);

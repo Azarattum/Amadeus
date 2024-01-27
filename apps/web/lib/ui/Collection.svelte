@@ -26,25 +26,22 @@
 
   export let fixed = false;
   export let style: CollectionType;
+  export let href: string | undefined = undefined;
   export let of: Collection | undefined = undefined;
   export let tracks: Track[] | undefined = undefined;
 
   const unique = <T,>(x: T[]) => [...new Set(x)];
 
   $: filtered = (tracks || of?.collection?.tracks)?.filter(match($search));
-  $: href =
-    of?.collection && style !== "playlist"
-      ? `/explore/${style}#${of?.id}`
-      : undefined;
   $: details = of
     ? unique(
         "artists" in of
           ? of.artists.map((x) => x.title)
           : "sources" in of
-          ? of?.sources
-              .map((x: string) => capitalize(x.split("/")[0]))
-              .filter((x): x is string => !!x)
-          : [],
+            ? of?.sources
+                .map((x: string) => capitalize(x.split("/")[0]))
+                .filter((x): x is string => !!x)
+            : [],
       ).join(", ")
     : "Loading";
 </script>

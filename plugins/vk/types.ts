@@ -9,6 +9,7 @@ import {
   array,
   type,
 } from "@amadeus-music/core";
+import { nully } from "@amadeus-music/util/string";
 
 function toAssets(art?: string, thumbnail?: string) {
   if (!art) return { thumbnails: [], arts: [] };
@@ -65,7 +66,7 @@ function toTrack(data: Infer<typeof track>) {
     artists: (data.main_artists?.map(toArtist) || []).concat(
       data.featured_artists?.map(toArtist) || [],
     ),
-    title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
+    title: data.title + (nully` (${data.subtitle})` || ""),
     album: toAlbum(data.album || data.title, true),
     sources: [`vk/${data.owner_id}_${data.id}`],
     duration: data.duration,

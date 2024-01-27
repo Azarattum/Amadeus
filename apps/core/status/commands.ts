@@ -6,8 +6,8 @@ import {
   green,
   reset,
 } from "@amadeus-music/util/color";
+import { capitalize, dedupe, nully } from "@amadeus-music/util/string";
 import { format as formatPlugin, plugins } from "../plugin/loader";
-import { capitalize, dedupe } from "@amadeus-music/util/string";
 import { persistence, users } from "../event/persistence";
 import { pretty } from "@amadeus-music/util/object";
 import { register, settings } from "../data/config";
@@ -73,9 +73,9 @@ command("status", ["all", arg.plugin, arg.pool])((filter) => {
   const status = pools.status();
 
   filter = filter?.toLowerCase();
-  let message = filter
-    ? `Status report for ${bright}${filter}${reset}:\n`
-    : "Status report:\n";
+  let message =
+    nully`Status report for ${bright}${filter}${reset}:\n` ||
+    "Status report:\n";
 
   const filtered = status.filter((x) => {
     if (filter === "all") return true;

@@ -18,6 +18,7 @@
   import { debounce } from "@amadeus-music/util/async";
   import { streams, search, expand } from "$lib/trpc";
   import Collection from "$lib/ui/Collection.svelte";
+  import { nully } from "@amadeus-music/util/string";
   import { multistream, stream } from "$lib/stream";
   import { navigating } from "$app/stores";
   import Overview from "./overview.svelte";
@@ -76,19 +77,17 @@
     ? page.endsWith("/artist")
       ? "artist"
       : page.endsWith("/album")
-      ? "album"
-      : kind
+        ? "album"
+        : kind
     : kind;
   $: data =
     kind === "album"
       ? stream(expand.album, streams.next)
       : kind === "artist"
-      ? stream(expand.artist, streams.next)
-      : undefined;
+        ? stream(expand.artist, streams.next)
+        : undefined;
   $: data?.update({ page: estimate, id });
-  $: title = $data?.detail?.title
-    ? `${$data?.detail?.title} - Amadeus`
-    : "Amadeus";
+  $: title = nully`${$data?.detail?.title} - Amadeus` || "Amadeus";
 </script>
 
 <Frame>
