@@ -96,6 +96,7 @@
     const children = [...event.currentTarget.children];
     const backwards = event.type === "introstart";
     const tasks: [Element, Keyframe[]][] = [];
+    children.forEach((x) => backwards && x.classList.add("opacity-0"));
     await new Promise(requestAnimationFrame);
 
     children.forEach((element, i) => {
@@ -119,7 +120,9 @@
       tasks.push([element, frames]);
     });
 
+    await new Promise(requestAnimationFrame);
     tasks.forEach(([element, frames]) => element.animate(frames, config));
+    children.forEach((x) => backwards && x.classList.remove("opacity-0"));
   }
 
   function end({ currentTarget }: Event & { currentTarget: Element }) {
