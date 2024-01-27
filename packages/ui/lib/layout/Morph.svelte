@@ -23,6 +23,7 @@
   export let animation: KeyframeAnimationOptions & { duration?: number } = {};
   export let key: string | undefined = undefined;
   export let container = false;
+  export let loosely = false;
   export let marker = !key;
   $: config = {
     fill: "forwards",
@@ -40,16 +41,31 @@
 
     const fromRect = from.getBoundingClientRect();
     const toRect = to.getBoundingClientRect();
-    const fromStyle = getComputedStyle(from);
-    const toStyle = getComputedStyle(to);
 
     const dh = toRect.height / fromRect.height;
     const dw = toRect.width / fromRect.width;
     const dx = toRect.left - fromRect.left;
     const dy = toRect.top - fromRect.top;
 
-    const roundedFrom = Number.parseFloat(fromStyle.borderRadius) || 0;
-    const roundedTo = Number.parseFloat(toStyle.borderRadius) || 0;
+    if (loosely) {
+      const transformOrigin = `${dx + toRect.width / 2}px ${dy + toRect.height / 2}px`;
+      const from = { ...base, transformOrigin };
+      const to = { ...from, transform: `scale3d(0.7,0.7,1)`, opacity: "0" };
+      return { frames: backwards ? [to, from] : [from, to] };
+    }
+
+    const fromStyle = getComputedStyle(from);
+    const toStyle = getComputedStyle(to);
+
+    const roundedKeys = [
+      "borderTopLeftRadius",
+      "borderTopRightRadius",
+      "borderBottomLeftRadius",
+      "borderBottomRightRadius",
+    ] as const satisfies (keyof CSSStyleDeclaration)[];
+
+    const roundedFrom = roundedKeys.map((x) => parseFloat(fromStyle[x]) || 0);
+    const roundedTo = roundedKeys.map((x) => parseFloat(toStyle[x]) || 0);
     const bgFrom = fromStyle.backgroundColor;
     const bgTo = toStyle.backgroundColor;
     const colorFrom = fromStyle.color;
@@ -57,10 +73,7 @@
 
     const style: Keyframe = { ...base };
     if (dx || dy || dw !== 1 || dh !== 1) {
-      style.transform = `translate3d(${dx}px,${dy}px,0) scale(${dw},${dh})`;
-    }
-    if (roundedFrom !== roundedTo) {
-      style.borderRadius = `${roundedTo / dw}px / ${roundedTo / dh}px`;
+      style.transform = `translate3d(${dx}px,${dy}px,0) scale3d(${dw},${dh},1)`;
     }
     if (bgFrom !== bgTo) {
       style.backgroundColor = bgTo;
@@ -68,6 +81,11 @@
     if (colorFrom !== colorTo) {
       style.color = colorTo;
     }
+    roundedKeys.forEach((key, i) => {
+      if (roundedFrom[i] !== roundedTo[i]) {
+        style[key] = `${roundedTo[i] / dw}px ${roundedTo[i] / dh}px`;
+      }
+    });
 
     return {
       inverse: (child: Element) => {
@@ -80,7 +98,7 @@
           if (!backwards) t = 1 - t;
           return {
             transform:
-              ` scale(${1 / ((1 - t) * dw + t)}, ${1 / ((1 - t) * dh + t)})` +
+              ` scale3d(${1 / ((1 - t) * dw + t)}, ${1 / ((1 - t) * dh + t)},1)` +
               ` translate3d(${(t - 1) * dx}px,${(t - 1) * dy}px,0)`,
             transformOrigin: `${originX}px ${originY}px`,
           };
@@ -128,10 +146,10 @@
   function end({ currentTarget }: Event & { currentTarget: Element }) {
     if (marker) return;
     [...currentTarget.children].forEach((element) => {
-      element.getAnimations().forEach((x) => x.cancel());
+      element.getAnimations().forEach((x) => x.id === config.id && x.cancel());
       if (!container) return;
       [...element.children].forEach((child) => {
-        child.getAnimations().forEach((x) => x.cancel());
+        child.getAnimations().forEach((x) => x.id === config.id && x.cancel());
       });
     });
   }
