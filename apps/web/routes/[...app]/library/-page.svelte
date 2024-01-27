@@ -25,6 +25,7 @@
   import PlaybackActions from "$lib/ui/PlaybackActions.svelte";
   import type { Track } from "@amadeus-music/protocol";
   import Collection from "$lib/ui/Collection.svelte";
+  import { nully } from "@amadeus-music/util/string";
   import Overview from "$lib/ui/Overview.svelte";
   import Tracks from "$lib/ui/Tracks.svelte";
   import { navigating } from "$app/stores";
@@ -48,16 +49,16 @@
     ? page.endsWith("/artist")
       ? "artist"
       : page.endsWith("/playlist")
-      ? "playlist"
-      : kind
+        ? "playlist"
+        : kind
     : kind;
   $: data =
     kind === "playlist"
       ? $playlists.find((x) => x.id === id)
       : kind === "artist"
-      ? $artists.find((x) => x.id === id)
-      : undefined;
-  $: title = data ? `${data.title} - Amadeus` : "Amadeus";
+        ? $artists.find((x) => x.id === id)
+        : undefined;
+  $: title = nully`${data?.title} - Amadeus` || "Amadeus";
 
   /* === Library Actions === */
   function edit({ detail: { action, after, item } }: EditEvent<Track>) {
@@ -120,7 +121,11 @@
 </Projection>
 <Projection at="artist" ephemeral {title}>
   <Frame morph="artist-{hash}">
-    <Collection of={data} style="artist" />
+    <Collection
+      of={data}
+      href={nully`/explore/artist#${data?.id}`}
+      style="artist"
+    />
   </Frame>
 </Projection>
 

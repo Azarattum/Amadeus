@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
+    "@amadeus-music/util": "workspace:*",
     "youtubei.js": "^9.1.0"
   },
   "devDependencies": {

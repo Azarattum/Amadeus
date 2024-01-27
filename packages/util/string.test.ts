@@ -1,4 +1,4 @@
-import { capitalize, unprefix, offset } from "./string";
+import { capitalize, unprefix, offset, nully } from "./string";
 import { expect, it } from "vitest";
 
 it("capitalizes", () => {
@@ -17,4 +17,16 @@ it("unprefixes", () => {
 it("offsets", () => {
   expect(offset("one\ntwo\nthree")).toBe("    one\n    two\n    three");
   expect(offset("one\ntwo\nthree", 2)).toBe("  one\n  two\n  three");
+});
+
+it("nullifies", () => {
+  expect(nully`Hi ${0} there`).toBe("Hi 0 there");
+  expect(nully`Hi ${null} there`).toBe(undefined);
+  expect(nully`Hi ${undefined} there`).toBe(undefined);
+  expect(nully`Hi ${"you"} there`).toBe("Hi you there");
+  expect(nully`Hi ${"you"} there ${null}`).toBe(undefined);
+  expect(nully`Hi ${"you"} there ${undefined}`).toBe(undefined);
+  expect(nully`Hi ${false} there`).toBe("Hi false there");
+  expect(nully`Hi ${null}` || "Hello").toBe("Hello");
+  expect(nully`${undefined}` || "").toBe("");
 });

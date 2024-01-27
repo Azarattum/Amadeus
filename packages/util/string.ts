@@ -122,3 +122,14 @@ export function unbrace(string: string) {
   }
   return bracketCount === 0 ? output.trim() : "";
 }
+
+/**
+ * String literal template function that makes the whole string `undefined`
+ * if one of the interpolated values is `null` or `undefined`
+ */
+export function nully(strings: TemplateStringsArray, ...values: unknown[]) {
+  return values.reduce((acc, item, i) => {
+    if (acc == null || item == null) return undefined;
+    return acc + String(item) + strings[i + 1];
+  }, strings[0]) as string | undefined;
+}

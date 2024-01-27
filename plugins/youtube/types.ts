@@ -1,3 +1,4 @@
+import { nully } from "@amadeus-music/util/string";
 import type { YTMusic } from "youtubei.js";
 
 function toAssets(url?: string, secondary = url) {
@@ -67,8 +68,8 @@ function toTrack(data: MusicResponsiveListItem & TrackInfo) {
         data.thumbnail?.[data.thumbnail.length - 1]?.url,
       ),
     },
-    title: data.title + (data.subtitle ? ` (${data.subtitle})` : ""),
     duration: data.duration?.seconds || +data.duration! || 0,
+    title: data.title + (nully` (${data.subtitle})` || ""),
     sources: [`youtube/${data.id}`],
   };
 }
