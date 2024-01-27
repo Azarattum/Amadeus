@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Header, Stack, Icon, Text, Card, When } from "@amadeus-music/ui";
+  import { Header, Stack, Icon, Text, Card } from "@amadeus-music/ui";
   let selected: boolean[] = [];
 </script>
 
@@ -44,15 +44,13 @@
   </Stack>
 
   <Stack>
-    <When lg>
-      <div
-        class="sticky top-11 z-10 hidden auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-4 backdrop-blur-md lg:grid"
-      >
-        <Header sm>Title</Header>
-        <Header sm>Artist</Header>
-        <Header sm>Album</Header>
-      </div>
-    </When>
+    <div
+      class="sticky top-11 z-10 hidden auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-4 backdrop-blur-md lg:grid"
+    >
+      <Header sm>Title</Header>
+      <Header sm>Artist</Header>
+      <Header sm>Album</Header>
+    </div>
     <Card selected={selected[0]} on:click={() => (selected[0] = !selected[0])}>
       <Text accent>Rockstar</Text>
       <Text secondary sm>Nickelback</Text>

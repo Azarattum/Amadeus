@@ -8,7 +8,6 @@
     Stack,
     Frame,
     Icon,
-    When,
   } from "@amadeus-music/ui";
   import { playback, search, feed } from "$lib/data";
   import Collection from "$lib/ui/Collection.svelte";
@@ -36,8 +35,8 @@
     ? page.endsWith("/recommended")
       ? -2
       : page.endsWith("/listened")
-      ? -1
-      : id
+        ? -1
+        : id
     : id;
   $: data = $feed.find((x) => x.id === id);
 </script>
@@ -46,9 +45,9 @@
   <Topbar title="Home">
     <Header indent xl id="feed">
       Home
-      <When not sm slot="after">
-        <Button round href="/settings"><Icon of="settings" /></Button>
-      </When>
+      <Button round class="sm:hidden" href="/settings" slot="after">
+        <Icon of="settings" />
+      </Button>
     </Header>
   </Topbar>
   <Stack class="gap-4 p-4">

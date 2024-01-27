@@ -5,9 +5,9 @@
     Gateway,
     Button,
     Spacer,
+    Stack,
     Icon,
     link,
-    When,
   } from "@amadeus-music/ui";
   import Settings from "./settings/-page.svelte";
   import Library from "./library/-page.svelte";
@@ -30,12 +30,12 @@
       <Button compact air primary={tab === "explore"} href={link("explore")}>
         <Icon of="compass" md />Explore
       </Button>
-      <When sm>
+      <Stack class="hidden sm:flex">
         <Spacer />
         <Button compact air href={link("settings")}>
           <Icon of="settings" md />Settings
         </Button>
-      </When>
+      </Stack>
     </svelte:fragment>
     <Gateway for="navigation" slot="sections" />
     <Projection at="home" title="Amadeus" let:visible let:active>
