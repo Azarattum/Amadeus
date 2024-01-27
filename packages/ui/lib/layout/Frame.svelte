@@ -5,7 +5,7 @@
 
   let classes: Classes = "";
   export { classes as class };
-  export let morph: string = "";
+  export let morph: string | undefined = undefined;
 </script>
 
 <Morph container key={morph}>
