@@ -1,6 +1,10 @@
 <script lang="ts">
   import { type IntersectionEvent, intersection } from "../../action";
+  import { type Classes, tw } from "../../internal/tailwind";
   import { createEventDispatcher } from "svelte";
+
+  let classes: Classes = "";
+  export { classes as class };
 
   const active = [false, false] as [boolean, boolean];
   const dispatch = createEventDispatcher<{
@@ -24,36 +28,28 @@
 </script>
 
 <div
-  class="grid w-full snap-x snap-mandatory overflow-y-hidden overflow-x-scroll rounded-lg transition-colors duration-300 ease-linear will-change-transform"
-  style="grid: auto / auto-flow {$$slots.before ? '1fr ' : ''}100%{$$slots.after
-    ? ' 1fr'
-    : ''};"
+  class={tw`grid grow snap-x snap-mandatory grid-cols-[auto_100%_auto] overflow-x-scroll rounded-lg transition-colors duration-300 ease-linear will-change-transform ${classes}`}
   on:wheel|passive={({ deltaX }) => (wheel = deltaX)}
   class:bg-primary-600={active[0] || active[1]}
   on:touchend={finish}
 >
-  {#if $$slots.before}
-    <div
-      class="flex items-center px-4 text-content-200 transition-colors"
-      style="scroll-snap-align: none;"
-      on:intersect={intersected(0)}
-      class:text-white={active[0]}
-      use:intersection={0.5}
-    >
-      <slot name="before" />
-    </div>
-  {/if}
+  <div
+    class="flex items-center px-4 text-content-200 transition-colors contain-paint"
+    on:intersect={intersected(0)}
+    class:text-white={active[0]}
+    use:intersection={0.5}
+  >
+    <slot name="before" />
+  </div>
   <div class="snap-center snap-always"><slot /></div>
-  {#if $$slots.after}
-    <div
-      class="flex items-center px-4 text-content-200 transition-colors"
-      on:intersect={intersected(1)}
-      class:text-white={active[1]}
-      use:intersection={0.5}
-    >
-      <slot name="after" />
-    </div>
-  {/if}
+  <div
+    class="flex items-center px-4 text-content-200 transition-colors contain-paint"
+    on:intersect={intersected(1)}
+    class:text-white={active[1]}
+    use:intersection={0.5}
+  >
+    <slot name="after" />
+  </div>
 </div>
 
 <style>
