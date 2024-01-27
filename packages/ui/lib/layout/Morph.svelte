@@ -24,14 +24,14 @@
   export let key: string | undefined = undefined;
   export let container = false;
   export let loosely = false;
-  export let marker = !key;
+  export let marker = false;
   $: config = {
     fill: "forwards",
     easing: "ease",
     duration: 300,
     id: "morph",
     ...animation,
-    ...(marker ? { duration: 0, delay: 0 } : {}),
+    ...(marker || !key ? { duration: 0, delay: 0 } : {}),
   } as const;
 
   function compute(from: Element, to?: Element | null, backwards = true) {
@@ -144,7 +144,7 @@
   }
 
   function end({ currentTarget }: Event & { currentTarget: Element }) {
-    if (marker) return;
+    if (marker || !key) return;
     [...currentTarget.children].forEach((element) => {
       element.getAnimations().forEach((x) => x.id === config.id && x.cancel());
       if (!container) return;
