@@ -33,6 +33,10 @@
 
 <Morph marker key={`${type}-${id}`}>
   <Card big disabled={loading || !href} class={classes} {href}>
+    <!-- /// TODO: somehow support playlist avatars -->
+    <Morph marker key={`avatar-${type}-${id}`} slot="before">
+      <Avatar of={art} round={!!artist} />
+    </Morph>
     <Morph marker key="heading-{type}-{id}">
       <Header center {loading}>
         <Morph marker key="title-{type}-{id}">
@@ -59,10 +63,6 @@
       {:else if !artist}
         <Text secondary {loading}>Loading...</Text>
       {/if}
-    </Morph>
-    <!-- /// TODO: somehow support playlist avatars -->
-    <Morph marker key={`avatar-${type}-${id}`} slot="after">
-      <Avatar of={art} round={!!artist} />
     </Morph>
   </Card>
 </Morph>
