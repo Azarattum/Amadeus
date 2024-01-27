@@ -1,7 +1,6 @@
 <script lang="ts">
   import {
     type EditEvent,
-    Swipeable,
     Separator,
     Virtual,
     Header,
@@ -20,7 +19,6 @@
 
   const dispatch = createEventDispatcher<{
     edit: EditEvent<Track>["detail"];
-    action: Track;
     click: Track;
   }>();
 
@@ -123,29 +121,17 @@
         {track}
       </h2>
     {:else if track}
-      {#if $$slots.default || $$slots.action}
-        <Swipeable
-          on:before={() => dispatch("action", track)}
-          on:after={() => select(track)}
-        >
-          <slot name="action" slot="before" />
-          <TrackUI
-            selected={check(track, selected)}
-            {track}
-            {sm}
-            on:click={() => (selected.size ? select(track) : play(track))}
-            on:contextmenu={(e) => (e.preventDefault(), select(track))}
-          />
-          <Icon of="list" slot="after" />
-        </Swipeable>
-      {:else}
-        <TrackUI
-          selected={check(track, selected)}
-          {track}
-          {sm}
-          on:click={() => play(track)}
-        />
-      {/if}
+      <TrackUI
+        selected={check(track, selected)}
+        {track}
+        {sm}
+        on:click={() => (selected.size ? select(track) : play(track))}
+        on:contextmenu={(e) => (e.preventDefault(), select(track))}
+        on:select={({ detail: track }) => select(track)}
+        on:action
+      >
+        <slot name="action" slot="action" />
+      </TrackUI>
     {:else}
       <TrackUI {sm} />
     {/if}
