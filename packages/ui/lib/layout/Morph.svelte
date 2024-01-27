@@ -74,7 +74,7 @@
         const childRect = child.getBoundingClientRect();
         const originX = fromRect.x - childRect.x;
         const originY = fromRect.y - childRect.y;
-        const length = Math.ceil((config.duration / 1000) * 60);
+        const length = Math.ceil((config.duration / 1000) * 120);
         return Array.from({ length }).map((_, i) => {
           let t = (1 / (length - 1)) * i;
           if (!backwards) t = 1 - t;
