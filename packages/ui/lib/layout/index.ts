@@ -12,7 +12,6 @@ export { default as Frame } from "./Frame.svelte";
 export { default as Morph } from "./Morph.svelte";
 export { default as Words } from "./Words.svelte";
 export { default as Tabs } from "./Tabs.svelte";
-export { default as When } from "./When.svelte";
 export { default as Tab } from "./Tab.svelte";
 
 export * from "./Hologram.svelte";
