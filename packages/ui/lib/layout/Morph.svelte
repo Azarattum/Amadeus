@@ -20,6 +20,8 @@
 </script>
 
 <script lang="ts">
+  let classes = "";
+  export { classes as class };
   export let animation: KeyframeAnimationOptions & { duration?: number } = {};
   export let key: string | undefined = undefined;
   export let container = false;
@@ -114,7 +116,10 @@
     const children = [...event.currentTarget.children];
     const backwards = event.type === "introstart";
     const tasks: [Element, Keyframe[]][] = [];
-    children.forEach((x) => backwards && x.classList.add("opacity-0"));
+    children.forEach((x) => {
+      if (classes) x.classList.add(...classes.split(/\s+/));
+      if (backwards) x.classList.add("opacity-0");
+    });
     await new Promise(requestAnimationFrame);
 
     children.forEach((element, i) => {
@@ -147,6 +152,7 @@
     if (marker || !key) return;
     [...currentTarget.children].forEach((element) => {
       element.getAnimations().forEach((x) => x.id === config.id && x.cancel());
+      if (classes) element.classList.remove(...classes.split(/\s+/));
       if (!container) return;
       [...element.children].forEach((child) => {
         child.getAnimations().forEach((x) => x.id === config.id && x.cancel());
