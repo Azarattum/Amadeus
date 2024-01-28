@@ -37,12 +37,17 @@
   } as const;
 
   function compute(from: Element, to?: Element | null, backwards = true) {
-    const fallback = { opacity: 0 };
-    const base = { transformOrigin: "top left", pointerEvents: "none" };
-    if (!to) return { frames: backwards ? [fallback, {}] : [{}, fallback] };
+    const fallback = {
+      frames: backwards ? [{ opacity: 0 }, {}] : [{}, { opacity: 0 }],
+      inverse: undefined,
+    } as const;
+    if (!to) return fallback;
 
+    const base = { transformOrigin: "top left", pointerEvents: "none" };
     const fromRect = from.getBoundingClientRect();
     const toRect = to.getBoundingClientRect();
+
+    if (!fromRect.height || !fromRect.width) return fallback;
 
     const dh = toRect.height / fromRect.height;
     const dw = toRect.width / fromRect.width;
