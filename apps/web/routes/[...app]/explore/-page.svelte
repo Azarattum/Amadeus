@@ -142,7 +142,7 @@
       of={$data?.detail}
       tracks={$data}
       style="album"
-      on:end={() => remote.next()}
+      on:end={() => data?.next()}
     />
   </Frame>
 </Projection>
@@ -152,7 +152,7 @@
       of={$data?.detail}
       tracks={$data}
       style="artist"
-      on:end={() => remote.next()}
+      on:end={() => data?.next()}
     />
   </Frame>
 </Projection>
