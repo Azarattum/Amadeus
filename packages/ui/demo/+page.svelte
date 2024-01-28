@@ -48,9 +48,9 @@
       <LightSwitch class="mx-auto" />
     </svelte:fragment>
   </Sidenav>
-  <div class="h-full w-full p-8">
+  <div class="size-full p-8">
     <iframe
-      class="h-full w-full grow resize rounded-md p-4 outline outline-1 outline-highlight-100"
+      class="size-full grow resize rounded-md p-4 outline outline-1 outline-highlight-100"
       title="Story"
       bind:this={preview}
     />

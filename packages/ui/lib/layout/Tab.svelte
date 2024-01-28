@@ -28,7 +28,7 @@
 </script>
 
 <article
-  class="relative z-10 h-full w-full snap-start snap-always overflow-x-hidden overflow-y-scroll"
+  class="relative z-10 size-full snap-start snap-always overflow-x-hidden overflow-y-scroll"
   id={name.toLowerCase()}
   class:[&~nav_div_a]:pointer-events-none={current && stuck}
   class:[&~nav_div_a]:-translate-y-full={current && stuck}

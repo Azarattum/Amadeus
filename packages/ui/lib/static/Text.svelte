@@ -11,7 +11,7 @@
 </script>
 
 <span
-  class={tw`w-max max-w-full truncate rounded-md text-left [&>*]:align-bottom
+  class={tw`w-max max-w-full truncate rounded-md text-left *:align-bottom
   ${loading && "animate-pulse bg-highlight text-transparent"}
   ${accent ? "font-medium" : "font-normal"}
   ${classes}`}

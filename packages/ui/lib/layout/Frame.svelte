@@ -9,7 +9,7 @@
 </script>
 
 <Morph container key={morph}>
-  <div class="h-full w-full bg-surface contain-strict">
+  <div class="size-full bg-surface contain-strict">
     <div
       class={tw`absolute inset-0 overflow-y-auto overflow-x-hidden ${classes}`}
       use:autoscroll

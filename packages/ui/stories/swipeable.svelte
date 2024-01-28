@@ -9,7 +9,7 @@
       <Text accent>Hello</Text>
       <Text secondary sm>Adele</Text>
       <div
-        class="h-[48px] w-[48px] rounded bg-gradient-to-r from-green-500 to-lime-500 shadow-lg"
+        class="size-[48px] rounded bg-gradient-to-r from-green-500 to-lime-500 shadow-lg"
         slot="before"
       />
     </Card>

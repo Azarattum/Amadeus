@@ -13,7 +13,7 @@
         <Text secondary><Icon of="clock" sm /> 32:14</Text>
       </Stack>
       <div
-        class="h-[104px] w-[104px] rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 shadow-lg"
+        class="size-[104px] rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 shadow-lg"
         slot="after"
       />
     </Card>
@@ -26,7 +26,7 @@
         <Text secondary><Icon of="clock" sm /> 32:14</Text>
       </Stack>
       <div
-        class="h-[104px] w-[104px] rounded-2xl bg-gradient-to-r from-yellow-500 to-amber-500 shadow-lg"
+        class="size-[104px] rounded-2xl bg-gradient-to-r from-yellow-500 to-amber-500 shadow-lg"
         slot="after"
       />
     </Card>
@@ -37,7 +37,7 @@
         <Text secondary><Icon of="clock" sm /> 32:14</Text>
       </Stack>
       <div
-        class="h-[104px] w-[104px] rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 shadow-lg"
+        class="size-[104px] rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 shadow-lg"
         slot="after"
       />
     </Card>
@@ -56,7 +56,7 @@
       <Text secondary sm>Nickelback</Text>
       <Text secondary class="hidden lg:inline">Rockstar</Text>
       <div
-        class="h-[48px] w-[48px] rounded bg-gradient-to-r from-rose-500 to-pink-500 shadow-lg"
+        class="size-[48px] rounded bg-gradient-to-r from-rose-500 to-pink-500 shadow-lg"
         slot="before"
       />
     </Card>
@@ -65,7 +65,7 @@
       <Text secondary sm>Adele</Text>
       <Text secondary sm class="hidden lg:inline">25</Text>
       <div
-        class="h-[48px] w-[48px] rounded bg-gradient-to-r from-green-500 to-lime-500 shadow-lg"
+        class="size-[48px] rounded bg-gradient-to-r from-green-500 to-lime-500 shadow-lg"
         slot="before"
       />
     </Card>
@@ -81,7 +81,7 @@
         too!</Text
       >
       <div
-        class="h-[48px] w-[48px] rounded bg-gradient-to-r from-purple-500 to-fuchsia-500 shadow-lg"
+        class="size-[48px] rounded bg-gradient-to-r from-purple-500 to-fuchsia-500 shadow-lg"
         slot="before"
       />
     </Card>

@@ -10,7 +10,7 @@
 </script>
 
 <nav
-  class={tw`flex h-[100dvh] flex-shrink-0 overflow-y-auto overflow-x-hidden ${classes}`}
+  class={tw`flex h-dvh flex-shrink-0 overflow-y-auto overflow-x-hidden ${classes}`}
 >
   <Stack class="grow-0">
     <div

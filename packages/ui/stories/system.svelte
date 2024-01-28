@@ -8,15 +8,15 @@
     <Stack class="gap-2">
       <Header lg>Primary</Header>
       <Stack x class="gap-2">
-        <div class="h-16 w-16 rounded-md bg-primary-100" />
-        <div class="h-16 w-16 rounded-md bg-primary-200" />
-        <div class="h-16 w-16 rounded-md bg-primary-300" />
-        <div class="h-16 w-16 rounded-md bg-primary-400" />
-        <div class="h-16 w-16 rounded-md bg-primary-500" />
-        <div class="h-16 w-16 rounded-md bg-primary-600" />
-        <div class="h-16 w-16 rounded-md bg-primary-700" />
-        <div class="h-16 w-16 rounded-md bg-primary-800" />
-        <div class="h-16 w-16 rounded-md bg-primary-900" />
+        <div class="size-16 rounded-md bg-primary-100" />
+        <div class="size-16 rounded-md bg-primary-200" />
+        <div class="size-16 rounded-md bg-primary-300" />
+        <div class="size-16 rounded-md bg-primary-400" />
+        <div class="size-16 rounded-md bg-primary-500" />
+        <div class="size-16 rounded-md bg-primary-600" />
+        <div class="size-16 rounded-md bg-primary-700" />
+        <div class="size-16 rounded-md bg-primary-800" />
+        <div class="size-16 rounded-md bg-primary-900" />
       </Stack>
     </Stack>
     <Stack class="gap-2">
@@ -33,12 +33,12 @@
           </Stack>
         </Stack>
         <Stack x class="gap-2">
-          <div class="h-16 w-16 rounded-md bg-surface" />
+          <div class="size-16 rounded-md bg-surface" />
           <div
-            class="h-16 w-16 rounded-md bg-surface-100 shadow-lg dark:shadow-none"
+            class="size-16 rounded-md bg-surface-100 shadow-lg dark:shadow-none"
           />
           <div
-            class="z-50 h-16 w-16 rounded-md bg-surface-200 backdrop-blur-md"
+            class="size-166 z-50 rounded-md bg-surface-200 backdrop-blur-md"
           />
         </Stack>
       </Stack>
@@ -46,17 +46,17 @@
     <Stack class="gap-2">
       <Header lg>Content</Header>
       <Stack x class="gap-2">
-        <div class="h-16 w-16 rounded-md bg-content" />
-        <div class="h-16 w-16 rounded-md bg-content-100" />
-        <div class="h-16 w-16 rounded-md bg-content-200" />
+        <div class="size-16 rounded-md bg-content" />
+        <div class="size-16 rounded-md bg-content-100" />
+        <div class="size-16 rounded-md bg-content-200" />
       </Stack>
     </Stack>
     <Stack class="gap-2">
       <Header lg>Highlight</Header>
       <Stack x class="gap-2">
-        <div class="h-16 w-16 rounded-md bg-highlight" />
-        <div class="h-16 w-16 rounded-md bg-highlight-100" />
-        <div class="h-16 w-16 rounded-md bg-highlight-200" />
+        <div class="size-16 rounded-md bg-highlight" />
+        <div class="size-16 rounded-md bg-highlight-100" />
+        <div class="size-16 rounded-md bg-highlight-200" />
       </Stack>
     </Stack>
   </Stack>

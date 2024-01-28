@@ -16,7 +16,7 @@
 
 <Realm>
   <Gateway for="root" />
-  <div class="flex h-[100dvh] max-h-[100dvh] w-[100dvw] max-w-[100dvw]">
+  <div class="flex h-dvh max-h-dvh w-dvw max-w-[100dvw]">
     <aside>
       <slot name="panel-left" />
     </aside>
@@ -24,7 +24,7 @@
       <header>
         <slot name="panel-top" />
       </header>
-      <main class="relative h-full w-full">
+      <main class="relative size-full">
         <slot />
       </main>
       <footer

@@ -145,7 +145,7 @@
     {#if selected.size}
       <Panel>
         <Stack x>
-          <form class="flex grow [&>*]:grow" on:submit={clear}>
+          <form class="flex grow *:grow" on:submit={clear}>
             <slot selected={[...selected]} />
           </form>
           <Separator />

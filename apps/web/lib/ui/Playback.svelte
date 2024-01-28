@@ -42,7 +42,7 @@
 
     <Image src={track?.album.arts?.[0]} size={324}>
       <div
-        class="flex h-full w-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
+        class="flex size-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
         style:filter="hue-rotate({track?.id || 0}deg)"
       >
         <Icon of="note" />
