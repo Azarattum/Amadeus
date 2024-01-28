@@ -42,7 +42,7 @@
 </script>
 
 <section
-  class="grid h-full max-h-[100dvh] snap-x snap-mandatory overflow-y-hidden overflow-x-scroll"
+  class="grid h-full max-h-dvh snap-x snap-mandatory overflow-y-hidden overflow-x-scroll"
   style="grid: auto / auto-flow 100%; perspective: 1px; perspective-origin: top left;"
   class:scroll-smooth={compact}
   bind:clientWidth={width}

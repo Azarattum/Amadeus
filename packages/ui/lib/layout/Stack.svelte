@@ -19,7 +19,7 @@
   {...$$restProps}
   class={tw`flex grow flex-col 
   ${x && "flex-row"}
-  ${z && "grid max-h-max max-w-max [&>*]:col-start-1 [&>*]:row-start-1"}
+  ${z && "grid max-h-max max-w-max *:col-start-1 *:row-start-1"}
   ${classes}`}
 >
   <slot />
