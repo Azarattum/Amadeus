@@ -78,65 +78,67 @@
   }
 </script>
 
-{#if !sm}
-  <div
-    class="sticky top-11 z-10 hidden auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-10 backdrop-blur-md lg:grid"
-    class:pl-24={timeline}
+<Stack>
+  {#if !sm}
+    <div
+      class="sticky top-11 z-10 hidden auto-cols-fr grid-flow-col border-b border-b-highlight bg-surface/70 pl-20 pr-10 backdrop-blur-md lg:grid"
+      class:pl-24={timeline}
+    >
+      <Header sm>Title</Header>
+      <Header sm>Artist</Header>
+      <Header sm>Album</Header>
+    </div>
+  {/if}
+  <Virtual
+    animate
+    key={(x) => (typeof x === "string" ? x : x?.entry || x?.id)}
+    sortable="tracks"
+    {prerender}
+    {fixed}
+    {items}
+    let:item={track}
+    let:index
+    on:edit
+    on:end
   >
-    <Header sm>Title</Header>
-    <Header sm>Artist</Header>
-    <Header sm>Album</Header>
-  </div>
-{/if}
-<Virtual
-  animate
-  key={(x) => (typeof x === "string" ? x : x?.entry || x?.id)}
-  sortable="tracks"
-  {prerender}
-  {fixed}
-  {items}
-  let:item={track}
-  let:index
-  on:edit
-  on:end
->
-  <div
-    class="relative flex [&_hr]:!opacity-100 [*:has(>&):last-of-type_hr]:!opacity-0"
-  >
-    {#if timeline}
-      <div
-        class="visible ml-4 flex h-14 w-0.5 items-center justify-center bg-highlight-100"
-        class:opacity-0={Number.isNaN(index)}
-      >
-        {#if typeof track === "string"}
-          <div class="absolute mt-4 h-2 w-2 rounded-full bg-content" />
-        {/if}
-      </div>
-    {/if}
-    {#if typeof track === "string"}
-      <h2
-        class="relative top-2 flex h-14 items-center indent-4 text-lg [*:has(>div>&)]:pointer-events-none"
-        draggable="false"
-      >
-        {track}
-      </h2>
-    {:else if track}
-      <TrackUI
-        selected={check(track, selected)}
-        {track}
-        {sm}
-        on:click={() => (selected.size ? select(track) : play(track))}
-        on:contextmenu={(e) => (e.preventDefault(), select(track))}
-        on:select={({ detail: track }) => select(track)}
-        on:action
-      >
-        <slot name="action" slot="action" />
-      </TrackUI>
-    {:else}
-      <TrackUI {sm} />
-    {/if}
-  </div>
-</Virtual>
+    <div
+      class="relative flex [&_hr]:!opacity-100 [*:has(>&):last-of-type_hr]:!opacity-0"
+    >
+      {#if timeline}
+        <div
+          class="visible ml-4 flex h-14 w-0.5 items-center justify-center bg-highlight-100"
+          class:opacity-0={Number.isNaN(index)}
+        >
+          {#if typeof track === "string"}
+            <div class="absolute mt-4 h-2 w-2 rounded-full bg-content" />
+          {/if}
+        </div>
+      {/if}
+      {#if typeof track === "string"}
+        <h2
+          class="relative top-2 flex h-14 items-center indent-4 text-lg [*:has(>div>&)]:pointer-events-none"
+          draggable="false"
+        >
+          {track}
+        </h2>
+      {:else if track}
+        <TrackUI
+          selected={check(track, selected)}
+          {track}
+          {sm}
+          on:click={() => (selected.size ? select(track) : play(track))}
+          on:contextmenu={(e) => (e.preventDefault(), select(track))}
+          on:select={({ detail: track }) => select(track)}
+          on:action
+        >
+          <slot name="action" slot="action" />
+        </TrackUI>
+      {:else}
+        <TrackUI {sm} />
+      {/if}
+    </div>
+  </Virtual>
+</Stack>
 
 {#if $$slots.default || $$slots.action}
   <Portal to="panel">
