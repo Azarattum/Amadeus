@@ -178,7 +178,7 @@
 
 {#if key}
   <div
-    class="contents"
+    class="contents *:will-change-transform"
     transition:enable|global
     on:outrostart={morph}
     on:introstart={morph}
