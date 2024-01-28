@@ -6,6 +6,7 @@
     Stack,
     Morph,
     Words,
+    Image,
     Icon,
     Text,
   } from "@amadeus-music/ui";
@@ -14,14 +15,13 @@
     Collection,
     Track,
   } from "@amadeus-music/protocol";
-  import { capitalize } from "@amadeus-music/util/string";
+  import { capitalize, nully } from "@amadeus-music/util/string";
   import PlaybackActions from "./PlaybackActions.svelte";
+  import FallbackCover from "./FallbackCover.svelte";
   import { format } from "@amadeus-music/util/time";
   import { playback, search } from "$lib/data";
   import Tracks from "$lib/ui/Tracks.svelte";
-  import { cubicInOut } from "svelte/easing";
-  import { fade } from "svelte/transition";
-  import Avatar from "./Avatar.svelte";
+  import ImageGrid from "./ImageGrid.svelte";
   import { match } from "$lib/util";
 
   export let fixed = false;
@@ -51,10 +51,38 @@
     x
     class={`place-items-center gap-4 ${style !== "playlist" ? "p-4" : "pb-4"}`}
   >
-    {#if style !== "playlist"}
-      <Morph key="avatar-{style}-{of?.id}">
-        <Avatar {of} round={style === "artist"} class="z-30" {href} />
+    {#if (!of || (of && "arts" in of)) && style !== "playlist"}
+      <Morph key="thumb-{style}-{of?.id}">
+        <ImageGrid
+          class="{style === 'artist' ? 'rounded-full' : 'rounded-2xl'} z-30"
+          {href}
+          let:size
+        >
+          <Image
+            thumbnail={of && (of.thumbnails?.[0] || "")}
+            src={of && (of.arts?.[0] || "")}
+            {size}
+          >
+            <FallbackCover of={style} xl id={of?.id} />
+          </Image>
+        </ImageGrid>
       </Morph>
+    {:else if of && filtered?.length}
+      <div
+        class="pointer-events-none absolute left-4 top-[137px] z-10 flex flex-col gap-2 rounded-2xl lg:top-[170px]"
+      >
+        {#each filtered?.slice(0, 4) || [] as { album, id }, i}
+          <Morph key={`thumb-${style}-${of?.id}-${i}`} class="!block">
+            <Image
+              thumbnail={album.thumbnails?.[0] || ""}
+              src={album.arts?.[0] || ""}
+              class="hidden"
+            >
+              <FallbackCover of="track" {id} />
+            </Image>
+          </Morph>
+        {/each}
+      </div>
     {/if}
     <Stack class="z-20 grow-0 gap-2">
       <Morph container key="heading-{style}-{of?.id}">
@@ -101,7 +129,13 @@
 </Topbar>
 <!-- /// TODO: albums -->
 
-<div transition:fade={{ easing: cubicInOut, duration: 300 }}>
+<Morph
+  loosely
+  class={style === "playlist"
+    ? "[&_[draggable='true']:nth-child(-n+4)_.rounded]:invisible"
+    : ""}
+  key={nully`${style}-${of?.id}`}
+>
   <Tracks
     fixed={fixed || (style === "playlist" ? !!$search : true)}
     tracks={filtered}
@@ -116,4 +150,4 @@
     <PlaybackActions {selected} />
     <slot {selected} />
   </Tracks>
-</div>
+</Morph>
