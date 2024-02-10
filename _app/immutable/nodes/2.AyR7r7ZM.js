@@ -1,1 +1,0 @@
-import{R as t}from"../chunks/control.pJ1mnnAb.js";function r(e,o){throw new t(e,o.toString())}new TextEncoder;function n(){throw r(302,"/home")}const c=Object.freeze(Object.defineProperty({__proto__:null,load:n},Symbol.toStringTag,{value:"Module"}));export{c as universal};
