@@ -1,22 +1,22 @@
 PODS:
-  - Capacitor (5.6.0):
+  - Capacitor (5.7.0):
     - CapacitorCordova
-  - CapacitorCordova (5.6.0)
+  - CapacitorCordova (5.7.0)
 
 DEPENDENCIES:
-  - "Capacitor (from `../../../node_modules/.pnpm/@capacitor+ios@5.6.0_@capacitor+core@5.6.0/node_modules/@capacitor/ios`)"
-  - "CapacitorCordova (from `../../../node_modules/.pnpm/@capacitor+ios@5.6.0_@capacitor+core@5.6.0/node_modules/@capacitor/ios`)"
+  - "Capacitor (from `../../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios`)"
+  - "CapacitorCordova (from `../../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios`)"
 
 EXTERNAL SOURCES:
   Capacitor:
-    :path: "../../../node_modules/.pnpm/@capacitor+ios@5.6.0_@capacitor+core@5.6.0/node_modules/@capacitor/ios"
+    :path: "../../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios"
   CapacitorCordova:
-    :path: "../../../node_modules/.pnpm/@capacitor+ios@5.6.0_@capacitor+core@5.6.0/node_modules/@capacitor/ios"
+    :path: "../../../node_modules/.pnpm/@capacitor+ios@5.7.0_@capacitor+core@5.7.0/node_modules/@capacitor/ios"
 
 SPEC CHECKSUMS:
-  Capacitor: ebfc16cdb8116d04c101686b080342872da42d43
-  CapacitorCordova: 931b48fcdbc9bc985fc2f16cec9f77c794a27729
+  Capacitor: fc155ee2ee45a2093d716f13cf5aa5a865e2d85a
+  CapacitorCordova: e825fce1a2e14e4b5730641c7e098dccf74397b7
 
-PODFILE CHECKSUM: fdc5e8e7f7652890ed000814e11ebadb5cd57656
+PODFILE CHECKSUM: f75970187263780bc880f7725ecccfca5799dc72
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.3
