@@ -7,6 +7,7 @@ import {
 } from "@amadeus-music/core";
 import type { FetchOptions } from "@amadeus-music/core/network/fetch";
 import { fetch as call, ok, pool, wrn } from "./plugin";
+// @ts-ignore
 import * as onnx from "onnxruntime-web";
 import { captcha } from "./types";
 import { readFileSync } from "fs";
