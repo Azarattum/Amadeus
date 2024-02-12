@@ -9,10 +9,8 @@
     Frame,
     Icon,
   } from "@amadeus-music/ui";
+  import { Collection, Overview, Track } from "$lib/ui";
   import { playback, search, feed } from "$lib/data";
-  import Collection from "$lib/ui/Collection.svelte";
-  import Overview from "$lib/ui/Overview.svelte";
-  import Track from "$lib/ui/Track.svelte";
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
 

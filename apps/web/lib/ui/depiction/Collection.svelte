@@ -16,12 +16,12 @@
     Track,
   } from "@amadeus-music/protocol";
   import { capitalize, nully } from "@amadeus-music/util/string";
-  import PlaybackActions from "./PlaybackActions.svelte";
-  import FallbackCover from "./FallbackCover.svelte";
+  import FallbackCover from "./internal/FallbackCover.svelte";
+  import ImageGrid from "./internal/ImageGrid.svelte";
   import { format } from "@amadeus-music/util/time";
   import { playback, search } from "$lib/data";
-  import Tracks from "$lib/ui/Tracks.svelte";
-  import ImageGrid from "./ImageGrid.svelte";
+  import { PlaybackActions } from "..";
+  import Tracks from "./Tracks.svelte";
   import { match } from "$lib/util";
 
   export let fixed = false;
