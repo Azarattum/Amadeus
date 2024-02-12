@@ -7,6 +7,7 @@
     Range,
     Text,
     Icon,
+    tw,
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { format } from "@amadeus-music/util/time";
@@ -40,12 +41,13 @@
       bind:checked={paused}
     />
 
-    <Image src={track?.album.arts?.[0]} size={324}>
+    <Image src={track?.album.arts?.[0] || null} size={324}>
       <div
-        class="flex size-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
+        class={tw`flex size-full items-center justify-center
+          ${track ? "bg-gradient-to-r from-rose-400 to-red-400 text-white" : "bg-surface-200 text-content-200"}`}
         style:filter="hue-rotate({track?.id || 0}deg)"
       >
-        <Icon of="note" />
+        <Icon of="note" xxl />
       </div>
     </Image>
     <div
