@@ -2,7 +2,7 @@
   import type { CollectionType, Collection } from "@amadeus-music/protocol";
   import { type EditEvent, Virtual, Icon } from "@amadeus-music/ui";
   import { createEventDispatcher } from "svelte";
-  import Card from "$lib/ui/Card.svelte";
+  import Unit from "./internal/Unit.svelte";
   import { match } from "$lib/util";
   import { ready } from "$lib/data";
 
@@ -44,7 +44,7 @@
   on:end
 >
   {#if item}
-    <Card
+    <Unit
       href="{href}/{aliases[item.id] || `${style}#${item.id}`}"
       {...{ [style]: item }}
     />
@@ -56,6 +56,6 @@
       <Icon of="plus" xxl />
     </button>
   {:else}
-    <Card {...{ [style]: true }} />
+    <Unit {...{ [style]: true }} />
   {/if}
 </Virtual>

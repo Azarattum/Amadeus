@@ -7,8 +7,8 @@
     Input,
     Icon,
   } from "@amadeus-music/ui";
-  import Player from "./Player.svelte";
   import { search } from "$lib/data";
+  import { Player } from "..";
 </script>
 
 <Layout>

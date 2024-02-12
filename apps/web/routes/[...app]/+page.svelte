@@ -12,9 +12,9 @@
   import Settings from "./settings/-page.svelte";
   import Library from "./library/-page.svelte";
   import Explore from "./explore/-page.svelte";
-  import Shell from "$lib/ui/Shell.svelte";
   import Home from "./home/-page.svelte";
   import { search } from "$lib/data";
+  import { Shell } from "$lib/ui";
 </script>
 
 <Hologram of="app" let:page let:hash>

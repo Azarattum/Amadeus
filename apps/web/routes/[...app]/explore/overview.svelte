@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { CollectionType, Collection } from "@amadeus-music/protocol";
   import { Header, Stack } from "@amadeus-music/ui";
-  import Overview from "$lib/ui/Overview.svelte";
+  import { Overview } from "$lib/ui";
 
   export let style: CollectionType;
   export let local: Collection[];

@@ -12,10 +12,10 @@
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { compare } from "@amadeus-music/util/time";
-  import { play as resume } from "./Player.svelte";
   import { createEventDispatcher } from "svelte";
-  import TrackUI from "./Track.svelte";
+  import TrackItem from "./Track.svelte";
   import { playback } from "$lib/data";
+  import { play as resume } from "..";
 
   const dispatch = createEventDispatcher<{
     edit: EditEvent<Track>["detail"];
@@ -122,7 +122,7 @@
           {track}
         </h2>
       {:else if track}
-        <TrackUI
+        <TrackItem
           selected={check(track, selected)}
           {track}
           {sm}
@@ -132,9 +132,9 @@
           on:action
         >
           <slot name="action" slot="action" />
-        </TrackUI>
+        </TrackItem>
       {:else}
-        <TrackUI {sm} />
+        <TrackItem {sm} />
       {/if}
     </div>
   </Virtual>

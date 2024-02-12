@@ -1,9 +1,8 @@
 <script lang="ts">
-  import PlaybackActions from "$lib/ui/PlaybackActions.svelte";
   import { Header, Button, Icon } from "@amadeus-music/ui";
   import { playlists, playback, library } from "$lib/data";
   import type { Track } from "@amadeus-music/protocol";
-  import Tracks from "$lib/ui/Tracks.svelte";
+  import { PlaybackActions, Tracks } from "$lib/ui";
 
   export let local: Track[];
   export let remote: Track[] | undefined;

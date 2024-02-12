@@ -17,11 +17,11 @@
   } from "@amadeus-music/ui";
   import { throttle } from "@amadeus-music/util/async";
   import type { Track } from "@amadeus-music/protocol";
-  import Playback from "$lib/ui/Playback.svelte";
   import { upcoming, playback } from "$lib/data";
-  import Tracks from "$lib/ui/Tracks.svelte";
+  import Playback from "./Playback.svelte";
   import { desource } from "$lib/trpc";
   import { tick } from "svelte";
+  import { Tracks } from "..";
 
   const sync = throttle(async () => {
     if (!track) return;

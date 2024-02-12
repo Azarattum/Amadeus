@@ -17,13 +17,13 @@
   import type { Artist, Album, Track } from "@amadeus-music/protocol";
   import { debounce } from "@amadeus-music/util/async";
   import { streams, search, expand } from "$lib/trpc";
-  import Collection from "$lib/ui/Collection.svelte";
   import { nully } from "@amadeus-music/util/string";
   import { multistream, stream } from "$lib/stream";
   import { navigating } from "$app/stores";
   import Overview from "./overview.svelte";
   import History from "./history.svelte";
   import Tracks from "./tracks.svelte";
+  import { Collection } from "$lib/ui";
 
   export let visible = true;
   export let active = true;

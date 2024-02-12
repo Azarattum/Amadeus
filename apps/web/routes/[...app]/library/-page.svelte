@@ -22,12 +22,9 @@
     tracks,
     search,
   } from "$lib/data";
-  import PlaybackActions from "$lib/ui/PlaybackActions.svelte";
+  import { PlaybackActions, Collection, Overview, Tracks } from "$lib/ui";
   import type { Track } from "@amadeus-music/protocol";
-  import Collection from "$lib/ui/Collection.svelte";
   import { nully } from "@amadeus-music/util/string";
-  import Overview from "$lib/ui/Overview.svelte";
-  import Tracks from "$lib/ui/Tracks.svelte";
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
 
