@@ -54,6 +54,7 @@
   let scroll = { x: 0, y: 0 };
   let outer = new DOMRect();
   let inner = new DOMRect();
+  let firstRender = true;
   let ended = true;
   let rowHeight = 1;
   let perRow = 0;
@@ -64,8 +65,9 @@
   $: pageMax = Math.max(Math.ceil(items.length / pageSize) - 2, 1);
   $: page = minmax(~~((scroll.y - offset) / pageHeight), 1, pageMax);
 
+  $: limit = firstRender ? page + overthrow * pageSize : Infinity;
   $: from = Math.max(page - overthrow, 0) * pageSize;
-  $: to = Math.max((page + overthrow + 1) * pageSize, prerender);
+  $: to = minmax((page + overthrow + 1) * pageSize, prerender, limit);
   $: slice = items.slice(from, to);
 
   $: window = (overthrow * 2 + 1) * pageSize;
@@ -140,6 +142,7 @@
     if (!width || !height) return;
     perRow = ~~(inner.width / (width + gap));
     rowHeight = height + gap;
+    requestIdleCallback(() => (firstRender = false));
   }
 
   /* === Sortable Logic === */
