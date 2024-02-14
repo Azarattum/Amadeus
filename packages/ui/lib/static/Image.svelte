@@ -30,6 +30,7 @@
         ? 'opacity-0'
         : 'opacity-100'}"
       src={size < 100 / globalThis.devicePixelRatio ? thumbnail : src}
+      crossorigin="anonymous"
       height="{size}px"
       draggable="false"
       width="{size}px"
