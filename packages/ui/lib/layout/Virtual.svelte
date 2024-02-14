@@ -142,7 +142,10 @@
     if (!width || !height) return;
     perRow = ~~(inner.width / (width + gap));
     rowHeight = height + gap;
-    requestIdleCallback(() => (firstRender = false));
+
+    (globalThis.requestIdleCallback || globalThis.requestAnimationFrame)(
+      () => (firstRender = false),
+    );
   }
 
   /* === Sortable Logic === */
