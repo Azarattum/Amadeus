@@ -177,16 +177,20 @@
 </script>
 
 {#if key}
-  <div
-    class="contents *:will-change-transform"
-    transition:enable|global
-    on:outrostart={morph}
-    on:introstart={morph}
-    on:introend={end}
-    use:mark={key}
-  >
-    <slot />
-  </div>
+  {#if marker}
+    <div class="contents" use:mark={key}><slot /></div>
+  {:else}
+    <div
+      class="contents *:will-change-transform"
+      transition:enable|global
+      on:outrostart={morph}
+      on:introstart={morph}
+      on:introend={end}
+      use:mark={key}
+    >
+      <slot />
+    </div>
+  {/if}
 {:else}
   <slot />
 {/if}
