@@ -21,7 +21,7 @@
 
 <aside class="absolute left-0 top-0">
   <button
-    class="fixed z-20 flex h-11 w-full origin-top scale-y-0 transform-gpu touch-manipulation select-none items-center justify-center border-b border-highlight bg-gradient-to-t from-surface/70 to-surface font-semibold opacity-0 backdrop-blur-md transition-composite will-change-transform sm:bg-inherit"
+    class="fixed z-20 flex h-11 w-full origin-top scale-y-0 touch-manipulation select-none items-center justify-center border-b border-highlight bg-gradient-to-t from-surface/70 to-surface font-semibold opacity-0 backdrop-blur-md transition-composite will-change-composite sm:bg-inherit"
     tabindex="-1"
     class:scale-y-100={stuck}
     class:opacity-100={stuck}
@@ -31,7 +31,11 @@
   </button>
 </aside>
 
-<div class="transition-composite" class:opacity-0={stuck} bind:this={trigger}>
+<div
+  class="relative z-10 transition-composite will-change-opacity"
+  class:opacity-0={stuck}
+  bind:this={trigger}
+>
   <slot />
 </div>
 
