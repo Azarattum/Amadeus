@@ -23,6 +23,10 @@ const theme = {
       paint: "transform, opacity, color, background-color",
       composite: "transform, opacity",
     },
+    willChange: {
+      composite: "transform, opacity",
+      opacity: "opacity",
+    },
     colors: {
       primary: {
         100: "hsl(var(--color-primary-100) / <alpha-value>)",
