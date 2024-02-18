@@ -6,14 +6,14 @@
   setContext("tabs", tabs);
 
   let container: HTMLElement;
-  let width = 0;
+  let rect = new DOMRect();
 
   $: offsets = elements.map((x) => x.offsetLeft);
   $: compact =
-    offsets.slice(-1)[0] + elements.slice(-1)[0]?.clientWidth >= width;
+    offsets.slice(-1)[0] + elements.slice(-1)[0]?.clientWidth >= rect.width;
   $: transforms = offsets.map((offset, i) => {
     if (!compact) return "";
-    const ratio = (width * i) / offset || 1;
+    const ratio = (rect.width * i) / offset || 1;
     return `
       translate3d(${-offset}px,-2.75rem,${-ratio + 1}px)
       scale(${ratio})
@@ -45,7 +45,7 @@
   class="grid h-full max-h-dvh snap-x snap-mandatory overflow-y-hidden overflow-x-scroll"
   style="grid: auto / auto-flow 100%; perspective: 1px; perspective-origin: top left;"
   class:scroll-smooth={compact}
-  bind:clientWidth={width}
+  bind:contentRect={rect}
   bind:this={container}
 >
   <slot />
