@@ -36,7 +36,11 @@ function connect(options: Options) {
       options,
     ) as any as DB;
     connections.set(options.name, { ...db, ...stores(db) });
-    const files = import.meta.glob("../sql/*.sql", { eager: true, as: "raw" });
+    const files = import.meta.glob<true, string, string>("../sql/*.sql", {
+      import: "default",
+      query: "?raw",
+      eager: true,
+    });
     // Disable indexing on the shared DB
     if (options.local) delete files["../sql/fts.sql"];
     const statements = Object.values(files)
