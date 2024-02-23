@@ -1,5 +1,9 @@
 <script context="module" lang="ts">
-  const icons = import.meta.glob("../icons/*.svg", { eager: true, as: "raw" });
+  const icons = import.meta.glob("../../icons/*.svg", {
+    import: "default",
+    query: "?raw",
+    eager: true,
+  });
 </script>
 
 <script lang="ts">
@@ -21,7 +25,7 @@
   export let xxl = false;
 
   $: size = xxl ? 104 : xl ? 44 : lg ? 32 : sm ? 21 : xs ? 16 : md ? 28 : 24;
-  $: source = icons[`../icons/${of}.svg`];
+  $: source = icons[`../../icons/${of}.svg`];
 </script>
 
 {#if source}
