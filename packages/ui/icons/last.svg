@@ -1,6 +1,1 @@
-<svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M22 17.5L18.5 20V15L22 17.5Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M2 5H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M2 11H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M2 17H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.805 4.28c-.391.092-.633.519-.524.924.059.218.288.453.5.511.226.063 18.212.063 18.438 0a.84.84 0 0 0 .306-.191.739.739 0 0 0-.348-1.246c-.194-.045-18.181-.043-18.372.002m0 6c-.391.092-.633.519-.524.924.059.218.288.453.5.511.226.063 18.212.063 18.438 0a.84.84 0 0 0 .306-.191.739.739 0 0 0-.348-1.246c-.194-.045-18.181-.043-18.372.002m16.535 3.997a1.06 1.06 0 0 0-.205.075c-.141.076-.33.319-.355.457-.013.072-.018 1.329-.012 2.794l.012 2.663.1.148c.111.164.431.346.609.346a.85.85 0 0 0 .26-.061c.08-.034.971-.65 1.979-1.37 1.723-1.23 1.84-1.321 1.933-1.507a.92.92 0 0 0 .098-.32c-.001-.165-.123-.419-.264-.548-.27-.249-3.666-2.633-3.805-2.672-.166-.046-.179-.046-.35-.005M1.805 16.28c-.391.092-.633.519-.524.924.059.218.288.453.5.511.225.063 12.213.063 12.438 0a.84.84 0 0 0 .306-.191.739.739 0 0 0-.348-1.246c-.194-.045-12.181-.043-12.372.002" fill="currentColor" fill-rule="evenodd"/></svg>
