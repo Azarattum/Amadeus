@@ -32,6 +32,7 @@ init(function* ({ yandex: { token } }) {
   this.fetch.baseURL = "https://api.music.yandex.net/";
   this.fetch.params = { page: "0" };
   this.fetch.headers = {
+    "X-Yandex-Music-Client": "YandexMusicAndroid/24023621",
     "User-Agent": "Yandex-Music-API",
     Authorization: `OAuth ${token}`,
   };
