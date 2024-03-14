@@ -1,6 +1,7 @@
 /// <reference types="svelte" />
 import "./internal/polyfill";
 import "./lib/tailwind.pcss";
+import "virtual:icons.css";
 
 export * from "./internal/tailwind";
 export * from "./lib/interactive";
