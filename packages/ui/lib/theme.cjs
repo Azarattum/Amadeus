@@ -27,6 +27,9 @@ const theme = {
       composite: "transform, opacity",
       opacity: "opacity",
     },
+    fontFamily: {
+      icon: "icons",
+    },
     colors: {
       primary: {
         100: "hsl(var(--color-primary-100) / <alpha-value>)",
