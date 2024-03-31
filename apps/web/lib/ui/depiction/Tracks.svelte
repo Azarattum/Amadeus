@@ -102,7 +102,7 @@
     on:end
   >
     <div
-      class="relative flex [&_hr]:!opacity-100 [*:has(>&):last-of-type_hr]:!opacity-0"
+      class="relative flex [&_hr]:!block [*:has(>&):last-of-type_hr]:!hidden"
     >
       {#if timeline}
         <div
