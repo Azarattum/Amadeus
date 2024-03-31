@@ -77,7 +77,7 @@
   $: order = Array.from({ length }).map((_, i) => i);
   $: index = reindex(items);
 
-  $: gridRows = `repeat(${rows},${rowHeight <= 1 ? "auto" : rowHeight + "px"})`;
+  $: gridRows = `repeat(${rows},${rowHeight <= 1 ? "auto" : rowHeight - gap + "px"})`;
   $: gridCols = Number.isInteger(columns)
     ? `repeat(${columns},1fr)`
     : `repeat(auto-fill,minmax(min(100%,${columns}),1fr))`;
