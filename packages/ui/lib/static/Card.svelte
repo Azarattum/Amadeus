@@ -13,8 +13,8 @@
     ? tw`bg-surface-highlight-200 
       ${!disabled && "hover:bg-surface-highlight-300"}`
     : big
-    ? tw`bg-surface-100 ${!disabled && "hover:bg-surface-highlight-100"}`
-    : tw`bg-surface ${!disabled && "hover:bg-surface-highlight"}`;
+      ? tw`bg-surface-100 ${!disabled && "hover:bg-surface-highlight-100"}`
+      : tw`bg-surface ${!disabled && "hover:bg-surface-highlight"}`;
   $: rounded = big ? "rounded-2xl" : "rounded-lg";
   $: container = big
     ? tw`gap-y-2 py-4 shadow-[0_0_20px_-4px] shadow-black/20 dark:shadow-none`
@@ -25,7 +25,7 @@
 
 <svelte:element
   this={disabled ? "article" : href ? "a" : "button"}
-  class={tw`group relative grid w-full touch-manipulation select-none grid-flow-col grid-cols-[auto_1fr_auto] px-4 outline-2 -outline-offset-2 outline-primary-600 contain-inline-size focus-visible:outline [&>div]:row-start-1
+  class={tw`group grid w-full touch-manipulation select-none grid-flow-col grid-cols-[auto_1fr_auto] px-4 outline-2 -outline-offset-2 outline-primary-600 contain-inline-size focus-visible:outline [&>div]:row-start-1
   ${container} ${rounded} ${bg} 
   ${!disabled && big && "transition-transform active:scale-95"} ${classes}`}
   role={href ? "link" : "button"}
@@ -50,7 +50,7 @@
   </div>
   {#if !big}
     <hr
-      class={tw`relative top-1 col-start-2 col-end-4 row-start-1 h-[1px] w-[calc(100%+0.5rem)] self-end border-none group-last-of-type:opacity-0
+      class={tw`relative top-1 col-start-2 col-end-4 row-start-1 h-[1px] w-[calc(100%+0.5rem)] self-end border-none group-last-of-type:hidden
     ${selected ? "bg-primary-900/10" : "bg-content/10"}`}
     />
   {/if}
