@@ -41,49 +41,52 @@
   export let items: T[];
   export let move = false;
   export let fixed = false;
-  export let overthrow = 1;
-  export let prerender = 1 as Prerender;
   export let columns: number | string = 1;
   export let key = (x: T) => x as any as K;
   export let animate: boolean | number = false;
   export let sortable: boolean | string = false;
   export let container: HTMLElement | undefined = undefined;
 
+  export let batch = 1;
+  export let overscan = 1;
+  export let prerender = 1 as Prerender;
+
   /* === Virtual Logic === */
   let wrapper: HTMLElement | null = null;
   let scroll = { x: 0, y: 0 };
   let outer = new DOMRect();
   let inner = new DOMRect();
-  let firstRender = true;
-  let ended = true;
+  let ended = false;
   let rowHeight = 1;
   let perRow = 0;
   let offset = 0;
 
-  $: pageSize = Math.ceil(outer.height / rowHeight) * perRow;
-  $: pageHeight = (pageSize / perRow) * rowHeight;
-  $: pageMax = Math.max(Math.ceil(items.length / pageSize) - 2, 1);
-  $: page = minmax(~~((scroll.y - offset) / pageHeight), 1, pageMax);
+  $: rows = Math.ceil(outer.height / rowHeight) + overscan * 2;
+  $: length = outer.height ? rows * perRow : prerender;
 
-  $: limit = firstRender ? page + overthrow * pageSize : Infinity;
-  $: from = Math.max(page - overthrow, 0) * pageSize;
-  $: to = minmax((page + overthrow + 1) * pageSize, prerender, limit);
-  $: slice = items.slice(from, to);
+  $: pageHeight = rowHeight * batch;
+  $: pageOffset = offset - pageHeight / 2;
+  $: page = ~~((scroll.y - pageOffset) / pageHeight);
+  $: totalHeight = Math.ceil(items.length / perRow) * rowHeight - gap;
 
-  $: window = (overthrow * 2 + 1) * pageSize;
-  $: order = Array.from({ length: window }).map((_, i) => i);
-  $: index = reindex(items);
+  $: start = (page * batch - overscan) * perRow;
+  $: from = Math.max(start, 0);
+  $: to = Math.min(start + length, items.length);
 
   $: duration = animate === true ? 300 : animate || 0;
-  $: totalHeight = Math.ceil(items.length / perRow) * rowHeight - gap;
-  $: template = Number.isInteger(columns)
+  $: order = Array.from({ length }).map((_, i) => i);
+  $: index = reindex(items);
+
+  $: gridRows = `repeat(${rows},${rowHeight <= 1 ? "auto" : rowHeight + "px"})`;
+  $: gridCols = Number.isInteger(columns)
     ? `repeat(${columns},1fr)`
     : `repeat(auto-fill,minmax(min(100%,${columns}),1fr))`;
+
   $: if (Number.isFinite(totalHeight)) {
     requestAnimationFrame(measure);
     ended = false;
   }
-  $: if (!ended && page === pageMax) {
+  $: if (!ended && to >= items.length - length / 2) {
     dispatch("end");
     ended = true;
   }
@@ -91,7 +94,7 @@
   function reindex(items: T[]) {
     if (!index && items.length) tick().then(measure);
     const reindexed = new Map<K, number>();
-    const reordered = Array.from<number>({ length: window });
+    const reordered = Array.from<number>({ length });
     const unused = new Set(order);
 
     for (let i = 0; i < items.length; i++) {
@@ -103,8 +106,8 @@
       const before = index?.get(id);
 
       if (before == null || before < from || before >= to) continue;
-      reordered[i % window] = order[before % window];
-      unused.delete(order[before % window]);
+      reordered[i % length] = order[before % length];
+      unused.delete(order[before % length]);
 
       if (before === i || !animate) continue;
       if ($transfer?.owner === wrapper && id === $transfer?.key) continue;
@@ -134,7 +137,7 @@
     inner = wrapper.parentElement?.getBoundingClientRect() as DOMRect;
     outer = container.getBoundingClientRect();
     inner.y += scroll.y;
-    offset = inner.y - outer.y - outer.height / 2;
+    offset = inner.y - outer.y;
     inner.width += gap;
     const target = wrapper.firstElementChild;
     if (!target) return;
@@ -142,10 +145,6 @@
     if (!width || !height) return;
     perRow = ~~(inner.width / (width + gap));
     rowHeight = height + gap;
-
-    (globalThis.requestIdleCallback || globalThis.requestAnimationFrame)(
-      () => (firstRender = false),
-    );
   }
 
   /* === Sortable Logic === */
@@ -205,7 +204,7 @@
       if (!passive && rollback == null) (rollback = index), (original = index);
       if (~index) items.splice(index, 1);
       if (~position) items.splice(position, 0, $transfer.data);
-      requestAnimationFrame(() => (items = items));
+      tick().then(() => (items = items));
     }
     if (!passive && wrapper) $transfer.owner = wrapper;
   }
@@ -247,7 +246,6 @@
     container.addEventListener("scroll", scroller, { passive: true });
     container.addEventListener("resize", measure);
     const { destroy } = resize(container);
-    ended = false;
     return () => {
       container?.removeEventListener("scroll", scroller);
       container?.removeEventListener("resize", measure);
@@ -259,23 +257,26 @@
 
 <div class="shrink-0 contain-layout" style:height="{totalHeight}px">
   <div
-    class="grid auto-rows-max will-change-transform contain-layout"
+    class="grid *:will-change-transform *:[overflow-anchor:none]"
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
+    style:contain={Number.isFinite(totalHeight) ? "layout size" : "layout"}
     class:pointer-events-none={!!$transfer}
-    style:grid-template-columns={template}
+    style:grid-template-columns={gridCols}
+    style:grid-template-rows={gridRows}
     style:gap="{gap}px"
     bind:this={wrapper}
     use:drag={"hold"}
     use:hold
   >
-    {#each slice as item, i (order[(from + i) % window] ?? i)}
+    {#each { length: Math.max(to - from, 0) } as _, i (order[(from + i) % length] ?? i)}
+      {@const index = from + i}
+      {@const item = items[index]}
+      {@const id = key(item)}
       <div
-        draggable={sortable && key(item) != null ? "true" : undefined}
-        style="overflow-anchor: none;"
-        class:invisible={$transfer?.owner === wrapper &&
-          $transfer?.key === key(item)}
+        draggable={sortable && id != null ? "true" : undefined}
+        class:invisible={$transfer?.owner === wrapper && $transfer?.key === id}
       >
-        <slot index={from + i} {item} />
+        <slot {index} {item} />
       </div>
     {/each}
   </div>
