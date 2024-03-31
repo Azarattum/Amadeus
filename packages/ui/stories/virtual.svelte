@@ -10,7 +10,7 @@
   <div
     class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll p-4"
   >
-    <Header>List 1</Header>
+    <Header class="shrink-0">List 1</Header>
     <Virtual
       animate
       items={items1}
@@ -31,7 +31,7 @@
     class="scroll flex h-full w-1/2 transform-gpu flex-col gap-4 overflow-y-scroll p-4"
     use:autoscroll
   >
-    <Header>List 2</Header>
+    <Header class="shrink-0">List 2</Header>
     <Virtual
       animate
       columns="20rem"
