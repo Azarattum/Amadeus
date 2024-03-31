@@ -3,8 +3,8 @@
 
   let classes: Classes = "";
   export { classes as class };
-  export let thumbnail: string | undefined | null = undefined;
   export let src: string | undefined | null = undefined;
+  export let thumbnail: string | undefined | null = src;
   export let size = 48;
   export let alt = "";
 
