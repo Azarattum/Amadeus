@@ -20,10 +20,10 @@ import {
 import { array, optional } from "@amadeus-music/core";
 import { safeFetch } from "./captcha";
 
-init(function* ({ vk: { token } }) {
-  if (!token) throw "No token found!";
+init(function* ({ vk: { tokens } }) {
+  if (!tokens.length) throw "No token found!";
   this.fetch.baseURL = "https://api.vk.me/method/";
-  this.fetch.params = { v: "5.190", access_token: token };
+  this.fetch.params = { v: "5.190", access_token: tokens };
   this.fetch.headers = {
     "User-Agent": "Mrs.ia/1520 CFNetwork/1331.0.7 Darwin/21.4.0",
   };

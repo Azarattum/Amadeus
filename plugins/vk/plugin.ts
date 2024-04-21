@@ -1,4 +1,10 @@
-import { string, defaulted, object, register } from "@amadeus-music/core";
+import {
+  defaulted,
+  register,
+  string,
+  object,
+  array,
+} from "@amadeus-music/core";
 import { name, version } from "./package.json";
 
 export const {
@@ -17,6 +23,6 @@ export const {
   name,
   version,
   config: {
-    vk: defaulted(object({ token: defaulted(string(), "") }), {}),
+    vk: defaulted(object({ tokens: defaulted(array(string()), []) }), {}),
   },
 });
