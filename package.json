@@ -47,6 +47,6 @@
     "vitest": "1.5.0"
   },
   "dependencies": {
-    "@capacitor/core": "^5.7.0"
+    "@capacitor/core": "^6.0.0"
   }
 }
