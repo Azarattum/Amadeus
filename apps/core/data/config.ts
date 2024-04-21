@@ -6,18 +6,21 @@ import {
   number,
   type Infer,
   string,
+  array,
 } from "superstruct";
 import { persistence, users } from "../event/persistence";
 import { readFile, writeFile } from "node:fs/promises";
 import { merge } from "@amadeus-music/util/object";
+import { plugins, unload } from "../plugin/loader";
 import type { Plugin } from "../plugin/types";
-import { plugins } from "../plugin/loader";
 import { fallback, pipe } from "libfun";
+import { wrn } from "../status/log";
 import { path } from "./path";
 
 type Config = Infer<typeof baseConfig>;
 const baseConfig = type({
   port: defaulted(number(), 8080),
+  disabled: defaulted(array(string()), []),
 });
 const baseSetting = type({
   name: defaulted(string(), "Unknown"),
@@ -25,17 +28,30 @@ const baseSetting = type({
 
 async function configure(plugins: Map<string, Plugin>, overrides = {}) {
   const configs = [...plugins.values()].map((x) => type(x.config || {}));
-  const config = intersection([baseConfig, ...configs]);
+  const schema = intersection([baseConfig, ...configs]);
   const file = path("config.json");
 
-  return pipe(file)(
+  const config = await pipe(file)(
     (x) => readFile(x, "utf8"),
     JSON.parse,
     fallback({}),
     (x) => merge(x, overrides),
-    (x) => create(x, config, "Invalid configuration!"),
-    (x) => writeFile(file, JSON.stringify(x, null, 2)).then(() => x)
+    (x) => create(x, schema, "Invalid configuration!"),
+    (x) => writeFile(file, JSON.stringify(x, null, 2)).then(() => x),
   );
+
+  const disabled = await Promise.all(
+    config.disabled
+      .filter((x) => plugins.has(x.toLowerCase()))
+      .map((x) => unload(x).then(() => x)),
+  );
+
+  if (disabled.length) {
+    const names = disabled.join(", ");
+    wrn(`${disabled.length} plugins (${names}) were disabled in config!`);
+  }
+
+  return config;
 }
 
 function settings() {
@@ -53,7 +69,7 @@ async function setup(username?: string) {
     promises.push(
       ...Object.entries(defaults)
         .filter(([key]) => !(key in settings))
-        .map(([key, value]) => storage.settings.store(key, value))
+        .map(([key, value]) => storage.settings.store(key, value)),
     );
   }
   await Promise.all(promises);
