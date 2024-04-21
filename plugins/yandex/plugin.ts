@@ -1,4 +1,10 @@
-import { string, defaulted, object, register } from "@amadeus-music/core";
+import {
+  defaulted,
+  register,
+  string,
+  object,
+  array,
+} from "@amadeus-music/core";
 import { name, version } from "./package.json";
 
 export const {
@@ -21,6 +27,6 @@ export const {
   name,
   version,
   config: {
-    yandex: defaulted(object({ token: defaulted(string(), "") }), {}),
+    yandex: defaulted(object({ tokens: defaulted(array(string()), []) }), {}),
   },
 });

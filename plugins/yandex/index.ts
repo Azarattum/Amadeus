@@ -26,16 +26,16 @@ import { auth, header, transform } from "./meta";
 import { array } from "@amadeus-music/core";
 import { createHash } from "node:crypto";
 
-init(function* ({ yandex: { token } }) {
-  if (!token) throw "No token found!";
+init(function* ({ yandex: { tokens } }) {
+  if (!tokens.length) throw "No token found!";
   this.connect.baseURL = "wss://uniproxy.alice.yandex.net/uni.ws";
   this.fetch.baseURL = "https://api.music.yandex.net/";
   this.fetch.params = { page: "0" };
   this.fetch.tls = "TLSv1.2";
   this.fetch.headers = {
     "X-Yandex-Music-Client": "YandexMusicAndroid/24023621",
+    Authorization: tokens.map((x) => `OAuth ${x}`),
     "User-Agent": "Yandex-Music-API",
-    Authorization: `OAuth ${token}`,
   };
 });
 
