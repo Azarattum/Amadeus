@@ -1,11 +1,11 @@
 import { merge, pick } from "@amadeus-music/util/object";
+import { Readable, type Writable } from "node:stream";
 import { gretch, type GretchOptions } from "gretchen";
 import tls, { type SecureVersion } from "node:tls";
 import type { Context } from "../plugin/types";
 import { errorify } from "libfun/utils/error";
 import type { Struct } from "superstruct";
 import { async, context } from "libfun";
-import { Readable } from "node:stream";
 import { pools } from "../event/pool";
 import { Form } from "./form";
 
@@ -20,7 +20,11 @@ type FetchOptions = {
   tls?: SecureVersion;
   form?: Record<
     string,
-    string | number | (string | number)[] | [Readable, string] | undefined
+    | string
+    | number
+    | (string | number)[]
+    | [Readable | Writable, string]
+    | undefined
   >;
 };
 

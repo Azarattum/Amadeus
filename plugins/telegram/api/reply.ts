@@ -41,7 +41,7 @@ function* queue(
   notifier: () => void,
   name: string,
   tracks: Track[],
-  group = true
+  group = true,
 ) {
   let done = false;
   const ping = (notifier(), setInterval(notifier, 3000));
@@ -56,13 +56,13 @@ function* queue(
         track,
         mode: markdown(),
         markup: !group ? menu(track.id) : undefined,
-      }).then((x) => (setTimeout(() => done || notifier(), 10), x))
+      }).then((x) => (setTimeout(() => done || notifier(), 10), x)),
     );
   }
   yield* yield* async(
     Promise.allSettled(promises).then((x) =>
-      x.map((x) => (x.status === "rejected" ? 0 : +x.value))
-    )
+      x.map((x) => (x.status === "rejected" ? 0 : +x.value)),
+    ),
   );
   done = true;
 }
@@ -73,21 +73,21 @@ function* reply(chat: number, params: Message) {
     params.file = yield* async(
       persistence()
         .settings.extract(params.track.id.toString())
-        .then(null, () => undefined)
+        .then(null, () => undefined),
     );
   }
 
   const { result } = yield* "track" in params
     ? sendAudio(chat, params)
     : "page" in params
-    ? sendPage(chat, params)
-    : sendMessage(chat, params);
+      ? sendPage(chat, params)
+      : sendMessage(chat, params);
 
   // Cache audio if any
   if ("track" in params && result.audio?.file_id) {
     yield* persistence().settings.store(
       params.track.id.toString(),
-      result.audio.file_id
+      result.audio.file_id,
     );
   }
 
@@ -128,7 +128,7 @@ function replier(chat: number, name: string, group = true) {
 
 function editor(chat: number) {
   return function* (message: number, params: Message) {
-    yield* editMessageCaption(chat, message, params);
+    yield* async(editMessageCaption(chat, message, params));
   };
 }
 
