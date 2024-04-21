@@ -31,6 +31,7 @@ init(function* ({ yandex: { token } }) {
   this.connect.baseURL = "wss://uniproxy.alice.yandex.net/uni.ws";
   this.fetch.baseURL = "https://api.music.yandex.net/";
   this.fetch.params = { page: "0" };
+  this.fetch.tls = "TLSv1.2";
   this.fetch.headers = {
     "X-Yandex-Music-Client": "YandexMusicAndroid/24023621",
     "User-Agent": "Yandex-Music-API",
@@ -51,7 +52,7 @@ search(function* (type, query, page) {
     };
 
     const { result } = yield* fetch("search", { params }).as(
-      resultsOf(collection, struct)
+      resultsOf(collection, struct),
     );
 
     const items = result[collection];
@@ -77,7 +78,7 @@ expand(function* (type, what, page) {
   if (!id) return;
   if (type === "album") {
     const { result } = yield* fetch(`albums/${id}/with-tracks`).as(
-      resultOf("volumes", array(track))
+      resultOf("volumes", array(track)),
     );
 
     yield* convert(result.volumes?.flat(), "track");
@@ -86,7 +87,7 @@ expand(function* (type, what, page) {
       const url = `artists/${id}/tracks`;
       const params = { page: i, "page-size": page };
       const { result } = yield* fetch(url, { params }).as(
-        resultOf("tracks", track)
+        resultOf("tracks", track),
       );
       if (!result.tracks) break;
       yield* convert(result.tracks, "track");
@@ -104,7 +105,7 @@ relate(function* (type, to, _) {
   const upper = (x: string) => x[0].toUpperCase() + x.slice(1);
 
   const { result } = yield* fetch(`${collection}/${id}/similar`).as(
-    resultOf(`similar${upper(collection)}`, struct)
+    resultOf(`similar${upper(collection)}`, struct),
   );
   yield* convert(result[`similar${upper(collection)}`], type);
 });
@@ -134,7 +135,7 @@ recognize(function* (stream) {
 
 function* identify(
   data: { sources?: string[]; title?: string },
-  type: "track" | "artist" | "album"
+  type: "track" | "artist" | "album",
 ) {
   return (
     data.sources?.find((x) => x.startsWith("yandex/"))?.slice(7) ||

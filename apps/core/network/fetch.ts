@@ -1,5 +1,6 @@
 import { merge, pick } from "@amadeus-music/util/object";
 import { gretch, type GretchOptions } from "gretchen";
+import tls, { type SecureVersion } from "node:tls";
 import type { Context } from "../plugin/types";
 import { errorify } from "libfun/utils/error";
 import type { Struct } from "superstruct";
@@ -12,10 +13,11 @@ type FetchOptions = {
   [K in keyof GretchOptions]: K extends "baseURL"
     ? string | string[]
     : K extends "headers"
-    ? Record<string, string | string[]>
-    : GretchOptions[K];
+      ? Record<string, string | string[]>
+      : GretchOptions[K];
 } & {
   params?: Record<string, string | number | (string | number)[]>;
+  tls?: SecureVersion;
   form?: Record<
     string,
     string | number | (string | number)[] | [Readable, string] | undefined
@@ -40,9 +42,12 @@ function fetch(this: Context, url: string, options: FetchOptions = {}) {
   }
   const body = options.form
     ? (Readable.toWeb(
-        new Form(options.form)
+        new Form(options.form),
       ) as ReadableStream<ArrayBufferView>)
     : undefined;
+
+  const defaultTLS = tls.DEFAULT_MAX_VERSION;
+  if (options.tls) tls.DEFAULT_MAX_VERSION = options.tls;
 
   const request = gretch<unknown, unknown>(url, {
     timeout: options.form ? 10 * 60 * 1000 : 10000,
@@ -57,6 +62,8 @@ function fetch(this: Context, url: string, options: FetchOptions = {}) {
       ...pick(options.headers),
     },
   });
+
+  if (options.tls) tls.DEFAULT_MAX_VERSION = defaultTLS;
 
   return {
     request,
