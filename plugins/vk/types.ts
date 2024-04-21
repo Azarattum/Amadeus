@@ -136,12 +136,15 @@ const track = type({
 
 const lyrics = type({
   lyrics: type({
-    timestamps: array(
-      type({
-        begin: number(),
-        end: number(),
-        line: optional(string()),
-      }),
+    text: optional(array(string())),
+    timestamps: optional(
+      array(
+        type({
+          begin: number(),
+          end: number(),
+          line: optional(string()),
+        }),
+      ),
     ),
   }),
 });

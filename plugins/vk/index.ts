@@ -38,7 +38,7 @@ search(function* (type, query, page) {
     const { response } = yield* safeFetch(
       `audio.search${method}`,
       { params: { q: query, count: page, offset: i } },
-      responseOf(items(struct))
+      responseOf(items(struct)),
     );
     if (!response.items.length) break;
     const results = convert(response.items, type);
@@ -101,13 +101,16 @@ transcribe(function* (track) {
     params: { audio_id: id },
   }).as(responseOf(optional(lyrics)));
 
-  if (!response?.lyrics) return;
-  yield response.lyrics.timestamps.map((x) => x.line || "").join("\n");
+  const lines =
+    response?.lyrics.timestamps?.map((x) => x.line || "") ||
+    response?.lyrics.text;
+
+  if (lines?.length) yield lines.join("\n");
 });
 
 function* identify(
   data: { sources?: string[]; title?: string },
-  type: "track" | "artist" | "album"
+  type: "track" | "artist" | "album",
 ) {
   return (
     data.sources?.find((x) => x.startsWith("vk/"))?.slice(3) ||
