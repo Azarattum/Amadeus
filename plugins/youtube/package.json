@@ -8,9 +8,9 @@
   },
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
-    "youtubei.js": "^9.1.0"
+    "youtubei.js": "^9.3.0"
   },
   "devDependencies": {
-    "vite": "5.1.1"
+    "vite": "5.2.10"
   }
 }

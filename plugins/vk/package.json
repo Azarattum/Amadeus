@@ -10,9 +10,9 @@
     "@amadeus-music/core": "workspace:*",
     "@amadeus-music/protocol": "workspace:*",
     "jpeg-js": "^0.4.4",
-    "onnxruntime-web": "^1.17.0"
+    "onnxruntime-web": "^1.17.3"
   },
   "devDependencies": {
-    "vite": "5.1.1"
+    "vite": "5.2.10"
   }
 }

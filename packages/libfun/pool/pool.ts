@@ -224,7 +224,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
       };
     },
     context(context) {
-      this.bind({ context });
+      this.bind({ context, group: "" });
     },
     bind(context: Override) {
       if (context?.context) {
@@ -278,7 +278,7 @@ function pools(options: Partial<Options<any>> = {}): Pools {
 function pool<T extends Fn = () => void, R = never>(
   this: Override & { scope?: string },
   global: {
-    options: Options<T>;
+    options: Options<Fn>;
     prototype: object;
     all: Map<string, Pool>;
     catchers: Set<Catcher>;

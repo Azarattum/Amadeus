@@ -13,12 +13,12 @@
     "@amadeus-music/protocol": "workspace:*",
     "@amadeus-music/ui": "workspace:*",
     "@amadeus-music/util": "workspace:*",
-    "@trpc/client": "^10.45.1",
-    "@trpc/server": "^10.45.1"
+    "@trpc/client": "^10.45.2",
+    "@trpc/server": "^10.45.2"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "3.0.1",
-    "crstore": "^0.22.0",
+    "crstore": "^0.23.1",
     "murmurhash": "^2.0.1"
   }
 }

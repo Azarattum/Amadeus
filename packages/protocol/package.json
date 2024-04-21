@@ -9,6 +9,6 @@
   "dependencies": {
     "@amadeus-music/util": "workspace:*",
     "murmurhash": "^2.0.1",
-    "superstruct": "^1.0.3"
+    "superstruct": "^1.0.4"
   }
 }
