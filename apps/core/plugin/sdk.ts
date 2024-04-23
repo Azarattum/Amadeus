@@ -31,7 +31,7 @@ const bound = {
 function register<
   T extends RecordStruct = undefined,
   S extends RecordStruct = undefined,
-  C extends Record<string, any> = Record<string, never>
+  C extends Record<string, any> = Record<string, never>,
 >(plugin: Plugin<T, S, C>) {
   assert(plugin, pluginInfo, "Tried to register an invalid plugin!");
   plugin.name = format(plugin.name) as string;
@@ -53,7 +53,7 @@ function register<
   return Object.fromEntries(
     Object.entries(bound)
       .filter((entry) => "bind" in entry[1])
-      .map(([key, fn]) => [key, (fn as any).bind(context)])
+      .map(([key, fn]) => [key, (fn as any).bind(context)]),
   ) as Configure<typeof bound, T, S, C & NativeContext>;
 }
 
@@ -72,3 +72,4 @@ export * from "@amadeus-music/util/color";
 export * from "@amadeus-music/protocol";
 
 export type { Page } from "../data/pagination";
+export type { Persistence } from "../event/persistence.types";

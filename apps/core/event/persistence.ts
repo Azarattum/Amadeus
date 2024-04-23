@@ -18,6 +18,7 @@ import { async } from "libfun";
 const rejected = (reason: unknown) =>
   wrn("Persistence provider has failed.", reason || "");
 
+const unique: Strategy = (x) => all(x, rejected).then((x) => new Set(x.flat()));
 const flatten: Strategy = (x) => all(x, rejected).then((x) => x.flat());
 const voided: Strategy = (x) => all(x, rejected).then(() => undefined);
 const raced: Strategy = (x) => Promise.any(x);
@@ -39,6 +40,7 @@ const strategies: { [K in Method]?: Strategy } = {
   "playlists.get": merged,
   "resources.get": merged,
   "library.get": flatten,
+  "library.has": unique,
   "artists.get": merged,
   "albums.get": merged,
   "tracks.get": merged,

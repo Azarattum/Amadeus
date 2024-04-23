@@ -50,9 +50,6 @@ export const feed = ({ replicated }: DB) =>
         .orderBy("playlists.id")
         .$castTo<Playlist & { collection: { tracks: { entry: number }[] } }>(),
     {
-      async clear(db, type: Feed) {
-        await db.deleteFrom("library").where("playlist", "=", type).execute();
-      },
       async get(db, type: Feed, limit = -1) {
         return db
           .selectFrom("library")
@@ -61,6 +58,13 @@ export const feed = ({ replicated }: DB) =>
           .limit(limit)
           .execute()
           .then((x) => x.map((y) => y.id as number));
+      },
+      async clear(db, type: Feed, before = Number.MAX_SAFE_INTEGER) {
+        await db
+          .deleteFrom("library")
+          .where("playlist", "=", type)
+          .where("date", "<=", before)
+          .execute();
       },
     },
   );

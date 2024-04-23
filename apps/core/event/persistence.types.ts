@@ -26,14 +26,15 @@ type Database = DeepPartial<{
   };
   feed: {
     get(type: Feed, limit?: number): Promise<number[]>;
-    clear(type: Feed): Promise<void>;
+    clear(type: Feed, before?: number): Promise<void>;
   };
   library: {
+    sample(size: number, deviation?: number): Promise<Track[]>;
     push(tracks: Track[], playlist?: number): Promise<void>;
     rearrange(entry: number, after?: number): Promise<void>;
     get(entries: number[]): Promise<Track[]>;
+    has(ids: number[]): Promise<Set<number>>;
     purge(entries: number[]): Promise<void>;
-    sample(size: number): Promise<Track[]>;
     banned(): Promise<number[]>;
   };
   settings: {

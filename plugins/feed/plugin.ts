@@ -15,6 +15,7 @@ export const {
   pool,
   users,
   relate,
+  expand,
   lookup,
   command,
   persistence,
@@ -24,15 +25,16 @@ export const {
   config: {
     feed: defaulted(
       object({
-        recommendations: defaulted(integer(), 50),
-        hour: defaulted(number(), 6),
+        recommendations: defaulted(integer(), 48),
+        chunk: defaulted(number(), 4),
       }),
       {},
     ),
   },
-  context: { preferences: { recommendations: 0, time: 0 } },
+  context: { preferences: { interval: 1000 * 60 * 60, chunk: 0 } },
 });
 
-export const recommend = pool<(user: string) => void>("recommend", {
-  concurrency: 1,
-});
+export const recommend = pool<(user: string, count: number) => void>(
+  "recommend",
+  { concurrency: 1 },
+);

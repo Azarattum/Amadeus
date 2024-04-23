@@ -1,41 +1,27 @@
 import {
-  command,
-  info,
-  stop,
-  init,
-  lookup,
-  ok,
   persistence,
   recommend,
-  relate,
+  command,
   users,
+  stop,
+  init,
+  info,
 } from "./plugin";
-import {
-  Feed,
-  arg,
-  async,
-  bright,
-  map,
-  reset,
-  type Track,
-} from "@amadeus-music/core";
-import { shuffle } from "@amadeus-music/util/object";
+import { bright, async, reset, Feed, arg } from "@amadeus-music/core";
 import { delay } from "@amadeus-music/util/async";
-import { minmax } from "@amadeus-music/util/math";
+import { suggest } from "./recommendation";
 
-const day = 1000 * 60 * 60 * 24;
-const cleanup = new Set<AbortController>();
+init(function* ({ feed: { chunk, recommendations } }) {
+  const interval = day / (recommendations / chunk);
+  const from = new Date();
+  from.setMinutes(0, 0, 0);
 
-init(function* ({ feed }) {
-  const date = new Date();
-  date.setHours(feed.hour, 0, 0);
-
-  this.preferences.recommendations = feed.recommendations;
-  this.preferences.time = +date;
+  this.preferences.interval = interval;
+  this.preferences.chunk = chunk;
 
   // Register recommendations update time for each user
   for (const user of Object.keys(yield* async(users()))) {
-    const pool = recommend.schedule({ absolute: +date, interval: day })(user);
+    const pool = recommend.schedule({ relative: +from, interval })(user, chunk);
     cleanup.add(pool.executor.controller);
     pool.then();
   }
@@ -50,65 +36,36 @@ command("register", [arg.text])(function* (user) {
   user = user?.toLowerCase() || "";
   yield* async(delay(5));
   if (!(yield* async(users()))[user]) return;
-  const absolute = this.preferences.time;
-  const pool = recommend.schedule({ absolute, interval: day })(user);
+
+  const { interval, chunk } = this.preferences;
+  const from = new Date();
+  from.setMinutes(0, 0, 0);
+
+  const pool = recommend.schedule({ absolute: +from, interval })(user, chunk);
   cleanup.add(pool.executor.controller);
   pool.then();
 });
 
-recommend(function* (user) {
+recommend(function* (user, count) {
   const db = persistence(user);
-  const count = this.preferences.recommendations;
-  const sample = yield* db.library.sample(100);
-  const banned = new Set(yield* db.library.banned());
+  const sample = yield* db.library.sample(3, 100);
+  const novel = (ids: number[]) => db.library.has(ids).then();
   const name =
     bright + (yield* db.settings.extract("name", "settings")) + reset;
 
-  info(`Assembling recommendations for ${name}...`);
-
-  const recommendations: Track[] = [];
-  for (let i = 0; i < sample.length; i++) {
-    // Find the number of recommendations per track (biased towards newer)
-    const track = sample[i];
-    const bias = 3 * Math.exp(-1 * ((1 / Math.sqrt(count)) * i)) + 3;
-    const left = sample.length - i;
-    const pick = minmax(
-      Math.ceil(((count - recommendations.length) / left) * bias),
-      0,
-      count,
-    );
-
-    // Search for similar tracks
-    const similar: (Track | undefined)[] | undefined = (yield* map(
-      relate("track", track, pick * 5),
-      function* (x) {
-        if (x.progress >= 1) x.close();
-        return shuffle(x.items.filter((x) => !banned.has(x.id))).slice(0, pick);
-      },
-    )).pop();
-    if (!similar) continue;
-
-    /// TODO: search for similar artists
-    /// TODO: search for similar albums
-
-    // Look up tracks without sources
-    for (let i = 0; i < similar.length; i++) {
-      const track = similar[i];
-      if (!track || track.sources.length) continue;
-      similar[i] = yield* lookup("track", track);
+  for (const reference of sample) {
+    const recommendations = yield* suggest(reference, count, novel);
+    if (recommendations.length) {
+      yield* db.library.push(recommendations, Feed.Recommended);
+      info(`Recommended a chunk of ${recommendations.length} to ${name}...`);
+      break;
     }
-
-    // Save recommendations
-    recommendations.push(
-      ...similar
-        .filter(<T>(x: T): x is NonNullable<T> => !!x)
-        .filter((x) => !banned.has(x.id))
-        .slice(0, left),
-    );
-    if (recommendations.length >= count) break;
   }
 
-  yield* db.feed.clear(Feed.Recommended);
-  yield* db.library.push(shuffle(recommendations), Feed.Recommended);
-  ok(`Successfully assembled recommendations for ${name}...`);
+  yield* db.feed.clear(Feed.Recommended, (Date.now() - day + minute) / 1000);
 });
+
+const minute = 1000 * 60;
+const day = minute * 60 * 24;
+
+const cleanup = new Set<AbortController>();

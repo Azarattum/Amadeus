@@ -26,14 +26,16 @@ import { search } from "./pool";
 
 async function* aggregate(
   generators: AsyncGenerator<any>[],
-  { args, id, tasks, controller }: Task<[...any[], number]>
+  { args, id, tasks, controller }: Task<[...any[], number]>,
 ) {
   generators = generators.map(batch);
   const groups = tasks.map((x) => x.group as string).filter((x) => x);
   const compare =
     id === "search"
       ? match(typeof args[1] === "string" ? args[1] : args[1].title)
-      : undefined;
+      : id === "relate"
+        ? () => Math.random() - 0.5
+        : undefined;
 
   const last = args[args.length - 1];
   const limit = Number.isInteger(+last) ? +last : 10;
@@ -73,7 +75,7 @@ function* lookup<T extends MediaType>(
   this: Context,
   type: T,
   query: string | Meta,
-  filter?: string
+  filter?: string,
 ) {
   const find = filter ? search.bind(this).where(filter) : search.bind(this);
   if (typeof query === "object") query = { ...query, album: undefined };

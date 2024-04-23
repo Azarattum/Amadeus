@@ -61,8 +61,7 @@ export const library = ({ replicated }: DB) =>
         .$castTo<Track & { entry: number }>()
         .execute();
     },
-    async sample(db, size: number) {
-      const deviation = size;
+    async sample(db, size: number, deviation = size) {
       const constant = (deviation * Math.sqrt(2 * Math.PI)) / 2;
 
       // Weighted random sampling based on the normal distribution
@@ -102,5 +101,12 @@ export const library = ({ replicated }: DB) =>
         .where("relevancy", "<", 0)
         .execute()
         .then((x) => x.map((y) => y.track as number));
+    },
+    async has(db, ids: number[]) {
+      return await db
+        .selectFrom("tracks")
+        .select("id")
+        .where("id", "in", ids)
+        .execute();
     },
   });
