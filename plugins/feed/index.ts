@@ -21,7 +21,7 @@ init(function* ({ feed: { chunk, recommendations } }) {
 
   // Register recommendations update time for each user
   for (const user of Object.keys(yield* async(users()))) {
-    const pool = recommend.schedule({ relative: +from, interval })(user, chunk);
+    const pool = recommend.schedule({ absolute: +from, interval })(user, chunk);
     cleanup.add(pool.executor.controller);
     pool.then();
   }
