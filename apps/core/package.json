@@ -19,7 +19,7 @@
     "libfun": "workspace:*",
     "string-similarity-js": "^2.1.4",
     "superstruct": "^1.0.4",
-    "ws": "^8.16.0"
+    "ws": "^8.17.1"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^5.0.5",
