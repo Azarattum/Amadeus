@@ -17,7 +17,7 @@
     "@trpc/server": "^10.45.2"
   },
   "devDependencies": {
-    "@sveltejs/adapter-static": "3.0.1",
+    "@sveltejs/adapter-static": "3.0.2",
     "crstore": "^0.23.1",
     "murmurhash": "^2.0.1"
   }
