@@ -5,4 +5,5 @@ export default {
     "prettier-plugin-sort-imports",
   ],
   overrides: [{ files: "*.svelte", options: { parser: "svelte" } }],
+  tailwindPreserveWhitespace: true,
 };
