@@ -7,7 +7,7 @@ function stream<I, T, U>(from: Subscription<I, Stream<T, U>>, next: Next) {
   let pages: T[][] = [];
   let id = 0;
 
-  const { subscribe, set } = writable<(T[] & { detail?: U }) | undefined>(
+  const { subscribe, set } = writable<({ detail?: U } & T[]) | undefined>(
     undefined,
     () => () => unsubscribe(),
   );
@@ -76,7 +76,7 @@ function multistream<T extends Record<string, Subscription>>(
 
 type Multistream<T extends Record<string, Subscription<any, any>>> = {
   [K in keyof T]: T[K] extends Subscription<any, Stream<infer T, infer U>>
-    ? { data: (T[] & { detail?: U }) | undefined; type: K }
+    ? { data: ({ detail?: U } & T[]) | undefined; type: K }
     : never;
 }[keyof T];
 
