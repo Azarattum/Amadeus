@@ -57,3 +57,25 @@ export function compare(date: Date) {
   }
   return date.getFullYear().toString();
 }
+
+/**
+ * Parses a time string and returns the total number of milliseconds.
+ * @param {string} time Time string in the format of "123h45m30s".
+ */
+export function parse(time?: string | null) {
+  if (!time) return 0;
+  if (time.toLowerCase() === "infinity") return Infinity;
+
+  return Array.from(time.matchAll(/(\d+)(\w?)/g)).reduce((total, chunk) => {
+    const [, value, unit] = chunk;
+    return total + parseInt(value) * (units[unit as keyof typeof units] || 1);
+  }, 0);
+}
+
+const units = {
+  w: 7 * 24 * 60 * 60 * 1000,
+  d: 24 * 60 * 60 * 1000,
+  h: 60 * 60 * 1000,
+  m: 60 * 1000,
+  s: 1000,
+} as const;
