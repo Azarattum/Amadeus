@@ -6,9 +6,8 @@
     Image,
     Range,
     Text,
-    Icon,
-    tw,
   } from "@amadeus-music/ui";
+  import FallbackCover from "../depiction/internal/FallbackCover.svelte";
   import type { Track } from "@amadeus-music/protocol";
   import { format } from "@amadeus-music/util/time";
   import { scale } from "svelte/transition";
@@ -41,14 +40,8 @@
       bind:checked={paused}
     />
 
-    <Image src={track?.album.arts?.[0] || null} size={324}>
-      <div
-        class={tw`flex size-full items-center justify-center
-          ${track ? "bg-gradient-to-r from-rose-400 to-red-400 text-white" : "bg-surface-200 text-content-200"}`}
-        style:filter="hue-rotate({track?.id || 0}deg)"
-      >
-        <Icon of="note" xxl />
-      </div>
+    <Image src={track?.album.arts?.[0] || null} class="rounded-2xl" size={324}>
+      <FallbackCover of="track" xxl id={track?.id} />
     </Image>
     <div
       class="absolute -inset-[1px] flex items-center justify-center rounded-2xl bg-surface-200 opacity-0 backdrop-blur transition-[opacity] duration-300 peer-checked:opacity-100"
