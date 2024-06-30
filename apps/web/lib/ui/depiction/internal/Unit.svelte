@@ -41,12 +41,15 @@
   <Card big disabled={loading || !href} class={classes} {href}>
     <Morph marker key="thumb-{type}-{id}" slot="before">
       <ImageGrid
-        class={type === "artist" ? "rounded-full" : "rounded-2xl"}
+        class={art && !("arts" in art) && "rounded-2xl shadow-2xl"}
         let:rounded
         let:size
       >
         {#if !art || (art && "arts" in art)}
           <Image
+            class="shadow-lg {type === 'artist'
+              ? 'rounded-full'
+              : 'rounded-2xl'}"
             thumbnail={art && (art.thumbnails?.[0] || "")}
             src={art && (art.arts?.[0] || "")}
             {size}

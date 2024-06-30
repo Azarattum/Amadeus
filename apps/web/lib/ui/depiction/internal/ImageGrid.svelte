@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { tw } from "@amadeus-music/ui";
+  import { type Classes, tw } from "@amadeus-music/ui";
 
-  let classes = "";
+  let classes: Classes = "";
   export { classes as class };
   export let href: string | undefined = undefined;
 
@@ -16,7 +16,7 @@
 
 <svelte:element
   this={href ? "a" : "div"}
-  class={tw`grid shrink-0 grid-cols-[repeat(auto-fit,minmax(calc(50%-0.5rem),1fr))] gap-2 shadow-lg contain-paint
+  class={tw`grid shrink-0 grid-cols-[repeat(auto-fit,minmax(calc(50%-0.5rem),1fr))] gap-2 
   ${href && "outline outline-0 outline-highlight transition-[outline_transform] active:scale-95 hover:outline-8"}
   ${classes}`}
   {href}

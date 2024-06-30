@@ -9,6 +9,7 @@
     Image,
     Icon,
     Text,
+    tw,
   } from "@amadeus-music/ui";
   import type {
     CollectionType,
@@ -53,12 +54,9 @@
   >
     {#if (!of || (of && "arts" in of)) && style !== "playlist"}
       <Morph key="thumb-{style}-{of?.id}">
-        <ImageGrid
-          class="{style === 'artist' ? 'rounded-full' : 'rounded-2xl'} z-30"
-          {href}
-          let:size
-        >
+        <ImageGrid class="z-30" {href} let:size>
           <Image
+            class={tw`shadow-2xl ${style === "artist" ? "rounded-full" : "rounded-2xl"}`}
             thumbnail={of && (of.thumbnails?.[0] || "")}
             src={of && (of.arts?.[0] || "")}
             {size}
@@ -76,7 +74,7 @@
             <Image
               thumbnail={album.thumbnails?.[0] || ""}
               src={album.arts?.[0] || ""}
-              class="hidden"
+              class="hidden rounded"
             >
               <FallbackCover of="track" {id} />
             </Image>

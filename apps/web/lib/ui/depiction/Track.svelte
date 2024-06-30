@@ -44,6 +44,7 @@
     <Image
       thumbnail={track ? track.album.thumbnails?.[0] || "" : undefined}
       src={track ? track.album.arts?.[0] || "" : undefined}
+      class="rounded"
       slot="before"
     >
       <div

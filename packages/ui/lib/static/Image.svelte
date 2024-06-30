@@ -5,41 +5,38 @@
   export { classes as class };
   export let src: string | undefined | null = undefined;
   export let thumbnail: string | undefined | null = src;
+  export let cache: string | true = "1d";
   export let size = 48;
   export let alt = "";
 
-  $: state =
-    src === "" || src === null
-      ? "error"
-      : ("loading" as "loading" | "error" | "ok");
-
-  let image: HTMLImageElement;
+  $: resolution = size * globalThis.devicePixelRatio;
+  $: data = resolution < 100 ? thumbnail : src;
+  $: url = `${data}#cache=${cache === true ? "infinity" : cache}&resize=${resolution}`;
+  $: skeleton = data === undefined;
+  $: fallback = !data;
 </script>
 
-<div
-  class={tw`overflow-hidden bg-highlight-100
-    ${size > 200 ? "rounded-2xl" : "rounded"} ${classes}`}
-  class:animate-pulse={state === "loading"}
-  style:height="{size}px"
-  style:width="{size}px"
->
-  {#if src && state !== "error"}
+{#if fallback}
+  <div
+    class={tw`bg-highlight-100 contain-strict ${skeleton && "animate-pulse"} ${classes}`}
+    style:height="{size}px"
+    style:width="{size}px"
+  >
+    {#if !skeleton}
+      <slot />
+    {/if}
+  </div>
+{:else}
+  {#key data}
     <img
-      class="transition-opacity duration-500
-        {image && !image.complete && state !== 'ok'
-        ? 'opacity-0'
-        : 'opacity-100'}"
-      src={size < 100 / globalThis.devicePixelRatio ? thumbnail : src}
+      class={tw`bg-highlight-100 object-cover ${classes}`}
       crossorigin="anonymous"
-      height="{size}px"
       draggable="false"
-      width="{size}px"
+      src={url}
       {alt}
-      on:error={() => (state = "error")}
-      on:load={() => (state = "ok")}
-      bind:this={image}
+      on:error={() => (fallback = true)}
+      style:height="{size}px"
+      style:width="{size}px"
     />
-  {:else if state === "error"}
-    <slot />
-  {/if}
-</div>
+  {/key}
+{/if}
