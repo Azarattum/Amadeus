@@ -16,7 +16,8 @@
 </script>
 
 <div
-  class="flex size-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
+  class="flex size-full items-center justify-center text-white"
+  style:background-image="linear-gradient(to right,#fb7185,#f87171)"
   style:filter="hue-rotate({id}deg)"
 >
   <Icon of={icon} {xl} />
