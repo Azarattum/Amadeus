@@ -101,9 +101,7 @@
     on:edit
     on:end
   >
-    <div
-      class="relative flex [&_hr]:!block [*:has(>&):last-of-type_hr]:!hidden"
-    >
+    <div class="flex [&_hr]:!block [*:has(>&):last-of-type_hr]:!hidden">
       {#if timeline}
         <div
           class="visible ml-4 flex h-14 w-0.5 items-center justify-center bg-highlight-100"
