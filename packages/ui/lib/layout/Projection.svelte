@@ -53,7 +53,7 @@
   <div
     {...props}
     class={tw`absolute inset-0
-      ${!active ? "-z-10 opacity-0" : "z-10"}
+      ${!active ? "-z-10 opacity-0 [&_*]:!overflow-hidden [&_*]:!will-change-auto" : "z-10"}
       ${typeof classes === "string" && classes}
       ${typeof classes === "function" && classes(active)}
     `}
