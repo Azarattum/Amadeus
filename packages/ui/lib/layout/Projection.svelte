@@ -2,12 +2,14 @@
   import { active as getActive, route as makeRoute } from "./Hologram.svelte";
   import type { Transition, HTMLProps } from "../../internal/types";
   import { tw } from "../../internal/tailwind";
+  import { tick } from "svelte";
 
   type In = $$Generic;
   type Out = $$Generic;
   type $$Props = {
     class?: ((active: boolean) => string) | string;
     ephemeral?: boolean;
+    fallback?: boolean;
     default?: boolean;
     title?: string;
     at: string;
@@ -29,9 +31,12 @@
   const current = getActive();
 
   $: inDOM = keep($current);
-  $: visible = $current === $route || (!!fallback && $current === $parent);
-  $: active =
-    $current.startsWith($route) || (!!fallback && $current === $parent);
+  $: defaulted = !!fallback && $current === $parent;
+  $: visible = $current === $route || defaulted;
+
+  const activate = (x: boolean) => tick().then(() => (active = x));
+  let active = $current.startsWith($route) || defaulted;
+  $: activate($current.startsWith($route) || defaulted);
 
   /**
    * Defer removing page from DOM when switched to a sibling branch.
