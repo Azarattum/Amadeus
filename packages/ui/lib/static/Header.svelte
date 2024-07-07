@@ -1,13 +1,13 @@
 <script lang="ts">
   import { type Classes, tw } from "../../internal/tailwind";
   import type { Either } from "../../internal/types";
-  type $$Props = Either<"sm" | "lg" | "xl"> & {
+  type $$Props = {
     loading?: boolean;
     center?: boolean;
     indent?: boolean;
     class?: Classes;
     id?: string;
-  };
+  } & Either<"sm" | "lg" | "xl">;
 
   let classes: Classes = "";
   export { classes as class };
@@ -43,7 +43,9 @@
   {:else}
     <slot />
   {/if}
-  <div class="absolute right-4 top-1/2 -translate-y-1/2">
-    <slot name="after" />
-  </div>
+  {#if $$slots.after}
+    <div class="absolute right-4 top-1/2 -translate-y-1/2">
+      <slot name="after" />
+    </div>
+  {/if}
 </svelte:element>
