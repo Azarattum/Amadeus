@@ -34,7 +34,8 @@
   $: defaulted = !!fallback && $current === $parent;
   $: visible = $current === $route || defaulted;
 
-  const activate = (x: boolean) => tick().then(() => (active = x));
+  const activate = (x: boolean) =>
+    x ? tick().then(() => (active = x)) : (active = x);
   let active = $current.startsWith($route) || defaulted;
   $: activate($current.startsWith($route) || defaulted);
 
