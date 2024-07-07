@@ -108,7 +108,7 @@
 </Tabs>
 
 <Projection at="playlist" ephemeral {title}>
-  <Frame morph="playlist-{hash}">
+  <Frame morph="playlist-{id}">
     <Collection of={data} style="playlist" on:edit={edit} let:selected>
       <Button air on:click={() => library.purge(selected.map((x) => x.entry))}>
         <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
@@ -117,7 +117,7 @@
   </Frame>
 </Projection>
 <Projection at="artist" ephemeral {title}>
-  <Frame morph="artist-{hash}">
+  <Frame morph="artist-{id}">
     <Collection
       of={data}
       href={nully`/explore/artist#${data?.id}`}
@@ -139,13 +139,13 @@
       <Icon of="clock" />Timeline
     </Button>
     {#if page.endsWith("playlist")}
-      {#await playlists.get(+hash) then { title }}
+      {#await playlists.get(id) then { title }}
         <Separator />
         <Button primary air><Icon of="disk" /><Text>{title}</Text></Button>
       {/await}
     {/if}
     {#if page.endsWith("artist")}
-      {#await artists.get(+hash) then { title }}
+      {#await artists.get(id) then { title }}
         <Separator />
         <Button primary air><Icon of="person" /><Text>{title}</Text></Button>
       {/await}
