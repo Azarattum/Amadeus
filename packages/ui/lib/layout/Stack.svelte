@@ -3,9 +3,8 @@
   import { type Classes, tw } from "../../internal/tailwind";
   import { setContext } from "svelte";
 
-  type $$Props = {
-    class?: Classes;
-  } & (Either<"x" | "z"> & Omit<HTMLProps["div"], "class">);
+  type $$Props = Either<{ x: boolean; z: boolean }> &
+    Omit<HTMLProps["div"], "class"> & { class?: Classes };
 
   let classes: Classes = "";
   export { classes as class };

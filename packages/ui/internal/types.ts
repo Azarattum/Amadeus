@@ -16,8 +16,8 @@ export type HTMLProps = {
   >;
 };
 
-export type Either<T extends string> = {
-  [K in T]: {
-    [U in T]?: U extends K ? true : false;
+export type Either<T extends Record<string, unknown>> = {
+  [K in keyof T]: {
+    [U in keyof T]?: U extends K ? T[U] : undefined;
   };
-}[T];
+}[keyof T];

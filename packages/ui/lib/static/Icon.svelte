@@ -3,9 +3,9 @@
   import type { Either } from "../../internal/types";
   import { icons } from "../../icons";
 
-  type $$Props = { of: keyof typeof icons; class?: Classes } & Either<
-    "xxl" | "xs" | "sm" | "md" | "lg" | "xl"
-  >;
+  type $$Props = Either<{
+    [K in "xxl" | "xs" | "sm" | "md" | "lg" | "xl"]: boolean;
+  }> & { of: keyof typeof icons; class?: Classes };
 
   let classes: Classes = "";
   export { classes as class };

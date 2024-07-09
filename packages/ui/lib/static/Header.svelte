@@ -7,7 +7,7 @@
     indent?: boolean;
     class?: Classes;
     id?: string;
-  } & Either<"sm" | "lg" | "xl">;
+  } & Either<{ sm: boolean; lg: boolean; xl: boolean }>;
 
   let classes: Classes = "";
   export { classes as class };

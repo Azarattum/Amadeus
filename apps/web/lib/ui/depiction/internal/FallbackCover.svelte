@@ -6,7 +6,7 @@
   type $$Props = {
     of: MediaType;
     id?: number;
-  } & Either<"xxl" | "xl">;
+  } & Either<{ xxl: boolean; xl: boolean }>;
 
   export let xxl: any = false;
   export let xl: any = false;
