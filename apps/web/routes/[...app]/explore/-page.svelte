@@ -99,16 +99,16 @@
       <Tracks remote={$remote.data} local={localTracks} on:end={remote.next} />
     {:else if $remote.type === "artists"}
       <Overview
+        of="artists"
         remote={$remote.data}
         local={localArtists}
-        style="artist"
         on:end={remote.next}
       />
     {:else if $remote.type === "albums"}
       <Overview
+        of="albums"
         remote={$remote.data}
         local={localAlbums}
-        style="album"
         on:end={remote.next}
       />
     {/if}

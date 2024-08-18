@@ -20,9 +20,10 @@ function gather<T extends Record<string, unknown>>(object: T) {
 /** Finds the entry in the object where the value is an object */
 function which<T extends Record<string, any>>(
   object: T,
-): readonly [keyof T | "", (T[keyof T] & object) | null] {
-  const nothing = ["", null] as const;
-  return Object.entries(object).find((entry) => ok(entry[1])) || nothing;
+): readonly [keyof T | undefined, (T[keyof T] & object) | null] {
+  const entries = Object.entries(object);
+  const nothing = () => [entries.find((entry) => entry[1])?.[0], null] as const;
+  return entries.find((entry) => ok(entry[1])) || nothing();
 }
 
 export { gather, unique, which, ok };

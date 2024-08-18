@@ -78,10 +78,9 @@
     <Stack class="gap-1">
       <Header sm>You Might Like</Header>
       <Media.Overview
-        of={$feed.length
+        playlists={$feed.length
           ? $feed.filter((x) => x.id in aliases)
           : [undefined, undefined]}
-        style="playlist"
         filter={$search}
         href="/home"
         {aliases}

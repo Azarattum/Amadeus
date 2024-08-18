@@ -3,7 +3,7 @@
   import { Header, Stack } from "@amadeus-music/ui";
   import { Media } from "$lib/ui";
 
-  export let style: CollectionType;
+  export let of: `${CollectionType}s`;
   export let local: Collection[];
   export let remote: Collection[] | undefined;
 </script>
@@ -12,11 +12,11 @@
   {#if local.length}
     <div>
       <Header sm>Library</Header>
-      <Media.Overview of={local} {style} />
+      <Media.Overview {...{ [of]: local }} />
     </div>
   {/if}
   <div>
     <Header sm>Search</Header>
-    <Media.Overview of={remote} href="/explore" {style} on:end />
+    <Media.Overview {...{ [of]: remote ?? true }} href="/explore" on:end />
   </div>
 </Stack>

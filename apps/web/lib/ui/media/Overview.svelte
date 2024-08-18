@@ -1,34 +1,63 @@
 <script lang="ts">
-  import type { CollectionType, Collection } from "@amadeus-music/protocol";
+  import type {
+    Collection,
+    Playlist,
+    Artist,
+    Album,
+  } from "@amadeus-music/protocol";
   import { type EditEvent, Virtual, Icon } from "@amadeus-music/ui";
+  import type { Either } from "@amadeus-music/ui/internal/types";
+  import { nully } from "@amadeus-music/util/string";
   import { createEventDispatcher } from "svelte";
   import { match } from "$lib/util/search";
+  import { which } from "$lib/util/props";
   import Unit from "./Summary.svelte";
   import { ready } from "$lib/data";
+
+  type $$Props = {
+    aliases?: Record<string, string>;
+    expandable?: boolean;
+    prerender?: number;
+    editable?: boolean;
+    filter?: string;
+    href?: string;
+  } & Either<{
+    playlists: (Playlist | undefined)[] | true;
+    artists: (Artist | undefined)[] | true;
+    albums: (Album | undefined)[] | true;
+  }>;
 
   const dispatch = createEventDispatcher<{
     rearrange: { after: number | undefined; id: number };
     create: void;
   }>();
 
-  export let of: (Collection | undefined)[] | undefined = undefined;
+  export let playlists: (Playlist | undefined)[] | true | undefined = undefined;
+  export let artists: (Artist | undefined)[] | true | undefined = undefined;
+  export let albums: (Album | undefined)[] | true | undefined = undefined;
   export let aliases: Record<string, string> = {};
-  export let style: CollectionType;
   export let expandable = false;
   export let href = "/library";
   export let editable = false;
   export let prerender = 3;
   export let filter = "";
 
+  $: [type, media] = which({
+    playlist: playlists,
+    artist: artists,
+    album: albums,
+  });
+
+  $: matcher = match(filter);
+  $: items =
+    media && ready(media)
+      ? (expandable ? [...media, null] : media).filter(matcher)
+      : Array.from<undefined>({ length: prerender });
+
   function edit({ detail }: EditEvent<Collection | undefined | null>) {
     if (!detail.item || detail.action !== "rearrange") return;
     dispatch("rearrange", { after: detail.after?.id, id: detail.item.id });
   }
-
-  $: items =
-    of && ready(of)
-      ? (expandable ? [...of, null] : of).filter(match(filter))
-      : Array.from<undefined>({ length: prerender });
 </script>
 
 <Virtual
@@ -45,8 +74,8 @@
 >
   {#if item}
     <Unit
-      href="{href}/{aliases[item.id] || `${style}#${item.id}`}"
-      {...{ [style]: item }}
+      href={nully`${href}/${aliases[item.id] ?? nully`${type}#${item.id}`}`}
+      {...type && { [type]: item }}
     />
   {:else if item === null}
     <button
@@ -56,6 +85,6 @@
       <Icon of="plus" xxl />
     </button>
   {:else}
-    <Unit {...{ [style]: true }} />
+    <Unit {...type && { [type]: true }} />
   {/if}
 </Virtual>

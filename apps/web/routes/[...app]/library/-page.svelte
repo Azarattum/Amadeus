@@ -58,10 +58,9 @@
   <Tab name="Playlists" {visible}>
     <Stack class="p-4">
       <Media.Overview
-        of={$playlists}
         expandable
         editable
-        style="playlist"
+        playlists={$playlists}
         filter={$search}
         on:create={() =>
           playlists.create({ title: Math.random().toString(36).slice(2) })}
@@ -72,7 +71,7 @@
   </Tab>
   <Tab name="Artists" {visible}>
     <Stack class="p-4">
-      <Media.Overview of={$artists} filter={$search} style="artist" />
+      <Media.Overview artists={$artists} filter={$search} />
     </Stack>
   </Tab>
   <Tab name="Timeline" {visible}>

@@ -70,18 +70,18 @@
       />
     {/if}
     <Stack class="z-20 grow-0 gap-2">
-      <Morph container key="heading-{type}-{media?.id}">
+      <Morph container key={nully`heading-${type}-${media?.id}`}>
         <Header indent={!!playlist} loading={!media} xl={!!playlist}>
           <!-- This div is needed for the container morph -->
           <div>
-            <Morph key="title-{type}-{media?.id}">
+            <Morph key={nully`title-${type}-${media?.id}`}>
               <Words from={media?.title ?? "Loading"} />
             </Morph>
           </div>
         </Header>
       </Morph>
-      <Morph key={`meta-${type}-${media?.id}`}>
-        <Stack x class="max-w-max gap-4 {type === 'playlist' ? 'ml-4' : ''}">
+      <Morph key={nully`meta-${type}-${media?.id}`}>
+        <Stack x class="max-w-max gap-4 {playlist ? 'ml-4' : ''}">
           {#if media?.collection}
             <Text secondary>
               <Icon of="note" sm />
