@@ -22,7 +22,6 @@
   <div class="pt-4">
     <Header indent sm>Library</Header>
     <Tracks
-      fixed
       tracks={local}
       on:action={({ detail }) => playback.push([detail], "last")}
       let:selected
@@ -35,7 +34,6 @@
 <div class="pt-4">
   <Header indent sm>Search</Header>
   <Tracks
-    fixed
     tracks={remote}
     on:action={({ detail }) => save([detail])}
     let:selected

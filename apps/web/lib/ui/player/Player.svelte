@@ -99,6 +99,7 @@
   </div>
   <div class="grow overflow-y-scroll contain-strict">
     <Tracks
+      editable
       sm
       tracks={$upcoming}
       on:click={(e) => (e.preventDefault(), skip(e.detail))}

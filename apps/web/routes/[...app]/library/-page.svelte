@@ -89,7 +89,6 @@
     <Stack class="pt-4">
       <Tracks
         timeline
-        fixed
         tracks={$tracks}
         on:action={({ detail }) => playback.push([detail], "last")}
         let:selected

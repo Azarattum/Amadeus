@@ -29,7 +29,7 @@
   type T = $$Generic;
   type K = $$Generic;
   type P = $$Generic<number>;
-  type Prerender = P & (P extends 0 ? never : NonNullable<unknown>);
+  type Prerender = (P extends 0 ? never : NonNullable<unknown>) & P;
   type $$Slots = { default: { index: number; item: T } };
 
   const dispatch = createEventDispatcher<{
@@ -40,7 +40,7 @@
   export let gap = 0;
   export let items: T[];
   export let move = false;
-  export let fixed = false;
+  export let readonly = false;
   export let columns: number | string = 1;
   export let key = (x: T) => x as any as K;
   export let animate: boolean | number = false;
@@ -187,7 +187,7 @@
   }
 
   function claim(position: number, passive = false) {
-    if (!sortable || !$transfer || fixed) return;
+    if (!sortable || !$transfer || readonly) return;
     if (key(items[position]) == null) return;
     if (!Number.isInteger(position)) {
       if (rollback != null && $transfer.owner !== wrapper) {

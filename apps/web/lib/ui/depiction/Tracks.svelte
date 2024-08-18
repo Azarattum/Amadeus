@@ -23,7 +23,8 @@
   }>();
 
   export let sm = false;
-  export let fixed = false;
+  /// TODO: infer editable by presence of `onedit` handler in Svelte 5
+  export let editable = false;
   export let timeline = false;
   export let tracks: (Track | undefined)[] | undefined = undefined;
 
@@ -92,9 +93,9 @@
   <Virtual
     animate
     key={(x) => (typeof x === "string" ? x : x?.entry || x?.id)}
+    readonly={!editable}
     sortable="tracks"
     {prerender}
-    {fixed}
     {items}
     let:item={track}
     let:index
