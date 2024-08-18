@@ -12,17 +12,17 @@
   $: resolution = size * globalThis.devicePixelRatio;
   $: data = resolution < 100 ? thumbnail : src;
   $: url = `${data}#cache=${cache === true ? "infinity" : cache}&resize=${resolution}`;
-  $: skeleton = data === undefined;
+  $: loading = data === undefined;
   $: fallback = !data;
 </script>
 
 {#if fallback}
   <div
-    class={tw`bg-highlight-100 contain-strict ${skeleton && "animate-pulse"} ${classes}`}
+    class={tw`bg-highlight-100 contain-strict ${loading && "animate-pulse"} ${classes}`}
     style:height="{size}px"
     style:width="{size}px"
   >
-    {#if !skeleton}
+    {#if !loading}
       <slot />
     {/if}
   </div>

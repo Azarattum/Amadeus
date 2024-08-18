@@ -115,7 +115,7 @@
     };
   }
 
-  async function morph(event: Event & { currentTarget: Element }) {
+  async function morph(event: { currentTarget: Element } & Event) {
     if (marker || !key) return;
     const targets = opponent(event.currentTarget, key)?.children;
     const children = [...event.currentTarget.children];
@@ -153,7 +153,7 @@
     children.forEach((x) => backwards && x.classList.remove("opacity-0"));
   }
 
-  function end({ currentTarget }: Event & { currentTarget: Element }) {
+  function end({ currentTarget }: { currentTarget: Element } & Event) {
     if (marker || !key) return;
     [...currentTarget.children].forEach((element) => {
       element.getAnimations().forEach((x) => x.id === config.id && x.cancel());
