@@ -36,7 +36,7 @@
         ? -1
         : id
     : id;
-  $: data = $feed.find((x) => x.id === id);
+  $: playlist = $feed.find((x) => x.id === id) ?? true;
 </script>
 
 <Frame>
@@ -97,12 +97,12 @@
 
 <Projection at="listened" ephemeral title="Listened - Amadeus">
   <Frame morph="playlist--1">
-    <Collection filter={$search} playlist={data} />
+    <Collection filter={$search} {playlist} />
   </Frame>
 </Projection>
 <Projection at="recommended" ephemeral title="Recommended - Amadeus">
   <Frame morph="playlist--2">
-    <Collection filter={$search} playlist={data} />
+    <Collection filter={$search} {playlist} />
   </Frame>
 </Projection>
 
