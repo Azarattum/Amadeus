@@ -3,7 +3,7 @@
   import { type EditEvent, Virtual, Icon } from "@amadeus-music/ui";
   import { createEventDispatcher } from "svelte";
   import Unit from "./internal/Unit.svelte";
-  import { match } from "$lib/util";
+  import { match } from "$lib/util/search";
   import { ready } from "$lib/data";
 
   const dispatch = createEventDispatcher<{

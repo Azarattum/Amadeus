@@ -1,7 +1,8 @@
 import type { Meta } from "@amadeus-music/protocol";
 
-function match(query: string) {
-  query = query.toLowerCase();
+/** Creates a media matcher function for a query */
+function match(query?: string) {
+  query = query?.toLowerCase();
   if (!query) return () => true;
   return (x?: Meta | null) =>
     x?.title?.toLowerCase().includes(query) ||
