@@ -27,6 +27,8 @@
   export let container = false;
   export let loosely = false;
   export let marker = false;
+
+  $: classList = classes ? classes.split(/\s+/) : [];
   $: config = {
     fill: "forwards",
     easing: "ease",
@@ -124,7 +126,7 @@
     const backwards = event.type === "introstart";
     const tasks: [Element, Keyframe[]][] = [];
     children.forEach((x) => {
-      if (classes) x.classList.add(...classes.split(/\s+/));
+      if (classList.length) x.classList.add(...classList);
       if (backwards) x.classList.add("opacity-0");
     });
     await new Promise(requestAnimationFrame);
@@ -159,7 +161,7 @@
     if (marker || !key) return;
     [...currentTarget.children].forEach((element) => {
       element.getAnimations().forEach((x) => x.id === config.id && x.cancel());
-      if (classes) element.classList.remove(...classes.split(/\s+/));
+      if (classList.length) element.classList.remove(...classList);
       if (!container) return;
       [...element.children].forEach((child) => {
         child.getAnimations().forEach((x) => x.id === config.id && x.cancel());
