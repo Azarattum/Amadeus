@@ -128,6 +128,7 @@
     children.forEach((x) => {
       if (classList.length) x.classList.add(...classList);
       if (backwards) x.classList.add("opacity-0");
+      x.setAttribute("inert", "");
     });
     await new Promise(requestAnimationFrame);
 
@@ -162,6 +163,7 @@
     [...currentTarget.children].forEach((element) => {
       element.getAnimations().forEach((x) => x.id === config.id && x.cancel());
       if (classList.length) element.classList.remove(...classList);
+      element.removeAttribute("inert");
       if (!container) return;
       [...element.children].forEach((child) => {
         child.getAnimations().forEach((x) => x.id === config.id && x.cancel());
