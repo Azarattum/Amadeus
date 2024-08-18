@@ -82,6 +82,8 @@
     if (dx || dy || dw !== 1 || dh !== 1) {
       style.transform = `translate3d(${dx}px,${dy}px,0) scale3d(${dw},${dh},1)`;
     }
+    /// TODO: background and rounded transitions are expensive and should
+    //   be optimized or eliminated completely
     if (bgFrom !== bgTo) {
       style.backgroundColor = bgTo;
     }
