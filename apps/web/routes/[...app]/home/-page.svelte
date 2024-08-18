@@ -9,10 +9,10 @@
     Frame,
     Icon,
   } from "@amadeus-music/ui";
-  import { Collection, Overview, Track } from "$lib/ui";
   import { playback, search, feed } from "$lib/data";
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
+  import { Media } from "$lib/ui";
 
   export let visible = true;
   export let active = true;
@@ -56,7 +56,7 @@
           class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,40rem),1fr))] gap-1"
         >
           {#each devices as { progress, device, track }}
-            <Track
+            <Media.Track
               sm
               class="dark:ring-none overflow-hidden rounded-lg bg-surface-100 shadow-sm ring-1 ring-highlight hover:bg-surface-highlight-100 [&>hr]:opacity-0"
               {progress}
@@ -69,7 +69,7 @@
               >
                 <Icon of="close" />
               </Button>
-            </Track>
+            </Media.Track>
           {/each}
         </div>
       </Stack>
@@ -77,7 +77,7 @@
 
     <Stack class="gap-1">
       <Header sm>You Might Like</Header>
-      <Overview
+      <Media.Overview
         of={$feed.length
           ? $feed.filter((x) => x.id in aliases)
           : [undefined, undefined]}
@@ -97,12 +97,12 @@
 
 <Projection at="listened" ephemeral title="Listened - Amadeus">
   <Frame morph="playlist--1">
-    <Collection filter={$search} {playlist} />
+    <Media.Collection filter={$search} {playlist} />
   </Frame>
 </Projection>
 <Projection at="recommended" ephemeral title="Recommended - Amadeus">
   <Frame morph="playlist--2">
-    <Collection filter={$search} {playlist} />
+    <Media.Collection filter={$search} {playlist} />
   </Frame>
 </Projection>
 

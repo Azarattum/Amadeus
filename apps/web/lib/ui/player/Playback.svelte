@@ -2,8 +2,8 @@
   import { Spinner, Button, Stack, Range, Text } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { format } from "@amadeus-music/util/time";
-  import Cover from "../depiction/Cover.svelte";
   import { scale } from "svelte/transition";
+  import { Media } from "$lib/ui";
 
   export let track: Track | undefined = undefined;
   export let currentTime = 0;
@@ -32,7 +32,7 @@
       type="checkbox"
       bind:checked={paused}
     />
-    <Cover lg album={track?.album || true} class="animate-none" />
+    <Media.Cover lg album={track?.album || true} class="animate-none" />
     <div
       class="absolute -inset-[1px] flex items-center justify-center rounded-relative bg-surface-200 opacity-0 backdrop-blur transition-[opacity] duration-300 peer-checked:opacity-100"
       class:opacity-100={loading}

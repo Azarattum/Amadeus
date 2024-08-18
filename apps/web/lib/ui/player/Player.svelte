@@ -20,8 +20,8 @@
   import { upcoming, playback } from "$lib/data";
   import Playback from "./Playback.svelte";
   import { desource } from "$lib/trpc";
+  import { Media } from "$lib/ui";
   import { tick } from "svelte";
-  import { Tracks } from "..";
 
   const sync = throttle(async () => {
     if (!track) return;
@@ -98,7 +98,7 @@
     <Separator />
   </div>
   <div class="grow overflow-y-scroll contain-strict">
-    <Tracks
+    <Media.Tracks
       editable
       sm
       tracks={$upcoming}
@@ -108,6 +108,6 @@
       <Button air on:click={() => playback.purge(selected.map((x) => x.entry))}>
         <Icon of="trash" /><Tooltip>Remove from Queue</Tooltip>
       </Button>
-    </Tracks>
+    </Media.Tracks>
   </div>
 </div>

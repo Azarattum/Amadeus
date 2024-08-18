@@ -2,7 +2,7 @@
   import { Header, Button, Icon } from "@amadeus-music/ui";
   import { playlists, playback, library } from "$lib/data";
   import type { Track } from "@amadeus-music/protocol";
-  import { PlaybackActions, Tracks } from "$lib/ui";
+  import { PlaybackActions, Media } from "$lib/ui";
 
   export let local: Track[];
   export let remote: Track[] | undefined;
@@ -21,19 +21,19 @@
 {#if local.length}
   <div class="pt-4">
     <Header indent sm>Library</Header>
-    <Tracks
+    <Media.Tracks
       tracks={local}
       on:action={({ detail }) => playback.push([detail], "last")}
       let:selected
     >
       <PlaybackActions {selected} />
       <Icon of="last" slot="action" />
-    </Tracks>
+    </Media.Tracks>
   </div>
 {/if}
 <div class="pt-4">
   <Header indent sm>Search</Header>
-  <Tracks
+  <Media.Tracks
     tracks={remote}
     on:action={({ detail }) => save([detail])}
     let:selected
@@ -44,5 +44,5 @@
     <Button air on:click={() => save(selected)}>
       <Icon of="save" />
     </Button>
-  </Tracks>
+  </Media.Tracks>
 </div>

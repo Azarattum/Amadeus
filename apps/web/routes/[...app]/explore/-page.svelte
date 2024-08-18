@@ -23,7 +23,7 @@
   import Overview from "./overview.svelte";
   import History from "./history.svelte";
   import Tracks from "./tracks.svelte";
-  import { Collection } from "$lib/ui";
+  import { Media } from "$lib/ui";
 
   export let visible = true;
   export let active = true;
@@ -137,7 +137,7 @@
 
 <Projection at="album" ephemeral {title}>
   <Frame morph={nully`album-${$album?.detail?.id}`}>
-    <Collection
+    <Media.Collection
       album={$album?.detail}
       tracks={$album}
       on:end={() => album?.next()}
@@ -146,7 +146,7 @@
 </Projection>
 <Projection at="artist" ephemeral {title}>
   <Frame morph={nully`artist-${$artist?.detail?.id}`}>
-    <Collection
+    <Media.Collection
       artist={$artist?.detail}
       tracks={$artist}
       on:end={() => artist?.next()}

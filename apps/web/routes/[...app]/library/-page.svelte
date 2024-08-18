@@ -22,9 +22,9 @@
     tracks,
     search,
   } from "$lib/data";
-  import { PlaybackActions, Collection, Overview, Tracks } from "$lib/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { nully } from "@amadeus-music/util/string";
+  import { PlaybackActions, Media } from "$lib/ui";
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
   import { ok } from "$lib/util/props";
@@ -57,7 +57,7 @@
 <Tabs>
   <Tab name="Playlists" {visible}>
     <Stack class="p-4">
-      <Overview
+      <Media.Overview
         of={$playlists}
         expandable
         editable
@@ -72,12 +72,12 @@
   </Tab>
   <Tab name="Artists" {visible}>
     <Stack class="p-4">
-      <Overview of={$artists} filter={$search} style="artist" />
+      <Media.Overview of={$artists} filter={$search} style="artist" />
     </Stack>
   </Tab>
   <Tab name="Timeline" {visible}>
     <Stack class="pt-4">
-      <Tracks
+      <Media.Tracks
         timeline
         tracks={$tracks}
         on:action={({ detail }) => playback.push([detail], "last")}
@@ -91,14 +91,14 @@
         >
           <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
         </Button>
-      </Tracks>
+      </Media.Tracks>
     </Stack>
   </Tab>
 </Tabs>
 
 <Projection at="playlist" ephemeral {title}>
   <Frame morph={nully`playlist-${id}`}>
-    <Collection
+    <Media.Collection
       editable
       filter={$search}
       {playlist}
@@ -108,12 +108,12 @@
       <Button air on:click={() => library.purge(selected.map((x) => x.entry))}>
         <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
       </Button>
-    </Collection>
+    </Media.Collection>
   </Frame>
 </Projection>
 <Projection at="artist" ephemeral {title}>
   <Frame morph={nully`artist-${id}`}>
-    <Collection
+    <Media.Collection
       href={nully`/explore/artist#${ok(artist)?.id}`}
       filter={$search}
       {artist}

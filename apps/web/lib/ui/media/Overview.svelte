@@ -2,8 +2,8 @@
   import type { CollectionType, Collection } from "@amadeus-music/protocol";
   import { type EditEvent, Virtual, Icon } from "@amadeus-music/ui";
   import { createEventDispatcher } from "svelte";
-  import Unit from "./internal/Unit.svelte";
   import { match } from "$lib/util/search";
+  import Unit from "./Summary.svelte";
   import { ready } from "$lib/data";
 
   const dispatch = createEventDispatcher<{

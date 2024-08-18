@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { CollectionType, Collection } from "@amadeus-music/protocol";
   import { Header, Stack } from "@amadeus-music/ui";
-  import { Overview } from "$lib/ui";
+  import { Media } from "$lib/ui";
 
   export let style: CollectionType;
   export let local: Collection[];
@@ -12,11 +12,11 @@
   {#if local.length}
     <div>
       <Header sm>Library</Header>
-      <Overview of={local} {style} />
+      <Media.Overview of={local} {style} />
     </div>
   {/if}
   <div>
     <Header sm>Search</Header>
-    <Overview of={remote} href="/explore" {style} on:end />
+    <Media.Overview of={remote} href="/explore" {style} on:end />
   </div>
 </Stack>

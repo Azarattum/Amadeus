@@ -14,7 +14,7 @@
   import { gather, which, ok } from "$lib/util/props";
   import { nully } from "@amadeus-music/util/string";
   import { format } from "@amadeus-music/util/time";
-  import Cover from "../Cover.svelte";
+  import Cover from "./Cover.svelte";
 
   type $$Props = Either<{
     playlist: Playlist | true;

@@ -13,7 +13,7 @@
   import type { Track } from "@amadeus-music/protocol";
   import { compare } from "@amadeus-music/util/time";
   import { createEventDispatcher } from "svelte";
-  import TrackItem from "./Track.svelte";
+  import MediaTrack from "./Track.svelte";
   import { playback } from "$lib/data";
   import { play as resume } from "..";
 
@@ -121,7 +121,7 @@
           {track}
         </h2>
       {:else if track}
-        <TrackItem
+        <MediaTrack
           selected={check(track, selected)}
           {track}
           {sm}
@@ -131,9 +131,9 @@
           on:action
         >
           <slot name="action" slot="action" />
-        </TrackItem>
+        </MediaTrack>
       {:else}
-        <TrackItem {sm} />
+        <MediaTrack {sm} />
       {/if}
     </div>
   </Virtual>
