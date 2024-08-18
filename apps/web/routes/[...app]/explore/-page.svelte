@@ -137,7 +137,7 @@
 </Portal>
 
 <Projection at="album" ephemeral {title}>
-  <Frame morph="album-{$data?.detail?.id}">
+  <Frame morph={nully`album-${$data?.detail?.id}`}>
     <Collection
       of={$data?.detail}
       tracks={$data}
@@ -147,7 +147,7 @@
   </Frame>
 </Projection>
 <Projection at="artist" ephemeral {title}>
-  <Frame morph="artist-{$data?.detail?.id}">
+  <Frame morph={nully`artist-${$data?.detail?.id}`}>
     <Collection
       of={$data?.detail}
       tracks={$data}
