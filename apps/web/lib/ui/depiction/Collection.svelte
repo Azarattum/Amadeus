@@ -1,123 +1,106 @@
 <script lang="ts">
   import {
+    type Classes,
     Header,
     Topbar,
     Spacer,
     Stack,
     Morph,
     Words,
-    Image,
     Icon,
     Text,
     tw,
   } from "@amadeus-music/ui";
-  import type {
-    CollectionType,
-    Collection,
-    Track,
+  import {
+    type Playlist,
+    type Artist,
+    type Track,
+    type Album,
   } from "@amadeus-music/protocol";
   import { capitalize, nully } from "@amadeus-music/util/string";
-  import FallbackCover from "./internal/FallbackCover.svelte";
-  import ImageGrid from "./internal/ImageGrid.svelte";
+  import type { Either } from "@amadeus-music/ui/internal/types";
+  import { gather, unique, which, ok } from "$lib/util/props";
   import { format } from "@amadeus-music/util/time";
-  import { playback, search } from "$lib/data";
+  import { match } from "$lib/util/search";
+  import { playback } from "$lib/data";
   import { PlaybackActions } from "..";
   import Tracks from "./Tracks.svelte";
-  import { match } from "$lib/util";
+  import Cover from "./Cover.svelte";
 
-  export let fixed = false;
-  export let style: CollectionType;
-  export let href: string | undefined = undefined;
-  export let of: Collection | undefined = undefined;
+  type $$Props = {
+    editable?: boolean;
+    tracks?: Track[];
+    class?: Classes;
+    filter?: string;
+    href?: string;
+  } & Either<{
+    playlist: Playlist | true;
+    artist: Artist | true;
+    album: Album | true;
+  }>;
+
+  export let playlist: Playlist | true | undefined = undefined;
+  export let artist: Artist | true | undefined = undefined;
+  export let album: Album | true | undefined = undefined;
   export let tracks: Track[] | undefined = undefined;
+  export let href: string | undefined = undefined;
+  /// TODO: infer editable by presence of `onedit` handler in Svelte 5
+  export let editable = false;
+  export let filter = "";
 
-  const unique = <T,>(x: T[]) => [...new Set(x)];
+  $: matcher = match(filter);
+  $: [type, media] = which({ playlist, artist, album });
+  $: collection = (tracks || media?.collection?.tracks)?.filter(matcher);
 
-  $: filtered = (tracks || of?.collection?.tracks)?.filter(match($search));
-  $: details = of
-    ? unique(
-        "artists" in of
-          ? of.artists.map((x) => x.title)
-          : "sources" in of
-            ? of?.sources
-                .map((x: string) => capitalize(x.split("/")[0]))
-                .filter((x): x is string => !!x)
-            : [],
-      ).join(", ")
-    : "Loading";
+  $: details = ok(album)?.artists?.map((x) => x.title) ||
+    which({ artist, album })[1]
+      ?.sources.map((x: string) => capitalize(x.split("/")[0]))
+      .filter((x): x is string => !!x) || ["Loading"];
 </script>
 
-<Topbar title={of?.title || ""}>
-  <Stack
-    x
-    class={`place-items-center gap-4 ${style !== "playlist" ? "p-4" : "pb-4"}`}
-  >
-    {#if (!of || (of && "arts" in of)) && style !== "playlist"}
-      <Morph key="thumb-{style}-{of?.id}">
-        <ImageGrid class="z-30" {href} let:size>
-          <Image
-            class={tw`shadow-2xl ${style === "artist" ? "rounded-full" : "rounded-2xl"}`}
-            thumbnail={of && (of.thumbnails?.[0] || "")}
-            src={of && (of.arts?.[0] || "")}
-            {size}
-          >
-            <FallbackCover of={style} xl id={of?.id} />
-          </Image>
-        </ImageGrid>
-      </Morph>
-    {:else if of && filtered?.length}
-      <div
-        class="pointer-events-none absolute left-4 top-[137px] z-10 flex flex-col gap-2 rounded-2xl lg:top-[170px]"
-      >
-        {#each filtered?.slice(0, 4) || [] as { album, id }, i}
-          <Morph key={`thumb-${style}-${of?.id}-${i}`} class="!block">
-            <Image
-              thumbnail={album.thumbnails?.[0] || ""}
-              src={album.arts?.[0] || ""}
-              class="hidden rounded"
-            >
-              <FallbackCover of="track" {id} />
-            </Image>
-          </Morph>
-        {/each}
-      </div>
+<Topbar title={media?.title}>
+  <Stack x class={`place-items-center gap-4 ${!playlist ? "p-4" : "pb-4"}`}>
+    {#if !playlist || media}
+      <Cover
+        {...gather({ playlist, artist, album })}
+        class={tw`${playlist ? "pointer-events-none absolute left-4 top-[137px] gap-2 lg:top-[170px] [&_img:is([inert])]:!visible [&_img:not([inert])]:hidden" : "ring-highlight transition-transform active:scale-95 hover:ring-8"}`}
+        morph={nully`thumb-${type}-${media?.id}`}
+        md={!playlist}
+        {href}
+      />
     {/if}
     <Stack class="z-20 grow-0 gap-2">
-      <Morph container key="heading-{style}-{of?.id}">
-        <Header
-          indent={style === "playlist"}
-          xl={style === "playlist"}
-          loading={!of}
-        >
+      <Morph container key="heading-{type}-{media?.id}">
+        <Header indent={!!playlist} loading={!media} xl={!!playlist}>
           <!-- This div is needed for the container morph -->
           <div>
-            <Morph key="title-{style}-{of?.id}">
-              <Words from={of?.title} />
+            <Morph key="title-{type}-{media?.id}">
+              <Words from={media?.title ?? "Loading"} />
             </Morph>
           </div>
         </Header>
       </Morph>
-      <Morph key={`meta-${style}-${of?.id}`}>
-        <Stack x class="max-w-max gap-4 {style === 'playlist' ? 'ml-4' : ''}">
-          {#if of?.collection}
+      <Morph key={`meta-${type}-${media?.id}`}>
+        <Stack x class="max-w-max gap-4 {type === 'playlist' ? 'ml-4' : ''}">
+          {#if media?.collection}
             <Text secondary>
               <Icon of="note" sm />
-              {of.collection.size}
+              {media.collection.size}
             </Text>
             <Text secondary>
               <Icon of="clock" sm />
-              {format(of.collection.duration)}
+              {format(media.collection.duration)}
             </Text>
-            {#if "remote" in of && of.remote}
+            {#if "remote" in media && media.remote}
               <Spacer />
-              <Text secondary><Icon of="share" sm /> {of.remote}</Text>
+              <Text secondary><Icon of="share" sm /> {media.remote}</Text>
             {/if}
           {:else}
-            <Text secondary indent={style === "playlist"} loading={!of}>
-              {#if style === "artist"}
+            <Text secondary indent={!!playlist} loading={!media}>
+              {#if artist}
                 <Icon of="globe" sm />
               {/if}
-              {details}
+              {unique(details).join(", ")}
             </Text>
           {/if}
         </Stack>
@@ -129,14 +112,12 @@
 
 <Morph
   loosely
-  class={style === "playlist"
-    ? "[&_[draggable='true']:nth-child(-n+4)_.rounded]:invisible"
-    : ""}
-  key={nully`${style}-${of?.id}`}
+  class={`${playlist && "[&_li:nth-child(-n+4)_img]:invisible"}`}
+  key={nully`${type}-${media?.id}`}
 >
   <Tracks
-    fixed={fixed || (style === "playlist" ? !!$search : true)}
-    tracks={filtered}
+    editable={editable && !filter}
+    tracks={collection}
     on:action={({ detail }) => playback.push([detail], "last")}
     let:selected
     on:click

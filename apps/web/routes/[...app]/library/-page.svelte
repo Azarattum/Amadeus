@@ -27,6 +27,7 @@
   import { nully } from "@amadeus-music/util/string";
   import { navigating } from "$app/stores";
   import { goto } from "$app/navigation";
+  import { ok } from "$lib/util/props";
 
   export let visible = true;
   export let active = true;
@@ -38,24 +39,13 @@
   }
 
   /* === Collection data === */
-  let kind: "playlist" | "artist" | "" = "";
   let id: number | null = null;
-
   $: id = active ? +hash || id : id;
-  $: kind = active
-    ? page.endsWith("/artist")
-      ? "artist"
-      : page.endsWith("/playlist")
-        ? "playlist"
-        : kind
-    : kind;
-  $: data =
-    kind === "playlist"
-      ? $playlists.find((x) => x.id === id)
-      : kind === "artist"
-        ? $artists.find((x) => x.id === id)
-        : undefined;
-  $: title = nully`${data?.title} - Amadeus` || "Amadeus";
+  /// NOTE: these would optimize nicely in Svelte 5 (remove note after migration)
+  $: playlist = $playlists.find((x) => x.id === id) ?? true;
+  $: artist = $artists.find((x) => x.id === id) ?? true;
+  $: title =
+    nully`${(ok(playlist) ?? ok(artist))?.title} - Amadeus` || "Amadeus";
 
   /* === Library Actions === */
   function edit({ detail: { action, after, item } }: EditEvent<Track>) {
@@ -108,7 +98,13 @@
 
 <Projection at="playlist" ephemeral {title}>
   <Frame morph={nully`playlist-${id}`}>
-    <Collection of={data} style="playlist" on:edit={edit} let:selected>
+    <Collection
+      editable
+      filter={$search}
+      {playlist}
+      on:edit={edit}
+      let:selected
+    >
       <Button air on:click={() => library.purge(selected.map((x) => x.entry))}>
         <Icon of="trash" /><Tooltip>Delete from Library</Tooltip>
       </Button>
@@ -118,9 +114,9 @@
 <Projection at="artist" ephemeral {title}>
   <Frame morph={nully`artist-${id}`}>
     <Collection
-      of={data}
-      href={nully`/explore/artist#${data?.id}`}
-      style="artist"
+      href={nully`/explore/artist#${ok(artist)?.id}`}
+      filter={$search}
+      {artist}
     />
   </Frame>
 </Projection>

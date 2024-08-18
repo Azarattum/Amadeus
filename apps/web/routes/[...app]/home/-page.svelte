@@ -97,12 +97,12 @@
 
 <Projection at="listened" ephemeral title="Listened - Amadeus">
   <Frame morph="playlist--1">
-    <Collection of={data} fixed style="playlist" />
+    <Collection filter={$search} playlist={data} />
   </Frame>
 </Projection>
 <Projection at="recommended" ephemeral title="Recommended - Amadeus">
   <Frame morph="playlist--2">
-    <Collection of={data} fixed style="playlist" />
+    <Collection filter={$search} playlist={data} />
   </Frame>
 </Projection>
 

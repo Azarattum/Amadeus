@@ -80,14 +80,13 @@
         ? "album"
         : kind
     : kind;
-  $: data =
-    kind === "album"
-      ? stream(expand.album, streams.next)
-      : kind === "artist"
-        ? stream(expand.artist, streams.next)
-        : undefined;
-  $: data?.update({ page: estimate, id });
-  $: title = nully`${$data?.detail?.title} - Amadeus` || "Amadeus";
+  /// TODO: when migrating to Svelte 5, kind checks will no longer be needed
+  $: album = kind === "album" ? stream(expand.album, streams.next) : undefined;
+  $: artist =
+    kind === "artist" ? stream(expand.artist, streams.next) : undefined;
+  $: (album ?? artist)?.update({ page: estimate, id });
+  $: title =
+    nully`${($album ?? $artist)?.detail?.title} - Amadeus` || "Amadeus";
 </script>
 
 <Frame>
@@ -137,22 +136,20 @@
 </Portal>
 
 <Projection at="album" ephemeral {title}>
-  <Frame morph={nully`album-${$data?.detail?.id}`}>
+  <Frame morph={nully`album-${$album?.detail?.id}`}>
     <Collection
-      of={$data?.detail}
-      tracks={$data}
-      style="album"
-      on:end={() => data?.next()}
+      album={$album?.detail}
+      tracks={$album}
+      on:end={() => album?.next()}
     />
   </Frame>
 </Projection>
 <Projection at="artist" ephemeral {title}>
-  <Frame morph={nully`artist-${$data?.detail?.id}`}>
+  <Frame morph={nully`artist-${$artist?.detail?.id}`}>
     <Collection
-      of={$data?.detail}
-      tracks={$data}
-      style="artist"
-      on:end={() => data?.next()}
+      artist={$artist?.detail}
+      tracks={$artist}
+      on:end={() => artist?.next()}
     />
   </Frame>
 </Projection>
@@ -175,16 +172,16 @@
       <Button to="search-artists" air><Icon of="people" />Artists</Button>
       <Button to="search-albums" air><Icon of="disk" />Albums</Button>
     {/if}
-    {#if page.endsWith("album") && $data?.detail?.title}
+    {#if page.endsWith("album") && $artist?.detail?.title}
       <Separator />
       <Button primary air>
-        <Icon of="disk" /><Text>{$data.detail.title}</Text>
+        <Icon of="disk" /><Text>{$artist.detail.title}</Text>
       </Button>
     {/if}
-    {#if page.endsWith("artist") && $data?.detail?.title}
+    {#if page.endsWith("artist") && $album?.detail?.title}
       <Separator />
       <Button primary air>
-        <Icon of="person" /><Text>{$data.detail.title}</Text>
+        <Icon of="person" /><Text>{$album.detail.title}</Text>
       </Button>
     {/if}
   </Portal>

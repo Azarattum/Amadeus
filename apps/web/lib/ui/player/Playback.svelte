@@ -1,15 +1,8 @@
 <script lang="ts">
-  import {
-    Spinner,
-    Button,
-    Stack,
-    Image,
-    Range,
-    Text,
-  } from "@amadeus-music/ui";
-  import FallbackCover from "../depiction/internal/FallbackCover.svelte";
+  import { Spinner, Button, Stack, Range, Text } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { format } from "@amadeus-music/util/time";
+  import Cover from "../depiction/Cover.svelte";
   import { scale } from "svelte/transition";
 
   export let track: Track | undefined = undefined;
@@ -33,18 +26,15 @@
   </Button>
 </Stack>
 <div class="px-11">
-  <label class="relative block cursor-pointer rounded-2xl shadow-xl">
+  <label class="relative block cursor-pointer rounded-relative shadow-xl">
     <input
-      class="peer absolute inset-0 appearance-none rounded-2xl outline-2 outline-offset-8 outline-primary-600 focus-visible:outline"
+      class="peer absolute inset-0 appearance-none rounded-relative outline-2 outline-offset-8 outline-primary-600 focus-visible:outline"
       type="checkbox"
       bind:checked={paused}
     />
-
-    <Image src={track?.album.arts?.[0] || null} class="rounded-2xl" size={324}>
-      <FallbackCover of="track" xxl id={track?.id} />
-    </Image>
+    <Cover lg album={track?.album || true} class="animate-none" />
     <div
-      class="absolute -inset-[1px] flex items-center justify-center rounded-2xl bg-surface-200 opacity-0 backdrop-blur transition-[opacity] duration-300 peer-checked:opacity-100"
+      class="absolute -inset-[1px] flex items-center justify-center rounded-relative bg-surface-200 opacity-0 backdrop-blur transition-[opacity] duration-300 peer-checked:opacity-100"
       class:opacity-100={loading}
     >
       {#if loading}

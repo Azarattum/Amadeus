@@ -30,6 +30,9 @@ const theme = {
     fontFamily: {
       icon: "icons",
     },
+    borderRadius: {
+      relative: "8.333%",
+    },
     colors: {
       primary: {
         100: "hsl(var(--color-primary-100) / <alpha-value>)",

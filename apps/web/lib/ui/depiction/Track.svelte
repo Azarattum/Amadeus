@@ -2,7 +2,6 @@
   import {
     type Classes,
     Swipeable,
-    Image,
     Stack,
     Text,
     Card,
@@ -11,6 +10,7 @@
   } from "@amadeus-music/ui";
   import type { Track } from "@amadeus-music/protocol";
   import { createEventDispatcher } from "svelte";
+  import Cover from "./Cover.svelte";
 
   const dispatch = createEventDispatcher<{
     action: Track;
@@ -41,19 +41,7 @@
     on:contextmenu
     on:click
   >
-    <Image
-      thumbnail={track ? track.album.thumbnails?.[0] || "" : undefined}
-      src={track ? track.album.arts?.[0] || "" : undefined}
-      class="rounded"
-      slot="before"
-    >
-      <div
-        class="flex size-full items-center justify-center bg-gradient-to-r from-rose-400 to-red-400 text-white"
-        style:filter="hue-rotate({track?.id || 0}deg)"
-      >
-        <Icon of="note" />
-      </div>
-    </Image>
+    <Cover album={track?.album || true} slot="before" />
     <Text accent loading={!track}>
       {primary}
       <Text secondary>{secondary}</Text>
