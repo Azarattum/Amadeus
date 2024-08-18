@@ -256,7 +256,7 @@
 </script>
 
 <div class="shrink-0 contain-layout" style:height="{totalHeight}px">
-  <div
+  <ul
     class="grid *:will-change-transform *:[overflow-anchor:none]"
     style:transform="translate3d(0,{Math.ceil(from / perRow) * rowHeight}px,0)"
     style:contain={Number.isFinite(totalHeight) ? "layout size" : "layout"}
@@ -272,14 +272,14 @@
       {@const index = from + i}
       {@const item = items[index]}
       {@const id = key(item)}
-      <div
+      <li
         draggable={sortable && id != null ? "true" : undefined}
         class:invisible={$transfer?.owner === wrapper && $transfer?.key === id}
       >
         <slot {index} {item} />
-      </div>
+      </li>
     {/each}
-  </div>
+  </ul>
   {#if sortable}
     <Portal to="overlay">
       {#if $transfer?.owner === wrapper}
