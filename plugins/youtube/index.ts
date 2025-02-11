@@ -10,7 +10,7 @@ import {
   transcribe,
 } from "./plugin";
 import { async } from "@amadeus-music/core";
-import { Innertube } from "youtubei.js";
+import { ClientType, Innertube, YTNodes } from "youtubei.js";
 import { convert } from "./types";
 
 init(function* () {
@@ -19,9 +19,10 @@ init(function* () {
     1000,
   );
 
-  const youtube = yield* async(Innertube.create());
+  const youtube = yield* async(Innertube.create({ client_type: ClientType.IOS }));
   this.youtube.player = youtube.session.player;
   this.youtube.music = youtube.music;
+  this.youtube.instance = youtube;
   info("Player initialized successfully.");
   clearTimeout(loadMessage);
 });
@@ -44,8 +45,8 @@ desource(function* (track) {
   if (!id) return;
 
   yield yield* async<string>(
-    this.youtube.music
-      .getInfo(id)
+    this.youtube.instance
+      .getBasicInfo(id, 'IOS')
       .then((x) => x.chooseFormat({ type: "audio", quality: "best" }))
       .then((x) => x.decipher(this.youtube.player)),
   );
@@ -58,15 +59,15 @@ expand(function* (type, what, _) {
   const playlist = yield* async(
     type === "artist"
       ? this.youtube.music
-          .getArtist(id)
-          .then((x) => x.sections?.filter((x) => x.type === "MusicShelf"))
-          .then((x) => x.find((x: any) => x.title.toString() === "Songs"))
-          .then<string | undefined>((x: any) => x?.endpoint?.payload?.browseId)
-          .catch(() => undefined)
+        .getArtist(id)
+        .then((x) => x.sections?.filter((x) => x.is(YTNodes.MusicShelf)))
+        .then((x) => x.find((x) => x.title.toString() === "Songs"))
+        .then<string | undefined>((x) => x?.endpoint?.payload?.browseId)
+        .catch(() => undefined)
       : this.youtube.music
-          .getAlbum(id)
-          .then((x) => x.url?.match(/list=([^&]+)/)?.[1])
-          .catch(() => undefined),
+        .getAlbum(id)
+        .then((x) => x.url?.match(/list=([^&]+)/)?.[1])
+        .catch(() => undefined),
   );
   if (!playlist) return;
 
@@ -100,8 +101,8 @@ relate(function* (type, to, _) {
   const items = yield* async(
     this.youtube.music
       .getRelated(id)
-      .then((x) => x.find((x) => x.type === "MusicCarouselShelf"))
-      .then((x: any) => x?.contents)
+      .then((x) => 'contents' in x && x.contents.find((x) => x.is(YTNodes.MusicCarouselShelf)))
+      .then((x) => x ? x.contents.filter((x) => x.is(YTNodes.MusicResponsiveListItem)) : undefined)
       .catch(() => undefined),
   );
   yield* convert(items, type);
@@ -111,7 +112,7 @@ scrape(function* (url) {
   const id = url.match(/youtu(be.com|.be)\/(watch\?v=)?([a-zA-Z0-9_-]+)/)?.[3];
   if (!id) return;
 
-  const info = yield* async(this.youtube.music.getInfo(id));
+  const info = yield* async(this.youtube.instance.getBasicInfo(id, 'IOS'));
   yield* convert([info["basic_info"]], "track");
 });
 
