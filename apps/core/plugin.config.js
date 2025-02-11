@@ -48,5 +48,6 @@ export default defineConfig({
     commonjsOptions: {
       ignoreDynamicRequires: true,
     },
+    rollupOptions: { external: ["bun:sqlite"] },
   },
 });
