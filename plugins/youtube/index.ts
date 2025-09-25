@@ -46,7 +46,7 @@ desource(function* (track) {
 
   yield yield* async<string>(
     this.youtube.instance
-      .getBasicInfo(id, 'IOS')
+      .getBasicInfo(id, { client: 'IOS' })
       .then((x) => x.chooseFormat({ type: "audio", quality: "best" }))
       .then((x) => x.decipher(this.youtube.player)),
   );
@@ -112,7 +112,7 @@ scrape(function* (url) {
   const id = url.match(/youtu(be.com|.be)\/(watch\?v=)?([a-zA-Z0-9_-]+)/)?.[3];
   if (!id) return;
 
-  const info = yield* async(this.youtube.instance.getBasicInfo(id, 'IOS'));
+  const info = yield* async(this.youtube.instance.getBasicInfo(id, { client: 'IOS' }));
   yield* convert([info["basic_info"]], "track");
 });
 
