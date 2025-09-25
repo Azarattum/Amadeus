@@ -17,7 +17,7 @@ import { resolve } from "path";
 // Use constant sid to avoid cyrillic captchas.
 //   This does seem to work, but is there a better way?..
 const CAPTCHA_SID = "625944628258";
-const CAPTCHA_URL = `https://vk.com/captcha.php?sid=${CAPTCHA_SID}&s=1`;
+const CAPTCHA_URL = `https://vk.ru/captcha.php?sid=${CAPTCHA_SID}&s=1`;
 
 // Throttles expensive API calls
 const safeCall = pool<
