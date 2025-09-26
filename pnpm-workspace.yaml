@@ -1,4 +1,12 @@
 packages:
-  - "apps/*"
-  - "packages/*"
-  - "plugins/*"
+  - apps/*
+  - packages/*
+  - plugins/*
+
+onlyBuiltDependencies:
+  - '@sveltejs/kit'
+  - '@vlcn.io/crsqlite'
+  - better-sqlite3
+  - esbuild
+  - protobufjs
+  - svelte-preprocess
