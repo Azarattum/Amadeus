@@ -6,10 +6,14 @@ import { context } from "libfun";
 function reencode(
   url: string,
   metadata: Meta,
-  format: "opus" | "ogg" | "caf" = "opus"
+  format: "opus" | "ogg" | "caf" = "opus",
 ) {
   const artists = metadata.artists?.map((x) => x.title).join(", ");
-  let stream = ffmpeg(url).on("error", error);
+  let stream = ffmpeg(url)
+    .addInputOptions("-reconnect_on_network_error", "1")
+    .addInputOptions("-rw_timeout", "4000000")
+    .on("error", error);
+
   if (metadata.album?.title) {
     stream = stream.outputOptions("-metadata", `Album=${metadata.album.title}`);
   }

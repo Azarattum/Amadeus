@@ -16,10 +16,6 @@ export const {
   name,
   version,
   context: {
-    youtube: {
-      instance: {} as never as Innertube,
-      music: {} as never as Innertube["music"],
-      player: {} as never as Innertube["session"]["player"],
-    },
+    youtube: {} as never as Innertube,
   },
 });
