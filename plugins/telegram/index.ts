@@ -33,7 +33,9 @@ stop(function* () {
     .map(([chat, message]) => deleteMessage(chat, message));
   yield* async(Promise.allSettled(promises));
   temp.clear();
-  http(false).off("request", request);
+  try {
+    http(false).off("request", request);
+  } catch {}
 });
 
 cli("register", [arg.text])(function* (user) {
