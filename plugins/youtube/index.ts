@@ -19,12 +19,14 @@ init(function* () {
     1000,
   );
 
-  this.youtube = yield* async(
+  this.youtube.instance = yield* async(
     Innertube.create({
       client_type: ClientType.ANDROID,
+      fetch: globalThis.fetch,
       player_id: "0004de42",
     }),
   );
+  this.youtube.music = this.youtube.instance.music;
 
   info("Player initialized successfully.");
   clearTimeout(loadMessage);
@@ -48,7 +50,7 @@ desource(function* (track) {
   if (!id) return;
 
   yield yield* async<string>(
-    this.youtube
+    this.youtube.instance
       .getBasicInfo(id)
       .then((x) => x.chooseFormat({ type: "audio", quality: "best" }))
       .then((x) => x.decipher()),
@@ -123,7 +125,7 @@ scrape(function* (url) {
   const id = url.match(/youtu(be.com|.be)\/(watch\?v=)?([a-zA-Z0-9_-]+)/)?.[3];
   if (!id) return;
 
-  const info = yield* async(this.youtube.getBasicInfo(id));
+  const info = yield* async(this.youtube.instance.getBasicInfo(id));
   yield* convert([info["basic_info"]], "track");
 });
 
