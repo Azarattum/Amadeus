@@ -66,7 +66,7 @@ expand(function* (type, what, _) {
       ? this.youtube.music
           .getArtist(id)
           .then((x) => x.sections?.filter((x) => x.is(YTNodes.MusicShelf)))
-          .then((x) => x.find((x) => x.title.toString() === "Songs"))
+          .then((x) => x.find((x) => x.title.toString() === "Top songs"))
           .then<string | undefined>((x) => x?.endpoint?.payload?.browseId)
           .catch(() => undefined)
       : this.youtube.music
