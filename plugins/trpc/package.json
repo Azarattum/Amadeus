@@ -9,10 +9,10 @@
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
     "@amadeus-music/protocol": "workspace:*",
-    "@trpc/server": "^10.45.2",
+    "@trpc/server": "^10.45.4",
     "superstruct": "^1.0.4"
   },
   "devDependencies": {
-    "vite": "5.3.2"
+    "vite": "^5.4.21"
   }
 }

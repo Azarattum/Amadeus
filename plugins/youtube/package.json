@@ -11,6 +11,6 @@
     "youtubei.js": "^17.0.1"
   },
   "devDependencies": {
-    "vite": "5.3.2"
+    "vite": "^5.4.21"
   }
 }
