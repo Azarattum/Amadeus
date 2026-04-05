@@ -42,7 +42,7 @@ jobs:
           REMOTE_IP: ${{ secrets.REMOTE_IP }}
         run: |
           eval $(ssh-agent -s)
-          ssh-add <(echo "$REMOTE_SSH_KEY")
+          echo "$REMOTE_SSH_KEY" | ssh-add -
           scp -O -r -o "StrictHostKeyChecking no" -o "BatchMode yes" build/* "$REMOTE_IP":/home/amadeus
           ssh -n -o "StrictHostKeyChecking no" -o "BatchMode yes" "$REMOTE_IP" "rm -rf /home/amadeus/public"
           ssh-agent -k
