@@ -21,9 +21,8 @@ init(function* () {
 
   this.youtube.instance = yield* async(
     Innertube.create({
-      client_type: ClientType.ANDROID,
+      client_type: ClientType.ANDROID_VR,
       fetch: globalThis.fetch,
-      player_id: "0004de42",
     }),
   );
   this.youtube.music = this.youtube.instance.music;
