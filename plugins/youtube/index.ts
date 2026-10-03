@@ -9,11 +9,16 @@ import {
   search,
   transcribe,
 } from "./plugin";
-import { ClientType, Innertube, YTNodes } from "youtubei.js";
+import { ClientType, Innertube, Platform, YTNodes } from "youtubei.js";
 import { async } from "@amadeus-music/core";
+import { runInNewContext } from "node:vm";
 import { convert } from "./types";
 
 init(function* () {
+  // Execute the current player code downloaded and extracted by YouTube.js.
+  Platform.shim.eval = (data) =>
+    runInNewContext(`(() => { ${data.output}\n})()`, {}, { timeout: 1000 });
+
   const loadMessage = setTimeout(
     () => info("Retrieving player script..."),
     1000,
@@ -52,7 +57,7 @@ desource(function* (track) {
     this.youtube.instance
       .getBasicInfo(id)
       .then((x) => x.chooseFormat({ type: "audio", quality: "best" }))
-      .then((x) => x.decipher()),
+      .then((x) => x.decipher(this.youtube.instance.session.player)),
   );
 });
 
