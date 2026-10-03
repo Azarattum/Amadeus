@@ -26,7 +26,7 @@ init(function* () {
 
   this.youtube.instance = yield* async(
     Innertube.create({
-      client_type: ClientType.ANDROID_VR,
+      client_type: ClientType.VISIONOS,
       fetch: globalThis.fetch,
     }),
   );
