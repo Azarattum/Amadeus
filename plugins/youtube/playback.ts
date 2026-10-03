@@ -1,7 +1,7 @@
 import { type Innertube, Platform } from "youtubei.js";
 import { runInNewContext } from "node:vm";
 
-// YouTube.js supplies the extracted player code, but no default evaluator.
+// YouTube.js downloads and extracts the current player code. We only execute it.
 Platform.shim.eval = (data) =>
   runInNewContext(`(function () { ${data.output}\n})()`, Object.create(null), {
     timeout: 1000,

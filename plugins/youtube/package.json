@@ -4,12 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.js",
-    "test": "vitest run -c ../../vite.node.js"
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.js"
   },
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
-    "youtubei.js": "^17.0.1"
+    "youtubei.js": "^18.1.0"
   },
   "devDependencies": {
     "vite": "^5.4.21"
