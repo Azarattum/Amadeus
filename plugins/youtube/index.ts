@@ -9,30 +9,38 @@ import {
   search,
   transcribe,
 } from "./plugin";
-import { ClientType, Innertube, YTNodes } from "youtubei.js";
+import { ClientType, Innertube, Platform, YTNodes } from "youtubei.js";
 import { async } from "@amadeus-music/core";
-import { getAudioURL } from "./playback";
+import { runInNewContext } from "node:vm";
 import { convert } from "./types";
 
 init(function* () {
+  // Execute the current player code downloaded and extracted by YouTube.js.
+  Platform.shim.eval = (data) =>
+    runInNewContext(
+      `(function () { ${data.output}\n})()`,
+      Object.create(null),
+      {
+        timeout: 1000,
+        contextCodeGeneration: { strings: false, wasm: false },
+      },
+    );
+
   const loadMessage = setTimeout(
     () => info("Retrieving player script..."),
     1000,
   );
 
-  try {
-    this.youtube.instance = yield* async(
-      Innertube.create({
-        client_type: ClientType.ANDROID_VR,
-        fetch: globalThis.fetch,
-      }),
-    );
-    this.youtube.music = this.youtube.instance.music;
+  this.youtube.instance = yield* async(
+    Innertube.create({
+      client_type: ClientType.ANDROID_VR,
+      fetch: globalThis.fetch,
+    }),
+  );
+  this.youtube.music = this.youtube.instance.music;
 
-    info("Player initialized successfully.");
-  } finally {
-    clearTimeout(loadMessage);
-  }
+  info("Player initialized successfully.");
+  clearTimeout(loadMessage);
 });
 
 search(function* (type, query, _) {
@@ -52,7 +60,12 @@ desource(function* (track) {
   const id = yield* identify(track, "track");
   if (!id) return;
 
-  yield yield* async<string>(getAudioURL(this.youtube.instance, id));
+  yield yield* async<string>(
+    this.youtube.instance
+      .getBasicInfo(id)
+      .then((x) => x.chooseFormat({ type: "audio", quality: "best" }))
+      .then((x) => x.decipher(this.youtube.instance.session.player)),
+  );
 });
 
 expand(function* (type, what, _) {
