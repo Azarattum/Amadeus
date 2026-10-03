@@ -11,6 +11,7 @@ import {
 } from "./plugin";
 import { ClientType, Innertube, YTNodes } from "youtubei.js";
 import { async } from "@amadeus-music/core";
+import { getAudioURL } from "./playback";
 import { convert } from "./types";
 
 init(function* () {
@@ -19,16 +20,19 @@ init(function* () {
     1000,
   );
 
-  this.youtube.instance = yield* async(
-    Innertube.create({
-      client_type: ClientType.ANDROID_VR,
-      fetch: globalThis.fetch,
-    }),
-  );
-  this.youtube.music = this.youtube.instance.music;
+  try {
+    this.youtube.instance = yield* async(
+      Innertube.create({
+        client_type: ClientType.ANDROID_VR,
+        fetch: globalThis.fetch,
+      }),
+    );
+    this.youtube.music = this.youtube.instance.music;
 
-  info("Player initialized successfully.");
-  clearTimeout(loadMessage);
+    info("Player initialized successfully.");
+  } finally {
+    clearTimeout(loadMessage);
+  }
 });
 
 search(function* (type, query, _) {
@@ -48,12 +52,7 @@ desource(function* (track) {
   const id = yield* identify(track, "track");
   if (!id) return;
 
-  yield yield* async<string>(
-    this.youtube.instance
-      .getBasicInfo(id)
-      .then((x) => x.chooseFormat({ type: "audio", quality: "best" }))
-      .then((x) => x.decipher()),
-  );
+  yield yield* async<string>(getAudioURL(this.youtube.instance, id));
 });
 
 expand(function* (type, what, _) {

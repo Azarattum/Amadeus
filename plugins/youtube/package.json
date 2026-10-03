@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.js"
+    "build": "vite build -c node_modules/@amadeus-music/core/plugin.config.js",
+    "test": "vitest run -c ../../vite.node.js"
   },
   "dependencies": {
     "@amadeus-music/core": "workspace:*",
