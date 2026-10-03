@@ -17,14 +17,7 @@ import { convert } from "./types";
 init(function* () {
   // Execute the current player code downloaded and extracted by YouTube.js.
   Platform.shim.eval = (data) =>
-    runInNewContext(
-      `(function () { ${data.output}\n})()`,
-      Object.create(null),
-      {
-        timeout: 1000,
-        contextCodeGeneration: { strings: false, wasm: false },
-      },
-    );
+    runInNewContext(`(() => { ${data.output}\n})()`, {}, { timeout: 1000 });
 
   const loadMessage = setTimeout(
     () => info("Retrieving player script..."),
