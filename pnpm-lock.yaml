@@ -184,8 +184,8 @@ importers:
         specifier: 3.0.2
         version: 3.0.2(@sveltejs/kit@2.5.17(@sveltejs/vite-plugin-svelte@3.1.2(svelte@5.19.9)(vite@5.4.21(@types/node@24.5.2)))(svelte@5.19.9)(vite@5.4.21(@types/node@24.5.2)))
       crstore:
-        specifier: ^0.24.0
-        version: 0.24.0
+        specifier: ^0.25.0
+        version: 0.25.0
       murmurhash:
         specifier: ^2.0.1
         version: 2.0.1
@@ -196,8 +196,8 @@ importers:
         specifier: workspace:*
         version: link:../protocol
       crstore:
-        specifier: ^0.24.0
-        version: 0.24.0
+        specifier: ^0.25.0
+        version: 0.25.0
       superstruct:
         specifier: ^1.0.4
         version: 1.0.4
@@ -277,8 +277,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/util
       crstore:
-        specifier: ^0.24.0
-        version: 0.24.0
+        specifier: ^0.25.0
+        version: 0.25.0
     devDependencies:
       vite:
         specifier: ^5.4.21
@@ -1334,8 +1334,8 @@ packages:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
 
-  crstore@0.24.0:
-    resolution: {integrity: sha512-FiO96irlCBZBIwHalqR8yIjlaHP1R7sb71S/U60P2D0RQH9p8VY2Iimrg/z7dnaKp5hzPPCfpnZSIb1PX3MBeQ==}
+  crstore@0.25.0:
+    resolution: {integrity: sha512-VGnyxaGwqUnGXMcv3KRG1WcGkqIt8UP47VIeRHOkBORt6QOs06gBG49wYtyZ2nK15jwS1m95zuxu6xFbEXtK/w==}
 
   css-declaration-sorter@7.3.1:
     resolution: {integrity: sha512-gz6x+KkgNCjxq3Var03pRYLhyNfwhkKF1g/yoLgDNtFvVu0/fOLV9C8fFEZRjACp/XQLumjAYo7JVjzH3wLbxA==}
@@ -4209,7 +4209,7 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  crstore@0.24.0:
+  crstore@0.25.0:
     dependencies:
       '@types/bun': 1.2.2
       '@vlcn.io/crsqlite': 0.16.3
